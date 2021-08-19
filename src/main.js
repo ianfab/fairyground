@@ -4,7 +4,7 @@ const ffish = require("ffish")
 
 console.log("Loading ffish.js...")
 
-ffish["onRuntimeEnabled"] = () =>
+ffish["onRuntimeInitialized"] = () =>
 {
 	// Never gets called...
 	console.log("ffish.js initialized!")
