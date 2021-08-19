@@ -4,14 +4,13 @@
   "description": "Testing the ffish.js library",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "build": "browserify src/main.js -o public/bundle.js",
-    "watch-build": "watchify src/main.js -o public/bundle.js"
+    "start": "node server.js"
   },
   "author": "thearst3rd",
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "express": "^4.17.1",
-    "ffish": "^0.6.2"
+    "ffish": "^0.6.2",
+    "ffish-es6": "^0.6.2"
   }
 }

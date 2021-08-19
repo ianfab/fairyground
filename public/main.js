@@ -1,12 +1,13 @@
 // Client-side ffish.js test
 
-const ffish = require("ffish")
+import Module from "./ffish.js"
+let ffish = null
 
 console.log("Loading ffish.js...")
 
-ffish["onRuntimeInitialized"] = () =>
+new Module().then(loadedModule =>
 {
-	// Never gets called...
+	ffish = loadedModule
 	console.log("ffish.js initialized!")
 
 	let board = new ffish.Board("chess")
@@ -15,4 +16,4 @@ ffish["onRuntimeInitialized"] = () =>
 	console.log(board.toString())
 
 	board.delete()
-}
+})
