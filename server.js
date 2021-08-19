@@ -19,3 +19,19 @@ const listener = app.listen(port, () =>
 {
 	console.log(`Listening on port ${listener.address().port}`)
 })
+
+// Testing ffish.js on the server
+const ffish = require("ffish")
+
+ffish["onRuntimeInitialized"] = () =>
+{
+	// This gets properly called!
+	console.log("ffish.js initialized!")
+
+	let board = new ffish.Board("chess")
+	board.push("e2e4")
+	board.push("d7d5")
+	console.log(board.toString())
+
+	board.delete()
+}
