@@ -1,6 +1,6 @@
 // Client-side ffish.js test
 
-import Module from "./ffish.js"
+import Module from "ffish-es6"
 let ffish = null
 
 console.log("Loading ffish.js...")

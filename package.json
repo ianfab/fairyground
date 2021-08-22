@@ -4,7 +4,9 @@
   "description": "Testing the ffish.js library",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "browserify -p esmify src/main.js -o public/bundle.js",
+    "watch-build": "watchify -p esmify src/main.js -o public/bundle.js"
   },
   "author": "thearst3rd",
   "license": "GPL-3.0-or-later",
@@ -12,5 +14,9 @@
     "express": "^4.17.1",
     "ffish": "^0.6.2",
     "ffish-es6": "^0.6.2"
+  },
+  "devDependencies": {
+    "browser-resolve": "^2.0.0",
+    "esmify": "^2.1.1"
   }
 }

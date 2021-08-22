@@ -14,11 +14,6 @@ app.get("/ffish.wasm", (req, res) =>
 	const ffishWasmFilename = path.join(__dirname, "node_modules", "ffish-es6", "ffish.wasm")
 	res.sendFile(ffishWasmFilename)
 })
-app.get("/ffish.js", (req, res) =>
-{
-	const ffishJsFilename = path.join(__dirname, "node_modules", "ffish-es6", "ffish.js")
-	res.sendFile(ffishJsFilename)
-})
 
 const listener = app.listen(port, () =>
 {
