@@ -1,0 +1,37 @@
+.tatiana .cg-wrap piece.p-piece.white {
+  background-image: url('images/pieces/tatiana/wP.svg');
+}
+.tatiana .cg-wrap piece.b-piece.white {
+  background-image: url('images/pieces/tatiana/wB.svg');
+}
+.tatiana .cg-wrap piece.n-piece.white {
+  background-image: url('images/pieces/tatiana/wN.svg');
+}
+.tatiana .cg-wrap piece.r-piece.white {
+  background-image: url('images/pieces/tatiana/wR.svg');
+}
+.tatiana .cg-wrap piece.q-piece.white {
+  background-image: url('images/pieces/tatiana/wQ.svg');
+}
+.tatiana .cg-wrap piece.k-piece.white {
+  background-image: url('images/pieces/tatiana/wK.svg');
+}
+
+.tatiana .cg-wrap piece.p-piece.black {
+  background-image: url('images/pieces/tatiana/bP.svg');
+}
+.tatiana .cg-wrap piece.b-piece.black {
+  background-image: url('images/pieces/tatiana/bB.svg');
+}
+.tatiana .cg-wrap piece.n-piece.black {
+  background-image: url('images/pieces/tatiana/bN.svg');
+}
+.tatiana .cg-wrap piece.r-piece.black {
+  background-image: url('images/pieces/tatiana/bR.svg');
+}
+.tatiana .cg-wrap piece.q-piece.black {
+  background-image: url('images/pieces/tatiana/bQ.svg');
+}
+.tatiana .cg-wrap piece.k-piece.black {
+  background-image: url('images/pieces/tatiana/bK.svg');
+}

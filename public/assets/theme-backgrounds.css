@@ -1,0 +1,9 @@
+/*
+ * Board
+ */
+.blue .cg-wrap {
+  background-image: url('images/board/blue.svg');
+}
+.purple .cg-wrap {
+  background-image: url('images/board/purple.svg');
+}

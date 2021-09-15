@@ -1,0 +1,37 @@
+.tatiana-knightmate .cg-wrap piece.p-piece.white {
+  background-image: url('images/pieces/tatiana/wP.svg');
+}
+.tatiana-knightmate .cg-wrap piece.b-piece.white {
+  background-image: url('images/pieces/tatiana/wB.svg');
+}
+.tatiana-knightmate .cg-wrap piece.k-piece.white {
+  background-image: url('images/pieces/tatiana/wN.svg');
+}
+.tatiana-knightmate .cg-wrap piece.r-piece.white {
+  background-image: url('images/pieces/tatiana/wR.svg');
+}
+.tatiana-knightmate .cg-wrap piece.q-piece.white {
+  background-image: url('images/pieces/tatiana/wQ.svg');
+}
+.tatiana-knightmate .cg-wrap piece.m-piece.white {
+  background-image: url('images/pieces/tatiana/wK.svg');
+}
+
+.tatiana-knightmate .cg-wrap piece.p-piece.black {
+  background-image: url('images/pieces/tatiana/bP.svg');
+}
+.tatiana-knightmate .cg-wrap piece.b-piece.black {
+  background-image: url('images/pieces/tatiana/bB.svg');
+}
+.tatiana-knightmate .cg-wrap piece.k-piece.black {
+  background-image: url('images/pieces/tatiana/bN.svg');
+}
+.tatiana-knightmate .cg-wrap piece.r-piece.black {
+  background-image: url('images/pieces/tatiana/bR.svg');
+}
+.tatiana-knightmate .cg-wrap piece.q-piece.black {
+  background-image: url('images/pieces/tatiana/bQ.svg');
+}
+.tatiana-knightmate .cg-wrap piece.m-piece.black {
+  background-image: url('images/pieces/tatiana/bK.svg');
+}

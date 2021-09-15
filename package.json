@@ -1,6 +1,6 @@
 {
   "name": "ffish-test",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Testing the ffish.js library",
   "main": "server.js",
   "scripts": {
@@ -11,8 +11,8 @@
   "author": "thearst3rd",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "chessgroundx": "^8.3.0",
     "express": "^4.17.1",
-    "ffish": "^0.6.2",
     "ffish-es6": "^0.6.2"
   },
   "devDependencies": {

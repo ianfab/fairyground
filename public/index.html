@@ -1,16 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<meta charset="utf-8"/>
 		<title>ffish.js test</title>
+		<link rel="stylesheet" href="assets/chessground.css"/>
+		<link rel="stylesheet" href="assets/theme-backgrounds.css">
+		<link rel="stylesheet" href="assets/theme-merida.css">
+		<link rel="stylesheet" href="assets/theme-tatiana.css">
+		<link rel="stylesheet" href="assets/theme-merida-knightmate.css">
+		<link rel="stylesheet" href="assets/theme-tatiana-knightmate.css">
 	</head>
+
 	<body>
 		<header>
 			<h1>ffish.js test</h1>
 		</header>
 		<main>
-			<p>Not much here, come back later</p>
+			<div>
+				<h2>with chessgroundx</h2>
+				<select id="dropdown-variant">
+					<option value="chess">Chess</option>
+					<option value="antichess">Antichess</option>
+					<!--option value="losers">Losers</option-->
+					<option value="atomic">Atomic</option>
+					<!--option value="nocheckatomic">Atomic (ICC no-check)</option-->
+					<option value="3check">Three-check</option>
+					<option value="knightmate">Knightmate</option>
+					<option value="almost">Almost Chess</option>
+					<option value="chigorin">Chigorin</option>
+					<option value="hoppelpoppel">Hoppel-Poppel</option>
+					<option value="nightrider">Nightrider</option>
+				</select>
+				<input id="button-set-variant" type="button" value="Set"/>
+			</div>
+			<div id="chessground-container-div" class="purple merida">
+				<div id="chessground-board"></div>
+			</div>
+			<div style="margin-top: 20px;">
+				<input id="button-reset" type="button" value="New Game"/>
+				<input id="button-flip" type="button" value="Flip Board"/>
+				<input id="button-undo" type="button" value="Undo"/>
+				<input id="range-volume" type="range" min="0" max="1" value="0.4" step="0.05">Volume</input>
+				<input id="button-ai" type="button" value="Play AI Move"/>
+			</div>
+			<div style="margin-top: 4px;">
+				<input id="check-auto-ai" type="checkbox">Auto-Play AI Move</input>
+				<input id="check-dests" type="checkbox" checked>Show Dests</input>
+			</div>
+			<p id="fen-text"></p>
+			<p id="pgn-text"></p>
 		</main>
+		<script src="bundle.js" defer></script>
 	</body>
-	<script src="bundle.js" defer></script>
 </html>
