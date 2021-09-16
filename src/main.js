@@ -112,6 +112,9 @@ new Module().then(loadedModule =>
 		chessground.cancelPremove()
 		clearTimeout(aiTimeout)
 		clearTimeout(premoveTimeout)
+
+		if (checkboxAi.checked && chessground.state.orientation === "black")
+			aiPlayMoveTimeout()
 	}
 
 	buttonFlip.onclick = function()
@@ -125,6 +128,9 @@ new Module().then(loadedModule =>
 		chessground.cancelPremove()
 		clearTimeout(aiTimeout)
 		clearTimeout(premoveTimeout)
+
+		if (checkboxAi.checked && chessground.state.orientation === "black")
+			aiPlayMoveTimeout()
 	}
 	buttonUndo.onclick = function()
 	{
@@ -145,14 +151,8 @@ new Module().then(loadedModule =>
 	}
 	buttonAi.onclick = function()
 	{
-		if (board.isGameOver())
-			return
+		aiPlayMove()
 
-		const moves = board.legalMoves().split(" ")
-		const move = moves[Math.floor(Math.random() * moves.length)]
-		const capture = isCapture(board, move)
-		board.push(move)
-		afterMove(capture)
 		chessground.cancelPremove()
 		clearTimeout(aiTimeout)
 		clearTimeout(premoveTimeout)
@@ -247,6 +247,53 @@ function isCapture(board, move)
 	return false
 }
 
+function aiPlayMove()
+{
+	if (board.isGameOver())
+		return
+
+	const moves = board.legalMoves().split(" ")
+	const move = moves[Math.floor(Math.random() * moves.length)]
+	const capture = isCapture(board, move)
+	board.push(move)
+	afterMove(capture)
+}
+
+function aiPlayMoveTimeout()
+{
+	const oppColor = board.turn() ? "black" : "white"
+	chessground.set({
+		movable:
+		{
+			color: oppColor,
+		},
+	})
+	aiTimeout = setTimeout(() =>
+	{
+		aiPlayMove()
+
+		const premove = chessground.state.premovable.current
+		if (premove !== undefined)
+		{
+			const newMoves = board.legalMoves().split(" ")
+			// Check if premove is legal
+			const premoveUci = premove[0] + premove[1]
+			for (let i = 0; i < newMoves.length; i++)
+			{
+				if (newMoves[i].startsWith(premoveUci))
+				{
+					premoveTimeout = setTimeout(() =>
+					{
+						chessground.playPremove()
+					}, 100)
+					return
+				}
+			}
+			chessground.cancelPremove()
+		}
+	}, 100)
+}
+
 function afterChessgroundMove(orig, dest, metadata)
 {
 	// Auto promote to queen for now
@@ -270,44 +317,8 @@ function afterChessgroundMove(orig, dest, metadata)
 		board.push(move + promotion)
 	afterMove(capture)
 
-	if (checkboxAi.checked && !board.isGameOver())
-	{
-		const oppColor = board.turn() ? "black" : "white"
-		chessground.set({
-			movable:
-			{
-				color: oppColor,
-			},
-		})
-		aiTimeout = setTimeout(() =>
-		{
-			const moves = board.legalMoves().split(" ")
-			const move = moves[Math.floor(Math.random() * moves.length)]
-			const capture = isCapture(board, move)
-			board.push(move)
-			afterMove(capture)
-
-			const premove = chessground.state.premovable.current
-			if (premove !== undefined)
-			{
-				const newMoves = board.legalMoves().split(" ")
-				// Check if premove is legal
-				const premoveUci = premove[0] + premove[1]
-				for (let i = 0; i < newMoves.length; i++)
-				{
-					if (newMoves[i].startsWith(premoveUci))
-					{
-						premoveTimeout = setTimeout(() =>
-						{
-							chessground.playPremove()
-						}, 100)
-						return
-					}
-				}
-				chessground.cancelPremove()
-			}
-		}, 100)
-	}
+	if (checkboxAi.checked)
+		aiPlayMoveTimeout()
 }
 
 function afterMove(capture)
