@@ -11,8 +11,6 @@ ffish-test is my little project which uses ffish.js to generate legal moves for 
 Install dependancies
 
 ```bash
-# Something like this I think?? TODO: check this :)
-npm install -g browserify watchify emsify
 npm install
 ```
 
