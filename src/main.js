@@ -113,7 +113,7 @@ new Module().then(loadedModule =>
 		clearTimeout(aiTimeout)
 		clearTimeout(premoveTimeout)
 
-		if (checkboxAi.checked && chessground.state.orientation === "black")
+		if (checkboxAi.checked && chessground.state.orientation !== getColor(board))
 			aiPlayMoveTimeout()
 	}
 
@@ -129,7 +129,7 @@ new Module().then(loadedModule =>
 		clearTimeout(aiTimeout)
 		clearTimeout(premoveTimeout)
 
-		if (checkboxAi.checked && chessground.state.orientation === "black")
+		if (checkboxAi.checked && chessground.state.orientation !== getColor(board))
 			aiPlayMoveTimeout()
 	}
 	buttonUndo.onclick = function()
