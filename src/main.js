@@ -2,9 +2,6 @@
 
 const Chessground = require("chessgroundx").Chessground
 
-const fenTextEl = document.getElementById("fen-text")
-const pgnTextEl = document.getElementById("pgn-text")
-
 const dropdownVariant = document.getElementById("dropdown-variant")
 const buttonSetVariant = document.getElementById("button-set-variant")
 
@@ -16,6 +13,10 @@ const buttonAi = document.getElementById("button-ai")
 
 const checkboxAi = document.getElementById("check-auto-ai")
 const checkboxDests = document.getElementById("check-dests")
+
+const textFen = document.getElementById("text-fen")
+const buttonSetFen = document.getElementById("button-set-fen")
+const labelPgn = document.getElementById("label-pgn")
 
 const chessgroundContainerEl = document.getElementById("chessground-container-div")
 const chessgroundEl = document.getElementById("chessground-board")
@@ -168,6 +169,20 @@ new Module().then(loadedModule =>
 		})
 	}
 
+	buttonSetFen.onclick = function()
+	{
+		const fen = textFen.value
+		if (ffish.validateFen(fen, board.variant()))
+		{
+			board.setFen(fen)
+			updateChessground()
+		}
+		else
+		{
+			alert("Invalid FEN")
+		}
+	}
+
 	updateChessground()
 })
 
@@ -261,6 +276,9 @@ function aiPlayMove()
 
 function aiPlayMoveTimeout()
 {
+	if (board.isGameOver())
+		return
+
 	const oppColor = board.turn() ? "black" : "white"
 	chessground.set({
 		movable:
@@ -379,8 +397,8 @@ function getPgn(board)
 
 function updateChessground()
 {
-	fenTextEl.innerText = board.fen()
-	pgnTextEl.innerText = getPgn(board)
+	textFen.value = board.fen()
+	labelPgn.innerText = getPgn(board)
 
 	chessground.set({
 		fen: board.fen(),
