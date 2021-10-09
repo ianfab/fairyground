@@ -13,7 +13,7 @@
   "dependencies": {
     "chessgroundx": "^8.3.0",
     "express": "^4.17.1",
-    "ffish-es6": "^0.6.2"
+    "ffish-es6": "^0.6.3"
   },
   "devDependencies": {
     "browser-resolve": "^2.0.0",
