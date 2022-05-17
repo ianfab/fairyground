@@ -52,8 +52,7 @@ new Module().then(loadedModule =>
 
 	const config =
 	{
-		fen: "8/8/8/8/8/8/8/8",
-		geometry: 0,
+		geometry: 4,
 		movable:
 		{
 			free: false,
@@ -380,7 +379,6 @@ function updateChessground()
 
 	chessground.set({
 		fen: board.fen(),
-		geometry: 0,
 		check: board.isCheck(),
 		turnColor: getColor(board),
 		movable:
