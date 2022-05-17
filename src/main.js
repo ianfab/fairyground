@@ -3,7 +3,6 @@
 const Chessground = require("chessgroundx").Chessground
 
 const dropdownVariant = document.getElementById("dropdown-variant")
-const buttonSetVariant = document.getElementById("button-set-variant")
 
 const buttonFlip = document.getElementById("button-flip")
 const buttonReset = document.getElementById("button-reset")
@@ -78,7 +77,7 @@ new Module().then(loadedModule =>
 	soundCheck.volume = rangeVolume.value
 	soundTerminal.volume = rangeVolume.value
 
-	buttonSetVariant.onclick = function()
+	dropdownVariant.onchange = function()
 	{
 		initBoard(dropdownVariant.value)
 		updateChessground()
