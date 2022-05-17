@@ -22,6 +22,9 @@
 .merida .cg-wrap piece.c-piece.white {
   background-image: url('images/pieces/merida/wC.svg');
 }
+.merida .cg-wrap piece.m-piece.white {
+  background-image: url('images/pieces/merida/wM.svg');
+}
 
 .merida .cg-wrap piece.p-piece.black {
   background-image: url('images/pieces/merida/bP.svg');
@@ -46,4 +49,7 @@
 }
 .merida .cg-wrap piece.c-piece.black {
   background-image: url('images/pieces/merida/bC.svg');
+}
+.merida .cg-wrap piece.m-piece.black {
+  background-image: url('images/pieces/merida/bM.svg');
 }

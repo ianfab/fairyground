@@ -40,34 +40,6 @@ function initBoard(variant)
 
 	board = new ffish.Board(variant)
 	console.log("Variant:", board.variant())
-
-	// Change css class for knightmate if needed
-	if (board.variant() === "knightmate")
-	{
-		if (chessgroundContainerEl.classList.contains("merida"))
-		{
-			chessgroundContainerEl.classList.remove("merida")
-			chessgroundContainerEl.classList.add("merida-knightmate")
-		}
-		if (chessgroundContainerEl.classList.contains("tatiana"))
-		{
-			chessgroundContainerEl.classList.remove("tatiana")
-			chessgroundContainerEl.classList.add("tatiana-knightmate")
-		}
-	}
-	else
-	{
-		if (chessgroundContainerEl.classList.contains("merida-knightmate"))
-		{
-			chessgroundContainerEl.classList.remove("merida-knightmate")
-			chessgroundContainerEl.classList.add("merida")
-		}
-		if (chessgroundContainerEl.classList.contains("tatiana-knightmate"))
-		{
-			chessgroundContainerEl.classList.remove("tatiana-knightmate")
-			chessgroundContainerEl.classList.add("tatiana")
-		}
-	}
 }
 
 import Module from "ffish-es6"
@@ -81,6 +53,7 @@ new Module().then(loadedModule =>
 	const config =
 	{
 		fen: "8/8/8/8/8/8/8/8",
+		geometry: 0,
 		movable:
 		{
 			free: false,
@@ -407,6 +380,7 @@ function updateChessground()
 
 	chessground.set({
 		fen: board.fen(),
+		geometry: 0,
 		check: board.isCheck(),
 		turnColor: getColor(board),
 		movable:
