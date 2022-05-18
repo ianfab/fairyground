@@ -2,10 +2,9 @@
   "name": "ffish-test",
   "version": "0.0.2",
   "description": "Testing the ffish.js library",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "build": "browserify -p esmify src/main.js -o public/bundle.js",
+    "serve": "serve public --no-compression",
+    "build": "cp node_modules/ffish-es6/ffish.wasm public/ && browserify -p esmify src/main.js -o public/bundle.js",
     "watch-build": "watchify -p esmify src/main.js -o public/bundle.js"
   },
   "author": "thearst3rd",
@@ -13,12 +12,14 @@
   "dependencies": {
     "chessgroundx": "^8.3.0",
     "express": "^4.17.1",
-    "ffish-es6": "^0.6.3"
+    "ffish-es6": "^0.6.3",
+    "serve": "^12.0.0"
   },
   "devDependencies": {
     "browser-resolve": "^2.0.0",
     "browserify": "^17.0.0",
     "esmify": "^2.1.1",
-    "watchify": "^4.0.0"
+    "watchify": "^4.0.0",
+    "vercel": "^23.0.1"
   }
 }

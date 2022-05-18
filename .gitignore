@@ -1,5 +1,6 @@
 # Ignore browserified bundles, which should be compiled instead
 public/**/*bundle.js
+public/ffish.wasm
 
 # Rest of gitignore taken from:
 # https://github.com/github/gitignore/blob/master/Node.gitignore
@@ -122,3 +123,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# vercel
+.vercel
