@@ -29,7 +29,7 @@ npm run watch-build
 Start server
 
 ```bash
-npm serve
+npm run serve
 ```
 
 Then, browse to http://localhost:5000
