@@ -13,8 +13,8 @@ const buttonAi = document.getElementById("button-ai")
 const checkboxAi = document.getElementById("check-auto-ai")
 const checkboxDests = document.getElementById("check-dests")
 
-const textFen = document.getElementById("text-fen")
-const buttonSetFen = document.getElementById("button-set-fen")
+const textFen = document.getElementById("fen")
+const buttonSetFen = document.getElementById("set")
 const labelPgn = document.getElementById("label-pgn")
 
 const chessgroundContainerEl = document.getElementById("chessground-container-div")

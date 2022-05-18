@@ -84,7 +84,7 @@
     border-right: 0;
   }
 
-  #input #set {
+  #input button {
     display: inline-block;
     padding: 3px 6px 3px 6px;
     background: #888;
@@ -141,10 +141,6 @@
     <div style="margin-top: 4px;">
       <input id="check-auto-ai" type="checkbox">Auto-Play Bot Moves</input>
       <input id="check-dests" type="checkbox" checked>Show Dests</input>
-    </div>
-    <div style="margin-top: 20px;">
-      <input id="text-fen" type="text" style="width: 550px;"/>
-      <input id="button-set-fen" type="button" value="Set FEN"/>
     </div>
     <p id="label-pgn"></p>
   </div>
@@ -242,7 +238,6 @@
     const App = () => {
       let stockfish = null;
       let stockfish_state = "INIT"; // 'READY', 'FAILED'
-      let output = "";
       let output2 = "";
       let analysis_mode = true;
 
@@ -256,8 +251,6 @@
         const variant = $("#dropdown-variant").value;
         stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
         stockfish.postMessage(`position startpos`);
-        output = "";
-        stockfish.postMessage(`d`);
       };
 
       const setFen = () => {
@@ -268,8 +261,6 @@
         } else {
           stockfish.postMessage(`position startpos moves ${moves}`);
         }
-        output = "";
-        stockfish.postMessage(`d`);
       };
 
       const go = () => {
@@ -493,7 +484,7 @@
                 setFen();
               },
             }),
-            m("span#set", { disabled: !is_ready, onclick: setFen }, "Set"),
+            m("button#set", { disabled: !is_ready, onclick: setFen }, "Set"),
           ]),
           m("div#input", [
             m("input#depth", {
@@ -504,8 +495,8 @@
               placeholder: "Movetime",
               disabled: !is_ready,
             }),
-            m("span#set", { disabled: !is_ready, onclick: go }, "Go"),
-            m("span#set", { disabled: !is_ready, onclick: stop }, "Stop"),
+            m("button#go", { disabled: !is_ready, onclick: go }, "Go"),
+            m("button#stop", { disabled: !is_ready, onclick: stop }, "Stop"),
           ]),
           m("div#outputs", [
             m("div#chessground-container-div.blue.merida", [
@@ -514,10 +505,8 @@
             m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
           ]),
           m("div#links", [
-            m("a[href='/index.html']", "debug"),
-            m("a[href='/analysis.html']", "analysis"),
             m(
-              "a[href='https://github.com/ianfab/fairy-stockfish-nnue-wasm-demo']",
+              "a[href='https://github.com/ianfab/ffish-test']",
               "github"
             ),
           ]),
