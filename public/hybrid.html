@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8" />
+  <title>fairy-stockfish analysis</title>
+  <meta
+    name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no"
+  />
+  <!-- By curl https://data-url-maker-hiro18181.netlify.app/api/url/https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg -->
+  <link
+    rel="icon"
+    href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+CiAgPGcgc3R5bGU9Im9wYWNpdHk6MTsgZmlsbDpub25lOyBmaWxsLW9wYWNpdHk6MTsgZmlsbC1ydWxlOmV2ZW5vZGQ7IHN0cm9rZTojMDAwMDAwOyBzdHJva2Utd2lkdGg6MS41OyBzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDsgc3Ryb2tlLWRhc2hhcnJheTpub25lOyBzdHJva2Utb3BhY2l0eToxOyI+CiAgICA8cGF0aAogICAgICBkPSJNIDIyLDEwIEMgMzIuNSwxMSAzOC41LDE4IDM4LDM5IEwgMTUsMzkgQyAxNSwzMCAyNSwzMi41IDIzLDE4IgogICAgICBzdHlsZT0iZmlsbDojMDAwMDAwOyBzdHJva2U6IzAwMDAwMDsiIC8+CiAgICA8cGF0aAogICAgICBkPSJNIDI0LDE4IEMgMjQuMzgsMjAuOTEgMTguNDUsMjUuMzcgMTYsMjcgQyAxMywyOSAxMy4xOCwzMS4zNCAxMSwzMSBDIDkuOTU4LDMwLjA2IDEyLjQxLDI3Ljk2IDExLDI4IEMgMTAsMjggMTEuMTksMjkuMjMgMTAsMzAgQyA5LDMwIDUuOTk3LDMxIDYsMjYgQyA2LDI0IDEyLDE0IDEyLDE0IEMgMTIsMTQgMTMuODksMTIuMSAxNCwxMC41IEMgMTMuMjcsOS41MDYgMTMuNSw4LjUgMTMuNSw3LjUgQyAxNC41LDYuNSAxNi41LDEwIDE2LjUsMTAgTCAxOC41LDEwIEMgMTguNSwxMCAxOS4yOCw4LjAwOCAyMSw3IEMgMjIsNyAyMiwxMCAyMiwxMCIKICAgICAgc3R5bGU9ImZpbGw6IzAwMDAwMDsgc3Ryb2tlOiMwMDAwMDA7IiAvPgogICAgPHBhdGgKICAgICAgZD0iTSA5LjUgMjUuNSBBIDAuNSAwLjUgMCAxIDEgOC41LDI1LjUgQSAwLjUgMC41IDAgMSAxIDkuNSAyNS41IHoiCiAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7IHN0cm9rZTojZmZmZmZmOyIgLz4KICAgIDxwYXRoCiAgICAgIGQ9Ik0gMTUgMTUuNSBBIDAuNSAxLjUgMCAxIDEgIDE0LDE1LjUgQSAwLjUgMS41IDAgMSAxICAxNSAxNS41IHoiCiAgICAgIHRyYW5zZm9ybT0ibWF0cml4KDAuODY2LDAuNSwtMC41LDAuODY2LDkuNjkzLC01LjE3MykiCiAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7IHN0cm9rZTojZmZmZmZmOyIgLz4KICAgIDxwYXRoCiAgICAgIGQ9Ik0gMjQuNTUsMTAuNCBMIDI0LjEsMTEuODUgTCAyNC42LDEyIEMgMjcuNzUsMTMgMzAuMjUsMTQuNDkgMzIuNSwxOC43NSBDIDM0Ljc1LDIzLjAxIDM1Ljc1LDI5LjA2IDM1LjI1LDM5IEwgMzUuMiwzOS41IEwgMzcuNDUsMzkuNSBMIDM3LjUsMzkgQyAzOCwyOC45NCAzNi42MiwyMi4xNSAzNC4yNSwxNy42NiBDIDMxLjg4LDEzLjE3IDI4LjQ2LDExLjAyIDI1LjA2LDEwLjUgTCAyNC41NSwxMC40IHogIgogICAgICBzdHlsZT0iZmlsbDojZmZmZmZmOyBzdHJva2U6bm9uZTsiIC8+CiAgPC9nPgo8L3N2Zz4K"
+  />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Roboto+Mono"
+  />
+  <link rel="stylesheet" href="assets/chessground.css"/>
+  <link rel="stylesheet" href="assets/theme-backgrounds.css"/>
+  <link rel="stylesheet" href="assets/theme-merida.css"/>
+</head>
+
+<!-- CSS -->
+
+<style>
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  #root {
+    font-family: "Roboto Mono";
+    font-size: 13px;
+  }
+
+  main {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  #input {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  #input #fen {
+    width: 50%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input #move {
+    width: 10%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input #movetime {
+    width: 5%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input #depth {
+    width: 5%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input #set {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  #input #dropdown-variant {
+    width: 120px;
+    background: #eee;
+  }
+
+  #misc {
+    margin-bottom: 10px;
+  }
+
+  #outputs {
+    display: flex;
+    flex: 1 1 auto;
+    width: 100%;
+    height: 50%;
+  }
+
+  #output2 {
+    width: 60%;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-left: 20px;
+    overflow-x: scroll;
+    overflow-y: scroll;
+    box-shadow: inset 1px 1px 2px #eee;
+    font-size: 14px;
+  }
+
+  #links a {
+    margin: 20px;
+    font-size: 20px;
+    text-decoration: none;
+  }
+</style>
+
+<body>
+  <div id="root"></div>
+  <div>
+    <div style="margin-top: 20px;">
+      <input id="button-reset" type="button" value="New Game"/>
+      <input id="button-flip" type="button" value="Flip Board"/>
+      <input id="button-undo" type="button" value="Undo"/>
+      <input id="range-volume" type="range" min="0" max="1" value="0.4" step="0.05" style="margin-left: 8px;">Volume</input>
+      <input id="button-ai" type="button" value="Play Bot Move" style="margin-left: 6px;"/>
+    </div>
+    <div style="margin-top: 4px;">
+      <input id="check-auto-ai" type="checkbox">Auto-Play Bot Moves</input>
+      <input id="check-dests" type="checkbox" checked>Show Dests</input>
+    </div>
+    <div style="margin-top: 20px;">
+      <input id="text-fen" type="text" style="width: 550px;"/>
+      <input id="button-set-fen" type="button" value="Set FEN"/>
+    </div>
+    <p id="label-pgn"></p>
+  </div>
+  <script src="bundle.js" defer></script>
+  <!-- Javascript -->
+
+  <script src="./lib/stockfish.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mithril@2.0.4/mithril.min.js"></script>
+  <script>
+    const $ = (...args) => document.querySelector(...args);
+
+    const formatMB = (n) => {
+      return (n ? (n / 1e6).toPrecision(3) : "?") + "MB";
+    };
+
+    const isSupported = () => {
+      if (typeof WebAssembly !== "object") return false;
+      const source = Uint8Array.from([
+        0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 7, 8,
+        1, 4, 116, 101, 115, 116, 0, 0, 10, 15, 1, 13, 0, 65, 0, 253, 17, 65, 0,
+        253, 17, 253, 186, 1, 11,
+      ]);
+      if (
+        typeof WebAssembly.validate !== "function" ||
+        !WebAssembly.validate(source)
+      )
+        return false;
+      if (typeof Atomics !== "object") return false;
+      if (typeof SharedArrayBuffer !== "function") return false;
+      return true;
+    };
+
+    const RequestProgress = ({ attrs: { url, onFinishDownload } }) => {
+      let state = "INIT"; // 'LOADING', 'DONE', 'FAILED'
+      let loaded = 0;
+      let total = 0;
+
+      const oninit = () => {
+        state = "LOADING";
+        m.request({
+          url: url,
+          method: "GET",
+          responseType: "arraybuffer",
+          headers: { Accept: "*/*" },
+          config: (xhr) => {
+            xhr.onprogress = (e) => {
+              // TODO:
+              // When gzip compressed, the value of "loaded/total" gets messed up.
+              // On Chrome, "loaded" is the value after decompression, but on the other hand,
+              // On Firefox, "loaded" is the value before decompression.
+              loaded = e.loaded;
+              total =
+                e.total ||
+                Number(
+                  e.target.getResponseHeader("x-decompressed-content-length")
+                );
+              m.redraw();
+            };
+          },
+        }).then(
+          (response) => {
+            state = "DONE";
+            onFinishDownload(response);
+          },
+          (e) => {
+            console.error(e);
+            state = "FAILED";
+            onFinishDownload(null);
+          }
+        );
+      };
+
+      const view = () => {
+        const fraction =
+          total == -1 ? `?MB/?MB` : `${formatMB(loaded)}/${formatMB(total)}`;
+        return m("span", [
+          `${fraction} [${state}] `,
+          m(
+            "span",
+            {
+              style: "cursor: pointer;",
+              onclick: () =>
+                window.alert(
+                  "On some browsers, download size might look contradicted due to file compression."
+                ),
+            },
+            "[?]"
+          ),
+        ]);
+      };
+
+      return { oninit, view };
+    };
+
+    const App = () => {
+      let stockfish = null;
+      let stockfish_state = "INIT"; // 'READY', 'FAILED'
+      let output = "";
+      let output2 = "";
+      let analysis_mode = true;
+
+      let variants = [];
+
+      const getVariants = () => {
+        stockfish.postMessage(`uci`);
+      };
+
+      const setVariant = () => {
+        const variant = $("#dropdown-variant").value;
+        stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
+        stockfish.postMessage(`position startpos`);
+        output = "";
+        stockfish.postMessage(`d`);
+      };
+
+      const setFen = () => {
+        const fen = $("#fen").value;
+        const moves = $("#move").value;
+        if (fen.length > 0) {
+          stockfish.postMessage(`position fen ${fen} moves ${moves}`);
+        } else {
+          stockfish.postMessage(`position startpos moves ${moves}`);
+        }
+        output = "";
+        stockfish.postMessage(`d`);
+      };
+
+      const go = () => {
+        let args = "";
+        const movetime = $("#movetime").value;
+        const depth = $("#depth").value;
+        if (movetime.length > 0) {
+          args += ` movetime ${movetime}`;
+        }
+        if (depth.length > 0) {
+          args += ` depth ${depth}`;
+        }
+        stockfish.postMessage(`go${args}`);
+        output2 = "";
+      };
+
+      const stop = () => {
+        stockfish.postMessage(`stop`);
+      };
+
+      const scrollOutput = () => {
+        $("#output2").scrollTo({
+          top: $("#output2").scrollHeight,
+          behavior: "smooth",
+        });
+      };
+
+      // Make error catchable
+      const loadStockfish = async (params) => {
+        return await Stockfish(params);
+      };
+
+      const onFinishDownload = (data) => {
+        if (!data) {
+          stockfish_state = "FAILED";
+          m.redraw();
+          return;
+        }
+
+        loadStockfish({ wasmBinary: data })
+          .then((_stockfish) => {
+            stockfish = _stockfish;
+            stockfish_state = "READY";
+            stockfish.addMessageListener((line) => {
+              if (line.startsWith("option")) {
+                if (line.startsWith("option name UCI_Variant")) {
+                  variants = line
+                    .replace(
+                      "option name UCI_Variant type combo default chess var ",
+                      ""
+                    )
+                    .replace(/ var /g, " ")
+                    .split(" ");
+                }
+              } else if (line.startsWith(" ")) {
+              } else {
+                if (line.startsWith("Fen:")) {
+                  $("#fen").value = line.replace("Fen: ", "");
+                  $("#move").value = "";
+                }
+                if (line.startsWith("bestmove")) {
+                  $("#move").value = line.split(" ")[1];
+                  if (!analysis_mode) {
+                    setFen();
+                  }
+                }
+                output2 += line + "\n";
+              }
+              m.redraw();
+            });
+            getVariants();
+          })
+          .catch((e) => {
+            stockfish_state = "FAILED";
+            throw e;
+          })
+          .finally(() => m.redraw());
+      };
+
+      const onSelectNnueFile = async (e) => {
+        const selected = e.currentTarget.files[0];
+        if (selected) {
+          //
+          // TODO:
+          // On Archlinux Chromium 92.0.4515.107, most of times this code fails with the error saying:
+          //   TypeError: Failed to execute 'decode' on 'TextDecoder': The provided ArrayBufferView value must not be shared.
+          // On the other hand, either Chrome with the same version or Firefox never fail.
+          //
+          const FS = stockfish.FS;
+          const buffer = await selected.arrayBuffer();
+          const array = new Uint8Array(buffer);
+          const filename = "/" + selected.name;
+          const variant = selected.name.split(/[_.-]+/)[0];
+          FS.writeFile(filename, array);
+          stockfish.postMessage(`setoption name EvalFile value ${filename}`);
+          stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
+          stockfish.postMessage(`position startpos`);
+        }
+      };
+
+      const onSelectVariantsFile = async (e) => {
+        const selected = e.currentTarget.files[0];
+        if (selected) {
+          const FS = stockfish.FS;
+          const buffer = await selected.arrayBuffer();
+          const array = new Uint8Array(buffer);
+          const filename = "/" + selected.name;
+          FS.writeFile(filename, array);
+          stockfish.postMessage(`check ${filename}`);
+          stockfish.postMessage(`load ${filename}`);
+          getVariants();
+        }
+      };
+
+      const oninit = () => {
+        stockfish_state = "LOADING";
+      };
+
+      const view = () => {
+        const is_ready = stockfish_state == "READY";
+
+        return m("main", [
+          m("div#misc", [
+            m("div", [
+              "- download: ",
+              m(RequestProgress, {
+                url: "./lib/stockfish.wasm",
+                onFinishDownload,
+              }),
+            ]),
+            m("div", `- stockfish state: ${stockfish_state}`),
+            m("div", [
+              "- nnue file: ",
+              m("input", {
+                type: "file",
+                disabled: !is_ready,
+                onchange: onSelectNnueFile,
+              }),
+              m(
+                "span",
+                {
+                  style: "cursor: pointer;",
+                  onclick: () =>
+                    window.alert(
+                      [
+                        "You can upload a fairy-stockfish-14-compatible .nnue file. See here for the detail: https://github.com/ianfab/Fairy-Stockfish/wiki/List-of-networks.",
+                        "Note that there might be an issue on Chrome/Chromium, which is currently under the investigation. If you want to try this feature, please check out Firefox.",
+                      ].join("\n")
+                    ),
+                },
+                "[?]"
+              ),
+            ]),
+            m("div", [
+              "- variants.ini: ",
+              m("input", {
+                type: "file",
+                disabled: !is_ready,
+                onchange: onSelectVariantsFile,
+              }),
+              m(
+                "span",
+                {
+                  style: "cursor: pointer;",
+                  onclick: () =>
+                    window.alert(
+                      "You can upload a fairy-stockfish-14-compatible variants.ini file. See here for details: https://github.com/ianfab/Fairy-Stockfish/wiki/Variant-configuration."
+                    ),
+                },
+                "[?]"
+              ),
+            ]),
+            m("div", [
+              m("span", { style: "margin-right: 5px;" }, "- analysis mode:"),
+              m(
+                "span",
+                {
+                  style: "cursor: pointer;",
+                  onclick: () => {
+                    analysis_mode = !analysis_mode;
+                    scrollOutput();
+                  },
+                },
+                [analysis_mode ? "[x]" : "[ ]"]
+              ),
+            ]),
+          ]),
+          m("div#input", [
+            m(
+              "select#dropdown-variant",
+              {
+                disabled: !is_ready,
+                onchange: (e) => {
+                  window.setTimeout(setVariant, 10);
+                },
+              },
+              [
+                m("option", { value: "" }, "-- VARIANT --"),
+                ...variants.map((ex, index) => m("option", { value: ex }, ex)),
+              ]
+            ),
+            m("input#fen", {
+              placeholder: "Input FEN Here",
+              disabled: !is_ready,
+              onkeyup: (e) => {
+                if (e.keyCode != 13) {
+                  e.redraw = false;
+                  return;
+                }
+                setFen();
+              },
+            }),
+            m("input#move", {
+              placeholder: "Input Move Here",
+              disabled: !is_ready,
+              onkeyup: (e) => {
+                if (e.keyCode != 13) {
+                  e.redraw = false;
+                  return;
+                }
+                setFen();
+              },
+            }),
+            m("span#set", { disabled: !is_ready, onclick: setFen }, "Set"),
+          ]),
+          m("div#input", [
+            m("input#depth", {
+              placeholder: "Depth",
+              disabled: !is_ready,
+            }),
+            m("input#movetime", {
+              placeholder: "Movetime",
+              disabled: !is_ready,
+            }),
+            m("span#set", { disabled: !is_ready, onclick: go }, "Go"),
+            m("span#set", { disabled: !is_ready, onclick: stop }, "Stop"),
+          ]),
+          m("div#outputs", [
+            m("div#chessground-container-div.blue.merida", [
+              m("div#chessground-board"),
+            ]),
+            m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
+          ]),
+          m("div#links", [
+            m("a[href='/index.html']", "debug"),
+            m("a[href='/analysis.html']", "analysis"),
+            m(
+              "a[href='https://github.com/ianfab/fairy-stockfish-nnue-wasm-demo']",
+              "github"
+            ),
+          ]),
+        ]);
+      };
+
+      return { oninit, view };
+    };
+
+    if (!isSupported()) {
+      window.alert(
+        "Your browser is not supported. For more information, please take a look at https://github.com/hi-ogawa/Stockfish/wiki."
+      );
+    } else {
+      m.mount($("#root"), App);
+    }
+  </script>
+</body>

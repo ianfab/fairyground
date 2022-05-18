@@ -4,7 +4,7 @@
   "description": "Testing the ffish.js library",
   "scripts": {
     "serve": "serve public --no-compression",
-    "build": "cp node_modules/ffish-es6/ffish.wasm public/ && browserify -p esmify src/main.js -o public/bundle.js",
+    "build": "rm -rf public/lib && mkdir -p public/lib && cp node_modules/fairy-stockfish-nnue.wasm/* public/lib && cp node_modules/ffish-es6/ffish.wasm public/ && browserify -p esmify src/main.js -o public/bundle.js",
     "watch-build": "watchify -p esmify src/main.js -o public/bundle.js"
   },
   "author": "thearst3rd",
@@ -12,6 +12,7 @@
   "dependencies": {
     "chessgroundx": "^8.3.0",
     "express": "^4.17.1",
+    "fairy-stockfish-nnue.wasm": "^1.0.0",
     "ffish-es6": "^0.6.3",
     "serve": "^12.0.0"
   },
