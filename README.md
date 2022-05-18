@@ -2,7 +2,7 @@
 
 This is a fun little repository for me to hack on software like [Fairy-Stockfish](https://github.com/ianfab/Fairy-Stockfish), it's accompanying [ffish.js](https://www.npmjs.com/package/ffish-es6) library, and the graphical [chessgroundx](https://github.com/gbtami/chessgroundx). I can't guarantee that much of it will be very useful, I'm just hoping it's a fun project :)
 
-You can see it deployed at: https://ffish-test.herokuapp.com/
+You can see it deployed at: https://ffish-test.vercel.app/
 
 ## What is it
 
@@ -29,10 +29,10 @@ npm run watch-build
 Start server
 
 ```bash
-npm start
+npm serve
 ```
 
-Then, browse to http://localhost:8000
+Then, browse to http://localhost:5000
 
 Enjoy!
 
