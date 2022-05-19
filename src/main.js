@@ -8,12 +8,11 @@ const buttonFlip = document.getElementById("button-flip")
 const buttonReset = document.getElementById("button-reset")
 const buttonUndo = document.getElementById("button-undo")
 const rangeVolume = document.getElementById("range-volume")
-const buttonAi = document.getElementById("button-ai")
 
-const checkboxAi = document.getElementById("check-auto-ai")
 const checkboxDests = document.getElementById("check-dests")
 
 const textFen = document.getElementById("fen")
+const textMoves = document.getElementById("move")
 const buttonSetFen = document.getElementById("set")
 const labelPgn = document.getElementById("label-pgn")
 
@@ -28,9 +27,6 @@ const soundTerminal = new Audio("assets/sound/thearst3rd/terminal.wav")
 let ffish = null
 let board = null
 let chessground = null
-
-let aiTimeout = null
-let premoveTimeout = null
 
 function initBoard(variant)
 {
@@ -82,11 +78,6 @@ new Module().then(loadedModule =>
 		initBoard(dropdownVariant.value)
 		updateChessground()
 		chessground.cancelPremove()
-		clearTimeout(aiTimeout)
-		clearTimeout(premoveTimeout)
-
-		if (checkboxAi.checked && chessground.state.orientation !== getColor(board))
-			aiPlayMoveTimeout()
 	}
 
 	buttonFlip.onclick = function()
@@ -98,11 +89,6 @@ new Module().then(loadedModule =>
 		board.reset()
 		updateChessground()
 		chessground.cancelPremove()
-		clearTimeout(aiTimeout)
-		clearTimeout(premoveTimeout)
-
-		if (checkboxAi.checked && chessground.state.orientation !== getColor(board))
-			aiPlayMoveTimeout()
 	}
 	buttonUndo.onclick = function()
 	{
@@ -111,8 +97,6 @@ new Module().then(loadedModule =>
 		board.pop()
 		updateChessground()
 		chessground.cancelPremove()
-		clearTimeout(aiTimeout)
-		clearTimeout(premoveTimeout)
 	}
 	rangeVolume.oninput = function()
 	{
@@ -120,14 +104,6 @@ new Module().then(loadedModule =>
 		soundCapture.volume = rangeVolume.value
 		soundCheck.volume = rangeVolume.value
 		soundTerminal.volume = rangeVolume.value
-	}
-	buttonAi.onclick = function()
-	{
-		aiPlayMove()
-
-		chessground.cancelPremove()
-		clearTimeout(aiTimeout)
-		clearTimeout(premoveTimeout)
 	}
 
 	checkboxDests.oninput = function()
@@ -143,9 +119,18 @@ new Module().then(loadedModule =>
 	buttonSetFen.onclick = function()
 	{
 		const fen = textFen.value
-		if (ffish.validateFen(fen, board.variant()))
+		if (!fen || ffish.validateFen(fen, board.variant()))
 		{
-			board.setFen(fen)
+			if (fen)
+				board.setFen(fen)
+			else
+				board.reset()
+
+			const moves = textMoves.value.split(" ").reverse()
+			while (moves.length > 0)
+			{
+				board.push(moves.pop())
+			}
 			updateChessground()
 		}
 		else
@@ -233,56 +218,6 @@ function isCapture(board, move)
 	return false
 }
 
-function aiPlayMove()
-{
-	if (board.isGameOver(true))
-		return
-
-	const moves = board.legalMoves().split(" ")
-	const move = moves[Math.floor(Math.random() * moves.length)]
-	const capture = isCapture(board, move)
-	board.push(move)
-	afterMove(capture)
-}
-
-function aiPlayMoveTimeout()
-{
-	if (board.isGameOver(true))
-		return
-
-	const oppColor = board.turn() ? "black" : "white"
-	chessground.set({
-		movable:
-		{
-			color: oppColor,
-		},
-	})
-	aiTimeout = setTimeout(() =>
-	{
-		aiPlayMove()
-
-		const premove = chessground.state.premovable.current
-		if (premove !== undefined)
-		{
-			const newMoves = board.legalMoves().split(" ")
-			// Check if premove is legal
-			const premoveUci = premove[0] + premove[1]
-			for (let i = 0; i < newMoves.length; i++)
-			{
-				if (newMoves[i].startsWith(premoveUci))
-				{
-					premoveTimeout = setTimeout(() =>
-					{
-						chessground.playPremove()
-					}, 100)
-					return
-				}
-			}
-			chessground.cancelPremove()
-		}
-	}, 100)
-}
-
 function afterChessgroundMove(orig, dest, metadata)
 {
 	// Auto promote to queen for now
@@ -305,14 +240,13 @@ function afterChessgroundMove(orig, dest, metadata)
 	if (!board.push(move))
 		board.push(move + promotion)
 	afterMove(capture)
-
-	if (checkboxAi.checked)
-		aiPlayMoveTimeout()
 }
 
 function afterMove(capture)
 {
 	updateChessground()
+	textMoves.value = board.moveStack()
+	buttonSetFen.click()
 
 	if (capture)
 	{
@@ -373,7 +307,6 @@ function getPgn(board)
 
 function updateChessground()
 {
-	textFen.value = board.fen()
 	labelPgn.innerText = getPgn(board)
 
 	chessground.set({
@@ -400,14 +333,5 @@ function updateChessground()
 		const lastMoveTo = lastMove.substring(2, 4)
 		chessground.set({lastMove: [lastMoveFrom, lastMoveTo]})
 		buttonUndo.disabled = false
-	}
-
-	if (board.isGameOver(true))
-	{
-		buttonAi.disabled = true
-	}
-	else
-	{
-		buttonAi.disabled = false
 	}
 }

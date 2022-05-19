@@ -94,6 +94,16 @@
     cursor: pointer;
   }
 
+  #controls button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
   #input #dropdown-variant {
     width: 120px;
     background: #eee;
@@ -106,12 +116,30 @@
   #outputs {
     display: flex;
     flex: 1 1 auto;
+    margin-top: 10px;
     width: 100%;
     height: 50%;
   }
 
+  #info {
+    padding: 10px;
+    margin-left: 20px;
+    font-size: 14px;
+  }
+
+  #label-pgn {
+    height: 20%;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-left: 20px;
+    overflow-x: scroll;
+    overflow-y: scroll;
+    box-shadow: inset 1px 1px 2px #eee;
+    font-size: 14px;
+  }
+
   #output2 {
-    width: 60%;
+    height: 80%;
     border: 1px solid #ddd;
     padding: 10px;
     margin-left: 20px;
@@ -130,20 +158,6 @@
 
 <body>
   <div id="root"></div>
-  <div>
-    <div style="margin-top: 20px;">
-      <input id="button-reset" type="button" value="New Game"/>
-      <input id="button-flip" type="button" value="Flip Board"/>
-      <input id="button-undo" type="button" value="Undo"/>
-      <input id="range-volume" type="range" min="0" max="1" value="0.4" step="0.05" style="margin-left: 8px;">Volume</input>
-      <input id="button-ai" type="button" value="Play Bot Move" style="margin-left: 6px;"/>
-    </div>
-    <div style="margin-top: 4px;">
-      <input id="check-auto-ai" type="checkbox">Auto-Play Bot Moves</input>
-      <input id="check-dests" type="checkbox" checked>Show Dests</input>
-    </div>
-    <p id="label-pgn"></p>
-  </div>
   <script src="bundle.js" defer></script>
   <!-- Javascript -->
 
@@ -317,15 +331,9 @@
                 }
               } else if (line.startsWith(" ")) {
               } else {
-                if (line.startsWith("Fen:")) {
-                  $("#fen").value = line.replace("Fen: ", "");
-                  $("#move").value = "";
-                }
-                if (line.startsWith("bestmove")) {
-                  $("#move").value = line.split(" ")[1];
-                  if (!analysis_mode) {
-                    setFen();
-                  }
+                if (line.startsWith("bestmove") && !analysis_mode) {
+                  $("#move").value += " " + line.split(" ")[1];
+                  $("#set").click();
                 }
                 output2 += line + "\n";
               }
@@ -498,11 +506,21 @@
             m("button#go", { disabled: !is_ready, onclick: go }, "Go"),
             m("button#stop", { disabled: !is_ready, onclick: stop }, "Stop"),
           ]),
+          m("div#controls", [
+            m("button#button-reset", "New Game"),
+            m("button#button-flip", "Flip Board"),
+            m("button#button-undo", "Undo"),
+            m("input[type=range]#range-volume", {"min": 0, "max": 1, "value": 0.4, "step": 0.05}, "range"),
+            m("label", m("input[type=checkbox]#check-dests", {"checked": true}), "Show Dests"),
+          ]),
           m("div#outputs", [
             m("div#chessground-container-div.blue.merida", [
               m("div#chessground-board"),
             ]),
-            m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
+            m("div#info", [
+              m("p#label-pgn"),
+              m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
+            ]),
           ]),
           m("div#links", [
             m(
