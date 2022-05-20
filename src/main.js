@@ -155,7 +155,7 @@ new Module().then(loadedModule =>
 function getDests(board)
 {
 	const dests = {}
-	const moves = board.legalMoves().split(" ")
+	const moves = board.legalMoves().split(" ").filter(m => m !== '')
 	for (let i = 0; i < moves.length; i++)
 	{
 		const move = moves[i]
