@@ -145,8 +145,8 @@ function getDests(board)
 	for (let i = 0; i < moves.length; i++)
 	{
 		const move = moves[i]
-		const from = move.substring(0, 2)
-		const to = move.substring(2, 4)
+		const from = move.match(/(\D\d+)(\D\d+)/)[1].replace("10", ":")
+		const to = move.match(/(\D\d+)(\D\d+)/)[2].replace("10", ":")
 		if (dests[from] === undefined)
 			dests[from] = []
 		dests[from].push(to)
@@ -229,7 +229,7 @@ function afterChessgroundMove(orig, dest, metadata)
 			promotion = "c"
 	}
 	// TODO, make this way better
-	const move = orig + dest
+	const move = orig.replace(":", "10") + dest.replace(":", "10")
 	const capture = isCapture(board, move)
 	if (!board.push(move))
 		board.push(move + promotion)
