@@ -293,6 +293,12 @@
         $("#set").click();
       };
 
+      const undo = () => {
+        const moves = $("#move").value;
+        $("#move").value = moves.substring(0, moves.lastIndexOf(" "));
+        setFen();
+      };
+
       const go = () => {
         let args = "";
         const movetime = $("#movetime").value;
@@ -499,6 +505,7 @@
             }),
             m("button#set", { disabled: !is_ready, onclick: () => {window.setTimeout(setFen, 10);}}, "Set"),
             m("button#reset", { disabled: !is_ready, onclick: reset }, "Reset"),
+            m("button#undo", { disabled: !is_ready, onclick: undo }, "Undo"),
           ]),
           m("div#input", [
             m("input#depth", {
@@ -517,7 +524,6 @@
             m("p#label-stm", {"hidden": true}),
           ]),
           m("div#controls", [
-            m("button#button-undo", "Undo"),
             m("button#button-flip", "Flip Board"),
             m("input[type=range]#range-volume", {"min": 0, "max": 1, "value": 0.4, "step": 0.05}, "range"),
             m("label", m("input[type=checkbox]#check-dests", {"checked": show_dests, onclick: () => {show_dests = !show_dests;}}), "Show Dests"),

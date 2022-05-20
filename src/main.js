@@ -6,7 +6,7 @@ const variantsIni = document.getElementById("variants-ini")
 const dropdownVariant = document.getElementById("dropdown-variant")
 
 const buttonFlip = document.getElementById("button-flip")
-const buttonUndo = document.getElementById("button-undo")
+const buttonUndo = document.getElementById("undo")
 const rangeVolume = document.getElementById("range-volume")
 
 const checkboxDests = document.getElementById("check-dests")
