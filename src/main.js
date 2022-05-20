@@ -2,6 +2,7 @@
 
 const Chessground = require("chessgroundx").Chessground
 
+const variantsIni = document.getElementById("variants-ini")
 const dropdownVariant = document.getElementById("dropdown-variant")
 
 const buttonFlip = document.getElementById("button-flip")
@@ -72,6 +73,19 @@ new Module().then(loadedModule =>
 	soundCapture.volume = rangeVolume.value
 	soundCheck.volume = rangeVolume.value
 	soundTerminal.volume = rangeVolume.value
+
+	variantsIni.onchange = function(e)
+	{
+		const selected = e.currentTarget.files[0]
+		if (selected) {
+			selected.text().then(
+				function(ini) {
+					console.log(ini)
+					ffish.loadVariantConfig(ini)
+				}
+			)
+		}
+	}
 
 	dropdownVariant.onchange = function()
 	{
