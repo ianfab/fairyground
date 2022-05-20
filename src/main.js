@@ -5,7 +5,6 @@ const Chessground = require("chessgroundx").Chessground
 const dropdownVariant = document.getElementById("dropdown-variant")
 
 const buttonFlip = document.getElementById("button-flip")
-const buttonReset = document.getElementById("button-reset")
 const buttonUndo = document.getElementById("button-undo")
 const rangeVolume = document.getElementById("range-volume")
 
@@ -15,6 +14,7 @@ const textFen = document.getElementById("fen")
 const textMoves = document.getElementById("move")
 const buttonSetFen = document.getElementById("set")
 const labelPgn = document.getElementById("label-pgn")
+const labelStm = document.getElementById("label-stm")
 
 const chessgroundContainerEl = document.getElementById("chessground-container-div")
 const chessgroundEl = document.getElementById("chessground-board")
@@ -83,12 +83,6 @@ new Module().then(loadedModule =>
 	buttonFlip.onclick = function()
 	{
 		chessground.toggleOrientation()
-	}
-	buttonReset.onclick = function()
-	{
-		board.reset()
-		updateChessground()
-		chessground.cancelPremove()
 	}
 	buttonUndo.onclick = function()
 	{
@@ -308,6 +302,7 @@ function getPgn(board)
 function updateChessground()
 {
 	labelPgn.innerText = getPgn(board)
+	labelStm.innerText = getColorOrUndefined(board)
 
 	chessground.set({
 		fen: board.fen(),

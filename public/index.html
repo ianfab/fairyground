@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8" />
-  <title>fairy-stockfish analysis</title>
+  <title>Fairy-Stockfish</title>
   <meta
     name="viewport"
     content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no"
@@ -253,7 +253,11 @@
       let stockfish = null;
       let stockfish_state = "INIT"; // 'READY', 'FAILED'
       let output2 = "";
-      let analysis_mode = true;
+      let show_dests = true;
+      let analysis_mode = false;
+      let play_white = false;
+      let play_black = false;
+      let play_move = false;
 
       let variants = [];
 
@@ -268,6 +272,7 @@
       };
 
       const setFen = () => {
+        stockfish.postMessage(`stop`);
         const fen = $("#fen").value;
         const moves = $("#move").value;
         if (fen.length > 0) {
@@ -275,18 +280,29 @@
         } else {
           stockfish.postMessage(`position startpos moves ${moves}`);
         }
+        stm = $("#label-stm").innerText;
+        if (stm != "undefined" && (analysis_mode || (play_white && stm == "white") || (play_black && stm == "black")))
+          setTimeout(go(), 10);
+      };
+
+      const reset = () => {
+        $("#fen").value = "";
+        $("#move").value = "";
+        $("#set").click();
       };
 
       const go = () => {
         let args = "";
         const movetime = $("#movetime").value;
         const depth = $("#depth").value;
-        if (movetime.length > 0) {
+        if (!analysis_mode && movetime.length > 0) {
           args += ` movetime ${movetime}`;
         }
-        if (depth.length > 0) {
+        if (!analysis_mode && depth.length > 0) {
           args += ` depth ${depth}`;
         }
+        stm = $("#label-stm").innerText;
+        play_move = (play_white && stm == "white") || (play_black && stm == "black");
         stockfish.postMessage(`go${args}`);
         output2 = "";
       };
@@ -331,7 +347,8 @@
                 }
               } else if (line.startsWith(" ")) {
               } else {
-                if (line.startsWith("bestmove") && !analysis_mode) {
+                if (line.startsWith("bestmove") && play_move) {
+                  play_move = false;
                   $("#move").value += " " + line.split(" ")[1];
                   $("#set").click();
                 }
@@ -441,20 +458,6 @@
                 "[?]"
               ),
             ]),
-            m("div", [
-              m("span", { style: "margin-right: 5px;" }, "- analysis mode:"),
-              m(
-                "span",
-                {
-                  style: "cursor: pointer;",
-                  onclick: () => {
-                    analysis_mode = !analysis_mode;
-                    scrollOutput();
-                  },
-                },
-                [analysis_mode ? "[x]" : "[ ]"]
-              ),
-            ]),
           ]),
           m("div#input", [
             m(
@@ -492,7 +495,8 @@
                 setFen();
               },
             }),
-            m("button#set", { disabled: !is_ready, onclick: setFen }, "Set"),
+            m("button#set", { disabled: !is_ready, onclick: () => {window.setTimeout(setFen, 10);}}, "Set"),
+            m("button#reset", { disabled: !is_ready, onclick: reset }, "Reset"),
           ]),
           m("div#input", [
             m("input#depth", {
@@ -505,13 +509,16 @@
             }),
             m("button#go", { disabled: !is_ready, onclick: go }, "Go"),
             m("button#stop", { disabled: !is_ready, onclick: stop }, "Stop"),
+            m("label", m("input[type=checkbox]#analysis", {"checked": analysis_mode, onclick: () => {analysis_mode = !analysis_mode;}}), "Analysis"),
+            m("label", m("input[type=checkbox]#playwhite", {"checked": play_white, onclick: () => {play_white = !play_white;}}), "Play white"),
+            m("label", m("input[type=checkbox]#playblack", {"checked": play_black, onclick: () => {play_black = !play_black;}}), "Play black"),
+            m("p#label-stm", {"hidden": true}),
           ]),
           m("div#controls", [
-            m("button#button-reset", "New Game"),
-            m("button#button-flip", "Flip Board"),
             m("button#button-undo", "Undo"),
+            m("button#button-flip", "Flip Board"),
             m("input[type=range]#range-volume", {"min": 0, "max": 1, "value": 0.4, "step": 0.05}, "range"),
-            m("label", m("input[type=checkbox]#check-dests", {"checked": true}), "Show Dests"),
+            m("label", m("input[type=checkbox]#check-dests", {"checked": show_dests, onclick: () => {show_dests = !show_dests;}}), "Show Dests"),
           ]),
           m("div#outputs", [
             m("div#chessground-container-div.blue.merida", [
