@@ -15,9 +15,9 @@
     rel="stylesheet"
     href="https://fonts.googleapis.com/css?family=Roboto+Mono"
   />
-  <link rel="stylesheet" href="assets/chessground.css"/>
-  <link rel="stylesheet" href="assets/theme-backgrounds.css"/>
-  <link rel="stylesheet" href="assets/theme-merida.css"/>
+  <link rel="stylesheet" href="assets/chessground.css" />
+  <link rel="stylesheet" href="assets/theme-backgrounds.css" />
+  <link rel="stylesheet" href="assets/theme-merida.css" />
 </head>
 
 <!-- CSS -->
@@ -283,7 +283,12 @@
           stockfish.postMessage(`position startpos moves ${moves}`);
         }
         stm = $("#label-stm").innerText;
-        if (stm != "undefined" && (analysis_mode || (play_white && stm == "white") || (play_black && stm == "black")))
+        if (
+          stm != "undefined" &&
+          (analysis_mode ||
+            (play_white && stm == "white") ||
+            (play_black && stm == "black"))
+        )
           setTimeout(go(), 10);
       };
 
@@ -310,7 +315,8 @@
           args += ` depth ${depth}`;
         }
         stm = $("#label-stm").innerText;
-        play_move = (play_white && stm == "white") || (play_black && stm == "black");
+        play_move =
+          (play_white && stm == "white") || (play_black && stm == "black");
         stockfish.postMessage(`go${args}`);
         output2 = "";
       };
@@ -503,7 +509,16 @@
                 setFen();
               },
             }),
-            m("button#set", { disabled: !is_ready, onclick: () => {window.setTimeout(setFen, 10);}}, "Set"),
+            m(
+              "button#set",
+              {
+                disabled: !is_ready,
+                onclick: () => {
+                  window.setTimeout(setFen, 10);
+                },
+              },
+              "Set"
+            ),
             m("button#reset", { disabled: !is_ready, onclick: reset }, "Reset"),
             m("button#undo", { disabled: !is_ready, onclick: undo }, "Undo"),
           ]),
@@ -518,15 +533,55 @@
             }),
             m("button#go", { disabled: !is_ready, onclick: go }, "Go"),
             m("button#stop", { disabled: !is_ready, onclick: stop }, "Stop"),
-            m("label", m("input[type=checkbox]#analysis", {"checked": analysis_mode, onclick: () => {analysis_mode = !analysis_mode;}}), "Analysis"),
-            m("label", m("input[type=checkbox]#playwhite", {"checked": play_white, onclick: () => {play_white = !play_white;}}), "Play white"),
-            m("label", m("input[type=checkbox]#playblack", {"checked": play_black, onclick: () => {play_black = !play_black;}}), "Play black"),
-            m("p#label-stm", {"hidden": true}),
+            m(
+              "label",
+              m("input[type=checkbox]#analysis", {
+                checked: analysis_mode,
+                onclick: () => {
+                  analysis_mode = !analysis_mode;
+                },
+              }),
+              "Analysis"
+            ),
+            m(
+              "label",
+              m("input[type=checkbox]#playwhite", {
+                checked: play_white,
+                onclick: () => {
+                  play_white = !play_white;
+                },
+              }),
+              "Play white"
+            ),
+            m(
+              "label",
+              m("input[type=checkbox]#playblack", {
+                checked: play_black,
+                onclick: () => {
+                  play_black = !play_black;
+                },
+              }),
+              "Play black"
+            ),
+            m("p#label-stm", { hidden: true }),
           ]),
           m("div#controls", [
             m("button#button-flip", "Flip Board"),
-            m("input[type=range]#range-volume", {"min": 0, "max": 1, "value": 0.4, "step": 0.05}, "range"),
-            m("label", m("input[type=checkbox]#check-dests", {"checked": show_dests, onclick: () => {show_dests = !show_dests;}}), "Show Dests"),
+            m(
+              "input[type=range]#range-volume",
+              { min: 0, max: 1, value: 0.4, step: 0.05 },
+              "range"
+            ),
+            m(
+              "label",
+              m("input[type=checkbox]#check-dests", {
+                checked: show_dests,
+                onclick: () => {
+                  show_dests = !show_dests;
+                },
+              }),
+              "Show Dests"
+            ),
           ]),
           m("div#outputs", [
             m("div#chessground-container-div.blue.merida", [
@@ -538,10 +593,7 @@
             ]),
           ]),
           m("div#links", [
-            m(
-              "a[href='https://github.com/ianfab/fairyground']",
-              "github"
-            ),
+            m("a[href='https://github.com/ianfab/fairyground']", "github"),
           ]),
         ]);
       };
