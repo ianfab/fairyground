@@ -269,6 +269,8 @@
         const variant = $("#dropdown-variant").value;
         stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
         stockfish.postMessage(`position startpos`);
+        $("#fen").value = "";
+        $("#move").value = "";
       };
 
       const setFen = () => {
