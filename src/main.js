@@ -138,8 +138,7 @@ function getDests(board) {
   for (let i = 0; i < moves.length; i++) {
     const move = moves[i];
     const match = move.match(/(\D\d+)(\D\d+)/);
-    if (!match)
-      continue;
+    if (!match) continue;
     const from = match[1].replace("10", ":");
     const to = match[2].replace("10", ":");
     if (dests[from] === undefined) dests[from] = [];
@@ -201,15 +200,18 @@ function afterChessgroundMove(orig, dest, metadata) {
   // Auto promote to queen for now
   let promotion = "q";
   if (metadata.ctrlKey) {
-    if (board.variant() === "knightmate") promotion = "m";
-    else promotion = "n";
-  } else {
-    if (board.variant() === "almost") promotion = "c";
+    promotion = "n";
   }
   // TODO, make this way better
   const move = orig.replace(":", "10") + dest.replace(":", "10");
   const capture = isCapture(board, move);
-  if (!board.push(move)) board.push(move + promotion);
+  if (
+    (metadata.ctrlKey || !board.push(move)) &&
+    !board.push(move + promotion)
+  ) {
+    const foundmove = board.legalMoves().match(new RegExp(`${move}[^ ]+`));
+    if (foundmove) board.push(foundmove[0]);
+  }
   afterMove(capture);
 }
 
