@@ -137,8 +137,11 @@ function getDests(board) {
     .filter((m) => m !== "");
   for (let i = 0; i < moves.length; i++) {
     const move = moves[i];
-    const from = move.match(/(\D\d+)(\D\d+)/)[1].replace("10", ":");
-    const to = move.match(/(\D\d+)(\D\d+)/)[2].replace("10", ":");
+    const match = move.match(/(\D\d+)(\D\d+)/);
+    if (!match)
+      continue;
+    const from = match[1].replace("10", ":");
+    const to = match[2].replace("10", ":");
     if (dests[from] === undefined) dests[from] = [];
     dests[from].push(to);
   }
