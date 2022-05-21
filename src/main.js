@@ -10,6 +10,7 @@ const buttonUndo = document.getElementById("undo");
 const rangeVolume = document.getElementById("range-volume");
 
 const checkboxDests = document.getElementById("check-dests");
+const checkboxAdjudicate = document.getElementById("check-adjudicate");
 
 const textFen = document.getElementById("fen");
 const textMoves = document.getElementById("move");
@@ -148,7 +149,7 @@ function getDests(board) {
 }
 
 function getColorOrUndefined(board) {
-  if (board.isGameOver(true)) return undefined;
+  if (board.isGameOver(checkboxAdjudicate.checked)) return undefined;
   return getColor(board);
 }
 
@@ -228,7 +229,7 @@ function afterMove(capture) {
     soundMove.play();
   }
 
-  if (board.isGameOver(true)) {
+  if (board.isGameOver(checkboxAdjudicate.checked)) {
     soundTerminal.currentTime = 0.0;
     soundTerminal.play();
   } else if (board.isCheck()) {
@@ -259,7 +260,7 @@ function getPgn(board) {
     board.push(move);
   }
 
-  const result = board.result(true);
+  const result = board.result(checkboxAdjudicate.checked);
   if (result !== "*") pgn += result;
 
   return pgn.trim();

@@ -254,6 +254,7 @@
       let stockfish_state = "INIT"; // 'READY', 'FAILED'
       let output2 = "";
       let show_dests = true;
+      let adjudicate = true;
       let analysis_mode = false;
       let play_white = false;
       let play_black = false;
@@ -584,6 +585,16 @@
                 },
               }),
               "Show Dests"
+            ),
+            m(
+              "label",
+              m("input[type=checkbox]#check-adjudicate", {
+                checked: adjudicate,
+                onclick: () => {
+                  adjudicate = !adjudicate;
+                },
+              }),
+              "Adjudicate"
             ),
           ]),
           m("div#outputs", [
