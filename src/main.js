@@ -80,6 +80,7 @@ new Module().then((loadedModule) => {
   };
 
   dropdownVariant.onchange = function () {
+    if (!ffish.variants().includes(dropdownVariant.value)) return;
     initBoard(dropdownVariant.value);
     updateChessground();
     chessground.cancelPremove();
