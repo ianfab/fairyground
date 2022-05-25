@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="assets/chessground.css" />
   <link rel="stylesheet" href="assets/theme-backgrounds.css" />
   <link rel="stylesheet" href="assets/theme-merida.css" />
+  <link rel="stylesheet" href="assets/theme-cburnett.css" />
 </head>
 
 <!-- CSS -->
@@ -326,6 +327,11 @@
         stockfish.postMessage(`stop`);
       };
 
+      const changePieces = () => {
+        $("#chessground-container-div").classList.toggle("cburnett");
+        $("#chessground-container-div").classList.toggle("merida");
+      };
+
       const scrollOutput = () => {
         $("#output2").scrollTo({
           top: $("#output2").scrollHeight,
@@ -570,6 +576,7 @@
             m("p#label-stm", { hidden: true }),
           ]),
           m("div#controls", [
+            m("button", { onclick: changePieces }, "Change pieces"),
             m("button#button-flip", "Flip Board"),
             m(
               "input[type=range]#range-volume",
