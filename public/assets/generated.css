@@ -1,0 +1,2400 @@
+.board1x1 .cg-wrap {
+  width: 640px;
+  height: 640px;
+}
+.board1x1 cg-container {
+  width: 100%;
+  height: 100%;
+}
+.board1x1 cg-helper {
+  width: 100.00000%;
+  height: 100.00000%;
+}
+.board1x1 cg-board square {
+  width: 100.00000%;
+  height: 100.00000%;
+}
+.board1x1 .cg-wrap piece {
+  width: 100.00000%;
+  height: 100.00000%;
+}
+.board1x2 .cg-wrap {
+  width: 320px;
+  height: 640px;
+}
+.board1x2 cg-container {
+  width: 100%;
+  height: 200%;
+}
+.board1x2 cg-helper {
+  width: 100.00000%;
+  height: 50.00000%;
+}
+.board1x2 cg-board square {
+  width: 100.00000%;
+  height: 50.00000%;
+}
+.board1x2 .cg-wrap piece {
+  width: 100.00000%;
+  height: 50.00000%;
+}
+.board1x3 .cg-wrap {
+  width: 213px;
+  height: 640px;
+}
+.board1x3 cg-container {
+  width: 100%;
+  height: 300%;
+}
+.board1x3 cg-helper {
+  width: 100.00000%;
+  height: 33.33333%;
+}
+.board1x3 cg-board square {
+  width: 100.00000%;
+  height: 33.33333%;
+}
+.board1x3 .cg-wrap piece {
+  width: 100.00000%;
+  height: 33.33333%;
+}
+.board1x4 .cg-wrap {
+  width: 160px;
+  height: 640px;
+}
+.board1x4 cg-container {
+  width: 100%;
+  height: 400%;
+}
+.board1x4 cg-helper {
+  width: 100.00000%;
+  height: 25.00000%;
+}
+.board1x4 cg-board square {
+  width: 100.00000%;
+  height: 25.00000%;
+}
+.board1x4 .cg-wrap piece {
+  width: 100.00000%;
+  height: 25.00000%;
+}
+.board1x5 .cg-wrap {
+  width: 128px;
+  height: 640px;
+}
+.board1x5 cg-container {
+  width: 100%;
+  height: 500%;
+}
+.board1x5 cg-helper {
+  width: 100.00000%;
+  height: 20.00000%;
+}
+.board1x5 cg-board square {
+  width: 100.00000%;
+  height: 20.00000%;
+}
+.board1x5 .cg-wrap piece {
+  width: 100.00000%;
+  height: 20.00000%;
+}
+.board1x6 .cg-wrap {
+  width: 106px;
+  height: 640px;
+}
+.board1x6 cg-container {
+  width: 100%;
+  height: 600%;
+}
+.board1x6 cg-helper {
+  width: 100.00000%;
+  height: 16.66666%;
+}
+.board1x6 cg-board square {
+  width: 100.00000%;
+  height: 16.66666%;
+}
+.board1x6 .cg-wrap piece {
+  width: 100.00000%;
+  height: 16.66666%;
+}
+.board1x7 .cg-wrap {
+  width: 91px;
+  height: 640px;
+}
+.board1x7 cg-container {
+  width: 100%;
+  height: 700%;
+}
+.board1x7 cg-helper {
+  width: 100.00000%;
+  height: 14.28571%;
+}
+.board1x7 cg-board square {
+  width: 100.00000%;
+  height: 14.28571%;
+}
+.board1x7 .cg-wrap piece {
+  width: 100.00000%;
+  height: 14.28571%;
+}
+.board1x8 .cg-wrap {
+  width: 80px;
+  height: 640px;
+}
+.board1x8 cg-container {
+  width: 100%;
+  height: 800%;
+}
+.board1x8 cg-helper {
+  width: 100.00000%;
+  height: 12.50000%;
+}
+.board1x8 cg-board square {
+  width: 100.00000%;
+  height: 12.50000%;
+}
+.board1x8 .cg-wrap piece {
+  width: 100.00000%;
+  height: 12.50000%;
+}
+.board1x9 .cg-wrap {
+  width: 71px;
+  height: 640px;
+}
+.board1x9 cg-container {
+  width: 100%;
+  height: 900%;
+}
+.board1x9 cg-helper {
+  width: 100.00000%;
+  height: 11.11111%;
+}
+.board1x9 cg-board square {
+  width: 100.00000%;
+  height: 11.11111%;
+}
+.board1x9 .cg-wrap piece {
+  width: 100.00000%;
+  height: 11.11111%;
+}
+.board1x10 .cg-wrap {
+  width: 64px;
+  height: 640px;
+}
+.board1x10 cg-container {
+  width: 100%;
+  height: 1000%;
+}
+.board1x10 cg-helper {
+  width: 100.00000%;
+  height: 10.00000%;
+}
+.board1x10 cg-board square {
+  width: 100.00000%;
+  height: 10.00000%;
+}
+.board1x10 .cg-wrap piece {
+  width: 100.00000%;
+  height: 10.00000%;
+}
+.board2x1 .cg-wrap {
+  width: 640px;
+  height: 320px;
+}
+.board2x1 cg-container {
+  width: 200%;
+  height: 100%;
+}
+.board2x1 cg-helper {
+  width: 50.00000%;
+  height: 100.00000%;
+}
+.board2x1 cg-board square {
+  width: 50.00000%;
+  height: 100.00000%;
+}
+.board2x1 .cg-wrap piece {
+  width: 50.00000%;
+  height: 100.00000%;
+}
+.board2x2 .cg-wrap {
+  width: 640px;
+  height: 640px;
+}
+.board2x2 cg-container {
+  width: 200%;
+  height: 200%;
+}
+.board2x2 cg-helper {
+  width: 50.00000%;
+  height: 50.00000%;
+}
+.board2x2 cg-board square {
+  width: 50.00000%;
+  height: 50.00000%;
+}
+.board2x2 .cg-wrap piece {
+  width: 50.00000%;
+  height: 50.00000%;
+}
+.board2x3 .cg-wrap {
+  width: 426px;
+  height: 640px;
+}
+.board2x3 cg-container {
+  width: 200%;
+  height: 300%;
+}
+.board2x3 cg-helper {
+  width: 50.00000%;
+  height: 33.33333%;
+}
+.board2x3 cg-board square {
+  width: 50.00000%;
+  height: 33.33333%;
+}
+.board2x3 .cg-wrap piece {
+  width: 50.00000%;
+  height: 33.33333%;
+}
+.board2x4 .cg-wrap {
+  width: 320px;
+  height: 640px;
+}
+.board2x4 cg-container {
+  width: 200%;
+  height: 400%;
+}
+.board2x4 cg-helper {
+  width: 50.00000%;
+  height: 25.00000%;
+}
+.board2x4 cg-board square {
+  width: 50.00000%;
+  height: 25.00000%;
+}
+.board2x4 .cg-wrap piece {
+  width: 50.00000%;
+  height: 25.00000%;
+}
+.board2x5 .cg-wrap {
+  width: 256px;
+  height: 640px;
+}
+.board2x5 cg-container {
+  width: 200%;
+  height: 500%;
+}
+.board2x5 cg-helper {
+  width: 50.00000%;
+  height: 20.00000%;
+}
+.board2x5 cg-board square {
+  width: 50.00000%;
+  height: 20.00000%;
+}
+.board2x5 .cg-wrap piece {
+  width: 50.00000%;
+  height: 20.00000%;
+}
+.board2x6 .cg-wrap {
+  width: 213px;
+  height: 640px;
+}
+.board2x6 cg-container {
+  width: 200%;
+  height: 600%;
+}
+.board2x6 cg-helper {
+  width: 50.00000%;
+  height: 16.66666%;
+}
+.board2x6 cg-board square {
+  width: 50.00000%;
+  height: 16.66666%;
+}
+.board2x6 .cg-wrap piece {
+  width: 50.00000%;
+  height: 16.66666%;
+}
+.board2x7 .cg-wrap {
+  width: 182px;
+  height: 640px;
+}
+.board2x7 cg-container {
+  width: 200%;
+  height: 700%;
+}
+.board2x7 cg-helper {
+  width: 50.00000%;
+  height: 14.28571%;
+}
+.board2x7 cg-board square {
+  width: 50.00000%;
+  height: 14.28571%;
+}
+.board2x7 .cg-wrap piece {
+  width: 50.00000%;
+  height: 14.28571%;
+}
+.board2x8 .cg-wrap {
+  width: 160px;
+  height: 640px;
+}
+.board2x8 cg-container {
+  width: 200%;
+  height: 800%;
+}
+.board2x8 cg-helper {
+  width: 50.00000%;
+  height: 12.50000%;
+}
+.board2x8 cg-board square {
+  width: 50.00000%;
+  height: 12.50000%;
+}
+.board2x8 .cg-wrap piece {
+  width: 50.00000%;
+  height: 12.50000%;
+}
+.board2x9 .cg-wrap {
+  width: 142px;
+  height: 640px;
+}
+.board2x9 cg-container {
+  width: 200%;
+  height: 900%;
+}
+.board2x9 cg-helper {
+  width: 50.00000%;
+  height: 11.11111%;
+}
+.board2x9 cg-board square {
+  width: 50.00000%;
+  height: 11.11111%;
+}
+.board2x9 .cg-wrap piece {
+  width: 50.00000%;
+  height: 11.11111%;
+}
+.board2x10 .cg-wrap {
+  width: 128px;
+  height: 640px;
+}
+.board2x10 cg-container {
+  width: 200%;
+  height: 1000%;
+}
+.board2x10 cg-helper {
+  width: 50.00000%;
+  height: 10.00000%;
+}
+.board2x10 cg-board square {
+  width: 50.00000%;
+  height: 10.00000%;
+}
+.board2x10 .cg-wrap piece {
+  width: 50.00000%;
+  height: 10.00000%;
+}
+.board3x1 .cg-wrap {
+  width: 640px;
+  height: 213px;
+}
+.board3x1 cg-container {
+  width: 300%;
+  height: 100%;
+}
+.board3x1 cg-helper {
+  width: 33.33333%;
+  height: 100.00000%;
+}
+.board3x1 cg-board square {
+  width: 33.33333%;
+  height: 100.00000%;
+}
+.board3x1 .cg-wrap piece {
+  width: 33.33333%;
+  height: 100.00000%;
+}
+.board3x2 .cg-wrap {
+  width: 640px;
+  height: 426px;
+}
+.board3x2 cg-container {
+  width: 300%;
+  height: 200%;
+}
+.board3x2 cg-helper {
+  width: 33.33333%;
+  height: 50.00000%;
+}
+.board3x2 cg-board square {
+  width: 33.33333%;
+  height: 50.00000%;
+}
+.board3x2 .cg-wrap piece {
+  width: 33.33333%;
+  height: 50.00000%;
+}
+.board3x3 .cg-wrap {
+  width: 640px;
+  height: 640px;
+}
+.board3x3 cg-container {
+  width: 300%;
+  height: 300%;
+}
+.board3x3 cg-helper {
+  width: 33.33333%;
+  height: 33.33333%;
+}
+.board3x3 cg-board square {
+  width: 33.33333%;
+  height: 33.33333%;
+}
+.board3x3 .cg-wrap piece {
+  width: 33.33333%;
+  height: 33.33333%;
+}
+.board3x4 .cg-wrap {
+  width: 480px;
+  height: 640px;
+}
+.board3x4 cg-container {
+  width: 300%;
+  height: 400%;
+}
+.board3x4 cg-helper {
+  width: 33.33333%;
+  height: 25.00000%;
+}
+.board3x4 cg-board square {
+  width: 33.33333%;
+  height: 25.00000%;
+}
+.board3x4 .cg-wrap piece {
+  width: 33.33333%;
+  height: 25.00000%;
+}
+.board3x5 .cg-wrap {
+  width: 384px;
+  height: 640px;
+}
+.board3x5 cg-container {
+  width: 300%;
+  height: 500%;
+}
+.board3x5 cg-helper {
+  width: 33.33333%;
+  height: 20.00000%;
+}
+.board3x5 cg-board square {
+  width: 33.33333%;
+  height: 20.00000%;
+}
+.board3x5 .cg-wrap piece {
+  width: 33.33333%;
+  height: 20.00000%;
+}
+.board3x6 .cg-wrap {
+  width: 320px;
+  height: 640px;
+}
+.board3x6 cg-container {
+  width: 300%;
+  height: 600%;
+}
+.board3x6 cg-helper {
+  width: 33.33333%;
+  height: 16.66666%;
+}
+.board3x6 cg-board square {
+  width: 33.33333%;
+  height: 16.66666%;
+}
+.board3x6 .cg-wrap piece {
+  width: 33.33333%;
+  height: 16.66666%;
+}
+.board3x7 .cg-wrap {
+  width: 274px;
+  height: 640px;
+}
+.board3x7 cg-container {
+  width: 300%;
+  height: 700%;
+}
+.board3x7 cg-helper {
+  width: 33.33333%;
+  height: 14.28571%;
+}
+.board3x7 cg-board square {
+  width: 33.33333%;
+  height: 14.28571%;
+}
+.board3x7 .cg-wrap piece {
+  width: 33.33333%;
+  height: 14.28571%;
+}
+.board3x8 .cg-wrap {
+  width: 240px;
+  height: 640px;
+}
+.board3x8 cg-container {
+  width: 300%;
+  height: 800%;
+}
+.board3x8 cg-helper {
+  width: 33.33333%;
+  height: 12.50000%;
+}
+.board3x8 cg-board square {
+  width: 33.33333%;
+  height: 12.50000%;
+}
+.board3x8 .cg-wrap piece {
+  width: 33.33333%;
+  height: 12.50000%;
+}
+.board3x9 .cg-wrap {
+  width: 213px;
+  height: 640px;
+}
+.board3x9 cg-container {
+  width: 300%;
+  height: 900%;
+}
+.board3x9 cg-helper {
+  width: 33.33333%;
+  height: 11.11111%;
+}
+.board3x9 cg-board square {
+  width: 33.33333%;
+  height: 11.11111%;
+}
+.board3x9 .cg-wrap piece {
+  width: 33.33333%;
+  height: 11.11111%;
+}
+.board3x10 .cg-wrap {
+  width: 192px;
+  height: 640px;
+}
+.board3x10 cg-container {
+  width: 300%;
+  height: 1000%;
+}
+.board3x10 cg-helper {
+  width: 33.33333%;
+  height: 10.00000%;
+}
+.board3x10 cg-board square {
+  width: 33.33333%;
+  height: 10.00000%;
+}
+.board3x10 .cg-wrap piece {
+  width: 33.33333%;
+  height: 10.00000%;
+}
+.board4x1 .cg-wrap {
+  width: 640px;
+  height: 160px;
+}
+.board4x1 cg-container {
+  width: 400%;
+  height: 100%;
+}
+.board4x1 cg-helper {
+  width: 25.00000%;
+  height: 100.00000%;
+}
+.board4x1 cg-board square {
+  width: 25.00000%;
+  height: 100.00000%;
+}
+.board4x1 .cg-wrap piece {
+  width: 25.00000%;
+  height: 100.00000%;
+}
+.board4x2 .cg-wrap {
+  width: 640px;
+  height: 320px;
+}
+.board4x2 cg-container {
+  width: 400%;
+  height: 200%;
+}
+.board4x2 cg-helper {
+  width: 25.00000%;
+  height: 50.00000%;
+}
+.board4x2 cg-board square {
+  width: 25.00000%;
+  height: 50.00000%;
+}
+.board4x2 .cg-wrap piece {
+  width: 25.00000%;
+  height: 50.00000%;
+}
+.board4x3 .cg-wrap {
+  width: 640px;
+  height: 480px;
+}
+.board4x3 cg-container {
+  width: 400%;
+  height: 300%;
+}
+.board4x3 cg-helper {
+  width: 25.00000%;
+  height: 33.33333%;
+}
+.board4x3 cg-board square {
+  width: 25.00000%;
+  height: 33.33333%;
+}
+.board4x3 .cg-wrap piece {
+  width: 25.00000%;
+  height: 33.33333%;
+}
+.board4x4 .cg-wrap {
+  width: 640px;
+  height: 640px;
+}
+.board4x4 cg-container {
+  width: 400%;
+  height: 400%;
+}
+.board4x4 cg-helper {
+  width: 25.00000%;
+  height: 25.00000%;
+}
+.board4x4 cg-board square {
+  width: 25.00000%;
+  height: 25.00000%;
+}
+.board4x4 .cg-wrap piece {
+  width: 25.00000%;
+  height: 25.00000%;
+}
+.board4x5 .cg-wrap {
+  width: 512px;
+  height: 640px;
+}
+.board4x5 cg-container {
+  width: 400%;
+  height: 500%;
+}
+.board4x5 cg-helper {
+  width: 25.00000%;
+  height: 20.00000%;
+}
+.board4x5 cg-board square {
+  width: 25.00000%;
+  height: 20.00000%;
+}
+.board4x5 .cg-wrap piece {
+  width: 25.00000%;
+  height: 20.00000%;
+}
+.board4x6 .cg-wrap {
+  width: 426px;
+  height: 640px;
+}
+.board4x6 cg-container {
+  width: 400%;
+  height: 600%;
+}
+.board4x6 cg-helper {
+  width: 25.00000%;
+  height: 16.66666%;
+}
+.board4x6 cg-board square {
+  width: 25.00000%;
+  height: 16.66666%;
+}
+.board4x6 .cg-wrap piece {
+  width: 25.00000%;
+  height: 16.66666%;
+}
+.board4x7 .cg-wrap {
+  width: 365px;
+  height: 640px;
+}
+.board4x7 cg-container {
+  width: 400%;
+  height: 700%;
+}
+.board4x7 cg-helper {
+  width: 25.00000%;
+  height: 14.28571%;
+}
+.board4x7 cg-board square {
+  width: 25.00000%;
+  height: 14.28571%;
+}
+.board4x7 .cg-wrap piece {
+  width: 25.00000%;
+  height: 14.28571%;
+}
+.board4x8 .cg-wrap {
+  width: 320px;
+  height: 640px;
+}
+.board4x8 cg-container {
+  width: 400%;
+  height: 800%;
+}
+.board4x8 cg-helper {
+  width: 25.00000%;
+  height: 12.50000%;
+}
+.board4x8 cg-board square {
+  width: 25.00000%;
+  height: 12.50000%;
+}
+.board4x8 .cg-wrap piece {
+  width: 25.00000%;
+  height: 12.50000%;
+}
+.board4x9 .cg-wrap {
+  width: 284px;
+  height: 640px;
+}
+.board4x9 cg-container {
+  width: 400%;
+  height: 900%;
+}
+.board4x9 cg-helper {
+  width: 25.00000%;
+  height: 11.11111%;
+}
+.board4x9 cg-board square {
+  width: 25.00000%;
+  height: 11.11111%;
+}
+.board4x9 .cg-wrap piece {
+  width: 25.00000%;
+  height: 11.11111%;
+}
+.board4x10 .cg-wrap {
+  width: 256px;
+  height: 640px;
+}
+.board4x10 cg-container {
+  width: 400%;
+  height: 1000%;
+}
+.board4x10 cg-helper {
+  width: 25.00000%;
+  height: 10.00000%;
+}
+.board4x10 cg-board square {
+  width: 25.00000%;
+  height: 10.00000%;
+}
+.board4x10 .cg-wrap piece {
+  width: 25.00000%;
+  height: 10.00000%;
+}
+.board5x1 .cg-wrap {
+  width: 640px;
+  height: 128px;
+}
+.board5x1 cg-container {
+  width: 500%;
+  height: 100%;
+}
+.board5x1 cg-helper {
+  width: 20.00000%;
+  height: 100.00000%;
+}
+.board5x1 cg-board square {
+  width: 20.00000%;
+  height: 100.00000%;
+}
+.board5x1 .cg-wrap piece {
+  width: 20.00000%;
+  height: 100.00000%;
+}
+.board5x2 .cg-wrap {
+  width: 640px;
+  height: 256px;
+}
+.board5x2 cg-container {
+  width: 500%;
+  height: 200%;
+}
+.board5x2 cg-helper {
+  width: 20.00000%;
+  height: 50.00000%;
+}
+.board5x2 cg-board square {
+  width: 20.00000%;
+  height: 50.00000%;
+}
+.board5x2 .cg-wrap piece {
+  width: 20.00000%;
+  height: 50.00000%;
+}
+.board5x3 .cg-wrap {
+  width: 640px;
+  height: 384px;
+}
+.board5x3 cg-container {
+  width: 500%;
+  height: 300%;
+}
+.board5x3 cg-helper {
+  width: 20.00000%;
+  height: 33.33333%;
+}
+.board5x3 cg-board square {
+  width: 20.00000%;
+  height: 33.33333%;
+}
+.board5x3 .cg-wrap piece {
+  width: 20.00000%;
+  height: 33.33333%;
+}
+.board5x4 .cg-wrap {
+  width: 640px;
+  height: 512px;
+}
+.board5x4 cg-container {
+  width: 500%;
+  height: 400%;
+}
+.board5x4 cg-helper {
+  width: 20.00000%;
+  height: 25.00000%;
+}
+.board5x4 cg-board square {
+  width: 20.00000%;
+  height: 25.00000%;
+}
+.board5x4 .cg-wrap piece {
+  width: 20.00000%;
+  height: 25.00000%;
+}
+.board5x5 .cg-wrap {
+  width: 640px;
+  height: 640px;
+}
+.board5x5 cg-container {
+  width: 500%;
+  height: 500%;
+}
+.board5x5 cg-helper {
+  width: 20.00000%;
+  height: 20.00000%;
+}
+.board5x5 cg-board square {
+  width: 20.00000%;
+  height: 20.00000%;
+}
+.board5x5 .cg-wrap piece {
+  width: 20.00000%;
+  height: 20.00000%;
+}
+.board5x6 .cg-wrap {
+  width: 533px;
+  height: 640px;
+}
+.board5x6 cg-container {
+  width: 500%;
+  height: 600%;
+}
+.board5x6 cg-helper {
+  width: 20.00000%;
+  height: 16.66666%;
+}
+.board5x6 cg-board square {
+  width: 20.00000%;
+  height: 16.66666%;
+}
+.board5x6 .cg-wrap piece {
+  width: 20.00000%;
+  height: 16.66666%;
+}
+.board5x7 .cg-wrap {
+  width: 457px;
+  height: 640px;
+}
+.board5x7 cg-container {
+  width: 500%;
+  height: 700%;
+}
+.board5x7 cg-helper {
+  width: 20.00000%;
+  height: 14.28571%;
+}
+.board5x7 cg-board square {
+  width: 20.00000%;
+  height: 14.28571%;
+}
+.board5x7 .cg-wrap piece {
+  width: 20.00000%;
+  height: 14.28571%;
+}
+.board5x8 .cg-wrap {
+  width: 400px;
+  height: 640px;
+}
+.board5x8 cg-container {
+  width: 500%;
+  height: 800%;
+}
+.board5x8 cg-helper {
+  width: 20.00000%;
+  height: 12.50000%;
+}
+.board5x8 cg-board square {
+  width: 20.00000%;
+  height: 12.50000%;
+}
+.board5x8 .cg-wrap piece {
+  width: 20.00000%;
+  height: 12.50000%;
+}
+.board5x9 .cg-wrap {
+  width: 355px;
+  height: 640px;
+}
+.board5x9 cg-container {
+  width: 500%;
+  height: 900%;
+}
+.board5x9 cg-helper {
+  width: 20.00000%;
+  height: 11.11111%;
+}
+.board5x9 cg-board square {
+  width: 20.00000%;
+  height: 11.11111%;
+}
+.board5x9 .cg-wrap piece {
+  width: 20.00000%;
+  height: 11.11111%;
+}
+.board5x10 .cg-wrap {
+  width: 320px;
+  height: 640px;
+}
+.board5x10 cg-container {
+  width: 500%;
+  height: 1000%;
+}
+.board5x10 cg-helper {
+  width: 20.00000%;
+  height: 10.00000%;
+}
+.board5x10 cg-board square {
+  width: 20.00000%;
+  height: 10.00000%;
+}
+.board5x10 .cg-wrap piece {
+  width: 20.00000%;
+  height: 10.00000%;
+}
+.board6x1 .cg-wrap {
+  width: 640px;
+  height: 106px;
+}
+.board6x1 cg-container {
+  width: 600%;
+  height: 100%;
+}
+.board6x1 cg-helper {
+  width: 16.66666%;
+  height: 100.00000%;
+}
+.board6x1 cg-board square {
+  width: 16.66666%;
+  height: 100.00000%;
+}
+.board6x1 .cg-wrap piece {
+  width: 16.66666%;
+  height: 100.00000%;
+}
+.board6x2 .cg-wrap {
+  width: 640px;
+  height: 213px;
+}
+.board6x2 cg-container {
+  width: 600%;
+  height: 200%;
+}
+.board6x2 cg-helper {
+  width: 16.66666%;
+  height: 50.00000%;
+}
+.board6x2 cg-board square {
+  width: 16.66666%;
+  height: 50.00000%;
+}
+.board6x2 .cg-wrap piece {
+  width: 16.66666%;
+  height: 50.00000%;
+}
+.board6x3 .cg-wrap {
+  width: 640px;
+  height: 320px;
+}
+.board6x3 cg-container {
+  width: 600%;
+  height: 300%;
+}
+.board6x3 cg-helper {
+  width: 16.66666%;
+  height: 33.33333%;
+}
+.board6x3 cg-board square {
+  width: 16.66666%;
+  height: 33.33333%;
+}
+.board6x3 .cg-wrap piece {
+  width: 16.66666%;
+  height: 33.33333%;
+}
+.board6x4 .cg-wrap {
+  width: 640px;
+  height: 426px;
+}
+.board6x4 cg-container {
+  width: 600%;
+  height: 400%;
+}
+.board6x4 cg-helper {
+  width: 16.66666%;
+  height: 25.00000%;
+}
+.board6x4 cg-board square {
+  width: 16.66666%;
+  height: 25.00000%;
+}
+.board6x4 .cg-wrap piece {
+  width: 16.66666%;
+  height: 25.00000%;
+}
+.board6x5 .cg-wrap {
+  width: 640px;
+  height: 533px;
+}
+.board6x5 cg-container {
+  width: 600%;
+  height: 500%;
+}
+.board6x5 cg-helper {
+  width: 16.66666%;
+  height: 20.00000%;
+}
+.board6x5 cg-board square {
+  width: 16.66666%;
+  height: 20.00000%;
+}
+.board6x5 .cg-wrap piece {
+  width: 16.66666%;
+  height: 20.00000%;
+}
+.board6x6 .cg-wrap {
+  width: 640px;
+  height: 640px;
+}
+.board6x6 cg-container {
+  width: 600%;
+  height: 600%;
+}
+.board6x6 cg-helper {
+  width: 16.66666%;
+  height: 16.66666%;
+}
+.board6x6 cg-board square {
+  width: 16.66666%;
+  height: 16.66666%;
+}
+.board6x6 .cg-wrap piece {
+  width: 16.66666%;
+  height: 16.66666%;
+}
+.board6x7 .cg-wrap {
+  width: 548px;
+  height: 640px;
+}
+.board6x7 cg-container {
+  width: 600%;
+  height: 700%;
+}
+.board6x7 cg-helper {
+  width: 16.66666%;
+  height: 14.28571%;
+}
+.board6x7 cg-board square {
+  width: 16.66666%;
+  height: 14.28571%;
+}
+.board6x7 .cg-wrap piece {
+  width: 16.66666%;
+  height: 14.28571%;
+}
+.board6x8 .cg-wrap {
+  width: 480px;
+  height: 640px;
+}
+.board6x8 cg-container {
+  width: 600%;
+  height: 800%;
+}
+.board6x8 cg-helper {
+  width: 16.66666%;
+  height: 12.50000%;
+}
+.board6x8 cg-board square {
+  width: 16.66666%;
+  height: 12.50000%;
+}
+.board6x8 .cg-wrap piece {
+  width: 16.66666%;
+  height: 12.50000%;
+}
+.board6x9 .cg-wrap {
+  width: 426px;
+  height: 640px;
+}
+.board6x9 cg-container {
+  width: 600%;
+  height: 900%;
+}
+.board6x9 cg-helper {
+  width: 16.66666%;
+  height: 11.11111%;
+}
+.board6x9 cg-board square {
+  width: 16.66666%;
+  height: 11.11111%;
+}
+.board6x9 .cg-wrap piece {
+  width: 16.66666%;
+  height: 11.11111%;
+}
+.board6x10 .cg-wrap {
+  width: 384px;
+  height: 640px;
+}
+.board6x10 cg-container {
+  width: 600%;
+  height: 1000%;
+}
+.board6x10 cg-helper {
+  width: 16.66666%;
+  height: 10.00000%;
+}
+.board6x10 cg-board square {
+  width: 16.66666%;
+  height: 10.00000%;
+}
+.board6x10 .cg-wrap piece {
+  width: 16.66666%;
+  height: 10.00000%;
+}
+.board7x1 .cg-wrap {
+  width: 640px;
+  height: 91px;
+}
+.board7x1 cg-container {
+  width: 700%;
+  height: 100%;
+}
+.board7x1 cg-helper {
+  width: 14.28571%;
+  height: 100.00000%;
+}
+.board7x1 cg-board square {
+  width: 14.28571%;
+  height: 100.00000%;
+}
+.board7x1 .cg-wrap piece {
+  width: 14.28571%;
+  height: 100.00000%;
+}
+.board7x2 .cg-wrap {
+  width: 640px;
+  height: 182px;
+}
+.board7x2 cg-container {
+  width: 700%;
+  height: 200%;
+}
+.board7x2 cg-helper {
+  width: 14.28571%;
+  height: 50.00000%;
+}
+.board7x2 cg-board square {
+  width: 14.28571%;
+  height: 50.00000%;
+}
+.board7x2 .cg-wrap piece {
+  width: 14.28571%;
+  height: 50.00000%;
+}
+.board7x3 .cg-wrap {
+  width: 640px;
+  height: 274px;
+}
+.board7x3 cg-container {
+  width: 700%;
+  height: 300%;
+}
+.board7x3 cg-helper {
+  width: 14.28571%;
+  height: 33.33333%;
+}
+.board7x3 cg-board square {
+  width: 14.28571%;
+  height: 33.33333%;
+}
+.board7x3 .cg-wrap piece {
+  width: 14.28571%;
+  height: 33.33333%;
+}
+.board7x4 .cg-wrap {
+  width: 640px;
+  height: 365px;
+}
+.board7x4 cg-container {
+  width: 700%;
+  height: 400%;
+}
+.board7x4 cg-helper {
+  width: 14.28571%;
+  height: 25.00000%;
+}
+.board7x4 cg-board square {
+  width: 14.28571%;
+  height: 25.00000%;
+}
+.board7x4 .cg-wrap piece {
+  width: 14.28571%;
+  height: 25.00000%;
+}
+.board7x5 .cg-wrap {
+  width: 640px;
+  height: 457px;
+}
+.board7x5 cg-container {
+  width: 700%;
+  height: 500%;
+}
+.board7x5 cg-helper {
+  width: 14.28571%;
+  height: 20.00000%;
+}
+.board7x5 cg-board square {
+  width: 14.28571%;
+  height: 20.00000%;
+}
+.board7x5 .cg-wrap piece {
+  width: 14.28571%;
+  height: 20.00000%;
+}
+.board7x6 .cg-wrap {
+  width: 640px;
+  height: 548px;
+}
+.board7x6 cg-container {
+  width: 700%;
+  height: 600%;
+}
+.board7x6 cg-helper {
+  width: 14.28571%;
+  height: 16.66666%;
+}
+.board7x6 cg-board square {
+  width: 14.28571%;
+  height: 16.66666%;
+}
+.board7x6 .cg-wrap piece {
+  width: 14.28571%;
+  height: 16.66666%;
+}
+.board7x7 .cg-wrap {
+  width: 640px;
+  height: 640px;
+}
+.board7x7 cg-container {
+  width: 700%;
+  height: 700%;
+}
+.board7x7 cg-helper {
+  width: 14.28571%;
+  height: 14.28571%;
+}
+.board7x7 cg-board square {
+  width: 14.28571%;
+  height: 14.28571%;
+}
+.board7x7 .cg-wrap piece {
+  width: 14.28571%;
+  height: 14.28571%;
+}
+.board7x8 .cg-wrap {
+  width: 560px;
+  height: 640px;
+}
+.board7x8 cg-container {
+  width: 700%;
+  height: 800%;
+}
+.board7x8 cg-helper {
+  width: 14.28571%;
+  height: 12.50000%;
+}
+.board7x8 cg-board square {
+  width: 14.28571%;
+  height: 12.50000%;
+}
+.board7x8 .cg-wrap piece {
+  width: 14.28571%;
+  height: 12.50000%;
+}
+.board7x9 .cg-wrap {
+  width: 497px;
+  height: 640px;
+}
+.board7x9 cg-container {
+  width: 700%;
+  height: 900%;
+}
+.board7x9 cg-helper {
+  width: 14.28571%;
+  height: 11.11111%;
+}
+.board7x9 cg-board square {
+  width: 14.28571%;
+  height: 11.11111%;
+}
+.board7x9 .cg-wrap piece {
+  width: 14.28571%;
+  height: 11.11111%;
+}
+.board7x10 .cg-wrap {
+  width: 448px;
+  height: 640px;
+}
+.board7x10 cg-container {
+  width: 700%;
+  height: 1000%;
+}
+.board7x10 cg-helper {
+  width: 14.28571%;
+  height: 10.00000%;
+}
+.board7x10 cg-board square {
+  width: 14.28571%;
+  height: 10.00000%;
+}
+.board7x10 .cg-wrap piece {
+  width: 14.28571%;
+  height: 10.00000%;
+}
+.board8x1 .cg-wrap {
+  width: 640px;
+  height: 80px;
+}
+.board8x1 cg-container {
+  width: 800%;
+  height: 100%;
+}
+.board8x1 cg-helper {
+  width: 12.50000%;
+  height: 100.00000%;
+}
+.board8x1 cg-board square {
+  width: 12.50000%;
+  height: 100.00000%;
+}
+.board8x1 .cg-wrap piece {
+  width: 12.50000%;
+  height: 100.00000%;
+}
+.board8x2 .cg-wrap {
+  width: 640px;
+  height: 160px;
+}
+.board8x2 cg-container {
+  width: 800%;
+  height: 200%;
+}
+.board8x2 cg-helper {
+  width: 12.50000%;
+  height: 50.00000%;
+}
+.board8x2 cg-board square {
+  width: 12.50000%;
+  height: 50.00000%;
+}
+.board8x2 .cg-wrap piece {
+  width: 12.50000%;
+  height: 50.00000%;
+}
+.board8x3 .cg-wrap {
+  width: 640px;
+  height: 240px;
+}
+.board8x3 cg-container {
+  width: 800%;
+  height: 300%;
+}
+.board8x3 cg-helper {
+  width: 12.50000%;
+  height: 33.33333%;
+}
+.board8x3 cg-board square {
+  width: 12.50000%;
+  height: 33.33333%;
+}
+.board8x3 .cg-wrap piece {
+  width: 12.50000%;
+  height: 33.33333%;
+}
+.board8x4 .cg-wrap {
+  width: 640px;
+  height: 320px;
+}
+.board8x4 cg-container {
+  width: 800%;
+  height: 400%;
+}
+.board8x4 cg-helper {
+  width: 12.50000%;
+  height: 25.00000%;
+}
+.board8x4 cg-board square {
+  width: 12.50000%;
+  height: 25.00000%;
+}
+.board8x4 .cg-wrap piece {
+  width: 12.50000%;
+  height: 25.00000%;
+}
+.board8x5 .cg-wrap {
+  width: 640px;
+  height: 400px;
+}
+.board8x5 cg-container {
+  width: 800%;
+  height: 500%;
+}
+.board8x5 cg-helper {
+  width: 12.50000%;
+  height: 20.00000%;
+}
+.board8x5 cg-board square {
+  width: 12.50000%;
+  height: 20.00000%;
+}
+.board8x5 .cg-wrap piece {
+  width: 12.50000%;
+  height: 20.00000%;
+}
+.board8x6 .cg-wrap {
+  width: 640px;
+  height: 480px;
+}
+.board8x6 cg-container {
+  width: 800%;
+  height: 600%;
+}
+.board8x6 cg-helper {
+  width: 12.50000%;
+  height: 16.66666%;
+}
+.board8x6 cg-board square {
+  width: 12.50000%;
+  height: 16.66666%;
+}
+.board8x6 .cg-wrap piece {
+  width: 12.50000%;
+  height: 16.66666%;
+}
+.board8x7 .cg-wrap {
+  width: 640px;
+  height: 560px;
+}
+.board8x7 cg-container {
+  width: 800%;
+  height: 700%;
+}
+.board8x7 cg-helper {
+  width: 12.50000%;
+  height: 14.28571%;
+}
+.board8x7 cg-board square {
+  width: 12.50000%;
+  height: 14.28571%;
+}
+.board8x7 .cg-wrap piece {
+  width: 12.50000%;
+  height: 14.28571%;
+}
+.board8x8 .cg-wrap {
+  width: 640px;
+  height: 640px;
+}
+.board8x8 cg-container {
+  width: 800%;
+  height: 800%;
+}
+.board8x8 cg-helper {
+  width: 12.50000%;
+  height: 12.50000%;
+}
+.board8x8 cg-board square {
+  width: 12.50000%;
+  height: 12.50000%;
+}
+.board8x8 .cg-wrap piece {
+  width: 12.50000%;
+  height: 12.50000%;
+}
+.board8x9 .cg-wrap {
+  width: 568px;
+  height: 640px;
+}
+.board8x9 cg-container {
+  width: 800%;
+  height: 900%;
+}
+.board8x9 cg-helper {
+  width: 12.50000%;
+  height: 11.11111%;
+}
+.board8x9 cg-board square {
+  width: 12.50000%;
+  height: 11.11111%;
+}
+.board8x9 .cg-wrap piece {
+  width: 12.50000%;
+  height: 11.11111%;
+}
+.board8x10 .cg-wrap {
+  width: 512px;
+  height: 640px;
+}
+.board8x10 cg-container {
+  width: 800%;
+  height: 1000%;
+}
+.board8x10 cg-helper {
+  width: 12.50000%;
+  height: 10.00000%;
+}
+.board8x10 cg-board square {
+  width: 12.50000%;
+  height: 10.00000%;
+}
+.board8x10 .cg-wrap piece {
+  width: 12.50000%;
+  height: 10.00000%;
+}
+.board9x1 .cg-wrap {
+  width: 640px;
+  height: 71px;
+}
+.board9x1 cg-container {
+  width: 900%;
+  height: 88%;
+}
+.board9x1 cg-helper {
+  width: 11.11111%;
+  height: 100.00000%;
+}
+.board9x1 cg-board square {
+  width: 11.11111%;
+  height: 100.00000%;
+}
+.board9x1 .cg-wrap piece {
+  width: 11.11111%;
+  height: 100.00000%;
+}
+.board9x2 .cg-wrap {
+  width: 640px;
+  height: 142px;
+}
+.board9x2 cg-container {
+  width: 900%;
+  height: 177%;
+}
+.board9x2 cg-helper {
+  width: 11.11111%;
+  height: 50.00000%;
+}
+.board9x2 cg-board square {
+  width: 11.11111%;
+  height: 50.00000%;
+}
+.board9x2 .cg-wrap piece {
+  width: 11.11111%;
+  height: 50.00000%;
+}
+.board9x3 .cg-wrap {
+  width: 640px;
+  height: 213px;
+}
+.board9x3 cg-container {
+  width: 900%;
+  height: 266%;
+}
+.board9x3 cg-helper {
+  width: 11.11111%;
+  height: 33.33333%;
+}
+.board9x3 cg-board square {
+  width: 11.11111%;
+  height: 33.33333%;
+}
+.board9x3 .cg-wrap piece {
+  width: 11.11111%;
+  height: 33.33333%;
+}
+.board9x4 .cg-wrap {
+  width: 640px;
+  height: 284px;
+}
+.board9x4 cg-container {
+  width: 900%;
+  height: 355%;
+}
+.board9x4 cg-helper {
+  width: 11.11111%;
+  height: 25.00000%;
+}
+.board9x4 cg-board square {
+  width: 11.11111%;
+  height: 25.00000%;
+}
+.board9x4 .cg-wrap piece {
+  width: 11.11111%;
+  height: 25.00000%;
+}
+.board9x5 .cg-wrap {
+  width: 640px;
+  height: 355px;
+}
+.board9x5 cg-container {
+  width: 900%;
+  height: 444%;
+}
+.board9x5 cg-helper {
+  width: 11.11111%;
+  height: 20.00000%;
+}
+.board9x5 cg-board square {
+  width: 11.11111%;
+  height: 20.00000%;
+}
+.board9x5 .cg-wrap piece {
+  width: 11.11111%;
+  height: 20.00000%;
+}
+.board9x6 .cg-wrap {
+  width: 640px;
+  height: 426px;
+}
+.board9x6 cg-container {
+  width: 900%;
+  height: 533%;
+}
+.board9x6 cg-helper {
+  width: 11.11111%;
+  height: 16.66666%;
+}
+.board9x6 cg-board square {
+  width: 11.11111%;
+  height: 16.66666%;
+}
+.board9x6 .cg-wrap piece {
+  width: 11.11111%;
+  height: 16.66666%;
+}
+.board9x7 .cg-wrap {
+  width: 640px;
+  height: 497px;
+}
+.board9x7 cg-container {
+  width: 900%;
+  height: 622%;
+}
+.board9x7 cg-helper {
+  width: 11.11111%;
+  height: 14.28571%;
+}
+.board9x7 cg-board square {
+  width: 11.11111%;
+  height: 14.28571%;
+}
+.board9x7 .cg-wrap piece {
+  width: 11.11111%;
+  height: 14.28571%;
+}
+.board9x8 .cg-wrap {
+  width: 640px;
+  height: 568px;
+}
+.board9x8 cg-container {
+  width: 900%;
+  height: 711%;
+}
+.board9x8 cg-helper {
+  width: 11.11111%;
+  height: 12.50000%;
+}
+.board9x8 cg-board square {
+  width: 11.11111%;
+  height: 12.50000%;
+}
+.board9x8 .cg-wrap piece {
+  width: 11.11111%;
+  height: 12.50000%;
+}
+.board9x9 .cg-wrap {
+  width: 640px;
+  height: 640px;
+}
+.board9x9 cg-container {
+  width: 900%;
+  height: 800%;
+}
+.board9x9 cg-helper {
+  width: 11.11111%;
+  height: 11.11111%;
+}
+.board9x9 cg-board square {
+  width: 11.11111%;
+  height: 11.11111%;
+}
+.board9x9 .cg-wrap piece {
+  width: 11.11111%;
+  height: 11.11111%;
+}
+.board9x10 .cg-wrap {
+  width: 576px;
+  height: 640px;
+}
+.board9x10 cg-container {
+  width: 900%;
+  height: 888%;
+}
+.board9x10 cg-helper {
+  width: 11.11111%;
+  height: 10.00000%;
+}
+.board9x10 cg-board square {
+  width: 11.11111%;
+  height: 10.00000%;
+}
+.board9x10 .cg-wrap piece {
+  width: 11.11111%;
+  height: 10.00000%;
+}
+.board10x1 .cg-wrap {
+  width: 640px;
+  height: 64px;
+}
+.board10x1 cg-container {
+  width: 1000%;
+  height: 80%;
+}
+.board10x1 cg-helper {
+  width: 10.00000%;
+  height: 100.00000%;
+}
+.board10x1 cg-board square {
+  width: 10.00000%;
+  height: 100.00000%;
+}
+.board10x1 .cg-wrap piece {
+  width: 10.00000%;
+  height: 100.00000%;
+}
+.board10x2 .cg-wrap {
+  width: 640px;
+  height: 128px;
+}
+.board10x2 cg-container {
+  width: 1000%;
+  height: 160%;
+}
+.board10x2 cg-helper {
+  width: 10.00000%;
+  height: 50.00000%;
+}
+.board10x2 cg-board square {
+  width: 10.00000%;
+  height: 50.00000%;
+}
+.board10x2 .cg-wrap piece {
+  width: 10.00000%;
+  height: 50.00000%;
+}
+.board10x3 .cg-wrap {
+  width: 640px;
+  height: 192px;
+}
+.board10x3 cg-container {
+  width: 1000%;
+  height: 240%;
+}
+.board10x3 cg-helper {
+  width: 10.00000%;
+  height: 33.33333%;
+}
+.board10x3 cg-board square {
+  width: 10.00000%;
+  height: 33.33333%;
+}
+.board10x3 .cg-wrap piece {
+  width: 10.00000%;
+  height: 33.33333%;
+}
+.board10x4 .cg-wrap {
+  width: 640px;
+  height: 256px;
+}
+.board10x4 cg-container {
+  width: 1000%;
+  height: 320%;
+}
+.board10x4 cg-helper {
+  width: 10.00000%;
+  height: 25.00000%;
+}
+.board10x4 cg-board square {
+  width: 10.00000%;
+  height: 25.00000%;
+}
+.board10x4 .cg-wrap piece {
+  width: 10.00000%;
+  height: 25.00000%;
+}
+.board10x5 .cg-wrap {
+  width: 640px;
+  height: 320px;
+}
+.board10x5 cg-container {
+  width: 1000%;
+  height: 400%;
+}
+.board10x5 cg-helper {
+  width: 10.00000%;
+  height: 20.00000%;
+}
+.board10x5 cg-board square {
+  width: 10.00000%;
+  height: 20.00000%;
+}
+.board10x5 .cg-wrap piece {
+  width: 10.00000%;
+  height: 20.00000%;
+}
+.board10x6 .cg-wrap {
+  width: 640px;
+  height: 384px;
+}
+.board10x6 cg-container {
+  width: 1000%;
+  height: 480%;
+}
+.board10x6 cg-helper {
+  width: 10.00000%;
+  height: 16.66666%;
+}
+.board10x6 cg-board square {
+  width: 10.00000%;
+  height: 16.66666%;
+}
+.board10x6 .cg-wrap piece {
+  width: 10.00000%;
+  height: 16.66666%;
+}
+.board10x7 .cg-wrap {
+  width: 640px;
+  height: 448px;
+}
+.board10x7 cg-container {
+  width: 1000%;
+  height: 560%;
+}
+.board10x7 cg-helper {
+  width: 10.00000%;
+  height: 14.28571%;
+}
+.board10x7 cg-board square {
+  width: 10.00000%;
+  height: 14.28571%;
+}
+.board10x7 .cg-wrap piece {
+  width: 10.00000%;
+  height: 14.28571%;
+}
+.board10x8 .cg-wrap {
+  width: 640px;
+  height: 512px;
+}
+.board10x8 cg-container {
+  width: 1000%;
+  height: 640%;
+}
+.board10x8 cg-helper {
+  width: 10.00000%;
+  height: 12.50000%;
+}
+.board10x8 cg-board square {
+  width: 10.00000%;
+  height: 12.50000%;
+}
+.board10x8 .cg-wrap piece {
+  width: 10.00000%;
+  height: 12.50000%;
+}
+.board10x9 .cg-wrap {
+  width: 640px;
+  height: 576px;
+}
+.board10x9 cg-container {
+  width: 1000%;
+  height: 720%;
+}
+.board10x9 cg-helper {
+  width: 10.00000%;
+  height: 11.11111%;
+}
+.board10x9 cg-board square {
+  width: 10.00000%;
+  height: 11.11111%;
+}
+.board10x9 .cg-wrap piece {
+  width: 10.00000%;
+  height: 11.11111%;
+}
+.board10x10 .cg-wrap {
+  width: 640px;
+  height: 640px;
+}
+.board10x10 cg-container {
+  width: 1000%;
+  height: 800%;
+}
+.board10x10 cg-helper {
+  width: 10.00000%;
+  height: 10.00000%;
+}
+.board10x10 cg-board square {
+  width: 10.00000%;
+  height: 10.00000%;
+}
+.board10x10 .cg-wrap piece {
+  width: 10.00000%;
+  height: 10.00000%;
+}
+.board11x1 .cg-wrap {
+  width: 640px;
+  height: 58px;
+}
+.board11x1 cg-container {
+  width: 1100%;
+  height: 72%;
+}
+.board11x1 cg-helper {
+  width: 9.09090%;
+  height: 100.00000%;
+}
+.board11x1 cg-board square {
+  width: 9.09090%;
+  height: 100.00000%;
+}
+.board11x1 .cg-wrap piece {
+  width: 9.09090%;
+  height: 100.00000%;
+}
+.board11x2 .cg-wrap {
+  width: 640px;
+  height: 116px;
+}
+.board11x2 cg-container {
+  width: 1100%;
+  height: 145%;
+}
+.board11x2 cg-helper {
+  width: 9.09090%;
+  height: 50.00000%;
+}
+.board11x2 cg-board square {
+  width: 9.09090%;
+  height: 50.00000%;
+}
+.board11x2 .cg-wrap piece {
+  width: 9.09090%;
+  height: 50.00000%;
+}
+.board11x3 .cg-wrap {
+  width: 640px;
+  height: 174px;
+}
+.board11x3 cg-container {
+  width: 1100%;
+  height: 218%;
+}
+.board11x3 cg-helper {
+  width: 9.09090%;
+  height: 33.33333%;
+}
+.board11x3 cg-board square {
+  width: 9.09090%;
+  height: 33.33333%;
+}
+.board11x3 .cg-wrap piece {
+  width: 9.09090%;
+  height: 33.33333%;
+}
+.board11x4 .cg-wrap {
+  width: 640px;
+  height: 232px;
+}
+.board11x4 cg-container {
+  width: 1100%;
+  height: 290%;
+}
+.board11x4 cg-helper {
+  width: 9.09090%;
+  height: 25.00000%;
+}
+.board11x4 cg-board square {
+  width: 9.09090%;
+  height: 25.00000%;
+}
+.board11x4 .cg-wrap piece {
+  width: 9.09090%;
+  height: 25.00000%;
+}
+.board11x5 .cg-wrap {
+  width: 640px;
+  height: 290px;
+}
+.board11x5 cg-container {
+  width: 1100%;
+  height: 363%;
+}
+.board11x5 cg-helper {
+  width: 9.09090%;
+  height: 20.00000%;
+}
+.board11x5 cg-board square {
+  width: 9.09090%;
+  height: 20.00000%;
+}
+.board11x5 .cg-wrap piece {
+  width: 9.09090%;
+  height: 20.00000%;
+}
+.board11x6 .cg-wrap {
+  width: 640px;
+  height: 349px;
+}
+.board11x6 cg-container {
+  width: 1100%;
+  height: 436%;
+}
+.board11x6 cg-helper {
+  width: 9.09090%;
+  height: 16.66666%;
+}
+.board11x6 cg-board square {
+  width: 9.09090%;
+  height: 16.66666%;
+}
+.board11x6 .cg-wrap piece {
+  width: 9.09090%;
+  height: 16.66666%;
+}
+.board11x7 .cg-wrap {
+  width: 640px;
+  height: 407px;
+}
+.board11x7 cg-container {
+  width: 1100%;
+  height: 509%;
+}
+.board11x7 cg-helper {
+  width: 9.09090%;
+  height: 14.28571%;
+}
+.board11x7 cg-board square {
+  width: 9.09090%;
+  height: 14.28571%;
+}
+.board11x7 .cg-wrap piece {
+  width: 9.09090%;
+  height: 14.28571%;
+}
+.board11x8 .cg-wrap {
+  width: 640px;
+  height: 465px;
+}
+.board11x8 cg-container {
+  width: 1100%;
+  height: 581%;
+}
+.board11x8 cg-helper {
+  width: 9.09090%;
+  height: 12.50000%;
+}
+.board11x8 cg-board square {
+  width: 9.09090%;
+  height: 12.50000%;
+}
+.board11x8 .cg-wrap piece {
+  width: 9.09090%;
+  height: 12.50000%;
+}
+.board11x9 .cg-wrap {
+  width: 640px;
+  height: 523px;
+}
+.board11x9 cg-container {
+  width: 1100%;
+  height: 654%;
+}
+.board11x9 cg-helper {
+  width: 9.09090%;
+  height: 11.11111%;
+}
+.board11x9 cg-board square {
+  width: 9.09090%;
+  height: 11.11111%;
+}
+.board11x9 .cg-wrap piece {
+  width: 9.09090%;
+  height: 11.11111%;
+}
+.board11x10 .cg-wrap {
+  width: 640px;
+  height: 581px;
+}
+.board11x10 cg-container {
+  width: 1100%;
+  height: 727%;
+}
+.board11x10 cg-helper {
+  width: 9.09090%;
+  height: 10.00000%;
+}
+.board11x10 cg-board square {
+  width: 9.09090%;
+  height: 10.00000%;
+}
+.board11x10 .cg-wrap piece {
+  width: 9.09090%;
+  height: 10.00000%;
+}
+.board12x1 .cg-wrap {
+  width: 640px;
+  height: 53px;
+}
+.board12x1 cg-container {
+  width: 1200%;
+  height: 66%;
+}
+.board12x1 cg-helper {
+  width: 8.33333%;
+  height: 100.00000%;
+}
+.board12x1 cg-board square {
+  width: 8.33333%;
+  height: 100.00000%;
+}
+.board12x1 .cg-wrap piece {
+  width: 8.33333%;
+  height: 100.00000%;
+}
+.board12x2 .cg-wrap {
+  width: 640px;
+  height: 106px;
+}
+.board12x2 cg-container {
+  width: 1200%;
+  height: 133%;
+}
+.board12x2 cg-helper {
+  width: 8.33333%;
+  height: 50.00000%;
+}
+.board12x2 cg-board square {
+  width: 8.33333%;
+  height: 50.00000%;
+}
+.board12x2 .cg-wrap piece {
+  width: 8.33333%;
+  height: 50.00000%;
+}
+.board12x3 .cg-wrap {
+  width: 640px;
+  height: 160px;
+}
+.board12x3 cg-container {
+  width: 1200%;
+  height: 200%;
+}
+.board12x3 cg-helper {
+  width: 8.33333%;
+  height: 33.33333%;
+}
+.board12x3 cg-board square {
+  width: 8.33333%;
+  height: 33.33333%;
+}
+.board12x3 .cg-wrap piece {
+  width: 8.33333%;
+  height: 33.33333%;
+}
+.board12x4 .cg-wrap {
+  width: 640px;
+  height: 213px;
+}
+.board12x4 cg-container {
+  width: 1200%;
+  height: 266%;
+}
+.board12x4 cg-helper {
+  width: 8.33333%;
+  height: 25.00000%;
+}
+.board12x4 cg-board square {
+  width: 8.33333%;
+  height: 25.00000%;
+}
+.board12x4 .cg-wrap piece {
+  width: 8.33333%;
+  height: 25.00000%;
+}
+.board12x5 .cg-wrap {
+  width: 640px;
+  height: 266px;
+}
+.board12x5 cg-container {
+  width: 1200%;
+  height: 333%;
+}
+.board12x5 cg-helper {
+  width: 8.33333%;
+  height: 20.00000%;
+}
+.board12x5 cg-board square {
+  width: 8.33333%;
+  height: 20.00000%;
+}
+.board12x5 .cg-wrap piece {
+  width: 8.33333%;
+  height: 20.00000%;
+}
+.board12x6 .cg-wrap {
+  width: 640px;
+  height: 320px;
+}
+.board12x6 cg-container {
+  width: 1200%;
+  height: 400%;
+}
+.board12x6 cg-helper {
+  width: 8.33333%;
+  height: 16.66666%;
+}
+.board12x6 cg-board square {
+  width: 8.33333%;
+  height: 16.66666%;
+}
+.board12x6 .cg-wrap piece {
+  width: 8.33333%;
+  height: 16.66666%;
+}
+.board12x7 .cg-wrap {
+  width: 640px;
+  height: 373px;
+}
+.board12x7 cg-container {
+  width: 1200%;
+  height: 466%;
+}
+.board12x7 cg-helper {
+  width: 8.33333%;
+  height: 14.28571%;
+}
+.board12x7 cg-board square {
+  width: 8.33333%;
+  height: 14.28571%;
+}
+.board12x7 .cg-wrap piece {
+  width: 8.33333%;
+  height: 14.28571%;
+}
+.board12x8 .cg-wrap {
+  width: 640px;
+  height: 426px;
+}
+.board12x8 cg-container {
+  width: 1200%;
+  height: 533%;
+}
+.board12x8 cg-helper {
+  width: 8.33333%;
+  height: 12.50000%;
+}
+.board12x8 cg-board square {
+  width: 8.33333%;
+  height: 12.50000%;
+}
+.board12x8 .cg-wrap piece {
+  width: 8.33333%;
+  height: 12.50000%;
+}
+.board12x9 .cg-wrap {
+  width: 640px;
+  height: 480px;
+}
+.board12x9 cg-container {
+  width: 1200%;
+  height: 600%;
+}
+.board12x9 cg-helper {
+  width: 8.33333%;
+  height: 11.11111%;
+}
+.board12x9 cg-board square {
+  width: 8.33333%;
+  height: 11.11111%;
+}
+.board12x9 .cg-wrap piece {
+  width: 8.33333%;
+  height: 11.11111%;
+}
+.board12x10 .cg-wrap {
+  width: 640px;
+  height: 533px;
+}
+.board12x10 cg-container {
+  width: 1200%;
+  height: 666%;
+}
+.board12x10 cg-helper {
+  width: 8.33333%;
+  height: 10.00000%;
+}
+.board12x10 cg-board square {
+  width: 8.33333%;
+  height: 10.00000%;
+}
+.board12x10 .cg-wrap piece {
+  width: 8.33333%;
+  height: 10.00000%;
+}
