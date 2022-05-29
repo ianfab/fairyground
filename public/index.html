@@ -269,6 +269,8 @@
       };
 
       const setVariant = () => {
+        play_move = false;
+        stop();
         const variant = $("#dropdown-variant").value;
         stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
         stockfish.postMessage(`position startpos`);
@@ -277,7 +279,7 @@
       };
 
       const setFen = () => {
-        stockfish.postMessage(`stop`);
+        stop();
         const fen = $("#fen").value;
         const moves = $("#move").value;
         if (fen.length > 0) {
@@ -285,7 +287,7 @@
         } else {
           stockfish.postMessage(`position startpos moves ${moves}`);
         }
-        stm = $("#label-stm").innerText;
+        const stm = $("#label-stm").innerText;
         if (
           stm != "undefined" &&
           (analysis_mode ||
@@ -308,6 +310,9 @@
       };
 
       const go = () => {
+        return_early = play_move;
+        stop();
+        if (return_early) return; // avoid race condition
         let args = "";
         const movetime = $("#movetime").value;
         const depth = $("#depth").value;
@@ -317,7 +322,7 @@
         if (!analysis_mode && depth.length > 0) {
           args += ` depth ${depth}`;
         }
-        stm = $("#label-stm").innerText;
+        const stm = $("#label-stm").innerText;
         play_move =
           (play_white && stm == "white") || (play_black && stm == "black");
         stockfish.postMessage(`go${args}`);
@@ -326,6 +331,11 @@
 
       const stop = () => {
         stockfish.postMessage(`stop`);
+      };
+
+      const force_stop = () => {
+        play_white = play_black = false;
+        stop();
       };
 
       const changePieces = () => {
@@ -540,7 +550,11 @@
               min: 0,
             }),
             m("button#go", { disabled: !is_ready, onclick: go }, "Go"),
-            m("button#stop", { disabled: !is_ready, onclick: stop }, "Stop"),
+            m(
+              "button#stop",
+              { disabled: !is_ready, onclick: force_stop },
+              "Stop"
+            ),
             m(
               "label",
               m("input[type=checkbox]#analysis", {
