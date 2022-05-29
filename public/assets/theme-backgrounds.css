@@ -1,6 +1,360 @@
-/*
- * Board
- */
-.blue .cg-wrap {
-  background-image: url('images/board/10x10blue.svg');
+.blue.board1x1 .cg-wrap {
+  background-image: url('images/board/blue1x1.svg');
+}
+.blue.board1x2 .cg-wrap {
+  background-image: url('images/board/blue1x2.svg');
+}
+.blue.board1x3 .cg-wrap {
+  background-image: url('images/board/blue1x3.svg');
+}
+.blue.board1x4 .cg-wrap {
+  background-image: url('images/board/blue1x4.svg');
+}
+.blue.board1x5 .cg-wrap {
+  background-image: url('images/board/blue1x5.svg');
+}
+.blue.board1x6 .cg-wrap {
+  background-image: url('images/board/blue1x6.svg');
+}
+.blue.board1x7 .cg-wrap {
+  background-image: url('images/board/blue1x7.svg');
+}
+.blue.board1x8 .cg-wrap {
+  background-image: url('images/board/blue1x8.svg');
+}
+.blue.board1x9 .cg-wrap {
+  background-image: url('images/board/blue1x9.svg');
+}
+.blue.board1x10 .cg-wrap {
+  background-image: url('images/board/blue1x10.svg');
+}
+.blue.board2x1 .cg-wrap {
+  background-image: url('images/board/blue2x1.svg');
+}
+.blue.board2x2 .cg-wrap {
+  background-image: url('images/board/blue2x2.svg');
+}
+.blue.board2x3 .cg-wrap {
+  background-image: url('images/board/blue2x3.svg');
+}
+.blue.board2x4 .cg-wrap {
+  background-image: url('images/board/blue2x4.svg');
+}
+.blue.board2x5 .cg-wrap {
+  background-image: url('images/board/blue2x5.svg');
+}
+.blue.board2x6 .cg-wrap {
+  background-image: url('images/board/blue2x6.svg');
+}
+.blue.board2x7 .cg-wrap {
+  background-image: url('images/board/blue2x7.svg');
+}
+.blue.board2x8 .cg-wrap {
+  background-image: url('images/board/blue2x8.svg');
+}
+.blue.board2x9 .cg-wrap {
+  background-image: url('images/board/blue2x9.svg');
+}
+.blue.board2x10 .cg-wrap {
+  background-image: url('images/board/blue2x10.svg');
+}
+.blue.board3x1 .cg-wrap {
+  background-image: url('images/board/blue3x1.svg');
+}
+.blue.board3x2 .cg-wrap {
+  background-image: url('images/board/blue3x2.svg');
+}
+.blue.board3x3 .cg-wrap {
+  background-image: url('images/board/blue3x3.svg');
+}
+.blue.board3x4 .cg-wrap {
+  background-image: url('images/board/blue3x4.svg');
+}
+.blue.board3x5 .cg-wrap {
+  background-image: url('images/board/blue3x5.svg');
+}
+.blue.board3x6 .cg-wrap {
+  background-image: url('images/board/blue3x6.svg');
+}
+.blue.board3x7 .cg-wrap {
+  background-image: url('images/board/blue3x7.svg');
+}
+.blue.board3x8 .cg-wrap {
+  background-image: url('images/board/blue3x8.svg');
+}
+.blue.board3x9 .cg-wrap {
+  background-image: url('images/board/blue3x9.svg');
+}
+.blue.board3x10 .cg-wrap {
+  background-image: url('images/board/blue3x10.svg');
+}
+.blue.board4x1 .cg-wrap {
+  background-image: url('images/board/blue4x1.svg');
+}
+.blue.board4x2 .cg-wrap {
+  background-image: url('images/board/blue4x2.svg');
+}
+.blue.board4x3 .cg-wrap {
+  background-image: url('images/board/blue4x3.svg');
+}
+.blue.board4x4 .cg-wrap {
+  background-image: url('images/board/blue4x4.svg');
+}
+.blue.board4x5 .cg-wrap {
+  background-image: url('images/board/blue4x5.svg');
+}
+.blue.board4x6 .cg-wrap {
+  background-image: url('images/board/blue4x6.svg');
+}
+.blue.board4x7 .cg-wrap {
+  background-image: url('images/board/blue4x7.svg');
+}
+.blue.board4x8 .cg-wrap {
+  background-image: url('images/board/blue4x8.svg');
+}
+.blue.board4x9 .cg-wrap {
+  background-image: url('images/board/blue4x9.svg');
+}
+.blue.board4x10 .cg-wrap {
+  background-image: url('images/board/blue4x10.svg');
+}
+.blue.board5x1 .cg-wrap {
+  background-image: url('images/board/blue5x1.svg');
+}
+.blue.board5x2 .cg-wrap {
+  background-image: url('images/board/blue5x2.svg');
+}
+.blue.board5x3 .cg-wrap {
+  background-image: url('images/board/blue5x3.svg');
+}
+.blue.board5x4 .cg-wrap {
+  background-image: url('images/board/blue5x4.svg');
+}
+.blue.board5x5 .cg-wrap {
+  background-image: url('images/board/blue5x5.svg');
+}
+.blue.board5x6 .cg-wrap {
+  background-image: url('images/board/blue5x6.svg');
+}
+.blue.board5x7 .cg-wrap {
+  background-image: url('images/board/blue5x7.svg');
+}
+.blue.board5x8 .cg-wrap {
+  background-image: url('images/board/blue5x8.svg');
+}
+.blue.board5x9 .cg-wrap {
+  background-image: url('images/board/blue5x9.svg');
+}
+.blue.board5x10 .cg-wrap {
+  background-image: url('images/board/blue5x10.svg');
+}
+.blue.board6x1 .cg-wrap {
+  background-image: url('images/board/blue6x1.svg');
+}
+.blue.board6x2 .cg-wrap {
+  background-image: url('images/board/blue6x2.svg');
+}
+.blue.board6x3 .cg-wrap {
+  background-image: url('images/board/blue6x3.svg');
+}
+.blue.board6x4 .cg-wrap {
+  background-image: url('images/board/blue6x4.svg');
+}
+.blue.board6x5 .cg-wrap {
+  background-image: url('images/board/blue6x5.svg');
+}
+.blue.board6x6 .cg-wrap {
+  background-image: url('images/board/blue6x6.svg');
+}
+.blue.board6x7 .cg-wrap {
+  background-image: url('images/board/blue6x7.svg');
+}
+.blue.board6x8 .cg-wrap {
+  background-image: url('images/board/blue6x8.svg');
+}
+.blue.board6x9 .cg-wrap {
+  background-image: url('images/board/blue6x9.svg');
+}
+.blue.board6x10 .cg-wrap {
+  background-image: url('images/board/blue6x10.svg');
+}
+.blue.board7x1 .cg-wrap {
+  background-image: url('images/board/blue7x1.svg');
+}
+.blue.board7x2 .cg-wrap {
+  background-image: url('images/board/blue7x2.svg');
+}
+.blue.board7x3 .cg-wrap {
+  background-image: url('images/board/blue7x3.svg');
+}
+.blue.board7x4 .cg-wrap {
+  background-image: url('images/board/blue7x4.svg');
+}
+.blue.board7x5 .cg-wrap {
+  background-image: url('images/board/blue7x5.svg');
+}
+.blue.board7x6 .cg-wrap {
+  background-image: url('images/board/blue7x6.svg');
+}
+.blue.board7x7 .cg-wrap {
+  background-image: url('images/board/blue7x7.svg');
+}
+.blue.board7x8 .cg-wrap {
+  background-image: url('images/board/blue7x8.svg');
+}
+.blue.board7x9 .cg-wrap {
+  background-image: url('images/board/blue7x9.svg');
+}
+.blue.board7x10 .cg-wrap {
+  background-image: url('images/board/blue7x10.svg');
+}
+.blue.board8x1 .cg-wrap {
+  background-image: url('images/board/blue8x1.svg');
+}
+.blue.board8x2 .cg-wrap {
+  background-image: url('images/board/blue8x2.svg');
+}
+.blue.board8x3 .cg-wrap {
+  background-image: url('images/board/blue8x3.svg');
+}
+.blue.board8x4 .cg-wrap {
+  background-image: url('images/board/blue8x4.svg');
+}
+.blue.board8x5 .cg-wrap {
+  background-image: url('images/board/blue8x5.svg');
+}
+.blue.board8x6 .cg-wrap {
+  background-image: url('images/board/blue8x6.svg');
+}
+.blue.board8x7 .cg-wrap {
+  background-image: url('images/board/blue8x7.svg');
+}
+.blue.board8x8 .cg-wrap {
+  background-image: url('images/board/blue8x8.svg');
+}
+.blue.board8x9 .cg-wrap {
+  background-image: url('images/board/blue8x9.svg');
+}
+.blue.board8x10 .cg-wrap {
+  background-image: url('images/board/blue8x10.svg');
+}
+.blue.board9x1 .cg-wrap {
+  background-image: url('images/board/blue9x1.svg');
+}
+.blue.board9x2 .cg-wrap {
+  background-image: url('images/board/blue9x2.svg');
+}
+.blue.board9x3 .cg-wrap {
+  background-image: url('images/board/blue9x3.svg');
+}
+.blue.board9x4 .cg-wrap {
+  background-image: url('images/board/blue9x4.svg');
+}
+.blue.board9x5 .cg-wrap {
+  background-image: url('images/board/blue9x5.svg');
+}
+.blue.board9x6 .cg-wrap {
+  background-image: url('images/board/blue9x6.svg');
+}
+.blue.board9x7 .cg-wrap {
+  background-image: url('images/board/blue9x7.svg');
+}
+.blue.board9x8 .cg-wrap {
+  background-image: url('images/board/blue9x8.svg');
+}
+.blue.board9x9 .cg-wrap {
+  background-image: url('images/board/blue9x9.svg');
+}
+.blue.board9x10 .cg-wrap {
+  background-image: url('images/board/blue9x10.svg');
+}
+.blue.board10x1 .cg-wrap {
+  background-image: url('images/board/blue10x1.svg');
+}
+.blue.board10x2 .cg-wrap {
+  background-image: url('images/board/blue10x2.svg');
+}
+.blue.board10x3 .cg-wrap {
+  background-image: url('images/board/blue10x3.svg');
+}
+.blue.board10x4 .cg-wrap {
+  background-image: url('images/board/blue10x4.svg');
+}
+.blue.board10x5 .cg-wrap {
+  background-image: url('images/board/blue10x5.svg');
+}
+.blue.board10x6 .cg-wrap {
+  background-image: url('images/board/blue10x6.svg');
+}
+.blue.board10x7 .cg-wrap {
+  background-image: url('images/board/blue10x7.svg');
+}
+.blue.board10x8 .cg-wrap {
+  background-image: url('images/board/blue10x8.svg');
+}
+.blue.board10x9 .cg-wrap {
+  background-image: url('images/board/blue10x9.svg');
+}
+.blue.board10x10 .cg-wrap {
+  background-image: url('images/board/blue10x10.svg');
+}
+.blue.board11x1 .cg-wrap {
+  background-image: url('images/board/blue11x1.svg');
+}
+.blue.board11x2 .cg-wrap {
+  background-image: url('images/board/blue11x2.svg');
+}
+.blue.board11x3 .cg-wrap {
+  background-image: url('images/board/blue11x3.svg');
+}
+.blue.board11x4 .cg-wrap {
+  background-image: url('images/board/blue11x4.svg');
+}
+.blue.board11x5 .cg-wrap {
+  background-image: url('images/board/blue11x5.svg');
+}
+.blue.board11x6 .cg-wrap {
+  background-image: url('images/board/blue11x6.svg');
+}
+.blue.board11x7 .cg-wrap {
+  background-image: url('images/board/blue11x7.svg');
+}
+.blue.board11x8 .cg-wrap {
+  background-image: url('images/board/blue11x8.svg');
+}
+.blue.board11x9 .cg-wrap {
+  background-image: url('images/board/blue11x9.svg');
+}
+.blue.board11x10 .cg-wrap {
+  background-image: url('images/board/blue11x10.svg');
+}
+.blue.board12x1 .cg-wrap {
+  background-image: url('images/board/blue12x1.svg');
+}
+.blue.board12x2 .cg-wrap {
+  background-image: url('images/board/blue12x2.svg');
+}
+.blue.board12x3 .cg-wrap {
+  background-image: url('images/board/blue12x3.svg');
+}
+.blue.board12x4 .cg-wrap {
+  background-image: url('images/board/blue12x4.svg');
+}
+.blue.board12x5 .cg-wrap {
+  background-image: url('images/board/blue12x5.svg');
+}
+.blue.board12x6 .cg-wrap {
+  background-image: url('images/board/blue12x6.svg');
+}
+.blue.board12x7 .cg-wrap {
+  background-image: url('images/board/blue12x7.svg');
+}
+.blue.board12x8 .cg-wrap {
+  background-image: url('images/board/blue12x8.svg');
+}
+.blue.board12x9 .cg-wrap {
+  background-image: url('images/board/blue12x9.svg');
+}
+.blue.board12x10 .cg-wrap {
+  background-image: url('images/board/blue12x10.svg');
 }

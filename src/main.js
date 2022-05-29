@@ -39,6 +39,18 @@ function initBoard(variant) {
   console.log("Variant:", board.variant());
 }
 
+function getDimensions() {
+  const fenBoard = board.fen().split(" ")[0];
+  const ranks = fenBoard.split("/").length;
+  const lastRank = fenBoard.split("/")[0].replace(/[^0-9a-z]/gi, "");
+  let files = lastRank.length;
+  for (const match of lastRank.matchAll(/\d+/g)) {
+    files += parseInt(match[0]) - match[0].length;
+  }
+  console.log("Board: %dx%d", files, ranks);
+  return { width: files, height: ranks };
+}
+
 import Module from "ffish-es6";
 new Module().then((loadedModule) => {
   ffish = loadedModule;
@@ -47,7 +59,6 @@ new Module().then((loadedModule) => {
   initBoard(dropdownVariant.value);
 
   const config = {
-    geometry: 4,
     movable: {
       free: false,
       showDests: checkboxDests.checked,
@@ -81,7 +92,17 @@ new Module().then((loadedModule) => {
 
   dropdownVariant.onchange = function () {
     if (!ffish.variants().includes(dropdownVariant.value)) return;
+    const oldDimensions = getDimensions();
     initBoard(dropdownVariant.value);
+    const newDimensions = getDimensions();
+    chessground.set({ dimensions: newDimensions });
+    chessgroundContainerEl.classList.toggle(
+      `board${oldDimensions["width"]}x${oldDimensions["height"]}`
+    );
+    chessgroundContainerEl.classList.toggle(
+      `board${newDimensions["width"]}x${newDimensions["height"]}`
+    );
+    chessground.redrawAll();
     updateChessground();
     chessground.cancelPremove();
   };
@@ -132,7 +153,7 @@ new Module().then((loadedModule) => {
 // Chessground helper functions
 
 function getDests(board) {
-  const dests = {};
+  const dests = new Map();
   const moves = board
     .legalMoves()
     .split(" ")
@@ -143,8 +164,8 @@ function getDests(board) {
     if (!match) continue;
     const from = match[1].replace("10", ":");
     const to = match[2].replace("10", ":");
-    if (dests[from] === undefined) dests[from] = [];
-    dests[from].push(to);
+    if (dests.get(from) === undefined) dests.set(from, []);
+    dests.get(from).push(to);
   }
   return dests;
 }

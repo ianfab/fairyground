@@ -101,3 +101,23 @@
 .merida .cg-wrap piece.j-piece.black {
   background-image: url('images/pieces/merida/bJ.svg');
 }
+
+
+.merida.board9x10 .cg-wrap piece.a-piece.white {
+  background-image: url('images/pieces/merida/wS.svg');
+}
+.merida.board9x10 .cg-wrap piece.b-piece.white {
+  background-image: url('images/pieces/merida/wE.svg');
+}
+.merida.board9x10 .cg-wrap piece.c-piece.white {
+  background-image: url('images/pieces/merida/wCa.svg');
+}
+.merida.board9x10 .cg-wrap piece.a-piece.black {
+  background-image: url('images/pieces/merida/bS.svg');
+}
+.merida.board9x10 .cg-wrap piece.b-piece.black {
+  background-image: url('images/pieces/merida/bE.svg');
+}
+.merida.board9x10 .cg-wrap piece.c-piece.black {
+  background-image: url('images/pieces/merida/bCa.svg');
+}
