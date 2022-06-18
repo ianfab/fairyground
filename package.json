@@ -11,7 +11,7 @@
     "chessgroundx": "^9.2.0",
     "express": "^4.17.1",
     "fairy-stockfish-nnue.wasm": "^1.0.1",
-    "ffish-es6": "^0.6.3",
+    "ffish-es6": "^0.6.8",
     "serve": "^12.0.0"
   },
   "devDependencies": {
