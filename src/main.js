@@ -1,6 +1,7 @@
 // ffish.js test using chessgroundx
 
 const Chessground = require("chessgroundx").Chessground;
+import * as util from "chessgroundx/util";
 
 const variantsIni = document.getElementById("variants-ini");
 const dropdownVariant = document.getElementById("dropdown-variant");
@@ -22,6 +23,8 @@ const chessgroundContainerEl = document.getElementById(
   "chessground-container-div"
 );
 const chessgroundEl = document.getElementById("chessground-board");
+const pocketTopEl = document.getElementById("pocket-top");
+const pocketBottomEl = document.getElementById("pocket-bottom");
 
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
@@ -32,11 +35,69 @@ let ffish = null;
 let board = null;
 let chessground = null;
 
+const WHITE = true;
+const BLACK = false;
+
+function getPieceRoles(pieceLetters) {
+  const uniqueLetters = new Set(pieceLetters.toLowerCase().split(""));
+  return [...uniqueLetters].map(char => char + "-piece");
+}
+
 function initBoard(variant) {
   if (board !== null) board.delete();
 
   board = new ffish.Board(variant);
   console.log("Variant:", board.variant());
+
+  // Figuring out pocket roles from initial FEN
+  const fenBoard = board.fen().split(" ")[0];
+  var pocketRoles = undefined;
+  if (fenBoard.includes('[')) {
+    const wpocket = board.pocket(WHITE);
+    const bpocket = board.pocket(BLACK);
+    // Variants with empty hands at start (zh, shogi, etc.)
+    if (!wpocket && !bpocket) {
+      const pieceLetters = fenBoard.replace(/[0-9kK\/\[\]]/g, "");
+      const pieceRoles = getPieceRoles(pieceLetters);
+      pocketRoles = {
+        white: pieceRoles,
+        black: pieceRoles,
+      }
+    // Variants having pieces in hand at start (placement, sittuyin, etc.)
+    } else {
+      pocketRoles = {
+        white: getPieceRoles(wpocket),
+        black: getPieceRoles(bpocket),
+      }
+    }
+  }
+
+  const config = {
+    dimensions: getDimensions(),
+    fen: fenBoard,
+    movable: {
+      free: true,
+      showDests: checkboxDests.checked,
+      events: {
+        after: afterChessgroundMove,
+        afterNewPiece: afterChessgroundDrop,
+      },
+    },
+    draggable: {
+      showGhost: true,
+    },
+    selectable: {
+      enabled: false,
+    },
+    pocketRoles: pocketRoles,
+  };
+
+  chessground = Chessground(chessgroundEl, config, pocketTopEl, pocketBottomEl);
+
+  if (pocketRoles === undefined) {
+    pocketTopEl.style.display = "none";
+    pocketBottomEl.style.display = "none";
+  }
 }
 
 function getDimensions() {
@@ -58,23 +119,6 @@ new Module().then((loadedModule) => {
 
   initBoard(dropdownVariant.value);
 
-  const config = {
-    movable: {
-      free: false,
-      showDests: checkboxDests.checked,
-      events: {
-        after: afterChessgroundMove,
-      },
-    },
-    draggable: {
-      showGhost: true,
-    },
-    selectable: {
-      enabled: false,
-    },
-  };
-  chessground = Chessground(chessgroundEl, config);
-
   soundMove.volume = rangeVolume.value;
   soundCapture.volume = rangeVolume.value;
   soundCheck.volume = rangeVolume.value;
@@ -95,16 +139,14 @@ new Module().then((loadedModule) => {
     const oldDimensions = getDimensions();
     initBoard(dropdownVariant.value);
     const newDimensions = getDimensions();
-    chessground.set({ dimensions: newDimensions });
+
     chessgroundContainerEl.classList.toggle(
       `board${oldDimensions["width"]}x${oldDimensions["height"]}`
     );
     chessgroundContainerEl.classList.toggle(
       `board${newDimensions["width"]}x${newDimensions["height"]}`
     );
-    chessground.redrawAll();
     updateChessground();
-    chessground.cancelPremove();
   };
 
   buttonFlip.onclick = function () {
@@ -236,6 +278,13 @@ function afterChessgroundMove(orig, dest, metadata) {
     if (foundmove) board.push(foundmove[0]);
   }
   afterMove(capture);
+}
+
+function afterChessgroundDrop(piece, dest, metadata) {
+  const role = piece.role;
+  const move = util.dropOrigOf(role) + dest.replace(":", "10");
+  board.push(move);
+  afterMove(false);
 }
 
 function afterMove(capture) {

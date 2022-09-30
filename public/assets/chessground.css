@@ -173,3 +173,79 @@ cg-board piece.fading {
 .cg-wrap coords.side coord {
   transform: translateY(39%);
 }
+
+/* Drop variants */
+.cg-wrap.pocket {
+  display: inline;
+}
+.pocket {
+  width: calc(var(--pocketLength) * (var(--cg-width) / var(--files)));
+  height: calc(var(--cg-height) / var(--ranks));
+  border-radius: 3px;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.3) inset;
+  background: #888;
+  white-space: nowrap;
+  display: flex;
+  --fs: calc(var(--cg-height) / var(--ranks));
+  font-size: var(--fs);
+  padding-bottom: 1px;
+}
+.pocket.top {
+  margin-bottom: var(--pocketMargin);
+}
+.pocket.bottom {
+  margin-top: var(--pocketMargin);
+}
+.pocket square, .pocket nosquare {
+  flex: 0 0 calc(100% / var(--pocketLength));
+  position: relative !important;
+  pointer-events: none;
+}
+.pocket piece {
+  height: 100% !important;
+  width: 100% !important;
+  background-position: center;
+  pointer-events: auto;
+}
+.pocket square.selected-square{
+  background-color: #14551e80 !important;
+}
+.pocket.usable square:first-child:hover {
+  border-radius: 3px 0 0 3px;
+}
+.pocket.usable square {
+  cursor: pointer;
+}
+.pocket.usable square:hover {
+  background-color: #999;
+  transition: background-color 0.13s;
+}
+.pocket.usable square.premove {
+  background-color: #555;
+}
+.pocket.usable square.premove:hover {
+  background-color: #666;
+}
+.pocket square.last-move {
+  will-change: transform;
+  background-color: rgba(155, 199, 0, 0.41);
+}
+.pocket piece[data-nb='0'] {
+  cursor: auto;
+  opacity: 0.1;
+}
+.pocket piece::after {
+  content: attr(data-nb);
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  line-height: 0.9em;
+  padding: 2px 0.2em;
+  font-weight: bold;
+  border-radius: 2px;
+  font-size: 0.3em;
+  color: #fff !important;
+  text-shadow: 0 1px 0 #000 !important;
+  background: #d85000 !important;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15) inset !important;
+}
