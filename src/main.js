@@ -40,7 +40,7 @@ const BLACK = false;
 
 function getPieceRoles(pieceLetters) {
   const uniqueLetters = new Set(pieceLetters.toLowerCase().split(""));
-  return [...uniqueLetters].map(char => char + "-piece");
+  return [...uniqueLetters].map((char) => char + "-piece");
 }
 
 function initBoard(variant) {
@@ -52,7 +52,7 @@ function initBoard(variant) {
   // Figuring out pocket roles from initial FEN
   const fenBoard = board.fen().split(" ")[0];
   var pocketRoles = undefined;
-  if (fenBoard.includes('[')) {
+  if (fenBoard.includes("[")) {
     const wpocket = board.pocket(WHITE);
     const bpocket = board.pocket(BLACK);
     // Variants with empty hands at start (zh, shogi, etc.)
@@ -62,13 +62,13 @@ function initBoard(variant) {
       pocketRoles = {
         white: pieceRoles,
         black: pieceRoles,
-      }
-    // Variants having pieces in hand at start (placement, sittuyin, etc.)
+      };
+      // Variants having pieces in hand at start (placement, sittuyin, etc.)
     } else {
       pocketRoles = {
         white: getPieceRoles(wpocket),
         black: getPieceRoles(bpocket),
-      }
+      };
     }
   }
 
