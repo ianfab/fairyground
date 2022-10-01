@@ -56,7 +56,7 @@ function initBoard(variant) {
     const wpocket = board.pocket(WHITE);
     const bpocket = board.pocket(BLACK);
     // Variants with empty hands at start (zh, shogi, etc.)
-    if (!wpocket && !bpocket) {
+    if (ffish.capturesToHand(variant)) {
       const pieceLetters = fenBoard.replace(/[0-9kK\/\[\]]/g, "");
       const pieceRoles = getPieceRoles(pieceLetters);
       pocketRoles = {
