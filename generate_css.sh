@@ -1,6 +1,6 @@
 #!/bin/bash
 # generate SVGs
-for i in {1..12};do for j in {1..10}; do sed "s#0 0 1000 1000#0 $(( 1000 - 100*j )) $(( 100*i )) $(( 100*j ))#" public/assets/images/board/blue_base.svg > "public/assets/images/board/blue${i}x${j}.svg";done;done
+for i in {1..12};do for j in {1..10}; do sed "s#0 0 1200 1000#0 $(( 1000 - 100*j )) $(( 100*i )) $(( 100*j ))#" public/assets/images/board/blue_base.svg > "public/assets/images/board/blue${i}x${j}.svg";done;done
 # generate background CSS
 for i in {1..12};do for j in {1..10}; do echo -e ".blue.board${i}x${j} cg-board {\n  background-image: url('images/board/blue${i}x${j}.svg');\n}";done;done > public/assets/theme-backgrounds.css
 
