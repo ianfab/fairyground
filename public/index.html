@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="assets/theme-backgrounds.css" />
   <link rel="stylesheet" href="assets/theme-merida.css" />
   <link rel="stylesheet" href="assets/theme-cburnett.css" />
+  <link rel="stylesheet" href="assets/theme-letters.css" />
 </head>
 
 <!-- CSS -->
@@ -339,8 +340,11 @@
       };
 
       const changePieces = () => {
-        $("#chessground-container-div").classList.toggle("cburnett");
-        $("#chessground-container-div").classList.toggle("merida");
+        const classes = ["merida", "cburnett", "letters"];
+        const el = $("#chessground-container-div");
+        const activeIndex = classes.findIndex((c) => el.classList.contains(c));
+        const nextIndex = (activeIndex + 1) % classes.length;
+        el.classList.replace(classes[activeIndex], classes[nextIndex]);
       };
 
       const scrollOutput = () => {
