@@ -146,6 +146,13 @@ new Module().then((loadedModule) => {
     chessgroundContainerEl.classList.toggle(
       `board${newDimensions["width"]}x${newDimensions["height"]}`
     );
+    if (ffish.capturesToHand(dropdownVariant.value))
+    {
+      console.log('pockets');
+      chessgroundContainerEl.classList.add(`pockets`);
+    }
+    else
+      chessgroundContainerEl.classList.remove(`pockets`);
     updateChessground();
   };
 

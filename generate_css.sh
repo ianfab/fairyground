@@ -25,6 +25,7 @@ rm public/assets/generated.css
 for i in {1..12};do
     for j in {1..10};do
         echo -e ".board${i}x${j} .cg-wrap {\n  width: $(( i > j ? 640 : 640 * i / j ))px;\n  height: $(( j > i ? 640 : 640 * j / i ))px;\n}" >> public/assets/generated.css
+        echo -e ".board${i}x${j}.pockets .cg-wrap {\n  width: $(( i > j ? 640 * i / ( i + 2 )  : 640 * i / j * i / ( i + 2 ) ))px;\n  height: $(( j > i ? 640 * i / ( i + 2 ) : 640 * j / ( i + 2 ) ))px;\n}" >> public/assets/generated.css
         echo -e ".board${i}x${j} cg-helper {\n  width: $(echo "scale=5;100 / ${i}" | bc)%;\n  height: $(echo "scale=5;100 / ${j}" | bc)%;\n}" >> public/assets/generated.css
         echo -e ".board${i}x${j} cg-board square {\n  width: $(echo "scale=5;100 / ${i}" | bc)%;\n  height: $(echo "scale=5;100 / ${j}" | bc)%;\n}" >> public/assets/generated.css
         echo -e ".board${i}x${j} .cg-wrap piece {\n  width: $(echo "scale=5;100 / ${i}" | bc)%;\n  height: $(echo "scale=5;100 / ${j}" | bc)%;\n}" >> public/assets/generated.css
