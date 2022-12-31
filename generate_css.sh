@@ -5,6 +5,7 @@ for i in {1..12};do for j in {1..10}; do sed "s#0 0 1200 1000#0 $(( 1000 - 100*j
 for i in {1..12};do for j in {1..10}; do echo -e ".blue.board${i}x${j} cg-board {\n  background-image: url('images/board/blue${i}x${j}.svg');\n}";done;done > public/assets/theme-backgrounds.css
 
 # generate theme-letters CSS
+rm public/assets/theme-letters.css
 for i in "white" "black";do
     for j in {a..z};do
         if [[ $i = "white" ]]
