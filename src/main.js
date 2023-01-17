@@ -103,7 +103,7 @@ function initBoard(variant) {
 function getDimensions() {
   const fenBoard = board.fen().split(" ")[0];
   const ranks = fenBoard.split("/").length;
-  const lastRank = fenBoard.split("/")[0].replace(/[^0-9a-z]/gi, "");
+  const lastRank = fenBoard.split("/")[0].replace(/[^0-9a-z*]/gi, "");
   let files = lastRank.length;
   for (const match of lastRank.matchAll(/\d+/g)) {
     files += parseInt(match[0]) - match[0].length;
