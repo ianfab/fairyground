@@ -10,7 +10,7 @@
   "dependencies": {
     "chessgroundx": "^10.2.2",
     "express": "^4.17.1",
-    "fairy-stockfish-nnue.wasm": "^1.0.2",
+    "fairy-stockfish-nnue.wasm": "^1.1.0",
     "ffish-es6": "^0.7.0",
     "serve": "^12.0.0"
   },
