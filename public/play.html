@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8" />
-  <title>Fairy-Stockfish playground</title>
+  <title>Play Fairy-Stockfish</title>
   <meta
     name="viewport"
     content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no"
@@ -75,13 +75,6 @@
     border-right: 0;
   }
 
-  #input #depth {
-    width: 5%;
-    padding: 2px 0 2px 6px;
-    border: 1px solid #ddd;
-    border-right: 0;
-  }
-
   #input button {
     display: inline-block;
     padding: 3px 6px 3px 6px;
@@ -117,34 +110,6 @@
     margin-top: 10px;
     width: 100%;
     height: 50%;
-  }
-
-  #info {
-    padding: 10px;
-    margin-left: 20px;
-    font-size: 16px;
-  }
-
-  #label-pgn {
-    height: 20%;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-left: 20px;
-    overflow-x: scroll;
-    overflow-y: scroll;
-    box-shadow: inset 1px 1px 2px #eee;
-    font-size: 16px;
-  }
-
-  #output2 {
-    height: 80%;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-left: 20px;
-    overflow-x: scroll;
-    overflow-y: scroll;
-    box-shadow: inset 1px 1px 2px #eee;
-    font-size: 16px;
   }
 
   #links a {
@@ -250,12 +215,10 @@
     const App = () => {
       let stockfish = null;
       let stockfish_state = "INIT"; // 'READY', 'FAILED'
-      let output2 = "";
       let show_dests = true;
       let adjudicate = true;
-      let analysis_mode = false;
       let play_white = false;
-      let play_black = false;
+      let play_black = true;
       let play_move = false;
 
       let variants = [];
@@ -286,9 +249,7 @@
         const stm = $("#label-stm").innerText;
         if (
           stm != "undefined" &&
-          (analysis_mode ||
-            (play_white && stm == "white") ||
-            (play_black && stm == "black"))
+          ((play_white && stm == "white") || (play_black && stm == "black"))
         )
           setTimeout(go(), 10);
       };
@@ -311,18 +272,13 @@
         if (return_early) return; // avoid race condition
         let args = "";
         const movetime = $("#movetime").value;
-        const depth = $("#depth").value;
-        if (!analysis_mode && movetime.length > 0) {
+        if (movetime.length > 0) {
           args += ` movetime ${movetime}`;
-        }
-        if (!analysis_mode && depth.length > 0) {
-          args += ` depth ${depth}`;
         }
         const stm = $("#label-stm").innerText;
         play_move =
           (play_white && stm == "white") || (play_black && stm == "black");
         stockfish.postMessage(`go${args}`);
-        output2 = "";
       };
 
       const stop = () => {
@@ -340,13 +296,6 @@
         const activeIndex = classes.findIndex((c) => el.classList.contains(c));
         const nextIndex = (activeIndex + 1) % classes.length;
         el.classList.replace(classes[activeIndex], classes[nextIndex]);
-      };
-
-      const scrollOutput = () => {
-        $("#output2").scrollTo({
-          top: $("#output2").scrollHeight,
-          behavior: "smooth",
-        });
       };
 
       // Make error catchable
@@ -383,7 +332,6 @@
                   $("#move").value += " " + line.split(" ")[1];
                   $("#set").click();
                 }
-                output2 += line + "\n";
               }
               m.redraw();
             });
@@ -440,6 +388,86 @@
         const is_ready = stockfish_state == "READY";
 
         return m("main", [
+          m("div#input", [
+            m(
+              "select#dropdown-variant",
+              {
+                disabled: !is_ready,
+                onchange: (e) => {
+                  window.setTimeout(setVariant, 10);
+                },
+              },
+              [
+                m("option", { value: "" }, "-- VARIANT --"),
+                ...variants.map((ex, index) => m("option", { value: ex }, ex)),
+              ]
+            ),
+            m(
+              "label",
+              m("input[type=checkbox]#playwhite", {
+                checked: play_white,
+                onclick: () => {
+                  play_white = !play_white;
+                },
+              }),
+              "Engine white"
+            ),
+            m(
+              "label",
+              m("input[type=checkbox]#playblack", {
+                checked: play_black,
+                onclick: () => {
+                  play_black = !play_black;
+                },
+              }),
+              "Engine black"
+            ),
+            m("p#label-stm", { hidden: true }),
+            m("input[type=number]#movetime", {
+              placeholder: "Movetime",
+              disabled: !is_ready,
+              min: 0,
+              value: 200,
+            }),
+            m("button#reset", { disabled: !is_ready, onclick: reset }, "Reset"),
+            m("button#undo", { disabled: !is_ready, onclick: undo }, "Undo"),
+          ]),
+          m("div#outputs", [
+            m("div#chessground-container-div.blue.merida.board8x8", [
+              m("div.cg-wrap.pocket", [m("div#pocket-top")]),
+              m("div#chessground-board"),
+              m("div.cg-wrap.pocket", [m("div#pocket-bottom")]),
+            ]),
+          ]),
+          m("div#controls", [
+            m("button", { onclick: changePieces }, "Change pieces"),
+            m("button#button-flip", "Flip Board"),
+            m(
+              "input[type=range]#range-volume",
+              { min: 0, max: 1, step: 0.05 },
+              "range"
+            ),
+            m(
+              "label",
+              m("input[type=checkbox]#check-dests", {
+                checked: show_dests,
+                onclick: () => {
+                  show_dests = !show_dests;
+                },
+              }),
+              "Show Dests"
+            ),
+            m(
+              "label",
+              m("input[type=checkbox]#check-adjudicate", {
+                checked: adjudicate,
+                onclick: () => {
+                  adjudicate = !adjudicate;
+                },
+              }),
+              "Adjudicate"
+            ),
+          ]),
           m("div#misc", [
             m("div", [
               `Fairy-Stockfish: ${stockfish_state} - download: `,
@@ -488,19 +516,6 @@
             ]),
           ]),
           m("div#input", [
-            m(
-              "select#dropdown-variant",
-              {
-                disabled: !is_ready,
-                onchange: (e) => {
-                  window.setTimeout(setVariant, 10);
-                },
-              },
-              [
-                m("option", { value: "" }, "-- VARIANT --"),
-                ...variants.map((ex, index) => m("option", { value: ex }, ex)),
-              ]
-            ),
             m("input#fen", {
               placeholder: "Input FEN Here",
               disabled: !is_ready,
@@ -533,101 +548,12 @@
               },
               "Set"
             ),
-            m("button#reset", { disabled: !is_ready, onclick: reset }, "Reset"),
-            m("button#undo", { disabled: !is_ready, onclick: undo }, "Undo"),
-          ]),
-          m("div#input", [
-            m("input[type=number]#depth", {
-              placeholder: "Depth",
-              disabled: !is_ready || analysis_mode,
-              min: 1,
-              max: 255,
-            }),
-            m("input[type=number]#movetime", {
-              placeholder: "Movetime",
-              disabled: !is_ready || analysis_mode,
-              min: 0,
-            }),
             m("button#go", { disabled: !is_ready, onclick: go }, "Go"),
             m(
               "button#stop",
               { disabled: !is_ready, onclick: force_stop },
               "Stop"
             ),
-            m(
-              "label",
-              m("input[type=checkbox]#analysis", {
-                checked: analysis_mode,
-                disabled: play_white || play_black,
-                onclick: () => {
-                  analysis_mode = !analysis_mode;
-                },
-              }),
-              "Analysis"
-            ),
-            m(
-              "label",
-              m("input[type=checkbox]#playwhite", {
-                checked: play_white,
-                disabled: analysis_mode,
-                onclick: () => {
-                  play_white = !play_white;
-                },
-              }),
-              "Play white"
-            ),
-            m(
-              "label",
-              m("input[type=checkbox]#playblack", {
-                checked: play_black,
-                disabled: analysis_mode,
-                onclick: () => {
-                  play_black = !play_black;
-                },
-              }),
-              "Play black"
-            ),
-            m("p#label-stm", { hidden: true }),
-          ]),
-          m("div#controls", [
-            m("button", { onclick: changePieces }, "Change pieces"),
-            m("button#button-flip", "Flip Board"),
-            m(
-              "input[type=range]#range-volume",
-              { min: 0, max: 1, step: 0.05 },
-              "range"
-            ),
-            m(
-              "label",
-              m("input[type=checkbox]#check-dests", {
-                checked: show_dests,
-                onclick: () => {
-                  show_dests = !show_dests;
-                },
-              }),
-              "Show Dests"
-            ),
-            m(
-              "label",
-              m("input[type=checkbox]#check-adjudicate", {
-                checked: adjudicate,
-                onclick: () => {
-                  adjudicate = !adjudicate;
-                },
-              }),
-              "Adjudicate"
-            ),
-          ]),
-          m("div#outputs", [
-            m("div#chessground-container-div.blue.merida.board8x8", [
-              m("div.cg-wrap.pocket", [m("div#pocket-top")]),
-              m("div#chessground-board"),
-              m("div.cg-wrap.pocket", [m("div#pocket-bottom")]),
-            ]),
-            m("div#info", [
-              m("p#label-pgn"),
-              m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
-            ]),
           ]),
           m("div#links", [
             m("a[href='https://github.com/ianfab/fairyground']", "github"),

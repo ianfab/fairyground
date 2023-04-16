@@ -342,8 +342,8 @@ function getPgn(board) {
 }
 
 function updateChessground() {
-  labelPgn.innerText = getPgn(board);
-  labelStm.innerText = getColorOrUndefined(board);
+  if (labelPgn) labelPgn.innerText = getPgn(board);
+  if (labelStm) labelStm.innerText = getColorOrUndefined(board);
 
   chessground.set({
     fen: board.fen(),
