@@ -2,10 +2,6 @@
 <head>
   <meta charset="utf-8" />
   <title>Fairy-Stockfish playground</title>
-  <meta
-    name="viewport"
-    content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no"
-  />
   <!-- By curl https://data-url-maker-hiro18181.netlify.app/api/url/https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg -->
   <link
     rel="icon"
@@ -117,6 +113,11 @@
     margin-top: 10px;
     width: 100%;
     height: 50%;
+  }
+
+  #controls {
+    margin-top: 20px;
+    margin-bottom: 10px;
   }
 
   #info {
@@ -589,48 +590,53 @@
             ),
             m("p#label-stm", { hidden: true }),
           ]),
-          m("div#controls", [
-            m("button", { onclick: changePieces }, "Change pieces"),
-            m("button#button-flip", "Flip Board"),
-            m(
-              "input[type=range]#range-volume",
-              { min: 0, max: 1, step: 0.05 },
-              "range"
-            ),
-            m(
-              "label",
-              m("input[type=checkbox]#check-dests", {
-                checked: show_dests,
-                onclick: () => {
-                  show_dests = !show_dests;
-                },
-              }),
-              "Show Dests"
-            ),
-            m(
-              "label",
-              m("input[type=checkbox]#check-adjudicate", {
-                checked: adjudicate,
-                onclick: () => {
-                  adjudicate = !adjudicate;
-                },
-              }),
-              "Adjudicate"
-            ),
-          ]),
           m("div#outputs", [
-            m("div#chessground-container-div.blue.merida.board8x8", [
-              m("div.cg-wrap.pocket", [m("div#pocket-top")]),
-              m("div#chessground-board"),
-              m("div.cg-wrap.pocket", [m("div#pocket-bottom")]),
+            m("div", [
+              m("div#chessground-container-div.blue.merida.board8x8", [
+                m("div.cg-wrap.pocket", [m("div#pocket-top")]),
+                m("div#chessground-board"),
+                m("div.cg-wrap.pocket", [m("div#pocket-bottom")]),
+              ]),
+              m("div#controls", [
+                m("button", { onclick: changePieces }, "Change pieces"),
+                m("button#button-flip", "Flip Board"),
+                m(
+                  "input[type=range]#range-volume",
+                  { min: 0, max: 1, step: 0.05 },
+                  "range"
+                ),
+                m(
+                  "label",
+                  m("input[type=checkbox]#check-dests", {
+                    checked: show_dests,
+                    onclick: () => {
+                      show_dests = !show_dests;
+                    },
+                  }),
+                  "Show Dests"
+                ),
+                m(
+                  "label",
+                  m("input[type=checkbox]#check-adjudicate", {
+                    checked: adjudicate,
+                    onclick: () => {
+                      adjudicate = !adjudicate;
+                    },
+                  }),
+                  "Adjudicate"
+                ),
+              ]),
+              m("div#links", [
+                m("a[href='/index.html']", "home"),
+                m("a[href='/play.html']", "play"),
+                m("a[href='/analysis.html']", "analysis"),
+                m("a[href='https://github.com/ianfab/fairyground']", "github"),
+              ]),
             ]),
             m("div#info", [
               m("p#label-pgn"),
               m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
             ]),
-          ]),
-          m("div#links", [
-            m("a[href='https://github.com/ianfab/fairyground']", "github"),
           ]),
         ]);
       };
