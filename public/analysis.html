@@ -45,9 +45,21 @@
     padding: 10px;
   }
 
+  #title {
+    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  #links a {
+    margin-right: 20px;
+    font-size: 20px;
+    text-decoration: none;
+  }
+
   #input {
     display: flex;
-    margin-bottom: 10px;
+    margin-top: 10px;
   }
 
   #input #fen {
@@ -147,12 +159,6 @@
     overflow-y: scroll;
     box-shadow: inset 1px 1px 2px #eee;
     font-size: 16px;
-  }
-
-  #links a {
-    margin: 20px;
-    font-size: 20px;
-    text-decoration: none;
   }
 </style>
 
@@ -413,6 +419,13 @@
         const is_ready = stockfish_state == "READY";
 
         return m("main", [
+          m("label#title", "Analyze with Fairy-Stockfish"),
+          m("div#links", [
+            m("a[href='/index.html']", "play"),
+            m("a[href='/analysis.html']", "analyze"),
+            m("a[href='/advanced.html']", "advanced"),
+            m("a[href='https://github.com/ianfab/fairyground']", "github"),
+          ]),
           m("div#input", [
             m(
               "select#dropdown-variant",
@@ -516,12 +529,7 @@
                   }),
                 ]),
                 m("div", [
-                  "- nnue file: ",
-                  m("input", {
-                    type: "file",
-                    disabled: !is_ready,
-                    onchange: onSelectNnueFile,
-                  }),
+                  "nnue file ",
                   m(
                     "span",
                     {
@@ -533,14 +541,15 @@
                     },
                     "[?]"
                   ),
-                ]),
-                m("div", [
-                  "- variants.ini: ",
-                  m("input#variants-ini", {
+                  ": ",
+                  m("input", {
                     type: "file",
                     disabled: !is_ready,
-                    onchange: onSelectVariantsFile,
+                    onchange: onSelectNnueFile,
                   }),
+                ]),
+                m("div", [
+                  "variants.ini ",
                   m(
                     "span",
                     {
@@ -552,13 +561,13 @@
                     },
                     "[?]"
                   ),
+                  ": ",
+                  m("input#variants-ini", {
+                    type: "file",
+                    disabled: !is_ready,
+                    onchange: onSelectVariantsFile,
+                  }),
                 ]),
-              ]),
-              m("div#links", [
-                m("a[href='/index.html']", "home"),
-                m("a[href='/play.html']", "play"),
-                m("a[href='/analysis.html']", "analysis"),
-                m("a[href='https://github.com/ianfab/fairyground']", "github"),
               ]),
             ]),
             m("div#info", [
