@@ -245,7 +245,7 @@
         $("#move").value = "";
       };
 
-      const setFen = () => {
+      const setFen = (move = true) => {
         stop();
         const fen = $("#fen").value;
         const moves = $("#move").value;
@@ -256,6 +256,7 @@
         }
         const stm = $("#label-stm").innerText;
         if (
+          move &&
           stm != "undefined" &&
           ((play_white && stm == "white") || (play_black && stm == "black"))
         )
@@ -271,7 +272,7 @@
       const undo = () => {
         const moves = $("#move").value;
         $("#move").value = moves.substring(0, moves.lastIndexOf(" "));
-        setFen();
+        setFen(false);
       };
 
       const go = () => {
