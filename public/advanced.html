@@ -50,6 +50,11 @@
     margin-bottom: 10px;
   }
 
+  #gamesettings {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
   #input #fen {
     width: 50%;
     padding: 2px 0 2px 6px;
@@ -78,6 +83,27 @@
     border-right: 0;
   }
 
+  #input #threads {
+    width: 5%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input #hash {
+    width: 5%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input #multipv {
+    width: 5%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
   #input button {
     display: inline-block;
     padding: 3px 6px 3px 6px;
@@ -86,6 +112,24 @@
     font-weight: bold;
     margin-right: 6px;
     cursor: pointer;
+  }
+
+  #movecontrol button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 6px;
+    margin-top: 2px;
+    cursor: pointer;
+  }
+
+  #movecontrol #gotomovenum {
+    width: 45%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
   }
 
   #controls button {
@@ -103,6 +147,12 @@
     background: #eee;
   }
 
+  #gamesettings #dropdown-quickpromotion {
+    width: 120px;
+    background: #eee;
+   margin-left: 10px;
+  }
+
   #misc {
     margin-bottom: 10px;
   }
@@ -115,6 +165,11 @@
     height: 50%;
   }
 
+  #movecontrol {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
   #controls {
     margin-top: 20px;
     margin-bottom: 10px;
@@ -123,6 +178,17 @@
   #info {
     padding: 10px;
     margin-left: 20px;
+    font-size: 16px;
+  }
+
+  #currentboardfen {
+    height: 10%;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-left: 20px;
+    overflow-x: scroll;
+    overflow-y: scroll;
+    box-shadow: inset 1px 1px 2px #eee;
     font-size: 16px;
   }
 
@@ -138,7 +204,7 @@
   }
 
   #output2 {
-    height: 80%;
+    height: 70%;
     border: 1px solid #ddd;
     padding: 10px;
     margin-left: 20px;
@@ -152,6 +218,16 @@
     margin: 20px;
     font-size: 20px;
     text-decoration: none;
+  }
+
+  spangameresult {
+    user-select: none;
+    font-size: 10px;
+    position: fixed;
+    transition: 0.5s linear;
+    font-weight: bold;
+    font-family: "Times New Roman",Georgia,Serif,Arial;
+    z-index: 2;
   }
 </style>
 
@@ -258,6 +334,7 @@
       let play_white = false;
       let play_black = false;
       let play_move = false;
+      let review_mode = false;
 
       let variants = [];
 
@@ -279,6 +356,7 @@
         stop();
         const fen = $("#fen").value;
         const moves = $("#move").value;
+
         if (fen.length > 0) {
           stockfish.postMessage(`position fen ${fen} moves ${moves}`);
         } else {
@@ -294,13 +372,129 @@
           setTimeout(go(), 10);
       };
 
+      const totalMoveNumber = () => {
+        let listlength = 0;
+        let i = 0;
+        moves_split = $("#move").value.split(' ');
+        for (i = 0; i < moves_split.length; i++)
+        {
+          if (moves_split[i].length == 0) {
+            continue;
+          }
+          listlength++;
+        }
+        return listlength;
+      }
+
+      const displayMove = (movenum) => {
+        if ($("#displayready").value.length > 0 && $("#displayready").value > 0)  //$("#displayready").value = 0, displayMove() is ready
+        {
+          return;
+        }
+        $("#displayready").value = 2;  //2 = displayMove() working
+        let i = 0;
+        let j = 0;
+        moves_split = $("#move").value.split(' ');
+        if (movenum==-1) {
+          force_stop();
+          $("#displaymoves").value = $("#move").value;
+          review_mode = false;
+          $("#isreviewmode").value = 0;
+        } else if (movenum > totalMoveNumber() || movenum < -1) {
+          console.log(`${movenum} is out of range for move number.`);
+          return;
+        } else {
+          force_stop();
+          review_mode = true;
+          $("#isreviewmode").value = 1;
+          $("#displaymoves").value = "";
+          for (i = 0, j = 0; j < movenum; i++, j++) {
+            if (moves_split[i].length == 0) {
+              j--;
+              continue;
+            }
+            $("#displaymoves").value = $("#displaymoves").value.concat(moves_split[i]);
+            if (j < movenum - 1)
+            {
+              $("#displaymoves").value = $("#displaymoves").value.concat(" ");
+            }
+          }
+        }
+        const fen = $("#fen").value;
+        const display_moves = $("#displaymoves").value;
+        if (fen.length > 0) {
+          stockfish.postMessage(`position fen ${fen} moves ${display_moves}`);
+        } else {
+          stockfish.postMessage(`position startpos moves ${display_moves}`);
+        }
+        console.log(`${display_moves}`);
+        $("#displayready").value = 1;  //1 = updateChessBoardToPosition() working
+      };
+
+      const displayNextMove = () => {
+        if ($("#gotomovenum").value.length <= 0) {
+          $("#gotomovenum").value = totalMoveNumber();
+        } else {
+          if ($("#gotomovenum").value < 0) {
+            $("#gotomovenum").value = 0;
+          } else if ($("#gotomovenum").value >= totalMoveNumber()) {
+            $("#gotomovenum").value = totalMoveNumber();
+          } else {
+            $("#gotomovenum").value ++;
+          }
+        }
+        displayMove($("#gotomovenum").value);
+      }
+
+      const displayPreviousMove = () => {
+        if ($("#gotomovenum").value.length <= 0) {
+          $("#gotomovenum").value = totalMoveNumber();
+        } else {
+          if ($("#gotomovenum").value <= 0) {
+            $("#gotomovenum").value = 0;
+          } else if ($("#gotomovenum").value > totalMoveNumber()) {
+            $("#gotomovenum").value = totalMoveNumber();
+          } else {
+            $("#gotomovenum").value --;
+          }
+        }
+        displayMove($("#gotomovenum").value);
+      }
+
+      const displayInitialPosition = () => {
+        $("#gotomovenum").value = 0;
+        displayMove(0);
+      }
+
+      const displayCurrentPosition = () => {
+        $("#gotomovenum").value = totalMoveNumber();
+        displayMove(-1);
+      }
+
+      const displaySpecifiedPosition = () => {
+        if ($("#gotomovenum").value.length <= 0) {
+          $("#gotomovenum").value = totalMoveNumber();
+        }
+        if ($("#gotomovenum").value < 0) {
+          $("#gotomovenum").value = 0;
+        } else if ($("#gotomovenum").value > totalMoveNumber()) {
+          $("#gotomovenum").value = totalMoveNumber();
+        }
+        displayMove($("#gotomovenum").value);
+      }
+
       const reset = () => {
+        review_mode = false;
         $("#fen").value = "";
         $("#move").value = "";
-        $("#set").click();
+        setFen();
+        $("#currentposition").click();
       };
 
       const undo = () => {
+        if (review_mode) {
+          return;
+        }
         const moves = $("#move").value;
         $("#move").value = moves.substring(0, moves.lastIndexOf(" "));
         setFen();
@@ -313,12 +507,52 @@
         let args = "";
         const movetime = $("#movetime").value;
         const depth = $("#depth").value;
-        if (!analysis_mode && movetime.length > 0) {
+        const threadnum = $("#threads").value;
+        const hashsize = $("#hash").value;
+        const multiplepondervalue = $("#multipv").value;
+        if (!analysis_mode && movetime.length > 0 && movetime > 0) {
           args += ` movetime ${movetime}`;
         }
-        if (!analysis_mode && depth.length > 0) {
+        if (!analysis_mode && depth.length > 0 && depth > 0) {
           args += ` depth ${depth}`;
         }
+
+        if (threadnum.length <= 0 || threadnum < 1) {
+          stockfish.postMessage(`setoption name Threads value 1`);
+        }
+        else if (threadnum > 512)
+        {
+          stockfish.postMessage(`setoption name Threads value 512`);
+        }
+        else
+        {
+          stockfish.postMessage(`setoption name Threads value ${threadnum}`);
+        }
+        stockfish.postMessage(`setoption name clear hash`);
+        if (hashsize.length <= 0 || hashsize < 1) {
+          stockfish.postMessage(`setoption name Hash value 16`);
+        }
+        else if (hashsize > 33554432)
+        {
+          stockfish.postMessage(`setoption name Hash value 33554432`);
+        }
+        else
+        {
+          stockfish.postMessage(`setoption name Hash value ${hashsize}`);
+        }
+        if (multiplepondervalue.length <= 0 || multiplepondervalue < 1) {
+          stockfish.postMessage(`setoption name MultiPV value 1`);
+        }
+        else if (multiplepondervalue > 500)
+        {
+          stockfish.postMessage(`setoption name Hash value 500`);
+        }
+        else
+        {
+          stockfish.postMessage(`setoption name MultiPV value ${multiplepondervalue}`);
+        }
+        stockfish.postMessage(`isready`);
+
         const stm = $("#label-stm").innerText;
         play_move =
           (play_white && stm == "white") || (play_black && stm == "black");
@@ -349,6 +583,30 @@
           behavior: "smooth",
         });
       };
+
+      const displayGameResult = () => {
+        let i = 0;
+        let chi = document.getElementsByTagName("spangameresult");
+        for (i = 0; i < chi.length; i++) {
+          document.body.removeChild(chi[i]);
+        }
+        if (review_mode) {
+          return;
+        }
+        var span = document.createElement("spangameresult");
+        span.innerHTML = $("#gameresult").value;
+        span.style.left = (window.innerWidth / 2) + "px";
+        span.style.top = (window.innerHeight / 2) + "px";
+        setTimeout(function () {
+          span.style.opacity = "1";
+          span.style.transform = "scale(40)";
+        }, 100);
+        setTimeout(function () {
+          span.style.opacity = "0";
+          span.style.transform = "scale(0.02)";
+        }, 2600);
+        document.body.appendChild(span);
+      }
 
       // Make error catchable
       const loadStockfish = async (params) => {
@@ -472,7 +730,7 @@
               "- variants.ini: ",
               m("input#variants-ini", {
                 type: "file",
-                disabled: !is_ready,
+                disabled: !is_ready || review_mode,
                 onchange: onSelectVariantsFile,
               }),
               m(
@@ -492,7 +750,7 @@
             m(
               "select#dropdown-variant",
               {
-                disabled: !is_ready,
+                disabled: !is_ready || review_mode,
                 onchange: (e) => {
                   window.setTimeout(setVariant, 10);
                 },
@@ -504,7 +762,7 @@
             ),
             m("input#fen", {
               placeholder: "Input FEN Here",
-              disabled: !is_ready,
+              disabled: !is_ready || review_mode,
               onkeyup: (e) => {
                 if (e.keyCode != 13) {
                   e.redraw = false;
@@ -515,7 +773,7 @@
             }),
             m("input#move", {
               placeholder: "Input Move Here",
-              disabled: !is_ready,
+              disabled: !is_ready || review_mode,
               onkeyup: (e) => {
                 if (e.keyCode != 13) {
                   e.redraw = false;
@@ -527,15 +785,18 @@
             m(
               "button#set",
               {
-                disabled: !is_ready,
+                disabled: !is_ready || review_mode,
                 onclick: () => {
+                  if (review_mode) {
+                    return;
+                  }
                   window.setTimeout(setFen, 10);
                 },
               },
               "Set"
             ),
             m("button#reset", { disabled: !is_ready, onclick: reset }, "Reset"),
-            m("button#undo", { disabled: !is_ready, onclick: undo }, "Undo"),
+            m("button#undo", { disabled: !is_ready || review_mode, hidden: review_mode, onclick: undo }, "Undo"),
           ]),
           m("div#input", [
             m("input[type=number]#depth", {
@@ -548,6 +809,24 @@
               placeholder: "Movetime",
               disabled: !is_ready || analysis_mode,
               min: 0,
+            }),
+            m("input[type=number]#threads", {
+              placeholder: "Threads",
+              disabled: !is_ready,
+              min: 1,
+              max:512,
+            }),
+            m("input[type=number]#hash", {
+              placeholder: "Hash",
+              disabled: !is_ready,
+              min: 1,
+              max:33554432,
+            }),
+            m("input[type=number]#multipv", {
+              placeholder: "MultiPV",
+              disabled: !is_ready,
+              min: 1,
+              max:500,
             }),
             m("button#go", { disabled: !is_ready, onclick: go }, "Go"),
             m(
@@ -570,7 +849,7 @@
               "label",
               m("input[type=checkbox]#playwhite", {
                 checked: play_white,
-                disabled: analysis_mode,
+                disabled: analysis_mode || review_mode,
                 onclick: () => {
                   play_white = !play_white;
                 },
@@ -581,7 +860,7 @@
               "label",
               m("input[type=checkbox]#playblack", {
                 checked: play_black,
-                disabled: analysis_mode,
+                disabled: analysis_mode || review_mode,
                 onclick: () => {
                   play_black = !play_black;
                 },
@@ -589,6 +868,66 @@
               "Play black"
             ),
             m("p#label-stm", { hidden: true }),
+            m("input#displaymoves", {
+              placeholder: "Moves displayed on board for analysis",
+              hidden: true,
+            }),
+            m("input[type=number]#displayready", {
+              placeholder: "Board display update ready status",
+              hidden: true,
+            }),
+            m("input[type=number]#isreviewmode", {
+              placeholder: "Stores value to judge whether it is in review mode",
+              hidden: true,
+            }),
+            m("input#gameresult", {
+              placeholder: "The game result",
+              hidden: true,
+              onclick: () => {
+                displayGameResult();
+              },
+            }),
+          ]),
+          m("div#gamesettings", [
+            m("p", {}, "Quick promote/demote to piece: "),
+            m(
+              "select#dropdown-quickpromotion",
+              {
+                disabled: !is_ready || review_mode,
+              },
+              [
+                m("option", { value: "" }, "<DISABLED>"),
+                m("option", { value: "a" }, "a"),
+                m("option", { value: "b" }, "b"),
+                m("option", { value: "c" }, "c"),
+                m("option", { value: "d" }, "d"),
+                m("option", { value: "e" }, "e"),
+                m("option", { value: "f" }, "f"),
+                m("option", { value: "g" }, "g"),
+                m("option", { value: "h" }, "h"),
+                m("option", { value: "i" }, "i"),
+                m("option", { value: "j" }, "j"),
+                m("option", { value: "k" }, "k"),
+                m("option", { value: "l" }, "l"),
+                m("option", { value: "m" }, "m"),
+                m("option", { value: "n" }, "n"),
+                m("option", { value: "o" }, "o"),
+                m("option", { value: "p" }, "p"),
+                m("option", { value: "q" }, "q"),
+                m("option", { value: "r" }, "r"),
+                m("option", { value: "s" }, "s"),
+                m("option", { value: "t" }, "t"),
+                m("option", { value: "u" }, "u"),
+                m("option", { value: "v" }, "v"),
+                m("option", { value: "w" }, "w"),
+                m("option", { value: "x" }, "x"),
+                m("option", { value: "y" }, "y"),
+                m("option", { value: "z" }, "z"),
+                m("option", { value: "+" }, "Promote (+)"),
+                m("option", { value: "-" }, "Demote (-)"),
+                m("option", { value: "=" }, "Keep (=)"),
+              ]
+            ),
           ]),
           m("div#outputs", [
             m("div", [
@@ -597,6 +936,20 @@
                 m("div#chessground-board"),
                 m("div.cg-wrap.pocket", [m("div#pocket-bottom")]),
               ]),
+              m("div#movecontrol",[
+                m("button#initialposition", { onclick: displayInitialPosition, disabled: !is_ready }, "Initial Position"),
+                m("button#currentposition", { onclick: displayCurrentPosition, disabled: !is_ready }, "Current Position"),
+                m("button#previousposition", { onclick: displayPreviousMove, disabled: !is_ready }, "Previous Position"),
+                m("button#nextposition", { onclick: displayNextMove, disabled: !is_ready }, "Next Position"),
+                m("input[type=number]#gotomovenum", {
+                  placeholder: "Move Number (1 turn is 2 moves)",
+                  disabled: !is_ready,
+                  min: 0,
+                }),
+                m("button#specifiedposition", { onclick: displaySpecifiedPosition, disabled: !is_ready }, "Go to Move"),
+              ]),
+              m("p", { hidden: !review_mode }, "Review mode enabled."),
+              m("p", { hidden: !review_mode }, "You can go to previous moves played to analyze your game, but you cannot make changes to the game. To exit review mode, click <reset> or <current position>."),
               m("div#controls", [
                 m("button", { onclick: changePieces }, "Change pieces"),
                 m("button#button-flip", "Flip Board"),
@@ -634,6 +987,7 @@
               ]),
             ]),
             m("div#info", [
+              m("p#currentboardfen"),
               m("p#label-pgn"),
               m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
             ]),
