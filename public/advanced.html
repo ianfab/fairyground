@@ -258,7 +258,7 @@
       )
         return false;
       if (typeof Atomics !== "object") return false;
-      if (typeof SharedArrayBuffer !== "function") return false;
+      if (typeof SharedArrayBuffer !== "function") {console.log("SharedArrayBuffer not enabled!"); return false;}
       return true;
     };
 
