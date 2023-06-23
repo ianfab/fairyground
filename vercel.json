@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm run watch-build"
+  "installCommand": "npm install"
   "headers": [
      {
         "source": "/(.*)",
