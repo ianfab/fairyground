@@ -114,7 +114,8 @@ function getDimensions() {
   };
 }
 
-new _ffishEs.default().then(loadedModule => {
+import Module from "ffish-es6";
+new Module().then((loadedModule) => {
   ffish = loadedModule;
   console.log("ffish.js initialized!");
   initBoard(dropdownVariant.value);
