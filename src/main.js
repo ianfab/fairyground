@@ -316,34 +316,77 @@ function isCapture(board, move) {
 function afterChessgroundMove(orig, dest, metadata) {
   // Auto promote to queen for now
   let promotion = quickPromotionPiece.value;
+  let gating = "";
   let i = 0;
 
   const move = orig.replace(":", "10") + dest.replace(":", "10");
   console.log(`${move}`);
   const capture = isCapture(board, move);
 
-//UCI notation syntax: <begin_file><begin_rank><end_file><end_rank>[[+ | -] | piece_id ]
+//UCI notation syntax (piece move): <begin_file><begin_rank><end_file><end_rank>[[+ | -] | piece_id ][,<gating_move>]
 //"[+ | -]" is the promotion/demotion mark for this move. If missing, it means that the piece keeps its current status. This type is used for piece advance (shogi type promotion, can be demoted)
 //"[piece_id]" is the character to refer to the piece type, e.g. q=queen, r=rook. This type is used for pawn promotion (chess type promotion, cannot be demoted)
+//[,<gating_move>] is used in games which have arrowGating = true, duckGating = true, staticGating = true or pastGating = true. They all require pieceDrop = false 
 
-  const legalmoves = board.legalMoves().trim().split(' ');  //This will set all possible moves (with promotion marks) at current in uci format into array
+  const legalmoves = board.legalMoves().trim().split(' ');  //This will set all possible moves (with promotion marks and gating moves) at current in uci format into array
+
   let possiblepromotions = [];
+  let possiblegatings = [];
+  let legalmove = "";
+  let legalgate = "";
   console.log(`${legalmoves}`);
   for (i = 0; i < legalmoves.length; i++) {  //Now look at each possible moves
-    if (legalmoves[i].length == 0) {
+    if (legalmoves[i].trim().length == 0) {
       continue;
     }
+    legalmove = legalmoves[i].trim().split(',')[0];
+    legalgate = legalmoves[i].trim().split(',')[1];  //this can be undefined
     //if it is a legal promotion/demotion move that matches the move player has made (see the syntax of uci notation, which is given above)
-    if ((move.trim() == legalmoves[i].trim().substring(0,move.trim().length)) && (legalmoves[i].trim().length == move.trim().length + 1)) {
-      if ( /^[a-z+-]+$/.test(legalmoves[i].trim().charAt(move.trim().length)) ) {
-        possiblepromotions.push(legalmoves[i].trim().charAt(move.trim().length));
+    if ((move.trim() == legalmove.substring(0,move.trim().length)) && (legalmove.length == move.trim().length + 1)) {
+      if ( /^[a-z+-]+$/.test(legalmove.charAt(move.trim().length)) ) {
+        if (!possiblepromotions.includes(legalmove.charAt(move.trim().length)))
+        {
+          possiblepromotions.push(legalmove.charAt(move.trim().length));
+        }
+      }
+      if (legalgate == undefined)  //now check the gating move
+      {
+        if (!possiblegatings.includes('='))
+        {
+          possiblegatings.push('=');  //we use = to represent that not gating is legal
+        }
+      }
+      else
+      {
+        if (!possiblegatings.includes(legalgate))
+        {
+          possiblegatings.push(legalgate);
+        }
       }
     //if it is legal to not promote/demote
-    } else if (move.trim() == legalmoves[i].trim()) {
-      possiblepromotions.push('=');  //we use = to represent that not promoting/demoting is legal
+    } else if (move.trim() == legalmove) {
+      if (!possiblepromotions.includes('='))
+      {
+        possiblepromotions.push('=');  //we use = to represent that not promoting/demoting is legal
+      }
+      if (legalgate == undefined)  //now check the gating move
+      {
+        if (!possiblegatings.includes('='))
+        {
+          possiblegatings.push('=');  //we use = to represent that not gating is legal
+        }
+      }
+      else
+      {
+        if (!possiblegatings.includes(legalgate))
+        {
+          possiblegatings.push(legalgate);
+        }
+      }
     }
   }
-  console.log(`possible choice: ${possiblepromotions}`);
+  console.log(`possible promotion choices: ${possiblepromotions}`);
+  console.log(`possible gating choices: ${possiblegatings}`);
   let choice = null;
   if (quickPromotionPiece.value != "" && !metadata.ctrlKey && possiblepromotions.includes(promotion)) {
     choice = promotion;
@@ -371,9 +414,9 @@ function afterChessgroundMove(orig, dest, metadata) {
   } else {
     console.log("Did you make an illegal move? Why is there no legal action?");
   }
-  console.log(`final choice: ${choice}`);
+  console.log(`final move choice: ${choice}`);
 
-  if (choice == null) {
+  if (choice == null || choice == undefined) {
     promotion = "";
   } else if (choice == "=") {
     promotion = "";
@@ -381,7 +424,39 @@ function afterChessgroundMove(orig, dest, metadata) {
     promotion = choice;
   }
 
-  if (!board.push(move + promotion)) {
+  choice = null;
+
+  if (possiblegatings.length > 1)  //if there are more than one option
+  {
+    while (true) {
+      choice = prompt(`There are multiple chioces that you can gate a wall square. They are\n${possiblegatings}\n, where = means do not gate, letters with numbers mean destination square (e.g. e4e5 means your piece has moved to e4 and you gate a wall square to e5). Now please enter your choice: `,"");
+      if (choice == null) {
+        alert(`Bad input: <null>. You should enter one option among ${possiblegatings}.`);
+        continue;
+      }
+      if (possiblegatings.includes(choice)) {
+        break;
+      } else {
+        alert(`Bad input: ${choice} . You should enter one option among ${possiblegatings}.`);
+        continue;
+      }
+    }
+  } else if (possiblegatings.length == 1) { //if there is only one option
+    choice = possiblegatings[0];
+  } else {
+    console.log("Did you make an illegal move? Why is there no legal action?");
+  }
+  console.log(`final gating choice: ${choice}`);
+
+  if (choice == null || choice == undefined) {
+    gating = "";
+  } else if (choice == "=") {
+    gating = "";
+  } else {
+    gating = "," + choice;
+  }
+
+  if (!board.push(move + promotion + gating)) {
     const foundmove = board.legalMoves().match(new RegExp(`${move}[^ ]+`));
     if (foundmove) board.push(foundmove[0]);
   }
@@ -402,7 +477,7 @@ function afterChessgroundDrop(piece, dest, metadata) {
 //So, dropping piece does not have demotion features. pieceDemotion option does not affect drop promotion function.
 //Pawns cannot be dropped in promoted status which they get it by reaching the promotion zone
 
-//Piece drop notation are the same for uci and san. they are all [+]<piece id>@<file><rank>, e.g. Q@d2, +R@c4
+//Piece drop notation are the same for uci and san. They are all [+]<piece id>@<file><rank>, e.g. Q@d2, +R@c4
 //This means that the format is different from moving, as the promotion mark is at the beginning. Just making some small changes will solve this.
 //The program logic is the same as moving.
 
