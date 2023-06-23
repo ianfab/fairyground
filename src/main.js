@@ -584,5 +584,3 @@ function updateChessground() {
     gameResult.click();
   }
 }
-
-},{"chessgroundx":6,"chessgroundx/util":21,"ffish-es6":23}]},{},[24]);
