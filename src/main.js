@@ -1,5 +1,6 @@
 // ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
+import * as util from "chessgroundx/util";
 
 const variantsIni = document.getElementById("variants-ini");
 const dropdownVariant = document.getElementById("dropdown-variant");
