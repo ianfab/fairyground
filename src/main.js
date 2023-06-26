@@ -28,6 +28,10 @@ const buttonCurrentPosition = document.getElementById("currentposition");
 const buttonSpecifiedPosition = document.getElementById("specifiedposition");
 const currentBoardFen = document.getElementById("currentboardfen");
 const gameResult = document.getElementById("gameresult");
+const gameStatus = document.getElementById("gamestatus");
+const whiteTime = document.getElementById("whitetime");
+const blackTime = document.getElementById("blacktime");
+const timeOutSide = document.getElementById("timeoutside");
 const quickPromotionPiece = document.getElementById("dropdown-quickpromotion");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
@@ -51,6 +55,7 @@ function initBoard(variant) {
 
   const fenBoard = board.fen().split(" ")[0];
   var pocketRoles = undefined;
+  resetTimer();
 
   if (fenBoard.includes("[")) {
     const wpocket = board.pocket(WHITE);
@@ -116,7 +121,7 @@ function getDimensions() {
 }
 
 import Module from "ffish-es6";
-new Module().then((loadedModule) => {
+new Module().then(loadedModule => {
   ffish = loadedModule;
   console.log("ffish.js initialized!");
   initBoard(dropdownVariant.value);
@@ -127,6 +132,7 @@ new Module().then((loadedModule) => {
 
   variantsIni.onchange = function (e) {
     const selected = e.currentTarget.files[0];
+    resetTimer();
 
     if (selected) {
       selected.text().then(function (ini) {
@@ -151,6 +157,7 @@ new Module().then((loadedModule) => {
       console.log("pockets");
       chessgroundContainerEl.classList.add(`pockets`);
     } else chessgroundContainerEl.classList.remove(`pockets`);
+    resetTimer();
 
     updateChessground();
   };
@@ -224,6 +231,10 @@ new Module().then((loadedModule) => {
     updateChessBoardToPosition(textFen.value,displayMoves.value,false);
   };
 
+  gameStatus.onclick = function () {
+    gameStatus.innerHTML = getGameStatus(false);
+  };
+
   updateChessground();
 }); // Chessground helper functions
 
@@ -254,6 +265,71 @@ function updateChessBoardToPosition(fen,movelist,enablemove) {
   displayReady.value = 0;
 };
 
+function getGameStatus(showresult) {
+  let result = "null";
+  if (board.isGameOver() || board.isGameOver(true) || board.isGameOver(false))
+  {
+    if (board.result() != "*") {
+      gameResult.value = board.result();
+      result = "END";
+    } else if (board.result(true) != "*") {
+      gameResult.value = board.result(true);
+      result = "END";
+    } else if (board.result(false) != "*") {
+      gameResult.value = board.result(false);
+      result = "END";
+    } else {
+      gameResult.value = "Unterminated";
+      result = "UNFINISHED";
+    }
+    if (showresult)
+    {
+      gameResult.click();
+    }
+  }
+  else if (timeOutSide.value == 1)
+  {
+    //console.log("White time out");
+    gameResult.value = "0-1";
+    result = "END";
+    if (showresult)
+    {
+      gameResult.click();
+    }
+  }
+  else if (timeOutSide.value == 2)
+  {
+    //console.log("Black time out");
+    gameResult.value = "1-0";
+    result = "END";
+    if (showresult)
+    {
+      gameResult.click();
+    }
+  }
+  else
+  {
+    //console.log("continue");
+    if (board.turn() == WHITE)
+    {
+      result = "PLAYING_WHITE";
+    }
+    else if (board.turn() == BLACK)
+    {
+      result = "PLAYING_BLACK";
+    }
+  }
+  return result;
+}
+
+function resetTimer()
+{
+  console.log("Timer reset!");
+  whiteTime.innerHTML = "--";
+  blackTime.innerHTML = "--";
+  timeOutSide.value = 0;
+}
+
 function getDests(board) {
   const dests = new Map();
   const moves = board.legalMoves().split(" ").filter(m => m !== "");
@@ -272,7 +348,7 @@ function getDests(board) {
 }
 
 function getColorOrUndefined(board) {
-  if (board.isGameOver(checkboxAdjudicate.checked)) return undefined;
+  if (getGameStatus(false) == "END") return undefined;
   return getColor(board);
 }
 
@@ -490,7 +566,7 @@ function afterChessgroundDrop(piece, dest, metadata) {
   let possiblepromotions = [];
   console.log(`${legalmoves}`);
   for (i = 0; i < legalmoves.length; i++) {
-    if (legalmoves[i].length == 0) {
+    if (legalmoves[i].trim().length == 0) {
       continue;
     }
     //if it is a legal promotion drop that matches the drop player has made
@@ -558,7 +634,7 @@ function afterMove(capture) {
     soundMove.play();
   }
 
-  if (board.isGameOver(checkboxAdjudicate.checked)) {
+  if (getGameStatus(false) == "END") {
     soundTerminal.currentTime = 0.0;
     soundTerminal.play();
   } else if (board.isCheck()) {
@@ -647,17 +723,5 @@ function updateChessground() {
     });
     buttonUndo.disabled = false;
   }
-  if (board.isGameOver() || board.isGameOver(true) || board.isGameOver(false))
-  {
-    if (board.result() != "*") {
-      gameResult.value = board.result();
-    } else if (board.result(true) != "*") {
-      gameResult.value = board.result(true);
-    } else if (board.result(false) != "*") {
-      gameResult.value = board.result(false);
-    } else {
-      gameResult.value = "Unterminated";
-    }
-    gameResult.click();
-  }
+  getGameStatus(true);
 }
