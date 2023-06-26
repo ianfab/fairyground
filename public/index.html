@@ -27,6 +27,15 @@
             const movecontrol = advpage.getElementById("movecontrol");
             const advtimectrl = advpage.getElementById("advtimectrl");
             const label_advtimectrl = advpage.getElementById("label-advtimectrl");
+            const playblack = advpage.getElementById("playblack");
+            const whitetimetype = advpage.getElementById("whitetimetype");
+            const blacktimetype = advpage.getElementById("blacktimetype");
+            const dropdown_whitetimemode = advpage.getElementById("dropdown-whitetimemode");
+            const dropdown_blacktimemode = advpage.getElementById("dropdown-blacktimemode");
+            const whitestarttime = advpage.getElementById("whitestarttime");
+            const blackstarttime = advpage.getElementById("blackstarttime");
+            const whitetimegain = advpage.getElementById("whitetimegain");
+            const blacktimegain = advpage.getElementById("blacktimegain");
             fen.style.display = "none";
             move.style.display = "none";
             set.style.display = "none";
@@ -46,6 +55,17 @@
             if (advtimectrl.checked == false) {
                 advtimectrl.click();
             }
+            if (playblack.checked == false) {
+                playblack.click();
+            }
+            dropdown_whitetimemode.selectedIndex = 1;
+            dropdown_blacktimemode.selectedIndex = 1;
+            whitetimetype.innerHTML = "tournament";
+            blacktimetype.innerHTML = "tournament";
+            whitestarttime.disabled = false;
+            blackstarttime.disabled = false;
+            whitetimegain.disabled = false;
+            blacktimegain.disabled = false;
         }
     </script>
 </body>
