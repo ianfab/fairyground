@@ -44,6 +44,14 @@
         padding: 10px;
     }
 
+    #pagetitle {
+        font-size: 60px;
+        font-family: 'Times New Roman', Times, serif, Arial;
+        margin-bottom: 10px;
+        font-style: oblique;
+        font-weight: bold;
+    }
+
     #input {
         display: flex;
         margin-bottom: 10px;
@@ -310,14 +318,21 @@
             }
 
             #advancedtimesettings #whitetimesettings #whitestarttime {
-                width: 20%;
+                width: 15%;
                 padding: 2px 0 2px 6px;
                 border: 1px solid #ddd;
                 border-right: 0;
             }
 
             #advancedtimesettings #whitetimesettings #whitetimegain {
-                width: 20%;
+                width: 15%;
+                padding: 2px 0 2px 6px;
+                border: 1px solid #ddd;
+                border-right: 0;
+            }
+
+            #advancedtimesettings #whitetimesettings #whitetimemargin {
+                width: 15%;
                 padding: 2px 0 2px 6px;
                 border: 1px solid #ddd;
                 border-right: 0;
@@ -335,14 +350,21 @@
             }
 
             #advancedtimesettings #blacktimesettings #blackstarttime {
-                width: 20%;
+                width: 15%;
                 padding: 2px 0 2px 6px;
                 border: 1px solid #ddd;
                 border-right: 0;
             }
 
             #advancedtimesettings #blacktimesettings #blacktimegain {
-                width: 20%;
+                width: 15%;
+                padding: 2px 0 2px 6px;
+                border: 1px solid #ddd;
+                border-right: 0;
+            }
+
+            #advancedtimesettings #blacktimesettings #blacktimemargin {
+                width: 15%;
                 padding: 2px 0 2px 6px;
                 border: 1px solid #ddd;
                 border-right: 0;
@@ -489,6 +511,8 @@
             let white_timer_type = "infinite";
             let black_timer_type = "infinite";
             let timer_interval = 100;
+            let white_time_margin = 0;
+            let black_time_margin = 0;
             let previous_mover = "";
             let timer;
 
@@ -788,11 +812,19 @@
                 }
                 white_time_gain = $("#whitetimegain").value;
                 black_time_gain = $("#blacktimegain").value;
-                if (white_time_gain.length < 1) {
+                if (white_time_gain.length < 1 || white_time_gain < 0) {
                     white_time_gain = 0;
                 }
-                if (black_time_gain.length < 1) {
+                if (black_time_gain.length < 1 || black_time_gain < 0) {
                     black_time_gain = 0;
+                }
+                white_time_margin = $("#whitetimemargin").value;
+                black_time_margin = $("#blacktimemargin").value;
+                if (white_time_margin.length < 1 || white_time_margin < 0) {
+                    white_time_margin = 0;
+                }
+                if (black_time_margin.length < 1 || black_time_margin < 0) {
+                    black_time_margin = 0;
                 }
                 white_moving_time_list = [];
                 black_moving_time_list = [];
@@ -801,10 +833,10 @@
                 $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 1000)}`;
                 $("#blacktime").innerHTML = `${parseInt(black_remaining_time / 1000)}`;
                 if (white_timer_type == "infinite") {
-                    $("#whitetime").innerHTML = "INFINITE";
+                    $("#whitetime").innerHTML = "INFINITY";
                 }
                 if (black_timer_type == "infinite") {
-                    $("#blacktime").innerHTML = "INFINITE";
+                    $("#blacktime").innerHTML = "INFINITY";
                 }
                 previous_mover = "";
             }
@@ -833,6 +865,9 @@
                     }
                     else if (previous_mover == "BLACK") {
                         black_moving_time_list.push(black_remaining_time);  //Time stamp for black's turn end
+                        if (black_remaining_time < 0) {
+                            black_remaining_time = 0;
+                        }
                         if (white_timer_type == "tournament") {
                             white_remaining_time = (+white_remaining_time) + (+white_time_gain) + (+timer_interval);
                         }
@@ -849,14 +884,14 @@
                         return;
                     }
                     white_remaining_time = white_remaining_time - timer_interval;
-                    if (white_remaining_time < 0) {
+                    if (white_remaining_time < -white_time_margin) {
                         deleteTimer();
                         $("#timeoutside").value = 1;
                         timeIsUpFor("WHITE");
                         return;
                     }
                     if (white_timer_type == "infinite") {
-                        $("#whitetime").innerHTML = "INFINITE";
+                        $("#whitetime").innerHTML = "INFINITY";
                     }
                     else if (white_remaining_time >= 10000) {
                         $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 1000)}`;
@@ -865,7 +900,7 @@
                         $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 100) / 10}`;
                     }
                     if (black_timer_type == "infinite") {
-                        $("#blacktime").innerHTML = "INFINITE";
+                        $("#blacktime").innerHTML = "INFINITY";
                     }
                     else if (black_remaining_time >= 10000) {
                         $("#blacktime").innerHTML = `${parseInt(black_remaining_time / 1000)}`;
@@ -884,6 +919,9 @@
                     }
                     else if (previous_mover == "WHITE") {
                         white_moving_time_list.push(white_remaining_time);  //Time stamp for white's turn end
+                        if (white_remaining_time < 0) {
+                            white_remaining_time = 0;
+                        }
                         if (black_timer_type == "tournament") {
                             black_remaining_time = (+black_remaining_time) + (+black_time_gain) + (+timer_interval);
                         }
@@ -900,14 +938,14 @@
                         return;
                     }
                     black_remaining_time = black_remaining_time - timer_interval;
-                    if (black_remaining_time < 0) {
+                    if (black_remaining_time < -black_time_margin) {
                         deleteTimer();
                         $("#timeoutside").value = 2;
                         timeIsUpFor("BLACK");
                         return;
                     }
                     if (white_timer_type == "infinite") {
-                        $("#whitetime").innerHTML = "INFINITE";
+                        $("#whitetime").innerHTML = "INFINITY";
                     }
                     else if (white_remaining_time >= 10000) {
                         $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 1000)}`;
@@ -916,7 +954,7 @@
                         $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 100) / 10}`;
                     }
                     if (black_timer_type == "infinite") {
-                        $("#blacktime").innerHTML = "INFINITE";
+                        $("#blacktime").innerHTML = "INFINITY";
                     }
                     else if (black_remaining_time >= 10000) {
                         $("#blacktime").innerHTML = `${parseInt(black_remaining_time / 1000)}`;
@@ -1126,6 +1164,7 @@
                 const is_ready = stockfish_state == "READY";
 
                 return m("main", [
+                    m("p#pagetitle","Advanced"),
                     m("div#misc", [
                         m("div", [
                             `Fairy-Stockfish: ${stockfish_state} - download: `,
@@ -1210,14 +1249,16 @@
                             },
                         }),
                         m(
-                            "button#set",
+                            "button#setpos",
                             {
                                 disabled: !is_ready || review_mode,
                                 onclick: () => {
                                     if (review_mode) {
                                         return;
                                     }
+                                    resetTimer();
                                     window.setTimeout(setFen, 10);
+                                    $("#currentposition").click();
                                 },
                             },
                             "Set"
@@ -1339,6 +1380,15 @@
                             placeholder: "Stores value that the side that run out of time",
                             hidden: true,
                         }),
+                        m("p#set", {
+                            onclick: () => {
+                                if (review_mode) {
+                                    return;
+                                }
+                                window.setTimeout(setFen, 10);
+                            },
+                            hidden: true,
+                        }, "Set position (internal)")
                     ]),
                     m("div#advancedtimesettings", { hidden: !advanced_time_control || during_play }, [
                         m("div#whitetimesettings", [
@@ -1349,7 +1399,7 @@
                                     disabled: !is_ready || review_mode,
                                     onchange: () => {
                                         $("#whitetimetype").innerHTML = $("#dropdown-whitetimemode").value;
-                                        white_timer_type = $("#dropdown-whitetimemode").value;
+                                        //white_timer_type = $("#dropdown-whitetimemode").value;
                                     },
                                 },
                                 [
@@ -1361,12 +1411,17 @@
                             ),
                             m("input[type=number]#whitestarttime", {
                                 placeholder: "Start time (ms)",
-                                disabled: !is_ready || review_mode || white_timer_type == "infinite",
+                                disabled: !is_ready || review_mode || $("#whitetimetype").innerHTML == "infinite",
                                 min: 1,
                             }),
                             m("input[type=number]#whitetimegain", {
                                 placeholder: "Time gain (ms)",
-                                disabled: !is_ready || review_mode || white_timer_type == "infinite" || white_timer_type == "time per move" || white_timer_type == "hourglass",
+                                disabled: !is_ready || review_mode || $("#whitetimetype").innerHTML == "infinite" || $("#whitetimetype").innerHTML == "time per move" || $("#whitetimetype").innerHTML == "hourglass",
+                                min: 0,
+                            }),
+                            m("input[type=number]#whitetimemargin", {
+                                placeholder: "Time margin (ms)",
+                                disabled: !is_ready || review_mode || $("#whitetimetype").innerHTML == "infinite",
                                 min: 0,
                             }),
                         ]),
@@ -1378,7 +1433,7 @@
                                     disabled: !is_ready || review_mode,
                                     onchange: () => {
                                         $("#blacktimetype").innerHTML = $("#dropdown-blacktimemode").value;
-                                        black_timer_type = $("#dropdown-blacktimemode").value;
+                                        //black_timer_type = $("#dropdown-blacktimemode").value;
                                     },
                                 },
                                 [
@@ -1390,12 +1445,17 @@
                             ),
                             m("input[type=number]#blackstarttime", {
                                 placeholder: "Start time (ms)",
-                                disabled: !is_ready || review_mode || black_timer_type == "infinite",
+                                disabled: !is_ready || review_mode || $("#blacktimetype").innerHTML == "infinite",
                                 min: 1,
                             }),
                             m("input[type=number]#blacktimegain", {
                                 placeholder: "Time gain (ms)",
-                                disabled: !is_ready || review_mode || black_timer_type == "infinite" || black_timer_type == "time per move" || black_timer_type == "hourglass",
+                                disabled: !is_ready || review_mode || $("#blacktimetype").innerHTML == "infinite" || $("#blacktimetype").innerHTML == "time per move" || $("#blacktimetype").innerHTML == "hourglass",
+                                min: 0,
+                            }),
+                            m("input[type=number]#blacktimemargin", {
+                                placeholder: "Time margin (ms)",
+                                disabled: !is_ready || review_mode || $("#blacktimetype").innerHTML == "infinite",
                                 min: 0,
                             }),
                         ]),
@@ -1406,6 +1466,11 @@
                                     alert("This time control system allows user select different time modes for two sides and gives user more choice on time odds settings.\nThe time modes are:\nInfinite: Selected side has infinite time\nTournament: Selected side has limited time and may get a time increment after a move\nTime per move: Selected side need to make each move within a fixed time limit\nHourglass: Selected side has limited time and used time will be added to opponent's time.\nNote: if you set engine's time mode to infinite, it will think forever!");
                                 }
                             }, "[Why can I choose different time modes for two sides?]"),
+                            m("p", {
+                                onclick: () => {
+                                    alert("Start time: The initial time at the beginning of the game. Not applicable to infinite.\nTime gain: Get a time increment of this many milliseconds after every move. Only applicable to tournament.\nTime margin: The time can be exceeded by this many milliseconds. The remaining time will be shown as minus numbers if exceeded. Not applicable to infinite.");
+                                }
+                            }, "  [What are these parameters?]"),
                         ]),
                     ]),
                     m("div#gamesettings", [

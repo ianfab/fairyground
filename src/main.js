@@ -1,7 +1,6 @@
 // ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
-
 const variantsIni = document.getElementById("variants-ini");
 const dropdownVariant = document.getElementById("dropdown-variant");
 const buttonFlip = document.getElementById("button-flip");
@@ -11,7 +10,7 @@ const checkboxDests = document.getElementById("check-dests");
 const checkboxAdjudicate = document.getElementById("check-adjudicate");
 const textFen = document.getElementById("fen");
 const textMoves = document.getElementById("move");
-const buttonSetFen = document.getElementById("set");
+const pSetFen = document.getElementById("set");
 const labelPgn = document.getElementById("label-pgn");
 const labelStm = document.getElementById("label-stm");
 const chessgroundContainerEl = document.getElementById("chessground-container-div");
@@ -26,6 +25,9 @@ const buttonPreviousPosition = document.getElementById("previousposition");
 const buttonInitialPosition = document.getElementById("initialposition");
 const buttonCurrentPosition = document.getElementById("currentposition");
 const buttonSpecifiedPosition = document.getElementById("specifiedposition");
+const buttonGameStart = document.getElementById("gamestart");
+const playWhite = document.getElementById("playwhite");
+const playBlack = document.getElementById("playblack");
 const currentBoardFen = document.getElementById("currentboardfen");
 const gameResult = document.getElementById("gameresult");
 const gameStatus = document.getElementById("gamestatus");
@@ -119,7 +121,6 @@ function getDimensions() {
     height: ranks
   };
 }
-
 import Module from "ffish-es6";
 new Module().then(loadedModule => {
   ffish = loadedModule;
@@ -158,6 +159,15 @@ new Module().then(loadedModule => {
       chessgroundContainerEl.classList.add(`pockets`);
     } else chessgroundContainerEl.classList.remove(`pockets`);
     resetTimer();
+    let play_white = playWhite.checked;
+    let play_black = playBlack.checked;
+    buttonCurrentPosition.click();
+    if (play_white) {
+      playWhite.click();
+    }
+    if (play_black) {
+      playBlack.click();
+    }
 
     updateChessground();
   };
@@ -191,7 +201,7 @@ new Module().then(loadedModule => {
     });
   };
 
-  buttonSetFen.onclick = function () {
+  pSetFen.onclick = function () {
     if (isReviewMode.value.length > 0 && isReviewMode.value == 1) {
       return;
     }
@@ -233,6 +243,19 @@ new Module().then(loadedModule => {
 
   gameStatus.onclick = function () {
     gameStatus.innerHTML = getGameStatus(false);
+  };
+
+  buttonGameStart.onclick = function () {
+    if (playWhite.checked == true && playBlack.checked == false) {
+      chessground.set({
+        orientation: "black"
+      });
+    }
+    if (playWhite.checked == false && playBlack.checked == true) {
+      chessground.set({
+        orientation: "white"
+      });
+    }
   };
 
   updateChessground();
@@ -624,7 +647,7 @@ function afterChessgroundDrop(piece, dest, metadata) {
 function afterMove(capture) {
   updateChessground();
   textMoves.value = board.moveStack();
-  buttonSetFen.click();
+  pSetFen.click();
 
   if (capture) {
     soundCapture.currentTime = 0.0;
