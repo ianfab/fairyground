@@ -26,6 +26,7 @@ const buttonInitialPosition = document.getElementById("initialposition");
 const buttonCurrentPosition = document.getElementById("currentposition");
 const buttonSpecifiedPosition = document.getElementById("specifiedposition");
 const buttonGameStart = document.getElementById("gamestart");
+const buttonReset = document.getElementById("reset");
 const playWhite = document.getElementById("playwhite");
 const playBlack = document.getElementById("playblack");
 const currentBoardFen = document.getElementById("currentboardfen");
@@ -220,6 +221,7 @@ new Module().then(loadedModule => {
 
         updateChessground();
         initializeThemes.click();
+        buttonReset.click();
     };
 
     buttonFlip.onclick = function () {
