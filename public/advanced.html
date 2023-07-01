@@ -8,9 +8,7 @@
     <link rel="stylesheet" href="assets/chessground.css" />
     <link rel="stylesheet" href="assets/generated.css" />
     <link rel="stylesheet" href="assets/theme-backgrounds.css" />
-    <link rel="stylesheet" href="assets/theme-merida.css" />
-    <link rel="stylesheet" href="assets/theme-cburnett.css" />
-    <link rel="stylesheet" href="assets/theme-letters.css" />
+    <link rel="stylesheet" href="assets/theme-default.css" />
     <base target="_blank">
 </head>
 
@@ -252,6 +250,14 @@
         font-size: 16px;
     }
 
+    #pocket-top {
+        display: flex;
+    }
+
+    #pocket-bottom {
+        display: flex;
+    }
+
     #links a {
         margin: 20px;
         font-size: 20px;
@@ -289,6 +295,9 @@
         }
 
     #blacktime {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
         user-select: none;
         font-size: 50px;
         font-weight: bold;
@@ -296,6 +305,9 @@
     }
 
     #whitetime {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
         user-select: none;
         font-size: 50px;
         font-weight: bold;
@@ -399,12 +411,35 @@
 <body>
     <div id="root"></div>
     <script src="bundle.js" defer></script>
+
+    <!--iframe src="./themes.html" onload="this.before((this.contentDocument.body || this.contentDocument).children[0]); this.remove();"--><!--/iframe-->
+
     <!-- Javascript -->
 
     <script src="./lib/stockfish.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mithril@2.0.4/mithril.min.js"></script>
     <script>
+        let themes = [[], [], []];
         const $ = (...args) => document.querySelector(...args);
+
+        //Remove duplicated elements
+        function uniqArr(arr) {
+            var newArr = new Set(arr)
+            return Array.from(newArr)
+        }
+
+        function getFileFromServer(url, doneCallback) {
+            var xhr;
+            function handleStateChange() {
+                if (xhr.readyState === 4) {
+                    doneCallback(xhr.status == 200 ? xhr.responseText : null);
+                }
+            }
+            xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = handleStateChange;
+            xhr.open('GET', url, true);
+            xhr.send();
+        }
 
         const formatMB = (n) => {
             return (n ? (n / 1e6).toPrecision(3) : "?") + "MB";
@@ -424,6 +459,7 @@
                 return false;
             if (typeof Atomics !== "object") return false;
             if (typeof SharedArrayBuffer !== "function") { console.log("SharedArrayBuffer not enabled!"); return false; }
+            if (typeof FileReader === "undefined") { return false; }
             return true;
         };
 
@@ -488,6 +524,135 @@
 
             return { oninit, view };
         };
+
+        const LoadThemes = () => {
+            themes = [[], [], []];
+            function StartLoad(data) {
+                console.log(`${typeof data}`);
+                data = data.replace(/\r\n/g, "\n")
+                data = data.replace(/\r/g, "\n");
+                let rawText = data.split('\n');
+                console.log('raw:', rawText);
+                let i = 0;
+                let j = 0;
+                let css_name = "";
+                let index = 0;
+                let require_list = [];
+                let themesettings = [];
+                let apply_to_all_list = [];
+                let loaded_css_list = [];
+                let require_board_list = [];
+                let board_apply_to_all_list = [];
+                let themeavailable = [];
+                let boardthemeavailable = [];
+                let link = null;
+                for (i = 0; i < rawText.length; i++) {
+                    if (rawText[i].length < 1 || rawText[i].charAt(0) == '#') {
+                        continue;
+                    }
+                    themesettings = rawText[i].trim().split('|');
+                    if (themesettings.length != 3) {
+                        console.warn(`At line ${i} in paragraph of themes.html: Bad syntax\n`);
+                        continue;
+                    }
+                    themeavailable = themesettings[1].split(',');
+                    boardthemeavailable = themesettings[2].split(',');
+                    if (themeavailable.length == 1 && themeavailable[0] == "") {
+                        themeavailable = [];
+                    }
+                    if (boardthemeavailable.length == 1 && boardthemeavailable[0] == "") {
+                        boardthemeavailable = [];
+                    }
+                    if ((themesettings[1].length < 1 && themesettings[2].length < 1) || (themeavailable.includes("") || boardthemeavailable.includes(""))) {
+                        console.warn(`At line ${i} in paragraph of themes.html: Piece and Board style names must not be both null or contain null element\n`);
+                        continue;
+                    }
+                    if (themesettings[1].length > 0) {
+                        require_list = themeavailable.filter((element) => { return element.charAt(0) == '@' });
+                        themeavailable = themeavailable.filter((element) => { return element.charAt(0) != '@' });
+                        for (j = 0; j < require_list.length; j++) {
+                            if (themes[0].includes(require_list[j].substring(1))) {
+                                index = themes[0].indexOf(require_list[j].substring(1));
+                                themeavailable = themeavailable.concat(themes[1][index]);
+                            }
+                            else {
+                                console.warn(`At line ${i} in paragraph of themes.html: Variant ${require_list[j].substring(1)} has not been defined yet. You need to put it before this line.\n`);
+                            }
+                        }
+                        themeavailable = uniqArr(themeavailable);
+                    }
+                    if (themesettings[2].length > 0) {
+                        require_board_list = boardthemeavailable.filter((element) => { return element.charAt(0) == '@' });
+                        boardthemeavailable = boardthemeavailable.filter((element) => { return element.charAt(0) != '@' });
+                        for (j = 0; j < require_board_list.length; j++) {
+                            if (themes[0].includes(require_board_list[j].substring(1))) {
+                                index = themes[0].indexOf(require_board_list[j].substring(1));
+                                boardthemeavailable = boardthemeavailable.concat(themes[2][index]);
+                            }
+                            else {
+                                console.warn(`At line ${i} in paragraph of themes.html: Variant ${require_board_list[j].substring(1)} has not been defined yet. You need to put it before this line.\n`);
+                            }
+                        }
+                        boardthemeavailable = uniqArr(boardthemeavailable);
+                    }
+                    if (themesettings[0] == "*") {
+                        if (themesettings[1].length > 0) {
+                            apply_to_all_list = apply_to_all_list.concat(themeavailable);
+                        }
+                        if (themesettings[2].length > 0) {
+                            board_apply_to_all_list = board_apply_to_all_list.concat(boardthemeavailable);
+                        }
+                    }
+                    else if (themes[0].includes(themesettings[0])) {
+                        if (themesettings[1].length > 0) {
+                            index = themes[0].indexOf(themesettings[0]);
+                            themes[1][index] = uniqArr(themes[1][index].concat(themeavailable));
+                        }
+                        if (themesettings[2].length > 0) {
+                            index = themes[0].indexOf(themesettings[0]);
+                            themes[2][index] = uniqArr(themes[2][index].concat(boardthemeavailable));
+                        }
+                    }
+                    else {
+                        themeavailable = uniqArr(themeavailable.concat(apply_to_all_list));
+                        boardthemeavailable = uniqArr(boardthemeavailable.concat(board_apply_to_all_list));
+                        themes[0].push(themesettings[0]);
+                        themes[1].push(themeavailable);
+                        themes[2].push(boardthemeavailable);
+                    }
+                }
+                for (i = 0; i < themes[0].length; i++) {
+                    for (j = 0; j < themes[1][i].length; j++) {
+                        css_name = "theme-piece-" + themes[1][i][j];
+                        if (loaded_css_list.includes(css_name)) {
+                            continue;
+                        }
+                        loaded_css_list.push(css_name);
+                        link = document.createElement('link');
+                        link.setAttribute('rel', 'stylesheet');
+                        link.setAttribute('href', "./assets/" + css_name + ".css");
+                        document.head.appendChild(link);
+                    }
+                    for (j = 0; j < themes[2][i].length; j++) {
+                        css_name = "theme-board-" + themes[2][i][j];
+                        if (loaded_css_list.includes(css_name)) {
+                            continue;
+                        }
+                        loaded_css_list.push(css_name);
+                        link = document.createElement('link');
+                        link.setAttribute('rel', 'stylesheet');
+                        link.setAttribute('href', "./assets/" + css_name + ".css");
+                        document.head.appendChild(link);
+                    }
+                }
+                console.log(themes);
+            }
+            let data = "";
+            this.getFileFromServer('./themes.txt', (res) => {
+                console.log('res:', res);
+                StartLoad(res);
+            });
+        }
 
         const App = () => {
             let stockfish = null;
@@ -566,7 +731,7 @@
                 return listlength;
             }
 
-            const displayMove = (movenum,is_force_stop) => {
+            const displayMove = (movenum, is_force_stop) => {
                 if ($("#displayready").value.length > 0 && $("#displayready").value > 0)  //$("#displayready").value = 0, displayMove() is ready
                 {
                     return;
@@ -633,7 +798,7 @@
                 if ($("#advtimectrl").checked == true) {
                     $("#advtimectrl").click();
                 }
-                displayMove($("#gotomovenum").value,true);
+                displayMove($("#gotomovenum").value, true);
             }
 
             const displayPreviousMove = () => {
@@ -651,7 +816,7 @@
                 if ($("#advtimectrl").checked == true) {
                     $("#advtimectrl").click();
                 }
-                displayMove($("#gotomovenum").value,true);
+                displayMove($("#gotomovenum").value, true);
             }
 
             const displayInitialPosition = () => {
@@ -659,7 +824,7 @@
                 if ($("#advtimectrl").checked == true) {
                     $("#advtimectrl").click();
                 }
-                displayMove(0,true);
+                displayMove(0, true);
             }
 
             const displayCurrentPosition = () => {
@@ -680,7 +845,7 @@
                 if ($("#advtimectrl").checked == true) {
                     $("#advtimectrl").click();
                 }
-                displayMove($("#gotomovenum").value,true);
+                displayMove($("#gotomovenum").value, true);
             }
 
             const reset = () => {
@@ -1034,12 +1199,92 @@
                 stop();
             };
 
-            const changePieces = () => {
-                const classes = ["merida", "cburnett", "letters"];
+            const changePieces = (onlyChangeWhenInvalid) => {
+                let index = 0;
+                let themename = "";
+                let classes = [];
+                let DOMListValue = "";
                 const el = $("#chessground-container-div");
-                const activeIndex = classes.findIndex((c) => el.classList.contains(c));
-                const nextIndex = (activeIndex + 1) % classes.length;
-                el.classList.replace(classes[activeIndex], classes[nextIndex]);
+                index = themes[0].indexOf($("#dropdown-variant").value);
+                if (index < 0 || $("#dropdown-variant").value == "") {
+                    index = themes[0].indexOf("");
+                }
+                if (index < 0) {
+                    themename = "default";
+                }
+                else {
+                    classes = themes[1][index];
+                    if (classes.length < 1) {
+                        classes = themes[1][themes[0].indexOf("")];
+                    }
+                }
+                DOMListValue = el.classList.value.split(' ');
+                if (classes.length > 0) {
+                    index = classes.indexOf(DOMListValue[1]) + 1;
+                    if (onlyChangeWhenInvalid) {
+                        if (index != 0) {
+                            console.log("No need to change piece.");
+                            return;
+                        }
+                    }
+                    if (index >= classes.length) {
+                        index = 0;
+                    }
+                    themename = classes[index];
+                }
+                else {
+                    themename = "default";
+                }
+                DOMListValue[1] = themename;
+                el.classList.value = DOMListValue.join(' ');
+                console.log(`Piece theme: ${themename}`);
+                //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
+                //const nextIndex = (activeIndex + 1) % classes.length;
+                //el.classList.replace(classes[activeIndex], classes[nextIndex]);
+            };
+
+            const changeBoard = (onlyChangeWhenInvalid) => {
+                let index = 0;
+                let boardthemename = "";
+                let classes = [];
+                let DOMListValue = "";
+                const el = $("#chessground-container-div");
+                index = themes[0].indexOf($("#dropdown-variant").value);
+                if (index < 0 || $("#dropdown-variant").value == "") {
+                    index = themes[0].indexOf("");
+                }
+                if (index < 0) {
+                    boardthemename = "defaultboard";
+                }
+                else {
+                    classes = themes[2][index];
+                    if (classes.length < 1) {
+                        classes = themes[2][themes[0].indexOf("")];
+                    }
+                }
+                DOMListValue = el.classList.value.split(' ');
+                if (classes.length > 0) {
+                    index = classes.indexOf(DOMListValue[0]) + 1;
+                    if (onlyChangeWhenInvalid) {
+                        if (index != 0) {
+                            console.log("No need to change board.");
+                            return;
+                        }
+                    }
+                    if (index >= classes.length) {
+                        index = 0;
+                    }
+                    boardthemename = classes[index];
+                }
+                else {
+                    boardthemename = "defaultboard";
+                }
+                DOMListValue[0] = boardthemename;
+                el.classList.value = DOMListValue.join(' ');
+                console.log(`Board theme: ${boardthemename}`);
+                //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
+                //const nextIndex = (activeIndex + 1) % classes.length;
+                //el.classList.replace(classes[activeIndex], classes[nextIndex]);
             };
 
             const scrollOutput = () => {
@@ -1144,6 +1389,7 @@
 
             const onSelectVariantsFile = async (e) => {
                 const selected = e.currentTarget.files[0];
+                //console.log(`${selected}`);
                 if (selected) {
                     const FS = stockfish.FS;
                     const buffer = await selected.arrayBuffer();
@@ -1164,7 +1410,7 @@
                 const is_ready = stockfish_state == "READY";
 
                 return m("main", [
-                    m("p#pagetitle","Advanced"),
+                    m("p#pagetitle", "Advanced"),
                     m("div#misc", [
                         m("div", [
                             `Fairy-Stockfish: ${stockfish_state} - download: `,
@@ -1388,7 +1634,20 @@
                                 window.setTimeout(setFen, 10);
                             },
                             hidden: true,
-                        }, "Set position (internal)")
+                        }, "Set position (internal)"),
+                        m("p#loadthemes", {
+                            hidden: true,
+                            onclick: () => {
+                                LoadThemes();
+                            }
+                        }, "Load Themes (internal)"),
+                        m("p#initializethemes", {
+                            hidden: true,
+                            onclick: () => {
+                                changePieces(true);
+                                changeBoard(true);
+                            }
+                        }, "Initialize Themes (internal)"),
                     ]),
                     m("div#advancedtimesettings", { hidden: !advanced_time_control || during_play }, [
                         m("div#whitetimesettings", [
@@ -1516,10 +1775,10 @@
                     ]),
                     m("div#outputs", [
                         m("div", [
-                            m("div#chessground-container-div.blue.merida.board8x8", [
-                                m("div.cg-wrap.pocket", [m("div#pocket-top")]),
+                            m("div#chessground-container-div.defaultboard.default.board8x8", [
+                                m("div.cg-wrap.pocket-top", [m("div#pocket-top")]),
                                 m("div#chessground-board"),
-                                m("div.cg-wrap.pocket", [m("div#pocket-bottom")]),
+                                m("div.cg-wrap.pocket-bottom", [m("div#pocket-bottom")]),
                             ]),
                             m("div#movecontrol", { hidden: during_play }, [
                                 m("button#initialposition", { onclick: displayInitialPosition, disabled: !is_ready }, "Initial Position"),
@@ -1536,7 +1795,16 @@
                             m("p", { hidden: !review_mode }, "Review mode enabled."),
                             m("p", { hidden: !review_mode }, "You can go to previous moves played to analyze your game, but you cannot make changes to the game. To exit review mode, click <reset> or <current position>."),
                             m("div#controls", [
-                                m("button", { onclick: changePieces }, "Change pieces"),
+                                m("button", {
+                                    onclick: () => {
+                                        changePieces(false);
+                                    }
+                                }, "Change pieces"),
+                                m("button", {
+                                    onclick: () => {
+                                        changeBoard(false);
+                                    }
+                                }, "Change board"),
                                 m("button#button-flip", "Flip Board"),
                                 m(
                                     "input[type=range]#range-volume",
@@ -1591,7 +1859,7 @@
                                     onclick: () => {
                                         white_remaining_time = (+white_remaining_time) + 10000;
                                     },
-                                },"Add 10s for white"),
+                                }, "Add 10s for white"),
                                 m("button#addtimeforblack", {
                                     onclick: () => {
                                         black_remaining_time = (+black_remaining_time) + 10000;

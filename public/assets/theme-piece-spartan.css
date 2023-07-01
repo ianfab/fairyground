@@ -1,0 +1,70 @@
+.spartan .cg-wrap piece.p-piece.white {
+  background-image: url('images/pieces/spartan/wP.svg');
+}
+.spartan .cg-wrap piece.b-piece.white {
+  background-image: url('images/pieces/spartan/wB.svg');
+}
+.spartan .cg-wrap piece.n-piece.white {
+  background-image: url('images/pieces/spartan/wN.svg');
+}
+.spartan .cg-wrap piece.r-piece.white {
+  background-image: url('images/pieces/spartan/wR.svg');
+}
+.spartan .cg-wrap piece.q-piece.white {
+  background-image: url('images/pieces/spartan/wQ.svg');
+}
+.spartan .cg-wrap piece.k-piece.white {
+  background-image: url('images/pieces/spartan/wK.svg');
+}
+.spartan .cg-wrap piece.a-piece.white {
+  background-image: url('images/pieces/spartan/wA.svg');
+}
+.spartan .cg-wrap piece.c-piece.white {
+  background-image: url('images/pieces/spartan/wC.svg');
+}
+.spartan .cg-wrap piece.m-piece.white {
+  background-image: url('images/pieces/spartan/wM.svg');
+}
+.spartan .cg-wrap piece.f-piece.white {
+  background-image: url('images/pieces/spartan/wF.svg');
+}
+.spartan .cg-wrap piece.s-piece.white {
+  background-image: url('images/pieces/spartan/wS.svg');
+}
+.spartan .cg-wrap piece.e-piece.white {
+  background-image: url('images/pieces/spartan/wE.svg');
+}
+.spartan .cg-wrap piece.h-piece.white {
+  background-image: url('images/pieces/spartan/wH.svg');
+}
+.spartan .cg-wrap piece.l-piece.white {
+  background-image: url('images/pieces/spartan/wL.svg');
+}
+.spartan .cg-wrap piece.g-piece.white {
+  background-image: url('images/pieces/spartan/wG.svg');
+}
+.spartan .cg-wrap piece.w-piece.white {
+  background-image: url('images/pieces/spartan/wW.svg');
+}
+.spartan .cg-wrap piece.j-piece.white {
+  background-image: url('images/pieces/spartan/wJ.svg');
+}
+
+.spartan .cg-wrap piece.h-piece.black {
+  background-image: url('images/pieces/spartan/bP.svg');
+}
+.spartan .cg-wrap piece.k-piece.black {
+  background-image: url('images/pieces/spartan/bK.svg');
+}
+.spartan .cg-wrap piece.c-piece.black {
+  background-image: url('images/pieces/spartan/bCaptain.svg');
+}
+.spartan .cg-wrap piece.l-piece.black {
+  background-image: url('images/pieces/spartan/bLieutenant.svg');
+}
+.spartan .cg-wrap piece.g-piece.black {
+  background-image: url('images/pieces/spartan/bGeneral.svg');
+}
+.spartan .cg-wrap piece.w-piece.black {
+  background-image: url('images/pieces/spartan/bWarlord.svg');
+}

@@ -175,7 +175,10 @@ cg-board piece.fading {
 }
 
 /* Drop variants */
-.cg-wrap.pocket {
+.cg-wrap.pocket-top {
+  display: inline;
+}
+.cg-wrap.pocket-bottom {
   display: inline;
 }
 .pocket {

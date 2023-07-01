@@ -1,0 +1,103 @@
+.synochess .cg-wrap piece.p-piece.white {
+  background-image: url('images/pieces/synochess/wP.svg');
+}
+.synochess .cg-wrap piece.b-piece.white {
+  background-image: url('images/pieces/synochess/wB.svg');
+}
+.synochess .cg-wrap piece.n-piece.white {
+  background-image: url('images/pieces/synochess/wN.svg');
+}
+.synochess .cg-wrap piece.r-piece.white {
+  background-image: url('images/pieces/synochess/wR.svg');
+}
+.synochess .cg-wrap piece.q-piece.white {
+  background-image: url('images/pieces/synochess/wQ.svg');
+}
+.synochess .cg-wrap piece.k-piece.white {
+  background-image: url('images/pieces/synochess/wK.svg');
+}
+.synochess .cg-wrap piece.a-piece.white {
+  background-image: url('images/pieces/synochess/wA.svg');
+}
+.synochess .cg-wrap piece.c-piece.white {
+  background-image: url('images/pieces/synochess/wC.svg');
+}
+.synochess .cg-wrap piece.m-piece.white {
+  background-image: url('images/pieces/synochess/wM.svg');
+}
+.synochess .cg-wrap piece.f-piece.white {
+  background-image: url('images/pieces/synochess/wF.svg');
+}
+.synochess .cg-wrap piece.s-piece.white {
+  background-image: url('images/pieces/synochess/wS.svg');
+}
+.synochess .cg-wrap piece.e-piece.white {
+  background-image: url('images/pieces/synochess/wE.svg');
+}
+.synochess .cg-wrap piece.h-piece.white {
+  background-image: url('images/pieces/synochess/wH.svg');
+}
+.synochess .cg-wrap piece.l-piece.white {
+  background-image: url('images/pieces/synochess/wL.svg');
+}
+.synochess .cg-wrap piece.g-piece.white {
+  background-image: url('images/pieces/synochess/wG.svg');
+}
+.synochess .cg-wrap piece.w-piece.white {
+  background-image: url('images/pieces/synochess/wW.svg');
+}
+.synochess .cg-wrap piece.j-piece.white {
+  background-image: url('images/pieces/synochess/wJ.svg');
+}
+
+.synochess .cg-wrap piece.p-piece.black {
+  background-image: url('images/pieces/synochess/bP.svg');
+}
+.synochess .cg-wrap piece.b-piece.black {
+  background-image: url('images/pieces/synochess/bB.svg');
+}
+.synochess .cg-wrap piece.n-piece.black {
+  background-image: url('images/pieces/synochess/bN.svg');
+}
+.synochess .cg-wrap piece.r-piece.black {
+  background-image: url('images/pieces/synochess/bR.svg');
+}
+.synochess .cg-wrap piece.q-piece.black {
+  background-image: url('images/pieces/synochess/bQ.svg');
+}
+.synochess .cg-wrap piece.k-piece.black {
+  background-image: url('images/pieces/synochess/bK.svg');
+}
+.synochess .cg-wrap piece.a-piece.black {
+  background-image: url('images/pieces/synochess/bA.svg');
+}
+.synochess .cg-wrap piece.c-piece.black {
+  background-image: url('images/pieces/synochess/bC.svg');
+}
+.synochess .cg-wrap piece.m-piece.black {
+  background-image: url('images/pieces/synochess/bM.svg');
+}
+.synochess .cg-wrap piece.f-piece.black {
+  background-image: url('images/pieces/synochess/bF.svg');
+}
+.synochess .cg-wrap piece.s-piece.black {
+  background-image: url('images/pieces/synochess/bS.svg');
+}
+.synochess .cg-wrap piece.e-piece.black {
+  background-image: url('images/pieces/synochess/bE.svg');
+}
+.synochess .cg-wrap piece.h-piece.black {
+  background-image: url('images/pieces/synochess/bH.svg');
+}
+.synochess .cg-wrap piece.l-piece.black {
+  background-image: url('images/pieces/synochess/bL.svg');
+}
+.synochess .cg-wrap piece.g-piece.black {
+  background-image: url('images/pieces/synochess/bG.svg');
+}
+.synochess .cg-wrap piece.w-piece.black {
+  background-image: url('images/pieces/synochess/bW.svg');
+}
+.synochess .cg-wrap piece.j-piece.black {
+  background-image: url('images/pieces/synochess/bJ.svg');
+}

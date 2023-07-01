@@ -1,0 +1,49 @@
+.chak .cg-wrap piece.p-piece.white {
+  background-image: url('images/pieces/chak/wP.svg');
+}
+.chak .cg-wrap piece.r-piece.white {
+  background-image: url('images/pieces/chak/wR.svg');
+}
+.chak .cg-wrap piece.q-piece.white {
+  background-image: url('images/pieces/chak/wQ.svg');
+}
+.chak .cg-wrap piece.k-piece.white {
+  background-image: url('images/pieces/chak/wK.svg');
+}
+.chak .cg-wrap piece.s-piece.white {
+  background-image: url('images/pieces/chak/wS.svg');
+}
+.chak .cg-wrap piece.o-piece.white {
+  background-image: url('images/pieces/chak/wO.svg');
+}
+.chak .cg-wrap piece.v-piece.white {
+  background-image: url('images/pieces/chak/wV.svg');
+}
+.chak .cg-wrap piece.j-piece.white {
+  background-image: url('images/pieces/chak/wJ.svg');
+}
+
+.chak .cg-wrap piece.p-piece.black {
+  background-image: url('images/pieces/chak/bP.svg');
+}
+.chak .cg-wrap piece.r-piece.black {
+  background-image: url('images/pieces/chak/bR.svg');
+}
+.chak .cg-wrap piece.q-piece.black {
+  background-image: url('images/pieces/chak/bQ.svg');
+}
+.chak .cg-wrap piece.k-piece.black {
+  background-image: url('images/pieces/chak/bK.svg');
+}
+.chak .cg-wrap piece.s-piece.black {
+  background-image: url('images/pieces/chak/bS.svg');
+}
+.chak .cg-wrap piece.o-piece.black {
+  background-image: url('images/pieces/chak/bO.svg');
+}
+.chak .cg-wrap piece.v-piece.black {
+  background-image: url('images/pieces/chak/bV.svg');
+}
+.chak .cg-wrap piece.j-piece.black {
+  background-image: url('images/pieces/chak/bJ.svg');
+}
