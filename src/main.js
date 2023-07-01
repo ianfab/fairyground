@@ -261,7 +261,7 @@ new Module().then(loadedModule => {
 
         if (!fen || ffish.validateFen(fen, board.variant())) {
             if (fen) board.setFen(fen); else board.reset();
-            const moves = textMoves.value.split(" ").reverse();
+            const moves = textMoves.value.trim().split(" ").reverse();
 
             while (moves.length > 0) {
                 board.push(moves.pop());
@@ -320,7 +320,7 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
 
     if (!fen || ffish.validateFen(fen, board.variant())) {
         if (fen) board.setFen(fen); else board.reset();
-        const moves = movelist.split(" ").reverse();
+        const moves = movelist.trim().split(" ").reverse();
 
         while (moves.length > 0) {
             board.push(moves.pop());
