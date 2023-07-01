@@ -41,6 +41,7 @@ const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
 const soundTerminal = new Audio("assets/sound/thearst3rd/terminal.wav");
+const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 let ffish = null;
 let board = null;
 let chessground = null;
@@ -68,6 +69,7 @@ function initBoard(variant) {
         if (ffish.capturesToHand(variant)) {
             const pieceLetters = fenBoard.replace(/[0-9kK\/\[\]]/g, "");
             const pieceRoles = getPieceRoles(pieceLetters);
+            console.log(pieceRoles);
             pocketRoles = {
                 white: pieceRoles,
                 black: pieceRoles
@@ -105,6 +107,50 @@ function initBoard(variant) {
         pocketTopEl.style.display = "none";
         pocketBottomEl.style.display = "none";
     }
+}
+
+function getWallSquarePosition() {
+    let FEN = board.fen().split(' ')[0];
+    let ranks = FEN.split('/');
+    let wall_square_list = [];
+    let file = [];
+    let i = 0;
+    let j = 0;
+    let current_file = 0;
+    let tmp_num = 0;
+    for (i = 0; i < ranks.length; i++) {
+        file = ranks[i].split('');
+        current_file = 0;
+        tmp_num = 0;
+        for (j = 0; j < file.length; j++) {
+            if (/^[0-9]{1}$/.test(file[j])) {
+                tmp_num = tmp_num * 10 + (+parseInt(file[j]));
+                continue;
+            }
+            else {
+                current_file = (+current_file) + (+tmp_num);
+                tmp_num = 0;
+            }
+            if (file[j] == '*') {
+                wall_square_list.push(`${files[current_file]}${ranks.length - i}`);
+            }
+            current_file++;
+        }
+    }
+    console.log(wall_square_list);
+    return wall_square_list;
+}
+
+function showWallSquares() {
+    let wall_square_list = getWallSquarePosition();
+    let i = 0;
+    let DrawShapeClass = { orig: "a1", brush: "red", customSvg: "./assets/images/wallsquare/barrier.svg" };
+    let DrawShapeList = [];
+    for (i = 0; i < wall_square_list.length; i++) {
+        DrawShapeClass.orig = wall_square_list[i];
+        DrawShapeList.push(DrawShapeClass);
+    }
+    chessground.setAutoShapes(DrawShapeList);
 }
 
 function getDimensions() {

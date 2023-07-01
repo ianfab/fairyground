@@ -113,3 +113,7 @@
 .cburnett .cg-wrap piece.l-piece.black {
   background-image: url('images/pieces/cburnett/Chess_Cdt45.svg');
 }
+
+.cburnett .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

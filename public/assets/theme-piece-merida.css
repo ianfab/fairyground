@@ -102,6 +102,10 @@
   background-image: url('images/pieces/merida/bJ.svg');
 }
 
+.merida .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}
+
 
 .merida.board9x10 .cg-wrap piece.a-piece.white {
   background-image: url('images/pieces/merida/wS.svg');
