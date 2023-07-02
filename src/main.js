@@ -198,6 +198,7 @@ new Module().then(loadedModule => {
             return;
         }
         if (!ffish.variants().includes(dropdownVariant.value)) return;
+        buttonReset.click();
         const oldDimensions = getDimensions();
         initBoard(dropdownVariant.value);
         const newDimensions = getDimensions();
@@ -221,7 +222,6 @@ new Module().then(loadedModule => {
 
         updateChessground();
         initializeThemes.click();
-        buttonReset.click();
     };
 
     buttonFlip.onclick = function () {
