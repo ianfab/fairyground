@@ -37,12 +37,33 @@ const blackTime = document.getElementById("blacktime");
 const timeOutSide = document.getElementById("timeoutside");
 const loadThemes = document.getElementById("loadthemes");
 const initializeThemes = document.getElementById("initializethemes");
+const isBoardSetup = document.getElementById("isboardsetup");
+const dropdownSetPiece = document.getElementById("dropdown-setpiece"); 
+const buttonClearBoard = document.getElementById("clearboard");
+const buttonInitialBoardPosition = document.getElementById("initboardpos");
+const buttonAddToPocket = document.getElementById("addtopocket");
+const buttonBoardSetupCopyFEN = document.getElementById("boardsetupcopyfen");
+const buttonValidatePosition = document.getElementById("validatepos");
+const dropdownSideToMove = document.getElementById("dropdown-sidetomove");
+const whiteOO = document.getElementById("whitekingsidecastle");
+const whiteOOO = document.getElementById("whitequeensidecastle");
+const blackOO = document.getElementById("blackkingsidecastle");
+const blackOOO = document.getElementById("blackqueensidecastle");
+const halfMoveClock = document.getElementById("halfmoveclock");
+const whiteRemainingChecks = document.getElementById("whiteremainingchecks");
+const blackRemainingChecks = document.getElementById("blackremainingchecks");
+const currentMoveNumber = document.getElementById("currentmovenum");
+const enPassantFile = document.getElementById("enpassantfile");
+const enPassantRank = document.getElementById("enpassantrank");
+const seirawanGatingFiles = document.getElementById("seirwangatingfiles");
+const copySetFEN = document.getElementById("copysetfen");
 const quickPromotionPiece = document.getElementById("dropdown-quickpromotion");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
 const soundTerminal = new Audio("assets/sound/thearst3rd/terminal.wav");
 const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+const pieces = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '+a', '+b', '+c', '+d', '+e', '+f', '+g', '+h', '+i', '+j', '+k', '+l', '+m', '+n', '+o', '+p', '+q', '+r', '+s', '+t', '+u', '+v', '+w', '+x', '+y', '+z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '+A', '+B', '+C', '+D', '+E', '+F', '+G', '+H', '+I', '+J', '+K', '+L', '+M', '+N', '+O', '+P', '+Q', '+R', '+S', '+T', '+U', '+V', '+W', '+X', '+Y', '+Z', '*'];
 let ffish = null;
 let board = null;
 let chessground = null;
@@ -100,7 +121,10 @@ function initBoard(variant) {
         selectable: {
             enabled: false
         },
-        pocketRoles: pocketRoles
+        pocketRoles: pocketRoles,
+        events: {
+            select: onSelectSquare,
+        },
     };
     chessground = Chessground(chessgroundEl, config, pocketTopEl, pocketBottomEl);
 
@@ -108,6 +132,49 @@ function initBoard(variant) {
         pocketTopEl.style.display = "none";
         pocketBottomEl.style.display = "none";
     }
+}
+
+function onSelectSquare(key) {
+    console.log("key:", key);
+    console.log(chessground.state);
+    if (!isBoardSetup.checked) {
+        return;
+    }
+    let piece = { role: "", color: "" };
+    let pieceid = "";
+    console.log("pieceid selected: ", dropdownSetPiece.value);
+    if (dropdownSetPiece.value == null || dropdownSetPiece.value == "<delete>") {
+        if (chessground.state.boardState.pieces.has(key)) {
+            chessground.state.boardState.pieces.delete(key);
+        }
+    }
+    else if (dropdownSetPiece.value == "<move>") {
+        ;
+    }
+    else {
+        pieceid = dropdownSetPiece.value;
+        if (pieceid.charAt(0) == '+') {
+            piece.role = "p";
+            pieceid = pieceid.substring(1);
+        }
+        if (("a" <= pieceid.charAt(0) && pieceid.charAt(0) <= "z") || pieceid.charAt(0) == "*") {
+            piece.color = "black";
+        }
+        else {
+            piece.color = "white";
+        }
+        if (pieceid.charAt(0) == "*") {
+            piece.role = "_-piece";
+        }
+        else {
+            piece.role = piece.role + pieceid.charAt(0).toLowerCase() + "-piece";
+        }
+        console.log("final piece id:", piece.role);
+        chessground.state.boardState.pieces.set(key, piece);
+    }
+    chessground.set({
+        lastMove: undefined
+    });
 }
 
 function getWallSquarePosition() {
@@ -152,6 +219,60 @@ function showWallSquares() {
         DrawShapeList.push(DrawShapeClass);
     }
     chessground.setAutoShapes(DrawShapeList);
+}
+
+function getUsedPieceID(variant) {
+    console.log("Now testing piece set! You may see a lot of warnings here.");
+    let validPieceID = pieces.filter((element) => {
+        return ffish.validateFen(element, variant) != -10;
+    });
+    return validPieceID;
+}
+
+function setPieceList(used_piece_list) {
+    while (dropdownSetPiece.length > 2) {
+        dropdownSetPiece.remove(2);
+    }
+    let option = null;
+    let i = 0;
+    for (i = 0; i < used_piece_list.length; i++) {
+        option = document.createElement("option");
+        option.text = used_piece_list[i];
+        option.value = used_piece_list[i];
+        dropdownSetPiece.add(option);
+    }
+}
+
+function addPieceToPocket(pieceid, color) {
+    if (pieceid.charAt(0) == "+") {
+        pieceid = "p" + pieceid.substring(1);
+    }
+    let piecerole = pieceid + "-piece";
+    if (!chessground.state.boardState.pockets.white.has(piecerole)) {
+        chessground.state.boardState.pockets.white.set(piecerole, 0);
+    }
+    if (!chessground.state.boardState.pockets.black.has(piecerole)) {
+        chessground.state.boardState.pockets.black.set(piecerole, 0);
+    }
+    if (!chessground.state.pocketRoles.white.includes(piecerole)) {
+        chessground.state.pocketRoles.white.push(piecerole);
+    }
+    if (!chessground.state.pocketRoles.black.includes(piecerole)) {
+        chessground.state.pocketRoles.black.push(piecerole);
+    }
+    if (color == "white") {
+        chessground.state.boardState.pockets.white.set(piecerole, chessground.state.boardState.pockets.white.get(piecerole) + 1);
+    }
+    else if (color == "black") {
+        chessground.state.boardState.pockets.black.set(piecerole, chessground.state.boardState.pockets.black.get(piecerole) + 1);
+    }
+    chessground.set({
+        lastMove: undefined,
+        pocketRoles: {
+            white: chessground.state.pocketRoles.white,
+            black: chessground.state.pocketRoles.black,
+        },
+    });
 }
 
 function getDimensions() {
@@ -222,6 +343,7 @@ new Module().then(loadedModule => {
 
         updateChessground();
         initializeThemes.click();
+        setPieceList(getUsedPieceID(dropdownVariant.value));
     };
 
     buttonFlip.onclick = function () {
@@ -258,6 +380,7 @@ new Module().then(loadedModule => {
             return;
         }
         const fen = textFen.value;
+        console.log(ffish.validateFen(fen, board.variant()));
 
         if (!fen || ffish.validateFen(fen, board.variant())) {
             if (fen) board.setFen(fen); else board.reset();
@@ -310,6 +433,90 @@ new Module().then(loadedModule => {
         }
     };
 
+    isBoardSetup.onchange = function () {
+        if (isBoardSetup.checked) {
+            chessground.set({
+                movable: {
+                    color: "both",
+                    dests: new Map(),
+                },
+                draggable: {
+                    deleteOnDropOff: true,
+                },
+            });
+        }
+        else {
+            buttonCurrentPosition.click();
+        }
+    }
+
+    buttonClearBoard.onclick = function () {
+        chessground.state.boardState.pieces.clear();
+        chessground.set({
+            lastMove: undefined
+        });
+    }
+
+    buttonInitialBoardPosition.onclick = function () {
+        chessground.set({
+            fen: ffish.startingFen(dropdownVariant.value),
+            lastMove: undefined
+        });
+    }
+
+    buttonAddToPocket.onclick = function () {
+        if (ffish.capturesToHand(dropdownVariant.value) || ffish.startingFen(dropdownVariant.value).includes("[")) {
+            if (dropdownSetPiece.value.includes("+")) {
+                window.alert("Promoted pieces cannot go into pockets. If you have dropLoop = true, Please directly add the target piece. For example, if you have a:c, then instead of adding +a, you need to add c.");
+            }
+            else if ("a" <= dropdownSetPiece.value && dropdownSetPiece.value <= "z") {
+                addPieceToPocket(dropdownSetPiece.value.toLowerCase(), "black");
+            }
+            else if ("A" <= dropdownSetPiece.value && dropdownSetPiece.value <= "Z") {
+                addPieceToPocket(dropdownSetPiece.value.toLowerCase(), "white");
+            }
+            else if (dropdownSetPiece.value == "*") {
+                window.alert("Error: Cannot add wall squares to pocket.");
+            }
+            else {
+                window.alert("Please select a piece (in a letter with or without promotion mark, such as 'a' or '+a') in order to add to pocket.");
+            }
+        }
+        else {
+            window.alert("This variant does not have a pocket.");
+        }
+    }
+
+    buttonBoardSetupCopyFEN.onclick = function () {
+        let FEN = getFEN();
+        if (FEN == null) {
+            return;
+        }
+        textFen.value = FEN;
+        copySetFEN.click();
+    }
+
+    buttonValidatePosition.onclick = function () {
+        validateFEN(getFEN());
+    }
+
+    dropdownSetPiece.onchange = function () {
+        if (dropdownSetPiece.value == "<move>") {
+            chessground.set({
+                movable: {
+                    color: "both",
+                    dests: new Map(),
+                },
+                draggable: {
+                    deleteOnDropOff: true,
+                },
+            });
+        }
+        else {
+            disableBoardMove();
+        }
+    }
+
     updateChessground();
 }); // Chessground helper functions
 
@@ -317,6 +524,7 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
     while (displayReady.value.length < 1 || displayReady.value != 1) {
         continue;
     }
+    console.log(ffish.validateFen(fen, board.variant()));
 
     if (!fen || ffish.validateFen(fen, board.variant())) {
         if (fen) board.setFen(fen); else board.reset();
@@ -337,6 +545,161 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
     }
     displayReady.value = 0;
 };
+
+function getFEN() {
+    let FEN = chessground.getFen();
+    let width = chessground.state.dimensions.width;
+    let height = chessground.state.dimensions.height;
+    if (dropdownSideToMove.value == "white/red/sente") {
+        FEN += " w";
+    }
+    else if (dropdownSideToMove.value == "black/black/gote") {
+        FEN += " b";
+    }
+    let castling = " ";
+    if (whiteOO.checked) {
+        castling += "K";
+    }
+    if (whiteOOO.checked) {
+        castling += "Q";
+    }
+    if (blackOO.checked) {
+        castling += "k";
+    }
+    if (blackOOO.checked) {
+        castling += "q";
+    }
+    if (seirawanGatingFiles.value.length > 0) {
+        if (/^[A-Za-z]*$/.test(seirawanGatingFiles.value)) {
+            let matcher = new RegExp("[^A-" + files[width - 1].toUpperCase() + "a-" + files[width - 1].toLowerCase() + "]");
+            if (!matcher.test(seirawanGatingFiles.value)) {
+                castling += seirawanGatingFiles.value;
+            }
+            else {
+                window.alert(`Bad Seirawan gating files: File out of range. File range is A-${files[width - 1].toUpperCase()}`);
+                return null;
+            }
+        }
+        else {
+            window.alert("Bad Seirawan gating files: All files should be given in letters. (e.g. ABCDabcd)");
+            return null;
+        }
+    }
+    if (castling == " ") {
+        castling = " -";
+    }
+    FEN += castling;
+    if (enPassantFile.value.length < 1 || enPassantRank.value.length < 1) {
+        FEN += " -";
+    }
+    else if (enPassantFile.value > 0 && enPassantFile.value <= width && enPassantRank.value > 0 && enPassantRank.value <= height) {
+        FEN += (" " + files[enPassantFile.value - 1] + (enPassantRank.value));
+    }
+    else {
+        window.alert("Bad en passant file or rank number.");
+        return null;
+    }
+    if (whiteRemainingChecks.value.length > 0 && blackRemainingChecks.value.length > 0) {
+        if (ffish.startingFen(dropdownVariant.value).split(' ').length != 7) {
+            window.alert("This variant does not have check number limits.");
+            return null;
+        }
+        if (whiteRemainingChecks.value > 0 && blackRemainingChecks.value > 0) {
+            FEN += ` ${whiteRemainingChecks.value}+${blackRemainingChecks.value}`;
+        }
+        else {
+            window.alert("Bad remaining checks. Remaining checks should be larger than 0.");
+            return null;
+        }
+    }
+    if (halfMoveClock.value.length > 0) {
+        if (halfMoveClock.value >= 0) {
+            FEN += ` ${halfMoveClock.value}`;
+        }
+        else {
+            window.alert("Bad half move clock. Half move clock should be larger than or equal to 0.");
+            return null;
+        }
+    }
+    else {
+        FEN += " 0";
+    }
+    if (currentMoveNumber.value.length > 0) {
+        if (currentMoveNumber.value > 0) {
+            FEN += ` ${currentMoveNumber.value}`;
+        }
+        else {
+            window.alert("Bad current move number. Current move number should be larger than 0.");
+            return null;
+        }
+    }
+    else {
+        FEN += " 1";
+    }
+    console.log(FEN);
+    return FEN;
+}
+
+function validateFEN(FEN) {
+    if (FEN == null) {
+        return false;
+    }
+    let result = ffish.validateFen(FEN);
+    if (result >= 0) {
+        window.alert("No errors found.");
+        return true;
+    }
+    //-10 Contains invalid piece characters or syntax error
+    //-9 Bad piece position
+    //-8 Line/column amount invalid
+    //-7 Bad piece character in pocket
+    //-6 Bad side to move flag
+    //-5 Invalid piece count or uexpected numbers
+    //-4 Bad en passant square
+    //-3 Multiple kings
+    //-2 Bad half move clock
+    //-1 Bad move number
+    if (result == -10) {
+        window.alert("Contains invalid piece characters or syntax error.");
+        return false;
+    }
+    if (result == -9) {
+        window.alert("Bad piece position.");
+        return false;
+    }
+    if (result == -8) {
+        window.alert("Line/column amount invalid.");
+        return false;
+    }
+    if (result == -7) {
+        window.alert("Bad piece character in pocket.");
+        return false;
+    }
+    if (result == -6) {
+        window.alert("Bad side to move flag.");
+        return false;
+    }
+    if (result == -5) {
+        window.alert("Invalid piece count or uexpected numbers.");
+        return false;
+    }
+    if (result == -4) {
+        window.alert("Bad en passant square.");
+        return false;
+    }
+    if (result == -3) {
+        window.alert("Multiple kings.");
+        return false;
+    }
+    if (result == -2) {
+        window.alert("Bad half move clock.");
+        return false;
+    }
+    if (result == -1) {
+        window.alert("Bad move number.");
+        return false;
+    }
+}
 
 function getGameStatus(showresult) {
     let result = "null";
@@ -458,6 +821,16 @@ function afterChessgroundMove(orig, dest, metadata) {
     let promotion = quickPromotionPiece.value;
     let gating = "";
     let i = 0;
+
+    if (isBoardSetup.checked) {
+        chessground.set({
+            movable: {
+                color: "both",
+                dests: new Map(),
+            }
+        });
+        return;
+    }
 
     const move = orig.replace(":", "10") + dest.replace(":", "10");
     console.log(`${move}`);
@@ -600,6 +973,16 @@ function afterChessgroundDrop(piece, dest, metadata) {
     let promotion = quickPromotionPiece.value;
     let i = 0;
 
+    if (isBoardSetup.checked) {
+        chessground.set({
+            movable: {
+                color: "both",
+                dests: new Map(),
+            }
+        });
+        return;
+    }
+
     //When dropPromoted = true in variant.ini, FairyStockfish allows an unpromoted piece to be dropped in promoted form (not compulsory)
     //Therefore, you need to consider about adding drop promoted piece function support.
 
@@ -734,7 +1117,10 @@ function disableBoardMove() {
     chessground.set({
         movable: {
             color: undefined
-        }
+        },
+        draggable: {
+            deleteOnDropOff: false,
+        },
     });
 }
 
@@ -743,7 +1129,10 @@ function enableBoardMove() {
         movable: {
             color: getColorOrUndefined(board),
             dests: getDests(board)
-        }
+        },
+        draggable: {
+            deleteOnDropOff: isBoardSetup.checked,
+        },
     });
 }
 

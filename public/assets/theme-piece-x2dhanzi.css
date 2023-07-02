@@ -42,3 +42,7 @@
 .x2dhanzi .cg-wrap piece.c-piece.black {
   background-image: url('images/pieces/2dhanzi/bC.svg');
 }
+
+.x2dhanzi .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

@@ -1,0 +1,107 @@
+.duck .cg-wrap piece.p-piece.white {
+  background-image: url('images/pieces/merida/wP.svg');
+}
+.duck .cg-wrap piece.b-piece.white {
+  background-image: url('images/pieces/merida/wB.svg');
+}
+.duck .cg-wrap piece.n-piece.white {
+  background-image: url('images/pieces/merida/wN.svg');
+}
+.duck .cg-wrap piece.r-piece.white {
+  background-image: url('images/pieces/merida/wR.svg');
+}
+.duck .cg-wrap piece.q-piece.white {
+  background-image: url('images/pieces/merida/wQ.svg');
+}
+.duck .cg-wrap piece.k-piece.white {
+  background-image: url('images/pieces/merida/wK.svg');
+}
+.duck .cg-wrap piece.a-piece.white {
+  background-image: url('images/pieces/merida/wA.svg');
+}
+.duck .cg-wrap piece.c-piece.white {
+  background-image: url('images/pieces/merida/wC.svg');
+}
+.duck .cg-wrap piece.m-piece.white {
+  background-image: url('images/pieces/merida/wM.svg');
+}
+.duck .cg-wrap piece.f-piece.white {
+  background-image: url('images/pieces/merida/wF.svg');
+}
+.duck .cg-wrap piece.s-piece.white {
+  background-image: url('images/pieces/merida/wS.svg');
+}
+.duck .cg-wrap piece.e-piece.white {
+  background-image: url('images/pieces/merida/wE.svg');
+}
+.duck .cg-wrap piece.h-piece.white {
+  background-image: url('images/pieces/merida/wH.svg');
+}
+.duck .cg-wrap piece.l-piece.white {
+  background-image: url('images/pieces/merida/wL.svg');
+}
+.duck .cg-wrap piece.g-piece.white {
+  background-image: url('images/pieces/merida/wG.svg');
+}
+.duck .cg-wrap piece.w-piece.white {
+  background-image: url('images/pieces/merida/wW.svg');
+}
+.duck .cg-wrap piece.j-piece.white {
+  background-image: url('images/pieces/merida/wJ.svg');
+}
+
+.duck .cg-wrap piece.p-piece.black {
+  background-image: url('images/pieces/merida/bP.svg');
+}
+.duck .cg-wrap piece.b-piece.black {
+  background-image: url('images/pieces/merida/bB.svg');
+}
+.duck .cg-wrap piece.n-piece.black {
+  background-image: url('images/pieces/merida/bN.svg');
+}
+.duck .cg-wrap piece.r-piece.black {
+  background-image: url('images/pieces/merida/bR.svg');
+}
+.duck .cg-wrap piece.q-piece.black {
+  background-image: url('images/pieces/merida/bQ.svg');
+}
+.duck .cg-wrap piece.k-piece.black {
+  background-image: url('images/pieces/merida/bK.svg');
+}
+.duck .cg-wrap piece.a-piece.black {
+  background-image: url('images/pieces/merida/bA.svg');
+}
+.duck .cg-wrap piece.c-piece.black {
+  background-image: url('images/pieces/merida/bC.svg');
+}
+.duck .cg-wrap piece.m-piece.black {
+  background-image: url('images/pieces/merida/bM.svg');
+}
+.duck .cg-wrap piece.f-piece.black {
+  background-image: url('images/pieces/merida/bF.svg');
+}
+.duck .cg-wrap piece.s-piece.black {
+  background-image: url('images/pieces/merida/bS.svg');
+}
+.duck .cg-wrap piece.e-piece.black {
+  background-image: url('images/pieces/merida/bE.svg');
+}
+.duck .cg-wrap piece.h-piece.black {
+  background-image: url('images/pieces/merida/bH.svg');
+}
+.duck .cg-wrap piece.l-piece.black {
+  background-image: url('images/pieces/merida/bL.svg');
+}
+.duck .cg-wrap piece.g-piece.black {
+  background-image: url('images/pieces/merida/bG.svg');
+}
+.duck .cg-wrap piece.w-piece.black {
+  background-image: url('images/pieces/merida/bW.svg');
+}
+.duck .cg-wrap piece.j-piece.black {
+  background-image: url('images/pieces/merida/bJ.svg');
+}
+
+.duck .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/duck.svg');
+}

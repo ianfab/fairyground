@@ -101,3 +101,7 @@
 .ordamirror .cg-wrap piece.j-piece.black {
   background-image: url('images/pieces/ordamirror/bJ.svg');
 }
+
+.ordamirror .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

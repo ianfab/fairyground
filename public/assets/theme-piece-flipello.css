@@ -5,3 +5,7 @@
 .flipello .cg-wrap piece.p-piece.black {
   background-image: url('images/pieces/flipello/bP.svg');
 }
+
+.flipello .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

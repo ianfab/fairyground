@@ -71,3 +71,7 @@
 .orda .cg-wrap piece.y-piece.black {
   background-image: url('images/pieces/orda/bY.svg');
 }
+
+.orda .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

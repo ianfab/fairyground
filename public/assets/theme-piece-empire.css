@@ -107,3 +107,7 @@
 .empire .cg-wrap piece.j-piece.black {
   background-image: url('images/pieces/empire/bJ.svg');
 }
+
+.empire .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

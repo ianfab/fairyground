@@ -104,3 +104,7 @@
 .shinobi .cg-wrap piece.j-piece.black {
   background-image: url('images/pieces/shinobi/bJ.svg');
 }
+
+.shinobi .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

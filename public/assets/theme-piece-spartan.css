@@ -68,3 +68,7 @@
 .spartan .cg-wrap piece.w-piece.black {
   background-image: url('images/pieces/spartan/bWarlord.svg');
 }
+
+.spartan .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

@@ -29,3 +29,7 @@
 .portella2kanji .cg-wrap.manipulable.orientation-white piece.pr-piece.black, .portella2kanji .cg-wrap.pocket-top piece.pr-piece.white, .portella2kanji .cg-wrap.manipulable.orientation-black piece.pr-piece.white, .portella2kanji .cg-wrap.pocket-top piece.pr-piece.black {background-image: url("images/pieces/portella2kanji/bpR.png");}
 .portella2kanji .cg-wrap.manipulable.orientation-white piece.s-piece.black, .portella2kanji .cg-wrap.pocket-top piece.s-piece.white, .portella2kanji .cg-wrap.manipulable.orientation-black piece.s-piece.white, .portella2kanji .cg-wrap.pocket-top piece.s-piece.black {background-image: url("images/pieces/portella2kanji/bS.png");}
 .portella2kanji .cg-wrap.manipulable.orientation-white piece.ps-piece.black, .portella2kanji .cg-wrap.pocket-top piece.ps-piece.white, .portella2kanji .cg-wrap.manipulable.orientation-black piece.ps-piece.white, .portella2kanji .cg-wrap.pocket-top piece.ps-piece.black {background-image: url("images/pieces/portella2kanji/bpS.png");}
+
+.portella2kanji .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

@@ -199,6 +199,7 @@
         padding: 10px;
         margin-left: 20px;
         font-size: 16px;
+        height: 600px;
     }
 
         #info #timecontrolduringplay {
@@ -314,6 +315,89 @@
         font-family: "Times New Roman",Georgia,Serif,Arial;
     }
 
+    #boardsetupsettings {
+        margin-bottom: 10px;
+    }
+
+        #boardsetupsettings #boardpiecechange {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+            #boardsetupsettings #boardpiecechange #dropdown-setpiece {
+                width: 120px;
+                background: #eee;
+            }
+
+            #boardsetupsettings #boardpiecechange button {
+                display: inline-block;
+                padding: 3px 6px 3px 6px;
+                background: #888;
+                color: #fff;
+                font-weight: bold;
+                margin-right: 6px;
+                cursor: pointer;
+            }
+
+    #boardsetupsettings2 {
+        margin-top: 20px;
+        margin-bottom: 10px;
+     }
+
+        #boardsetupsettings2 #dropdown-sidetomove {
+            width: 120px;
+            background: #eee;
+        }
+
+        #boardsetupsettings2 #halfmoveclock {
+            width: 25%;
+            padding: 2px 0 2px 6px;
+            border: 1px solid #ddd;
+            border-right: 0;
+        }
+
+        #boardsetupsettings2 #whiteremainingchecks {
+            width: 25%;
+            padding: 2px 0 2px 6px;
+            border: 1px solid #ddd;
+            border-right: 0;
+        }
+
+        #boardsetupsettings2 #blackremainingchecks {
+            width: 25%;
+            padding: 2px 0 2px 6px;
+            border: 1px solid #ddd;
+            border-right: 0;
+        }
+
+        #boardsetupsettings2 #currentmovenum {
+            width: 25%;
+            padding: 2px 0 2px 6px;
+            border: 1px solid #ddd;
+            border-right: 0;
+        }
+
+        #boardsetupsettings2 #enpassantfile {
+            width: 35%;
+            padding: 2px 0 2px 6px;
+            border: 1px solid #ddd;
+            border-right: 0;
+        }
+
+        #boardsetupsettings2 #enpassantrank {
+            width: 35%;
+            padding: 2px 0 2px 6px;
+            border: 1px solid #ddd;
+            border-right: 0;
+        }
+
+        #boardsetupsettings2 #seirwangatingfiles {
+            width: 60%;
+            padding: 2px 0 2px 6px;
+            border: 1px solid #ddd;
+            border-right: 0;
+        }
+
     #advancedtimesettings {
         margin-bottom: 10px;
     }
@@ -398,6 +482,9 @@
             }
 
     spangameresult {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
         user-select: none;
         font-size: 10px;
         position: fixed;
@@ -439,6 +526,25 @@
             xhr.onreadystatechange = handleStateChange;
             xhr.open('GET', url, true);
             xhr.send();
+        }
+
+        const copyText = async (val) => {
+            if (navigator.clipboard && navigator.permissions) {
+                await navigator.clipboard.writeText(val)
+            } else {
+                const textArea = document.createElement('textArea')
+                textArea.value = val
+                textArea.style.width = 0
+                textArea.style.position = 'fixed'
+                textArea.style.left = '-999px'
+                textArea.style.top = '10px'
+                textArea.setAttribute('readonly', 'readonly')
+                document.body.appendChild(textArea)
+
+                textArea.select()
+                document.execCommand('copy')
+                document.body.removeChild(textArea)
+            }
         }
 
         const formatMB = (n) => {
@@ -665,6 +771,7 @@
             let play_black = false;
             let play_move = false;
             let review_mode = false;
+            let board_setup_mode = false;
             let advanced_time_control = false;
             let during_play = false;
             let white_remaining_time = 0;
@@ -850,6 +957,7 @@
 
             const reset = () => {
                 review_mode = false;
+                board_setup_mode = false;
                 $("#fen").value = "";
                 $("#move").value = "";
                 resetTimer();
@@ -858,7 +966,7 @@
             };
 
             const undo = () => {
-                if (review_mode) {
+                if (review_mode || board_setup_mode) {
                     return;
                 }
                 const moves = $("#move").value;
@@ -868,6 +976,9 @@
             };
 
             const go = () => {
+                if (board_setup_mode) {
+                    return;
+                }
                 return_early = play_move;
                 stop();
                 console.log(`return early: ${return_early}`);
@@ -1442,7 +1553,7 @@
                             "- variants.ini: ",
                             m("input#variants-ini", {
                                 type: "file",
-                                disabled: !is_ready || review_mode,
+                                disabled: !is_ready || review_mode || board_setup_mode,
                                 onchange: onSelectVariantsFile,
                             }),
                             m(
@@ -1462,7 +1573,7 @@
                         m(
                             "select#dropdown-variant",
                             {
-                                disabled: !is_ready || review_mode,
+                                disabled: !is_ready || review_mode || board_setup_mode,
                                 onchange: (e) => {
                                     window.setTimeout(setVariant, 10);
                                 },
@@ -1510,7 +1621,7 @@
                             "Set"
                         ),
                         m("button#reset", { disabled: !is_ready, onclick: reset }, "Reset"),
-                        m("button#undo", { disabled: !is_ready || review_mode, hidden: review_mode, onclick: undo }, "Undo"),
+                        m("button#undo", { disabled: !is_ready || review_mode || board_setup_mode, hidden: review_mode, onclick: undo }, "Undo"),
                     ]),
                     m("div#input2", { hidden: during_play }, [
                         m("input[type=number]#depth", {
@@ -1559,7 +1670,7 @@
                             "label#label-analysis",
                             m("input[type=checkbox]#analysis", {
                                 checked: analysis_mode,
-                                disabled: play_white || play_black || advanced_time_control,
+                                disabled: play_white || play_black || advanced_time_control || board_setup_mode,
                                 onclick: () => {
                                     analysis_mode = !analysis_mode;
                                 },
@@ -1570,7 +1681,7 @@
                             "label",
                             m("input[type=checkbox]#playwhite", {
                                 checked: play_white,
-                                disabled: analysis_mode || review_mode,
+                                disabled: analysis_mode || review_mode || board_setup_mode,
                                 onclick: () => {
                                     play_white = !play_white;
                                 },
@@ -1581,7 +1692,7 @@
                             "label",
                             m("input[type=checkbox]#playblack", {
                                 checked: play_black,
-                                disabled: analysis_mode || review_mode,
+                                disabled: analysis_mode || review_mode || board_setup_mode,
                                 onclick: () => {
                                     play_black = !play_black;
                                 },
@@ -1592,12 +1703,23 @@
                             "label#label-advtimectrl",
                             m("input[type=checkbox]#advtimectrl", {
                                 checked: advanced_time_control,
-                                disabled: analysis_mode || review_mode,
+                                disabled: analysis_mode || review_mode || board_setup_mode,
                                 onclick: () => {
                                     advanced_time_control = !advanced_time_control;
                                 },
                             }),
                             "Advanced Time Control"
+                        ),
+                        m(
+                            "label#label-boardsetup",
+                            m("input[type=checkbox]#isboardsetup", {
+                                checked: board_setup_mode,
+                                disabled: analysis_mode || review_mode || advanced_time_control,
+                                onclick: () => {
+                                    board_setup_mode = !board_setup_mode;
+                                },
+                            }),
+                            "Board Setup"
                         ),
                         m("p#label-stm", { hidden: true }),
                         m("input#displaymoves", {
@@ -1648,6 +1770,12 @@
                                 changeBoard(true);
                             }
                         }, "Initialize Themes (internal)"),
+                        m("p#copysetfen", {
+                            hidden: true,
+                            onclick: () => {
+                                copyText($("#fen").value);
+                            }
+                        }, "Copy Set FEN (internal)"),
                     ]),
                     m("div#advancedtimesettings", { hidden: !advanced_time_control || during_play }, [
                         m("div#whitetimesettings", [
@@ -1737,7 +1865,7 @@
                         m(
                             "select#dropdown-quickpromotion",
                             {
-                                disabled: !is_ready || review_mode,
+                                disabled: !is_ready || review_mode || board_setup_mode,
                             },
                             [
                                 m("option", { value: "" }, "<DISABLED>"),
@@ -1773,6 +1901,62 @@
                             ]
                         ),
                     ]),
+                    m("div#boardsetupsettings", { hidden: !board_setup_mode }, [
+                        m("p", "Board Setup:"),
+                        m("div#boardpiecechange", { disabled: !is_ready }, [
+                            m("select#dropdown-setpiece", [
+                                m("option", { value: "<move>" }, "<move>"),
+                                m("option", { value: "<delete>" }, "<delete>"),
+                                m("option", { value: "b" }, "b"),
+                                m("option", { value: "k" }, "k"),
+                                m("option", { value: "n" }, "n"),
+                                m("option", { value: "p" }, "p"),
+                                m("option", { value: "q" }, "q"),
+                                m("option", { value: "r" }, "r"),
+                                m("option", { value: "B" }, "B"),
+                                m("option", { value: "K" }, "K"),
+                                m("option", { value: "N" }, "N"),
+                                m("option", { value: "P" }, "P"),
+                                m("option", { value: "Q" }, "Q"),
+                                m("option", { value: "R" }, "R"),
+                            ]),
+                            m(
+                                "button#addtopocket",
+                                { disabled: !is_ready },
+                                "Add piece to pocket"
+                            ),
+                            m(
+                                "button#clearboard",
+                                { disabled: !is_ready },
+                                "Clear Board"
+                            ),
+                            m(
+                                "button#initboardpos",
+                                { disabled: !is_ready },
+                                "Reset Board"
+                            ),
+                            m(
+                                "button#validatepos",
+                                { disabled: !is_ready },
+                                "Validate Position"
+                            ),
+                            m(
+                                "button#boardsetupcopyfen",
+                                { disabled: !is_ready },
+                                "Copy FEN"
+                            ),
+                        ]),
+                        m("div#pocketpiecechange", { hidden: true }, [
+                            m("form#pieceinpocket", { disabled: !is_ready }, [
+                                m("table#tablepieceinpocket", [
+                                    m("tr", [
+                                        m("td", "Piece ID"),
+                                        m("td", "Amount"),
+                                    ]),
+                                ]),
+                            ]),
+                        ]),
+                    ]),
                     m("div#outputs", [
                         m("div", [
                             m("div#chessground-container-div.defaultboard.default.board8x8", [
@@ -1780,13 +1964,77 @@
                                 m("div#chessground-board"),
                                 m("div.cg-wrap.pocket-bottom", [m("div#pocket-bottom")]),
                             ]),
+                            m("div#boardsetupsettings2", { hidden: !board_setup_mode }, [
+                                m("div", [
+                                    m("p","Side to move:"),
+                                    m("select#dropdown-sidetomove", [
+                                        m("option", { value: "white/red/sente" }, "white/red/sente"),
+                                        m("option", { value: "black/black/gote" }, "black/black/gote"),
+                                    ]),
+                                ]),
+                                m("div", [
+                                    m(
+                                        "label",
+                                        m("input[type=checkbox]#whitekingsidecastle"),
+                                        "White O-O"
+                                    ),
+                                    m(
+                                        "label",
+                                        m("input[type=checkbox]#whitequeensidecastle"),
+                                        "White O-O-O"
+                                    ),
+                                    m(
+                                        "label",
+                                        m("input[type=checkbox]#blackkingsidecastle"),
+                                        "Black O-O"
+                                    ),
+                                    m(
+                                        "label",
+                                        m("input[type=checkbox]#blackqueensidecastle"),
+                                        "Black O-O-O"
+                                    ),
+                                ]),
+                                m("div", [
+                                    m("input[type=number]#halfmoveclock", {
+                                        placeholder: "Half move clock",
+                                        min: 0,
+                                    }),
+                                    m("input[type=number]#whiteremainingchecks", {
+                                        placeholder: "White remaining checks",
+                                        min: 0,
+                                    }),
+                                    m("input[type=number]#blackremainingchecks", {
+                                        placeholder: "Black remaining checks",
+                                        min: 0,
+                                    }),
+                                    m("input[type=number]#currentmovenum", {
+                                        placeholder: "Current move number",
+                                        min: 1,
+                                    }),
+                                ]),
+                                m("div", [
+                                    m("input[type=number]#enpassantfile", {
+                                        placeholder: "En passant file number",
+                                        min: 1,
+                                    }),
+                                    m("input[type=number]#enpassantrank", {
+                                        placeholder: "En passant rank number",
+                                        min: 1,
+                                    }),
+                                ]),
+                                m("div", [
+                                    m("input#seirwangatingfiles", {
+                                        placeholder: "Seirawan gating files (e.g. ABab)",
+                                    }),
+                                ]),
+                            ]),
                             m("div#movecontrol", { hidden: during_play }, [
                                 m("button#initialposition", { onclick: displayInitialPosition, disabled: !is_ready }, "Initial Position"),
                                 m("button#currentposition", { onclick: displayCurrentPosition, disabled: !is_ready }, "Current Position"),
                                 m("button#previousposition", { onclick: displayPreviousMove, disabled: !is_ready }, "Previous Position"),
                                 m("button#nextposition", { onclick: displayNextMove, disabled: !is_ready }, "Next Position"),
                                 m("input[type=number]#gotomovenum", {
-                                    placeholder: "Move Number (1 turn is 2 moves)",
+                                    placeholder: "Half Move Number",
                                     disabled: !is_ready,
                                     min: 0,
                                 }),
@@ -1795,45 +2043,49 @@
                             m("p", { hidden: !review_mode }, "Review mode enabled."),
                             m("p", { hidden: !review_mode }, "You can go to previous moves played to analyze your game, but you cannot make changes to the game. To exit review mode, click <reset> or <current position>."),
                             m("div#controls", [
-                                m("button", {
-                                    onclick: () => {
-                                        changePieces(false);
-                                    }
-                                }, "Change pieces"),
-                                m("button", {
-                                    onclick: () => {
-                                        changeBoard(false);
-                                    }
-                                }, "Change board"),
-                                m("button#button-flip", "Flip Board"),
-                                m(
-                                    "input[type=range]#range-volume",
-                                    { min: 0, max: 1, step: 0.05 },
-                                    "range"
-                                ),
-                                m(
-                                    "label",
-                                    m("input[type=checkbox]#check-dests", {
-                                        checked: show_dests,
+                                m("div", [
+                                    m("button", {
                                         onclick: () => {
-                                            show_dests = !show_dests;
-                                        },
-                                    }),
-                                    "Show Dests"
-                                ),
-                                m(
-                                    "label",
-                                    m("input[type=checkbox]#check-adjudicate", {
-                                        checked: adjudicate,
+                                            changePieces(false);
+                                        }
+                                    }, "Change pieces"),
+                                    m("button", {
                                         onclick: () => {
-                                            adjudicate = !adjudicate;
-                                        },
-                                    }),
-                                    "Adjudicate"
-                                ),
+                                            changeBoard(false);
+                                        }
+                                    }, "Change board"),
+                                    m("button#button-flip", "Flip Board"),
+                                ]),
+                                m("div", [
+                                    m(
+                                        "input[type=range]#range-volume",
+                                        { min: 0, max: 1, step: 0.05 },
+                                        "range"
+                                    ),
+                                    m(
+                                        "label",
+                                        m("input[type=checkbox]#check-dests", {
+                                            checked: show_dests,
+                                            onclick: () => {
+                                                show_dests = !show_dests;
+                                            },
+                                        }),
+                                        "Show Legal Moves"
+                                    ),
+                                    m(
+                                        "label",
+                                        m("input[type=checkbox]#check-adjudicate", {
+                                            checked: adjudicate,
+                                            onclick: () => {
+                                                adjudicate = !adjudicate;
+                                            },
+                                        }),
+                                        "Adjudicate"
+                                    ),
+                                ]),
                             ]),
                             m("div#links", [
-                                m("a[href='./index.html']", "play"),
+                                m("a[href='./play.html']", "play"),
                                 m("a[href='./advanced.html']", "advanced"),
                                 m("a[href='https://github.com/ianfab/fairyground']", "github"),
                             ]),

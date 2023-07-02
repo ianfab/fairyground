@@ -101,3 +101,7 @@
 .seirawan .cg-wrap piece.j-piece.black {
   background-image: url('images/pieces/seirawan/bJ.svg');
 }
+
+.seirawan .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

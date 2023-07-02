@@ -47,3 +47,7 @@
 .chak .cg-wrap piece.j-piece.black {
   background-image: url('images/pieces/chak/bJ.svg');
 }
+
+.chak .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

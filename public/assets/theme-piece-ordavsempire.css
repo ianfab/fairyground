@@ -76,3 +76,7 @@
 }
 .ordavsempire .cg-wrap piece.y-piece.white {
   background-image: url('images/pieces/ordavsempire/wY.svg');
+
+.ordavsempire .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

@@ -42,3 +42,7 @@
 .wikim .cg-wrap piece.c-piece.black {
   background-image: url('images/pieces/wikim/bC.svg');
 }
+
+.wikim .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}
