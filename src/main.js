@@ -688,7 +688,7 @@ function validateFEN(FEN) {
         return false;
     }
     if (result == -3) {
-        window.alert("Multiple kings.");
+        window.alert("Multiple kings or no kings.");
         return false;
     }
     if (result == -2) {
