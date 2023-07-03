@@ -57,6 +57,11 @@ const enPassantFile = document.getElementById("enpassantfile");
 const enPassantRank = document.getElementById("enpassantrank");
 const seirawanGatingFiles = document.getElementById("seirwangatingfiles");
 const copySetFEN = document.getElementById("copysetfen");
+const dropdownPositionVariantType = document.getElementById("dropdown-posvarianttype");
+const dropdownPositionVariantName = document.getElementById("dropdown-posvariantname");
+const buttonAboutPosition = document.getElementById("aboutposition");
+const positionInformation = document.getElementById("positioninfo");
+const positionVariantTxt = document.getElementById("posvariant-txt");
 const quickPromotionPiece = document.getElementById("dropdown-quickpromotion");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
@@ -64,6 +69,8 @@ const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
 const soundTerminal = new Audio("assets/sound/thearst3rd/terminal.wav");
 const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 const pieces = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '+a', '+b', '+c', '+d', '+e', '+f', '+g', '+h', '+i', '+j', '+k', '+l', '+m', '+n', '+o', '+p', '+q', '+r', '+s', '+t', '+u', '+v', '+w', '+x', '+y', '+z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '+A', '+B', '+C', '+D', '+E', '+F', '+G', '+H', '+I', '+J', '+K', '+L', '+M', '+N', '+O', '+P', '+Q', '+R', '+S', '+T', '+U', '+V', '+W', '+X', '+Y', '+Z', '*'];
+var PositionVariantsDirectory = new Map();
+let EmptyMap = new Map();
 let ffish = null;
 let board = null;
 let chessground = null;
@@ -301,6 +308,7 @@ new Module().then(loadedModule => {
     soundCheck.volume = rangeVolume.value;
     soundTerminal.volume = rangeVolume.value;
     loadThemes.click();
+    LoadPositionVariant("server", null);
 
     variantsIni.onchange = function (e) {
         const selected = e.currentTarget.files[0];
@@ -344,6 +352,9 @@ new Module().then(loadedModule => {
         updateChessground();
         initializeThemes.click();
         setPieceList(getUsedPieceID(dropdownVariant.value));
+        positionInformation.innerHTML = "";
+        UpdateVariantsPositionTypeDropdown();
+        UpdateVariantsPositionNameDropdown();
     };
 
     buttonFlip.onclick = function () {
@@ -438,7 +449,7 @@ new Module().then(loadedModule => {
             chessground.set({
                 movable: {
                     color: "both",
-                    dests: new Map(),
+                    dests: EmptyMap,
                 },
                 draggable: {
                     deleteOnDropOff: true,
@@ -505,7 +516,7 @@ new Module().then(loadedModule => {
             chessground.set({
                 movable: {
                     color: "both",
-                    dests: new Map(),
+                    dests: EmptyMap,
                 },
                 draggable: {
                     deleteOnDropOff: true,
@@ -516,6 +527,55 @@ new Module().then(loadedModule => {
             disableBoardMove();
         }
     }
+
+    dropdownPositionVariantType.onchange = function () {
+        if (dropdownPositionVariantType.value == "(default)") {
+            textFen.value = "";
+            pSetFen.click();
+        }
+        UpdateVariantsPositionNameDropdown();
+        positionInformation.innerHTML = "";
+    }
+
+    dropdownPositionVariantName.onchange = function () {
+        let VariantTypeDirectory = null;
+        let VariantNameDirectory = null;
+        if (PositionVariantsDirectory.has(dropdownVariant.value)) {
+            VariantTypeDirectory = PositionVariantsDirectory.get(dropdownVariant.value);
+            if (VariantTypeDirectory.has(dropdownPositionVariantType.value)) {
+                VariantNameDirectory = VariantTypeDirectory.get(dropdownPositionVariantType.value);
+                if (VariantNameDirectory.has(dropdownPositionVariantName.value)) {
+                    let game = VariantNameDirectory.get(dropdownPositionVariantName.value);
+                    textFen.value = game.FEN;
+                    positionInformation.innerHTML = game.Description;
+                    textMoves.value = "";
+                    pSetFen.click();
+                }
+                else {
+                    dropdownPositionVariantName.selectedIndex = -1;
+                    positionInformation.innerHTML = "";
+                }
+            }
+            else {
+                dropdownPositionVariantName.selectedIndex = -1;
+                positionInformation.innerHTML = "";
+            }
+        }
+        else {
+            dropdownPositionVariantName.selectedIndex = -1;
+            positionInformation.innerHTML = "";
+        }
+    }
+
+    buttonAboutPosition.onclick = function () {
+        if (dropdownPositionVariantName.selectedIndex == -1) {
+            window.alert("Please select a position in \"Position Variant Name\"!\nIf there is nothing, it means that this chess variant does not have any position variant!");
+            return;
+        }
+        window.alert(dropdownVariant.value + "\\" + dropdownPositionVariantType.value + "\\" + dropdownPositionVariantName.value + ":\n" + positionInformation.innerHTML);
+    }
+
+    positionVariantTxt.onchange = onSelectPositionVariantsFile;
 
     updateChessground();
 }); // Chessground helper functions
@@ -544,6 +604,19 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
         disableBoardMove();
     }
     displayReady.value = 0;
+};
+
+const onSelectPositionVariantsFile = async (e) => {
+    const selected = e.currentTarget.files[0];
+    //console.log(`${selected}`);
+    if (selected) {
+        const reader = new FileReader();
+        reader.onload = function () {
+            console.log(reader.result);
+            LoadPositionVariant("client", reader.result);
+        }
+        reader.readAsText(selected);
+    }
 };
 
 function getFEN() {
@@ -656,7 +729,7 @@ function validateFEN(FEN) {
     //-6 Bad side to move flag
     //-5 Bad castling position or notation
     //-4 Bad en passant square
-    //-3 Multiple kings
+    //-3 Multiple kings or no kings
     //-2 Bad half move clock
     //-1 Bad move number
     if (result == -10) {
@@ -699,6 +772,126 @@ function validateFEN(FEN) {
         window.alert("Bad move number.");
         return false;
     }
+}
+
+function LoadPositionVariant(side, file) {
+    function StartLoad(data) {
+        let VariantTypeDirectory = new Map();
+        let VariantNameDirectory = new Map();
+        //This creates a tree structure to store position variants
+        //it looks like this:
+        //<Root dir: PositionVariantsDirectory>  //Items are classified by chess variant names
+        //    <Sub dir1: VariantTypeDirectory>  //Items are classified by position variant types, e.g. Mate in X, Handicaps, etc.
+        //        <Sub Sub dir1: VariantNameDirectory>  //Items are classified by the position variant name provided in the file.
+        //            <File: VariantPositionItem>  //This contains the FEN and the discription
+        //        <Sub Sub dir2: VariantNameDirectory>
+        //            <File: VariantPositionItem>
+        //            ...
+        //    <Sub dir2: VariantTypeDirectory>
+        //        <Sub Sub dir: VariantNameDirectory>
+        //            ...
+        //Syntax for each line: <chess variant name>|<position variant type>|<position variant name>|<FEN>|<description>
+        data = data.replace(/\r\n/g, "\n")
+        data = data.replace(/\r/g, "\n");
+        let rawText = data.split('\n');
+        let variantsettings = "";
+        let i = 0;
+        for (i = 0; i < rawText.length; i++) {
+            if (rawText[i].length < 1 || rawText[i].charAt(0) == '#') {
+                continue;
+            }
+            variantsettings = rawText[i].trim().split('|');
+            if (variantsettings.length != 5) {
+                console.warn(`At line ${i} in paragraph of <position variant file>: Bad syntax\n`);
+                continue;
+            }
+            if (PositionVariantsDirectory.has(variantsettings[0])) {
+                VariantTypeDirectory = PositionVariantsDirectory.get(variantsettings[0]);
+            }
+            else {
+                VariantTypeDirectory = new Map();
+            }
+            if (VariantTypeDirectory.has(variantsettings[1])) {
+                VariantNameDirectory = VariantTypeDirectory.get(variantsettings[1]);
+            }
+            else {
+                VariantNameDirectory = new Map();
+            }
+            if (VariantNameDirectory.has(variantsettings[2])) {
+                console.warn(`Variant "<ROOT>\\${variantsettings[0]}\\${variantsettings[1]}\\${variantsettings[2]}" already exists. This position variant will not get loaded.\n`);
+                continue;
+            }
+            VariantNameDirectory.set(variantsettings[2], {
+                FEN: variantsettings[3],
+                Description: variantsettings[4].replace("\\n",'\n'),
+            });
+            VariantTypeDirectory.set(variantsettings[1], VariantNameDirectory);
+            PositionVariantsDirectory.set(variantsettings[0], VariantTypeDirectory);
+        }
+        console.log("PositionVariants:", PositionVariantsDirectory);
+        return true;
+    }
+    if (side == "server") {
+        return window.getFileFromServer('./positionvariants.txt', (res) => {
+            console.log('res:', res);
+            StartLoad(res);
+        });
+    }
+    else if (side == "client") {
+        if (file == null || file == undefined) {
+            console.warn("Empty files provided.");
+            return false;
+        }
+        StartLoad(file);
+        return true;
+    }
+    return false;
+}
+
+function UpdateVariantsPositionTypeDropdown() {
+    while (dropdownPositionVariantType.length > 1) {
+        dropdownPositionVariantType.remove(1);
+    }
+    let VariantTypeDirectory = null;
+    let VariantTypeList = [];
+    let i = 0;
+    let option = null;
+    if (PositionVariantsDirectory.has(dropdownVariant.value)) {
+        VariantTypeDirectory = PositionVariantsDirectory.get(dropdownVariant.value);
+        VariantTypeList = [...VariantTypeDirectory];
+        for (i = 0; i < VariantTypeList.length; i++) {
+            option = document.createElement("option");
+            option.text = VariantTypeList[i][0];
+            option.value = VariantTypeList[i][0];
+            dropdownPositionVariantType.add(option);
+        }
+    }
+    dropdownPositionVariantType.selectedIndex = 0;
+}
+
+function UpdateVariantsPositionNameDropdown() {
+    while (dropdownPositionVariantName.length > 0) {
+        dropdownPositionVariantName.remove(0);
+    }
+    let VariantTypeDirectory = null;
+    let VariantNameDirectory = null;
+    let i = 0;
+    let option = null;
+    let VariantNameList = [];
+    if (PositionVariantsDirectory.has(dropdownVariant.value)) {
+        VariantTypeDirectory = PositionVariantsDirectory.get(dropdownVariant.value);
+        if (VariantTypeDirectory.has(dropdownPositionVariantType.value)) {
+            VariantNameDirectory = VariantTypeDirectory.get(dropdownPositionVariantType.value);
+            VariantNameList = [...VariantNameDirectory];
+            for (i = 0; i < VariantNameList.length; i++) {
+                option = document.createElement("option");
+                option.text = VariantNameList[i][0];
+                option.value = VariantNameList[i][0];
+                dropdownPositionVariantName.add(option);
+            }
+        }
+    }
+    dropdownPositionVariantName.selectedIndex = -1;
 }
 
 function getGameStatus(showresult) {
@@ -826,7 +1019,7 @@ function afterChessgroundMove(orig, dest, metadata) {
         chessground.set({
             movable: {
                 color: "both",
-                dests: new Map(),
+                dests: EmptyMap,
             }
         });
         return;
@@ -977,7 +1170,7 @@ function afterChessgroundDrop(piece, dest, metadata) {
         chessground.set({
             movable: {
                 color: "both",
-                dests: new Map(),
+                dests: EmptyMap,
             }
         });
         return;

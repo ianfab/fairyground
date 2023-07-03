@@ -190,6 +190,33 @@
         margin-bottom: 10px;
     }
 
+    #posvariantdiv {
+        display: flex;
+        margin-bottom: 10px;
+    }
+
+        #posvariantdiv #dropdown-posvarianttype {
+            min-width: 120px;
+            background: #eee;
+            margin-left: 10px;
+        }
+
+        #posvariantdiv #dropdown-posvariantname {
+            min-width: 120px;
+            background: #eee;
+            margin-left: 10px;
+        }
+
+        #posvariantdiv button {
+            display: inline-block;
+            padding: 3px 6px 3px 6px;
+            background: #888;
+            color: #fff;
+            font-weight: bold;
+            margin-right: 6px;
+            cursor: pointer;
+        }
+
     #controls {
         margin-top: 20px;
         margin-bottom: 10px;
@@ -1277,6 +1304,13 @@
                 $("#currentposition").click();
                 $("#input").style.display = "";
                 $("#input2").style.display = "";
+                $("#posvariantdiv").style.display = "";
+            }
+
+            const gameAbort = () => {
+                deleteTimer();
+                $("#gamestatus").innerHTML = "END";
+                gameEnd();
             }
 
             const goWithTimeControl = () => {
@@ -1284,8 +1318,9 @@
                     return;
                 }
                 //We need to prevent user from doing unnecessary actions during countdown, so we'll hide these divs
-                $("#input").style.display = "none";  //These two divs are unable to be hidden by {hidden: during_play}
+                $("#input").style.display = "none";  //These divs are unable to be hidden by {hidden: during_play}
                 $("#input2").style.display = "none";
+                $("#posvariantdiv").style.display = "none";
                 //$("#movecontrol").style.display = "none";
                 resetTimer();
                 setupTimer();
@@ -1568,6 +1603,24 @@
                                 "[?]"
                             ),
                         ]),
+                        m("div", { hidden: during_play }, [
+                            "- positionvariants.txt: ",
+                            m("input#posvariant-txt", {
+                                type: "file",
+                                disabled: !is_ready || review_mode || board_setup_mode,
+                            }),
+                            m(
+                                "span",
+                                {
+                                    style: "cursor: pointer;",
+                                    onclick: () =>
+                                        window.alert(
+                                            "You can select a Position Variant file to load different positions for different variants. Contents will be appended to the position variants provided by the server."
+                                        ),
+                                },
+                                "[?]"
+                            ),
+                        ]),
                     ]),
                     m("div#input", { hidden: during_play }, [
                         m(
@@ -1622,6 +1675,29 @@
                         ),
                         m("button#reset", { disabled: !is_ready, onclick: reset }, "Reset"),
                         m("button#undo", { disabled: !is_ready || review_mode || board_setup_mode, hidden: review_mode, onclick: undo }, "Undo"),
+                    ]),
+                    m("div#posvariantdiv", [
+                        m("p", "Position Variant Type:"),
+                        m(
+                            "select#dropdown-posvarianttype",
+                            {
+                                disabled: !is_ready || review_mode,
+                            },
+                            [
+                                m("option", { value: "(default)" }, "(default)"),
+                            ]
+                        ),
+                        m("p", "Position Variant Name:"),
+                        m(
+                            "select#dropdown-posvariantname",
+                            {
+                                disabled: !is_ready || review_mode,
+                            },
+                            []
+                        ),
+                        m("button#aboutposition", {
+                            disabled: !is_ready || review_mode,
+                        }, "About this position"),
                     ]),
                     m("div#input2", { hidden: during_play }, [
                         m("input[type=number]#depth", {
@@ -2091,6 +2167,7 @@
                             ]),
                         ]),
                         m("div#info", [
+                            m("p#positioninfo", ""),
                             m("p#currentboardfen"),
                             m("p#label-pgn"),
                             m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
@@ -2117,6 +2194,13 @@
                                         black_remaining_time = (+black_remaining_time) + 10000;
                                     },
                                 }, "Add 10s for black"),
+                                m("button#gameabort", {
+                                    onclick: () => {
+                                        if (confirm("Are you sure to abort the game?")) {
+                                            gameAbort();
+                                        }
+                                    },
+                                }, "ABORT GAME"),
                             ]),
                         ]),
                     ]),
