@@ -654,7 +654,7 @@ function validateFEN(FEN) {
     //-8 Line/column amount invalid
     //-7 Bad piece character in pocket
     //-6 Bad side to move flag
-    //-5 Invalid piece count or uexpected numbers
+    //-5 Bad castling position or notation
     //-4 Bad en passant square
     //-3 Multiple kings
     //-2 Bad half move clock
@@ -680,7 +680,7 @@ function validateFEN(FEN) {
         return false;
     }
     if (result == -5) {
-        window.alert("Invalid piece count or uexpected numbers.");
+        window.alert("Bad castling position or notation.");
         return false;
     }
     if (result == -4) {
