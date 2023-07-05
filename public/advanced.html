@@ -171,6 +171,7 @@
         width: 120px;
         background: #eee;
         margin-left: 10px;
+        margin-right: 10px;
     }
 
     #misc {
@@ -1975,6 +1976,11 @@
                                 m("option", { value: "-" }, "Demote (-)"),
                                 m("option", { value: "=" }, "Keep (=)"),
                             ]
+                        ),
+                        m(
+                            "label",
+                            m("input[type=checkbox]#clickclickmove", { disabled: review_mode }),
+                            "Click-click move"
                         ),
                     ]),
                     m("div#boardsetupsettings", { hidden: !board_setup_mode }, [

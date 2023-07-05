@@ -3,6 +3,7 @@ const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
 const variantsIni = document.getElementById("variants-ini");
 const dropdownVariant = document.getElementById("dropdown-variant");
+const buttonReset = document.getElementById("reset");
 const buttonFlip = document.getElementById("button-flip");
 const buttonUndo = document.getElementById("undo");
 const rangeVolume = document.getElementById("range-volume");
@@ -26,7 +27,6 @@ const buttonInitialPosition = document.getElementById("initialposition");
 const buttonCurrentPosition = document.getElementById("currentposition");
 const buttonSpecifiedPosition = document.getElementById("specifiedposition");
 const buttonGameStart = document.getElementById("gamestart");
-const buttonReset = document.getElementById("reset");
 const playWhite = document.getElementById("playwhite");
 const playBlack = document.getElementById("playblack");
 const currentBoardFen = document.getElementById("currentboardfen");
@@ -61,6 +61,7 @@ const dropdownPositionVariantType = document.getElementById("dropdown-posvariant
 const dropdownPositionVariantName = document.getElementById("dropdown-posvariantname");
 const buttonAboutPosition = document.getElementById("aboutposition");
 const positionInformation = document.getElementById("positioninfo");
+const clickClickMove = document.getElementById("clickclickmove");
 const positionVariantTxt = document.getElementById("posvariant-txt");
 const quickPromotionPiece = document.getElementById("dropdown-quickpromotion");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
@@ -126,7 +127,7 @@ function initBoard(variant) {
             showGhost: true
         },
         selectable: {
-            enabled: false
+            enabled: clickClickMove.checked,
         },
         pocketRoles: pocketRoles,
         events: {
@@ -531,6 +532,7 @@ new Module().then(loadedModule => {
     dropdownPositionVariantType.onchange = function () {
         if (dropdownPositionVariantType.value == "(default)") {
             textFen.value = "";
+            textMoves.value = "";
             pSetFen.click();
         }
         UpdateVariantsPositionNameDropdown();
@@ -577,6 +579,28 @@ new Module().then(loadedModule => {
 
     positionVariantTxt.onchange = onSelectPositionVariantsFile;
 
+    clickClickMove.onchange = function () {
+        if (clickClickMove.checked == true) {
+            chessground.set({
+                selectable: {
+                    enabled: true
+                },
+            });
+        }
+        else {
+            chessground.set({
+                selectable: {
+                    enabled: false
+                },
+            });
+        }
+    }
+
+    buttonReset.onclick = function () {
+        dropdownPositionVariantType.selectedIndex = 0;
+        dropdownPositionVariantType.onchange();
+    }
+
     updateChessground();
 }); // Chessground helper functions
 
@@ -608,7 +632,6 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
 
 const onSelectPositionVariantsFile = async (e) => {
     const selected = e.currentTarget.files[0];
-    //console.log(`${selected}`);
     if (selected) {
         const reader = new FileReader();
         reader.onload = function () {
