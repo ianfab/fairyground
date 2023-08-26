@@ -1,5 +1,5 @@
 #!/bin/bash
-for color in blue green brown;do
+for color in blue green brown purple;do
     # generate SVGs
     for i in {1..12};do for j in {1..10}; do sed "s#0 0 1200 1000#0 $(( 1000 - 100*j )) $(( 100*i )) $(( 100*j ))#" public/assets/images/board/${color}/${color}_base.svg > "public/assets/images/board/${color}/${color}${i}x${j}.svg";done;done
     # generate background CSS
