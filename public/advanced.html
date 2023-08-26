@@ -1,2227 +1,2429 @@
 <!DOCTYPE html>
 <head>
-    <meta charset="utf-8" />
-    <title>Fairy-Stockfish playground</title>
-    <!-- By curl https://data-url-maker-hiro18181.netlify.app/api/url/https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg -->
-    <link rel="icon"
-          href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+CiAgPGcgc3R5bGU9Im9wYWNpdHk6MTsgZmlsbDpub25lOyBmaWxsLW9wYWNpdHk6MTsgZmlsbC1ydWxlOmV2ZW5vZGQ7IHN0cm9rZTojMDAwMDAwOyBzdHJva2Utd2lkdGg6MS41OyBzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDsgc3Ryb2tlLWRhc2hhcnJheTpub25lOyBzdHJva2Utb3BhY2l0eToxOyI+CiAgICA8cGF0aAogICAgICBkPSJNIDIyLDEwIEMgMzIuNSwxMSAzOC41LDE4IDM4LDM5IEwgMTUsMzkgQyAxNSwzMCAyNSwzMi41IDIzLDE4IgogICAgICBzdHlsZT0iZmlsbDojMDAwMDAwOyBzdHJva2U6IzAwMDAwMDsiIC8+CiAgICA8cGF0aAogICAgICBkPSJNIDI0LDE4IEMgMjQuMzgsMjAuOTEgMTguNDUsMjUuMzcgMTYsMjcgQyAxMywyOSAxMy4xOCwzMS4zNCAxMSwzMSBDIDkuOTU4LDMwLjA2IDEyLjQxLDI3Ljk2IDExLDI4IEMgMTAsMjggMTEuMTksMjkuMjMgMTAsMzAgQyA5LDMwIDUuOTk3LDMxIDYsMjYgQyA2LDI0IDEyLDE0IDEyLDE0IEMgMTIsMTQgMTMuODksMTIuMSAxNCwxMC41IEMgMTMuMjcsOS41MDYgMTMuNSw4LjUgMTMuNSw3LjUgQyAxNC41LDYuNSAxNi41LDEwIDE2LjUsMTAgTCAxOC41LDEwIEMgMTguNSwxMCAxOS4yOCw4LjAwOCAyMSw3IEMgMjIsNyAyMiwxMCAyMiwxMCIKICAgICAgc3R5bGU9ImZpbGw6IzAwMDAwMDsgc3Ryb2tlOiMwMDAwMDA7IiAvPgogICAgPHBhdGgKICAgICAgZD0iTSA5LjUgMjUuNSBBIDAuNSAwLjUgMCAxIDEgOC41LDI1LjUgQSAwLjUgMC41IDAgMSAxIDkuNSAyNS41IHoiCiAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7IHN0cm9rZTojZmZmZmZmOyIgLz4KICAgIDxwYXRoCiAgICAgIGQ9Ik0gMTUgMTUuNSBBIDAuNSAxLjUgMCAxIDEgIDE0LDE1LjUgQSAwLjUgMS41IDAgMSAxICAxNSAxNS41IHoiCiAgICAgIHRyYW5zZm9ybT0ibWF0cml4KDAuODY2LDAuNSwtMC41LDAuODY2LDkuNjkzLC01LjE3MykiCiAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7IHN0cm9rZTojZmZmZmZmOyIgLz4KICAgIDxwYXRoCiAgICAgIGQ9Ik0gMjQuNTUsMTAuNCBMIDI0LjEsMTEuODUgTCAyNC42LDEyIEMgMjcuNzUsMTMgMzAuMjUsMTQuNDkgMzIuNSwxOC43NSBDIDM0Ljc1LDIzLjAxIDM1Ljc1LDI5LjA2IDM1LjI1LDM5IEwgMzUuMiwzOS41IEwgMzcuNDUsMzkuNSBMIDM3LjUsMzkgQyAzOCwyOC45NCAzNi42MiwyMi4xNSAzNC4yNSwxNy42NiBDIDMxLjg4LDEzLjE3IDI4LjQ2LDExLjAyIDI1LjA2LDEwLjUgTCAyNC41NSwxMC40IHogIgogICAgICBzdHlsZT0iZmlsbDojZmZmZmZmOyBzdHJva2U6bm9uZTsiIC8+CiAgPC9nPgo8L3N2Zz4K" />
-    <link rel="stylesheet" href="assets/chessground.css" />
-    <link rel="stylesheet" href="assets/generated.css" />
-    <link rel="stylesheet" href="assets/theme-backgrounds.css" />
-    <link rel="stylesheet" href="assets/theme-default.css" />
-    <base target="_blank">
+  <meta charset="utf-8" />
+  <title>Fairy-Stockfish playground</title>
+  <!-- By curl https://data-url-maker-hiro18181.netlify.app/api/url/https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg -->
+  <link
+    rel="icon"
+    href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+CiAgPGcgc3R5bGU9Im9wYWNpdHk6MTsgZmlsbDpub25lOyBmaWxsLW9wYWNpdHk6MTsgZmlsbC1ydWxlOmV2ZW5vZGQ7IHN0cm9rZTojMDAwMDAwOyBzdHJva2Utd2lkdGg6MS41OyBzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDsgc3Ryb2tlLWRhc2hhcnJheTpub25lOyBzdHJva2Utb3BhY2l0eToxOyI+CiAgICA8cGF0aAogICAgICBkPSJNIDIyLDEwIEMgMzIuNSwxMSAzOC41LDE4IDM4LDM5IEwgMTUsMzkgQyAxNSwzMCAyNSwzMi41IDIzLDE4IgogICAgICBzdHlsZT0iZmlsbDojMDAwMDAwOyBzdHJva2U6IzAwMDAwMDsiIC8+CiAgICA8cGF0aAogICAgICBkPSJNIDI0LDE4IEMgMjQuMzgsMjAuOTEgMTguNDUsMjUuMzcgMTYsMjcgQyAxMywyOSAxMy4xOCwzMS4zNCAxMSwzMSBDIDkuOTU4LDMwLjA2IDEyLjQxLDI3Ljk2IDExLDI4IEMgMTAsMjggMTEuMTksMjkuMjMgMTAsMzAgQyA5LDMwIDUuOTk3LDMxIDYsMjYgQyA2LDI0IDEyLDE0IDEyLDE0IEMgMTIsMTQgMTMuODksMTIuMSAxNCwxMC41IEMgMTMuMjcsOS41MDYgMTMuNSw4LjUgMTMuNSw3LjUgQyAxNC41LDYuNSAxNi41LDEwIDE2LjUsMTAgTCAxOC41LDEwIEMgMTguNSwxMCAxOS4yOCw4LjAwOCAyMSw3IEMgMjIsNyAyMiwxMCAyMiwxMCIKICAgICAgc3R5bGU9ImZpbGw6IzAwMDAwMDsgc3Ryb2tlOiMwMDAwMDA7IiAvPgogICAgPHBhdGgKICAgICAgZD0iTSA5LjUgMjUuNSBBIDAuNSAwLjUgMCAxIDEgOC41LDI1LjUgQSAwLjUgMC41IDAgMSAxIDkuNSAyNS41IHoiCiAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7IHN0cm9rZTojZmZmZmZmOyIgLz4KICAgIDxwYXRoCiAgICAgIGQ9Ik0gMTUgMTUuNSBBIDAuNSAxLjUgMCAxIDEgIDE0LDE1LjUgQSAwLjUgMS41IDAgMSAxICAxNSAxNS41IHoiCiAgICAgIHRyYW5zZm9ybT0ibWF0cml4KDAuODY2LDAuNSwtMC41LDAuODY2LDkuNjkzLC01LjE3MykiCiAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7IHN0cm9rZTojZmZmZmZmOyIgLz4KICAgIDxwYXRoCiAgICAgIGQ9Ik0gMjQuNTUsMTAuNCBMIDI0LjEsMTEuODUgTCAyNC42LDEyIEMgMjcuNzUsMTMgMzAuMjUsMTQuNDkgMzIuNSwxOC43NSBDIDM0Ljc1LDIzLjAxIDM1Ljc1LDI5LjA2IDM1LjI1LDM5IEwgMzUuMiwzOS41IEwgMzcuNDUsMzkuNSBMIDM3LjUsMzkgQyAzOCwyOC45NCAzNi42MiwyMi4xNSAzNC4yNSwxNy42NiBDIDMxLjg4LDEzLjE3IDI4LjQ2LDExLjAyIDI1LjA2LDEwLjUgTCAyNC41NSwxMC40IHogIgogICAgICBzdHlsZT0iZmlsbDojZmZmZmZmOyBzdHJva2U6bm9uZTsiIC8+CiAgPC9nPgo8L3N2Zz4K"
+  />
+  <link rel="stylesheet" href="assets/chessground.css" />
+  <link rel="stylesheet" href="assets/generated.css" />
+  <link rel="stylesheet" href="assets/theme-backgrounds.css" />
+  <link rel="stylesheet" href="assets/theme-default.css" />
+  <base target="_blank" />
 </head>
 
 <!-- CSS -->
 
 <style>
-    *,
-    *::before,
-    *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        border: 0;
-        font: inherit;
-    }
-
-    html,
-    body,
-    #root {
-        height: 100%;
-    }
-
-    #root {
-        font-size: 16px;
-    }
-
-    main {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        padding: 10px;
-    }
-
-    #pagetitle {
-        font-size: 60px;
-        font-family: 'Times New Roman', Times, serif, Arial;
-        margin-bottom: 10px;
-        font-style: oblique;
-        font-weight: bold;
-    }
-
-    #input {
-        display: flex;
-        margin-bottom: 10px;
-    }
-
-    #input2 {
-        display: flex;
-        margin-bottom: 10px;
-    }
-
-    #gamesettings {
-        display: flex;
-        margin-bottom: 10px;
-    }
-
-    #input #fen {
-        width: 50%;
-        padding: 2px 0 2px 6px;
-        border: 1px solid #ddd;
-        border-right: 0;
-    }
-
-    #input #move {
-        width: 10%;
-        padding: 2px 0 2px 6px;
-        border: 1px solid #ddd;
-        border-right: 0;
-    }
-
-    #input2 #movetime {
-        width: 5%;
-        padding: 2px 0 2px 6px;
-        border: 1px solid #ddd;
-        border-right: 0;
-    }
-
-    #input2 #depth {
-        width: 5%;
-        padding: 2px 0 2px 6px;
-        border: 1px solid #ddd;
-        border-right: 0;
-    }
-
-    #input2 #threads {
-        width: 5%;
-        padding: 2px 0 2px 6px;
-        border: 1px solid #ddd;
-        border-right: 0;
-    }
-
-    #input2 #hash {
-        width: 5%;
-        padding: 2px 0 2px 6px;
-        border: 1px solid #ddd;
-        border-right: 0;
-    }
-
-    #input2 #multipv {
-        width: 5%;
-        padding: 2px 0 2px 6px;
-        border: 1px solid #ddd;
-        border-right: 0;
-    }
-
-    #input button {
-        display: inline-block;
-        padding: 3px 6px 3px 6px;
-        background: #888;
-        color: #fff;
-        font-weight: bold;
-        margin-right: 6px;
-        cursor: pointer;
-    }
-
-    #input2 button {
-        display: inline-block;
-        padding: 3px 6px 3px 6px;
-        background: #888;
-        color: #fff;
-        font-weight: bold;
-        margin-right: 6px;
-        cursor: pointer;
-    }
-
-    #movecontrol button {
-        display: inline-block;
-        padding: 3px 6px 3px 6px;
-        background: #888;
-        color: #fff;
-        font-weight: bold;
-        margin-right: 6px;
-        margin-top: 2px;
-        cursor: pointer;
-    }
-
-    #movecontrol #gotomovenum {
-        width: 45%;
-        padding: 2px 0 2px 6px;
-        border: 1px solid #ddd;
-        border-right: 0;
-    }
-
-    #controls button {
-        display: inline-block;
-        padding: 3px 6px 3px 6px;
-        background: #888;
-        color: #fff;
-        font-weight: bold;
-        margin-right: 6px;
-        cursor: pointer;
-    }
-
-    #input #dropdown-variant {
-        width: 120px;
-        background: #eee;
-    }
-
-    #gamesettings #dropdown-quickpromotion {
-        width: 120px;
-        background: #eee;
-        margin-left: 10px;
-        margin-right: 10px;
-    }
-
-    #misc {
-        margin-bottom: 10px;
-    }
-
-    #outputs {
-        display: flex;
-        flex: 1 1 auto;
-        margin-top: 10px;
-        width: 100%;
-        height: 50%;
-    }
-
-    #movecontrol {
-        margin-top: 20px;
-        margin-bottom: 10px;
-    }
-
-    #posvariantdiv {
-        display: flex;
-        margin-bottom: 10px;
-    }
-
-        #posvariantdiv #dropdown-posvarianttype {
-            min-width: 120px;
-            background: #eee;
-            margin-left: 10px;
-        }
-
-        #posvariantdiv #dropdown-posvariantname {
-            min-width: 120px;
-            background: #eee;
-            margin-left: 10px;
-        }
-
-        #posvariantdiv button {
-            display: inline-block;
-            padding: 3px 6px 3px 6px;
-            background: #888;
-            color: #fff;
-            font-weight: bold;
-            margin-right: 6px;
-            cursor: pointer;
-        }
-
-    #controls {
-        margin-top: 20px;
-        margin-bottom: 10px;
-    }
-
-    #info {
-        padding: 10px;
-        margin-left: 20px;
-        font-size: 16px;
-        height: 600px;
-    }
-
-        #info #timecontrolduringplay {
-            padding: 10px;
-            margin-left: 20px;
-            font-size: 16px;
-        }
-
-            #info #timecontrolduringplay button {
-                display: inline-block;
-                padding: 3px 6px 3px 6px;
-                background: #888;
-                color: #fff;
-                font-weight: bold;
-                margin-right: 6px;
-                cursor: pointer;
-            }
-
-    #currentboardfen {
-        height: 10%;
-        border: 1px solid #ddd;
-        padding: 10px;
-        margin-left: 20px;
-        overflow-x: scroll;
-        overflow-y: scroll;
-        box-shadow: inset 1px 1px 2px #eee;
-        font-size: 16px;
-    }
-
-    #label-pgn {
-        height: 20%;
-        border: 1px solid #ddd;
-        padding: 10px;
-        margin-left: 20px;
-        overflow-x: scroll;
-        overflow-y: scroll;
-        box-shadow: inset 1px 1px 2px #eee;
-        font-size: 16px;
-    }
-
-    #output2 {
-        height: 70%;
-        border: 1px solid #ddd;
-        padding: 10px;
-        margin-left: 20px;
-        overflow-x: scroll;
-        overflow-y: scroll;
-        box-shadow: inset 1px 1px 2px #eee;
-        font-size: 16px;
-    }
-
-    #pocket-top {
-        display: flex;
-    }
-
-    #pocket-bottom {
-        display: flex;
-    }
-
-    #links a {
-        margin: 20px;
-        font-size: 20px;
-        text-decoration: none;
-    }
-
-    #info #timers {
-        width: 600px;
-        height: 125px;
-        border: 2px solid #EEE;
-        background-color: gray;
-        overflow: hidden;
-    }
-
-        #info #timers #whitetimer {
-            float: left;
-            width: 290px;
-            height: 120px;
-            border: 2px solid #000;
-            color: black;
-            background-color: white;
-            text-align: center;
-            overflow: hidden;
-        }
-
-        #info #timers #blacktimer {
-            float: right;
-            width: 290px;
-            height: 120px;
-            border: 2px solid #FFF;
-            color: white;
-            background-color: black;
-            text-align: center;
-            overflow: hidden;
-        }
-
-    #blacktime {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        font-size: 50px;
-        font-weight: bold;
-        font-family: "Times New Roman",Georgia,Serif,Arial;
-    }
-
-    #whitetime {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        font-size: 50px;
-        font-weight: bold;
-        font-family: "Times New Roman",Georgia,Serif,Arial;
-    }
-
-    #boardsetupsettings {
-        margin-bottom: 10px;
-    }
-
-        #boardsetupsettings #boardpiecechange {
-            display: flex;
-            margin-bottom: 10px;
-        }
-
-            #boardsetupsettings #boardpiecechange #dropdown-setpiece {
-                width: 120px;
-                background: #eee;
-            }
-
-            #boardsetupsettings #boardpiecechange button {
-                display: inline-block;
-                padding: 3px 6px 3px 6px;
-                background: #888;
-                color: #fff;
-                font-weight: bold;
-                margin-right: 6px;
-                cursor: pointer;
-            }
-
-    #boardsetupsettings2 {
-        margin-top: 20px;
-        margin-bottom: 10px;
-     }
-
-        #boardsetupsettings2 #dropdown-sidetomove {
-            width: 120px;
-            background: #eee;
-        }
-
-        #boardsetupsettings2 #halfmoveclock {
-            width: 25%;
-            padding: 2px 0 2px 6px;
-            border: 1px solid #ddd;
-            border-right: 0;
-        }
-
-        #boardsetupsettings2 #whiteremainingchecks {
-            width: 25%;
-            padding: 2px 0 2px 6px;
-            border: 1px solid #ddd;
-            border-right: 0;
-        }
-
-        #boardsetupsettings2 #blackremainingchecks {
-            width: 25%;
-            padding: 2px 0 2px 6px;
-            border: 1px solid #ddd;
-            border-right: 0;
-        }
-
-        #boardsetupsettings2 #currentmovenum {
-            width: 25%;
-            padding: 2px 0 2px 6px;
-            border: 1px solid #ddd;
-            border-right: 0;
-        }
-
-        #boardsetupsettings2 #enpassantfile {
-            width: 35%;
-            padding: 2px 0 2px 6px;
-            border: 1px solid #ddd;
-            border-right: 0;
-        }
-
-        #boardsetupsettings2 #enpassantrank {
-            width: 35%;
-            padding: 2px 0 2px 6px;
-            border: 1px solid #ddd;
-            border-right: 0;
-        }
-
-        #boardsetupsettings2 #seirwangatingfiles {
-            width: 60%;
-            padding: 2px 0 2px 6px;
-            border: 1px solid #ddd;
-            border-right: 0;
-        }
-
-    #advancedtimesettings {
-        margin-bottom: 10px;
-    }
-
-        #advancedtimesettings #whitetimesettings {
-            display: flex;
-            margin-bottom: 10px;
-        }
-
-            #advancedtimesettings #whitetimesettings #dropdown-whitetimemode {
-                margin-left: 10px;
-                width: 120px;
-                background: #eee;
-            }
-
-            #advancedtimesettings #whitetimesettings #whitestarttime {
-                width: 15%;
-                padding: 2px 0 2px 6px;
-                border: 1px solid #ddd;
-                border-right: 0;
-            }
-
-            #advancedtimesettings #whitetimesettings #whitetimegain {
-                width: 15%;
-                padding: 2px 0 2px 6px;
-                border: 1px solid #ddd;
-                border-right: 0;
-            }
-
-            #advancedtimesettings #whitetimesettings #whitetimemargin {
-                width: 15%;
-                padding: 2px 0 2px 6px;
-                border: 1px solid #ddd;
-                border-right: 0;
-            }
-
-        #advancedtimesettings #blacktimesettings {
-            display: flex;
-            margin-bottom: 10px;
-        }
-
-            #advancedtimesettings #blacktimesettings #dropdown-blacktimemode {
-                margin-left: 10px;
-                width: 120px;
-                background: #eee;
-            }
-
-            #advancedtimesettings #blacktimesettings #blackstarttime {
-                width: 15%;
-                padding: 2px 0 2px 6px;
-                border: 1px solid #ddd;
-                border-right: 0;
-            }
-
-            #advancedtimesettings #blacktimesettings #blacktimegain {
-                width: 15%;
-                padding: 2px 0 2px 6px;
-                border: 1px solid #ddd;
-                border-right: 0;
-            }
-
-            #advancedtimesettings #blacktimesettings #blacktimemargin {
-                width: 15%;
-                padding: 2px 0 2px 6px;
-                border: 1px solid #ddd;
-                border-right: 0;
-            }
-
-        #advancedtimesettings #gamecontrol-start {
-            display: flex;
-            margin-bottom: 10px;
-        }
-
-            #advancedtimesettings #gamecontrol-start #gamestart {
-                display: inline-block;
-                padding: 3px 6px 3px 6px;
-                background: #888;
-                color: #fff;
-                font-weight: bold;
-                margin-right: 6px;
-                cursor: pointer;
-            }
-
-    spangameresult {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        font-size: 10px;
-        position: fixed;
-        transition: 0.5s linear;
-        font-weight: bold;
-        font-family: "Times New Roman",Georgia,Serif,Arial;
-        z-index: 2;
-    }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  #root {
+    font-size: 16px;
+  }
+
+  main {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  #pagetitle {
+    font-size: 60px;
+    font-family: "Times New Roman", Times, serif, Arial;
+    margin-bottom: 10px;
+    font-style: oblique;
+    font-weight: bold;
+  }
+
+  #input {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  #input2 {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  #gamesettings {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  #input #fen {
+    width: 50%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input #move {
+    width: 10%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input2 #movetime {
+    width: 5%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input2 #depth {
+    width: 5%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input2 #threads {
+    width: 5%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input2 #hash {
+    width: 5%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input2 #multipv {
+    width: 5%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  #input2 button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  #movecontrol button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 6px;
+    margin-top: 2px;
+    cursor: pointer;
+  }
+
+  #movecontrol #gotomovenum {
+    width: 45%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #controls button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  #input #dropdown-variant {
+    width: 120px;
+    background: #eee;
+  }
+
+  #gamesettings #dropdown-quickpromotion {
+    width: 120px;
+    background: #eee;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  #misc {
+    margin-bottom: 10px;
+  }
+
+  #outputs {
+    display: flex;
+    flex: 1 1 auto;
+    margin-top: 10px;
+    width: 100%;
+    height: 50%;
+  }
+
+  #movecontrol {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  #posvariantdiv {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  #posvariantdiv #dropdown-posvarianttype {
+    min-width: 120px;
+    background: #eee;
+    margin-left: 10px;
+  }
+
+  #posvariantdiv #dropdown-posvariantname {
+    min-width: 120px;
+    background: #eee;
+    margin-left: 10px;
+  }
+
+  #posvariantdiv button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  #controls {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  #info {
+    padding: 10px;
+    margin-left: 20px;
+    font-size: 16px;
+    height: 600px;
+  }
+
+  #info #timecontrolduringplay {
+    padding: 10px;
+    margin-left: 20px;
+    font-size: 16px;
+  }
+
+  #info #timecontrolduringplay button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  #currentboardfen {
+    height: 10%;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-left: 20px;
+    overflow-x: scroll;
+    overflow-y: scroll;
+    box-shadow: inset 1px 1px 2px #eee;
+    font-size: 16px;
+  }
+
+  #label-pgn {
+    height: 20%;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-left: 20px;
+    overflow-x: scroll;
+    overflow-y: scroll;
+    box-shadow: inset 1px 1px 2px #eee;
+    font-size: 16px;
+  }
+
+  #output2 {
+    height: 70%;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-left: 20px;
+    overflow-x: scroll;
+    overflow-y: scroll;
+    box-shadow: inset 1px 1px 2px #eee;
+    font-size: 16px;
+  }
+
+  #pocket-top {
+    display: flex;
+  }
+
+  #pocket-bottom {
+    display: flex;
+  }
+
+  #links a {
+    margin: 20px;
+    font-size: 20px;
+    text-decoration: none;
+  }
+
+  #info #timers {
+    width: 600px;
+    height: 125px;
+    border: 2px solid #eee;
+    background-color: gray;
+    overflow: hidden;
+  }
+
+  #info #timers #whitetimer {
+    float: left;
+    width: 290px;
+    height: 120px;
+    border: 2px solid #000;
+    color: black;
+    background-color: white;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  #info #timers #blacktimer {
+    float: right;
+    width: 290px;
+    height: 120px;
+    border: 2px solid #fff;
+    color: white;
+    background-color: black;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  #blacktime {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: 50px;
+    font-weight: bold;
+    font-family: "Times New Roman", Georgia, Serif, Arial;
+  }
+
+  #whitetime {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: 50px;
+    font-weight: bold;
+    font-family: "Times New Roman", Georgia, Serif, Arial;
+  }
+
+  #boardsetupsettings {
+    margin-bottom: 10px;
+  }
+
+  #boardsetupsettings #boardpiecechange {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  #boardsetupsettings #boardpiecechange #dropdown-setpiece {
+    width: 120px;
+    background: #eee;
+  }
+
+  #boardsetupsettings #boardpiecechange button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  #boardsetupsettings2 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  #boardsetupsettings2 #dropdown-sidetomove {
+    width: 120px;
+    background: #eee;
+  }
+
+  #boardsetupsettings2 #halfmoveclock {
+    width: 25%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #boardsetupsettings2 #whiteremainingchecks {
+    width: 25%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #boardsetupsettings2 #blackremainingchecks {
+    width: 25%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #boardsetupsettings2 #currentmovenum {
+    width: 25%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #boardsetupsettings2 #enpassantfile {
+    width: 35%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #boardsetupsettings2 #enpassantrank {
+    width: 35%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #boardsetupsettings2 #seirwangatingfiles {
+    width: 60%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #advancedtimesettings {
+    margin-bottom: 10px;
+  }
+
+  #advancedtimesettings #whitetimesettings {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  #advancedtimesettings #whitetimesettings #dropdown-whitetimemode {
+    margin-left: 10px;
+    width: 120px;
+    background: #eee;
+  }
+
+  #advancedtimesettings #whitetimesettings #whitestarttime {
+    width: 15%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #advancedtimesettings #whitetimesettings #whitetimegain {
+    width: 15%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #advancedtimesettings #whitetimesettings #whitetimemargin {
+    width: 15%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #advancedtimesettings #blacktimesettings {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  #advancedtimesettings #blacktimesettings #dropdown-blacktimemode {
+    margin-left: 10px;
+    width: 120px;
+    background: #eee;
+  }
+
+  #advancedtimesettings #blacktimesettings #blackstarttime {
+    width: 15%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #advancedtimesettings #blacktimesettings #blacktimegain {
+    width: 15%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #advancedtimesettings #blacktimesettings #blacktimemargin {
+    width: 15%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #advancedtimesettings #gamecontrol-start {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  #advancedtimesettings #gamecontrol-start #gamestart {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  spangameresult {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: 10px;
+    position: fixed;
+    transition: 0.5s linear;
+    font-weight: bold;
+    font-family: "Times New Roman", Georgia, Serif, Arial;
+    z-index: 2;
+  }
 </style>
 
 <body>
-    <div id="root"></div>
-    <script src="bundle.js" defer></script>
+  <div id="root"></div>
+  <script src="bundle.js" defer></script>
 
-    <!--iframe src="./themes.html" onload="this.before((this.contentDocument.body || this.contentDocument).children[0]); this.remove();"--><!--/iframe-->
+  <!--iframe src="./themes.html" onload="this.before((this.contentDocument.body || this.contentDocument).children[0]); this.remove();"--><!--/iframe-->
 
-    <!-- Javascript -->
+  <!-- Javascript -->
 
-    <script src="./lib/stockfish.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mithril@2.0.4/mithril.min.js"></script>
-    <script>
-        let themes = [[], [], []];
-        const $ = (...args) => document.querySelector(...args);
+  <script src="./lib/stockfish.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mithril@2.0.4/mithril.min.js"></script>
+  <script>
+    let themes = [[], [], []];
+    const $ = (...args) => document.querySelector(...args);
 
-        //Remove duplicated elements
-        function uniqArr(arr) {
-            var newArr = new Set(arr)
-            return Array.from(newArr)
+    //Remove duplicated elements
+    function uniqArr(arr) {
+      var newArr = new Set(arr);
+      return Array.from(newArr);
+    }
+
+    function getFileFromServer(url, doneCallback) {
+      var xhr;
+      function handleStateChange() {
+        if (xhr.readyState === 4) {
+          doneCallback(xhr.status == 200 ? xhr.responseText : null);
         }
+      }
+      xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = handleStateChange;
+      xhr.open("GET", url, true);
+      xhr.send();
+    }
 
-        function getFileFromServer(url, doneCallback) {
-            var xhr;
-            function handleStateChange() {
-                if (xhr.readyState === 4) {
-                    doneCallback(xhr.status == 200 ? xhr.responseText : null);
-                }
-            }
-            xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = handleStateChange;
-            xhr.open('GET', url, true);
-            xhr.send();
-        }
+    const copyText = async (val) => {
+      if (navigator.clipboard && navigator.permissions) {
+        await navigator.clipboard.writeText(val);
+      } else {
+        const textArea = document.createElement("textArea");
+        textArea.value = val;
+        textArea.style.width = 0;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999px";
+        textArea.style.top = "10px";
+        textArea.setAttribute("readonly", "readonly");
+        document.body.appendChild(textArea);
 
-        const copyText = async (val) => {
-            if (navigator.clipboard && navigator.permissions) {
-                await navigator.clipboard.writeText(val)
-            } else {
-                const textArea = document.createElement('textArea')
-                textArea.value = val
-                textArea.style.width = 0
-                textArea.style.position = 'fixed'
-                textArea.style.left = '-999px'
-                textArea.style.top = '10px'
-                textArea.setAttribute('readonly', 'readonly')
-                document.body.appendChild(textArea)
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
+    };
 
-                textArea.select()
-                document.execCommand('copy')
-                document.body.removeChild(textArea)
-            }
-        }
+    const formatMB = (n) => {
+      return (n ? (n / 1e6).toPrecision(3) : "?") + "MB";
+    };
 
-        const formatMB = (n) => {
-            return (n ? (n / 1e6).toPrecision(3) : "?") + "MB";
-        };
+    const isSupported = () => {
+      if (typeof WebAssembly !== "object") return false;
+      const source = Uint8Array.from([
+        0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 7, 8,
+        1, 4, 116, 101, 115, 116, 0, 0, 10, 15, 1, 13, 0, 65, 0, 253, 17, 65, 0,
+        253, 17, 253, 186, 1, 11,
+      ]);
+      if (
+        typeof WebAssembly.validate !== "function" ||
+        !WebAssembly.validate(source)
+      )
+        return false;
+      if (typeof Atomics !== "object") return false;
+      if (typeof SharedArrayBuffer !== "function") {
+        console.log("SharedArrayBuffer not enabled!");
+        return false;
+      }
+      if (typeof FileReader === "undefined") {
+        return false;
+      }
+      return true;
+    };
 
-        const isSupported = () => {
-            if (typeof WebAssembly !== "object") return false;
-            const source = Uint8Array.from([
-                0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 7, 8,
-                1, 4, 116, 101, 115, 116, 0, 0, 10, 15, 1, 13, 0, 65, 0, 253, 17, 65, 0,
-                253, 17, 253, 186, 1, 11,
-            ]);
-            if (
-                typeof WebAssembly.validate !== "function" ||
-                !WebAssembly.validate(source)
-            )
-                return false;
-            if (typeof Atomics !== "object") return false;
-            if (typeof SharedArrayBuffer !== "function") { console.log("SharedArrayBuffer not enabled!"); return false; }
-            if (typeof FileReader === "undefined") { return false; }
-            return true;
-        };
+    const RequestProgress = ({ attrs: { url, onFinishDownload } }) => {
+      let state = "INIT"; // 'LOADING', 'DONE', 'FAILED'
+      let loaded = 0;
+      let total = 0;
 
-        const RequestProgress = ({ attrs: { url, onFinishDownload } }) => {
-            let state = "INIT"; // 'LOADING', 'DONE', 'FAILED'
-            let loaded = 0;
-            let total = 0;
-
-            const oninit = () => {
-                state = "LOADING";
-                m.request({
-                    url: url,
-                    method: "GET",
-                    responseType: "arraybuffer",
-                    headers: { Accept: "*/*" },
-                    config: (xhr) => {
-                        xhr.onprogress = (e) => {
-                            // TODO:
-                            // When gzip compressed, the value of "loaded/total" gets messed up.
-                            // On Chrome, "loaded" is the value after decompression, but on the other hand,
-                            // On Firefox, "loaded" is the value before decompression.
-                            loaded = e.loaded;
-                            total =
-                                e.total ||
-                                Number(
-                                    e.target.getResponseHeader("x-decompressed-content-length")
-                                );
-                            m.redraw();
-                        };
-                    },
-                }).then(
-                    (response) => {
-                        state = "DONE";
-                        onFinishDownload(response);
-                    },
-                    (e) => {
-                        console.error(e);
-                        state = "FAILED";
-                        onFinishDownload(null);
-                    }
+      const oninit = () => {
+        state = "LOADING";
+        m.request({
+          url: url,
+          method: "GET",
+          responseType: "arraybuffer",
+          headers: { Accept: "*/*" },
+          config: (xhr) => {
+            xhr.onprogress = (e) => {
+              // TODO:
+              // When gzip compressed, the value of "loaded/total" gets messed up.
+              // On Chrome, "loaded" is the value after decompression, but on the other hand,
+              // On Firefox, "loaded" is the value before decompression.
+              loaded = e.loaded;
+              total =
+                e.total ||
+                Number(
+                  e.target.getResponseHeader("x-decompressed-content-length")
                 );
+              m.redraw();
             };
+          },
+        }).then(
+          (response) => {
+            state = "DONE";
+            onFinishDownload(response);
+          },
+          (e) => {
+            console.error(e);
+            state = "FAILED";
+            onFinishDownload(null);
+          }
+        );
+      };
 
-            const view = () => {
-                const fraction =
-                    total == -1 ? `?MB/?MB` : `${formatMB(loaded)}/${formatMB(total)}`;
-                return m("span", [
-                    `${fraction} [${state}] `,
-                    m(
-                        "span",
-                        {
-                            style: "cursor: pointer;",
-                            onclick: () =>
-                                window.alert(
-                                    "On some browsers, download size might look contradictory due to file compression."
-                                ),
-                        },
-                        "[?]"
-                    ),
-                ]);
-            };
+      const view = () => {
+        const fraction =
+          total == -1 ? `?MB/?MB` : `${formatMB(loaded)}/${formatMB(total)}`;
+        return m("span", [
+          `${fraction} [${state}] `,
+          m(
+            "span",
+            {
+              style: "cursor: pointer;",
+              onclick: () =>
+                window.alert(
+                  "On some browsers, download size might look contradictory due to file compression."
+                ),
+            },
+            "[?]"
+          ),
+        ]);
+      };
 
-            return { oninit, view };
-        };
+      return { oninit, view };
+    };
 
-        const LoadThemes = () => {
-            themes = [[], [], []];
-            function StartLoad(data) {
-                console.log(`${typeof data}`);
-                data = data.replace(/\r\n/g, "\n")
-                data = data.replace(/\r/g, "\n");
-                let rawText = data.split('\n');
-                console.log('raw:', rawText);
-                let i = 0;
-                let j = 0;
-                let css_name = "";
-                let index = 0;
-                let require_list = [];
-                let themesettings = [];
-                let apply_to_all_list = [];
-                let loaded_css_list = [];
-                let require_board_list = [];
-                let board_apply_to_all_list = [];
-                let themeavailable = [];
-                let boardthemeavailable = [];
-                let link = null;
-                for (i = 0; i < rawText.length; i++) {
-                    if (rawText[i].length < 1 || rawText[i].charAt(0) == '#') {
-                        continue;
-                    }
-                    themesettings = rawText[i].trim().split('|');
-                    if (themesettings.length != 3) {
-                        console.warn(`At line ${i} in paragraph of themes.html: Bad syntax\n`);
-                        continue;
-                    }
-                    themeavailable = themesettings[1].split(',');
-                    boardthemeavailable = themesettings[2].split(',');
-                    if (themeavailable.length == 1 && themeavailable[0] == "") {
-                        themeavailable = [];
-                    }
-                    if (boardthemeavailable.length == 1 && boardthemeavailable[0] == "") {
-                        boardthemeavailable = [];
-                    }
-                    if ((themesettings[1].length < 1 && themesettings[2].length < 1) || (themeavailable.includes("") || boardthemeavailable.includes(""))) {
-                        console.warn(`At line ${i} in paragraph of themes.html: Piece and Board style names must not be both null or contain null element\n`);
-                        continue;
-                    }
-                    if (themesettings[1].length > 0) {
-                        require_list = themeavailable.filter((element) => { return element.charAt(0) == '@' });
-                        themeavailable = themeavailable.filter((element) => { return element.charAt(0) != '@' });
-                        for (j = 0; j < require_list.length; j++) {
-                            if (themes[0].includes(require_list[j].substring(1))) {
-                                index = themes[0].indexOf(require_list[j].substring(1));
-                                themeavailable = themeavailable.concat(themes[1][index]);
-                            }
-                            else {
-                                console.warn(`At line ${i} in paragraph of themes.html: Variant ${require_list[j].substring(1)} has not been defined yet. You need to put it before this line.\n`);
-                            }
-                        }
-                        themeavailable = uniqArr(themeavailable);
-                    }
-                    if (themesettings[2].length > 0) {
-                        require_board_list = boardthemeavailable.filter((element) => { return element.charAt(0) == '@' });
-                        boardthemeavailable = boardthemeavailable.filter((element) => { return element.charAt(0) != '@' });
-                        for (j = 0; j < require_board_list.length; j++) {
-                            if (themes[0].includes(require_board_list[j].substring(1))) {
-                                index = themes[0].indexOf(require_board_list[j].substring(1));
-                                boardthemeavailable = boardthemeavailable.concat(themes[2][index]);
-                            }
-                            else {
-                                console.warn(`At line ${i} in paragraph of themes.html: Variant ${require_board_list[j].substring(1)} has not been defined yet. You need to put it before this line.\n`);
-                            }
-                        }
-                        boardthemeavailable = uniqArr(boardthemeavailable);
-                    }
-                    if (themesettings[0] == "*") {
-                        if (themesettings[1].length > 0) {
-                            apply_to_all_list = apply_to_all_list.concat(themeavailable);
-                        }
-                        if (themesettings[2].length > 0) {
-                            board_apply_to_all_list = board_apply_to_all_list.concat(boardthemeavailable);
-                        }
-                    }
-                    else if (themes[0].includes(themesettings[0])) {
-                        if (themesettings[1].length > 0) {
-                            index = themes[0].indexOf(themesettings[0]);
-                            themes[1][index] = uniqArr(themes[1][index].concat(themeavailable));
-                        }
-                        if (themesettings[2].length > 0) {
-                            index = themes[0].indexOf(themesettings[0]);
-                            themes[2][index] = uniqArr(themes[2][index].concat(boardthemeavailable));
-                        }
-                    }
-                    else {
-                        themeavailable = uniqArr(themeavailable.concat(apply_to_all_list));
-                        boardthemeavailable = uniqArr(boardthemeavailable.concat(board_apply_to_all_list));
-                        themes[0].push(themesettings[0]);
-                        themes[1].push(themeavailable);
-                        themes[2].push(boardthemeavailable);
-                    }
-                }
-                for (i = 0; i < themes[0].length; i++) {
-                    for (j = 0; j < themes[1][i].length; j++) {
-                        css_name = "theme-piece-" + themes[1][i][j];
-                        if (loaded_css_list.includes(css_name)) {
-                            continue;
-                        }
-                        loaded_css_list.push(css_name);
-                        link = document.createElement('link');
-                        link.setAttribute('rel', 'stylesheet');
-                        link.setAttribute('href', "./assets/" + css_name + ".css");
-                        document.head.appendChild(link);
-                    }
-                    for (j = 0; j < themes[2][i].length; j++) {
-                        css_name = "theme-board-" + themes[2][i][j];
-                        if (loaded_css_list.includes(css_name)) {
-                            continue;
-                        }
-                        loaded_css_list.push(css_name);
-                        link = document.createElement('link');
-                        link.setAttribute('rel', 'stylesheet');
-                        link.setAttribute('href', "./assets/" + css_name + ".css");
-                        document.head.appendChild(link);
-                    }
-                }
-                console.log(themes);
-            }
-            let data = "";
-            this.getFileFromServer('./themes.txt', (res) => {
-                console.log('res:', res);
-                StartLoad(res);
-            });
-        }
-
-        const App = () => {
-            let stockfish = null;
-            let stockfish_state = "INIT"; // 'READY', 'FAILED'
-            let output2 = "";
-            let show_dests = true;
-            let adjudicate = true;
-            let analysis_mode = false;
-            let play_white = false;
-            let play_black = false;
-            let play_move = false;
-            let review_mode = false;
-            let board_setup_mode = false;
-            let advanced_time_control = false;
-            let during_play = false;
-            let white_remaining_time = 0;
-            let black_remaining_time = 0;
-            let white_moving_time_list = [];
-            let black_moving_time_list = [];
-            let white_time_gain = 0;
-            let black_time_gain = 0;
-            let white_timer_type = "infinite";
-            let black_timer_type = "infinite";
-            let timer_interval = 100;
-            let white_time_margin = 0;
-            let black_time_margin = 0;
-            let previous_mover = "";
-            let timer;
-
-            let variants = [];
-
-            const getVariants = () => {
-                stockfish.postMessage(`uci`);
-            };
-
-            const setVariant = () => {
-                play_move = false;
-                stop();
-                const variant = $("#dropdown-variant").value;
-                stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
-                stockfish.postMessage(`position startpos`);
-                $("#fen").value = "";
-                $("#move").value = "";
-                resetTimer();
-            };
-
-            const setFen = () => {
-                stop();
-                const fen = $("#fen").value;
-                const moves = $("#move").value;
-
-                if (fen.length > 0) {
-                    stockfish.postMessage(`position fen ${fen} moves ${moves}`);
-                } else {
-                    stockfish.postMessage(`position startpos moves ${moves}`);
-                }
-                const stm = $("#label-stm").innerText;
-                if (
-                    stm != "undefined" &&
-                    (analysis_mode ||
-                        (play_white && stm == "white") ||
-                        (play_black && stm == "black"))
-                )
-                    setTimeout(go(), 10);
-            };
-
-            const totalMoveNumber = () => {
-                let listlength = 0;
-                let i = 0;
-                moves_split = $("#move").value.split(' ');
-                for (i = 0; i < moves_split.length; i++) {
-                    if (moves_split[i].length == 0) {
-                        continue;
-                    }
-                    listlength++;
-                }
-                return listlength;
-            }
-
-            const displayMove = (movenum, is_force_stop) => {
-                if ($("#displayready").value.length > 0 && $("#displayready").value > 0)  //$("#displayready").value = 0, displayMove() is ready
-                {
-                    return;
-                }
-                $("#displayready").value = 2;  //2 = displayMove() working
-                let i = 0;
-                let j = 0;
-                moves_split = $("#move").value.split(' ');
-                if (movenum == -1) {
-                    if (is_force_stop) {
-                        force_stop();
-                    } else {
-                        stop();
-                    }
-                    $("#displaymoves").value = $("#move").value;
-                    review_mode = false;
-                    $("#isreviewmode").value = 0;
-                } else if (movenum > totalMoveNumber() || movenum < -1) {
-                    console.log(`${movenum} is out of range for move number.`);
-                    return;
-                } else {
-                    if (is_force_stop) {
-                        force_stop();
-                    } else {
-                        stop();
-                    }
-                    review_mode = true;
-                    $("#isreviewmode").value = 1;
-                    $("#displaymoves").value = "";
-                    for (i = 0, j = 0; j < movenum; i++, j++) {
-                        if (moves_split[i].length == 0) {
-                            j--;
-                            continue;
-                        }
-                        $("#displaymoves").value = $("#displaymoves").value.concat(moves_split[i]);
-                        if (j < movenum - 1) {
-                            $("#displaymoves").value = $("#displaymoves").value.concat(" ");
-                        }
-                    }
-                }
-                const fen = $("#fen").value;
-                const display_moves = $("#displaymoves").value;
-                if (fen.length > 0) {
-                    stockfish.postMessage(`position fen ${fen} moves ${display_moves}`);
-                } else {
-                    stockfish.postMessage(`position startpos moves ${display_moves}`);
-                }
-                console.log(`${display_moves}`);
-                $("#displayready").value = 1;  //1 = updateChessBoardToPosition() working
-            };
-
-            const displayNextMove = () => {
-                if ($("#gotomovenum").value.length <= 0) {
-                    $("#gotomovenum").value = totalMoveNumber();
-                } else {
-                    if ($("#gotomovenum").value < 0) {
-                        $("#gotomovenum").value = 0;
-                    } else if ($("#gotomovenum").value >= totalMoveNumber()) {
-                        $("#gotomovenum").value = totalMoveNumber();
-                    } else {
-                        $("#gotomovenum").value++;
-                    }
-                }
-                if ($("#advtimectrl").checked == true) {
-                    $("#advtimectrl").click();
-                }
-                displayMove($("#gotomovenum").value, true);
-            }
-
-            const displayPreviousMove = () => {
-                if ($("#gotomovenum").value.length <= 0) {
-                    $("#gotomovenum").value = totalMoveNumber();
-                } else {
-                    if ($("#gotomovenum").value <= 0) {
-                        $("#gotomovenum").value = 0;
-                    } else if ($("#gotomovenum").value > totalMoveNumber()) {
-                        $("#gotomovenum").value = totalMoveNumber();
-                    } else {
-                        $("#gotomovenum").value--;
-                    }
-                }
-                if ($("#advtimectrl").checked == true) {
-                    $("#advtimectrl").click();
-                }
-                displayMove($("#gotomovenum").value, true);
-            }
-
-            const displayInitialPosition = () => {
-                $("#gotomovenum").value = 0;
-                if ($("#advtimectrl").checked == true) {
-                    $("#advtimectrl").click();
-                }
-                displayMove(0, true);
-            }
-
-            const displayCurrentPosition = () => {
-                $("#gotomovenum").value = totalMoveNumber();
-                console.log(`Current: ${!during_play}`);
-                displayMove(-1, !during_play);
-            }
-
-            const displaySpecifiedPosition = () => {
-                if ($("#gotomovenum").value.length <= 0) {
-                    $("#gotomovenum").value = totalMoveNumber();
-                }
-                if ($("#gotomovenum").value < 0) {
-                    $("#gotomovenum").value = 0;
-                } else if ($("#gotomovenum").value > totalMoveNumber()) {
-                    $("#gotomovenum").value = totalMoveNumber();
-                }
-                if ($("#advtimectrl").checked == true) {
-                    $("#advtimectrl").click();
-                }
-                displayMove($("#gotomovenum").value, true);
-            }
-
-            const reset = () => {
-                review_mode = false;
-                board_setup_mode = false;
-                $("#fen").value = "";
-                $("#move").value = "";
-                resetTimer();
-                setFen();
-                $("#currentposition").click();
-            };
-
-            const undo = () => {
-                if (review_mode || board_setup_mode) {
-                    return;
-                }
-                const moves = $("#move").value;
-                $("#move").value = moves.substring(0, moves.lastIndexOf(" "));
-                resetTimer();
-                setFen();
-            };
-
-            const go = () => {
-                if (board_setup_mode) {
-                    return;
-                }
-                return_early = play_move;
-                stop();
-                console.log(`return early: ${return_early}`);
-                if (return_early) return; // avoid race condition
-                let args = "";
-                const movetime = $("#movetime").value;
-                const depth = $("#depth").value;
-                const threadnum = $("#threads").value;
-                const hashsize = $("#hash").value;
-                const multiplepondervalue = $("#multipv").value;
-                let wtime = 0;
-                let btime = 0;
-                let winc = 0;
-                let binc = 0;
-                if (!advanced_time_control && !analysis_mode && movetime.length > 0 && movetime > 0) {
-                    args += `movetime ${movetime}`;
-                }
-                else if (advanced_time_control) {
-                    if (white_timer_type == "infinite" && $("#label-stm").innerHTML == "white") {
-                        args += "infinite";
-                        console.log("wtime infinite");
-                    }
-                    else if (black_timer_type == "infinite" && $("#label-stm").innerHTML == "black") {
-                        args += "infinite";
-                        console.log("btime infinite");
-                    }
-                    else {
-                        if (white_timer_type == "time per move") {
-                            wtime += (+white_moving_time_list[0]);
-                            winc += (+white_moving_time_list[0]);
-                        }
-                        else if (white_timer_type == "tournament") {
-                            wtime += (+((+white_remaining_time) + (+white_time_gain)));
-                            winc += (+white_time_gain);
-                        }
-                        else if (white_timer_type == "hourglass") {  //How to tell that it's hourglass to engine?
-                            wtime += (+white_remaining_time);
-                        }
-                        if (black_timer_type == "time per move") {
-                            btime += (+black_moving_time_list[0]);
-                            binc += (+black_moving_time_list[0]);
-                        }
-                        else if (black_timer_type == "tournament") {
-                            btime += (+((+black_remaining_time) + (+black_time_gain)));
-                            binc = (+black_time_gain);
-                        }
-                        else if (black_timer_type == "hourglass") {  //How to tell that it's hourglass to engine?
-                            btime += (+black_remaining_time);
-                        }
-                        console.log(`wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`);
-                        args += `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`;
-                        stockfish.postMessage(`setoption name Move Overhead value ${timer_interval}`);
-                    }
-                }
-                if (!analysis_mode && depth.length > 0 && depth > 0) {
-                    args += ` depth ${depth}`;
-                }
-
-                if (threadnum.length <= 0 || threadnum < 1) {
-                    stockfish.postMessage(`setoption name Threads value 1`);
-                }
-                else if (threadnum > 512) {
-                    stockfish.postMessage(`setoption name Threads value 512`);
-                }
-                else {
-                    stockfish.postMessage(`setoption name Threads value ${threadnum}`);
-                }
-                stockfish.postMessage(`setoption name clear hash`);
-                if (hashsize.length <= 0 || hashsize < 1) {
-                    stockfish.postMessage(`setoption name Hash value 16`);
-                }
-                else if (hashsize > 33554432) {
-                    stockfish.postMessage(`setoption name Hash value 33554432`);
-                }
-                else {
-                    stockfish.postMessage(`setoption name Hash value ${hashsize}`);
-                }
-                if (multiplepondervalue.length <= 0 || multiplepondervalue < 1) {
-                    stockfish.postMessage(`setoption name MultiPV value 1`);
-                }
-                else if (multiplepondervalue > 500) {
-                    stockfish.postMessage(`setoption name Hash value 500`);
-                }
-                else {
-                    stockfish.postMessage(`setoption name MultiPV value ${multiplepondervalue}`);
-                }
-                stockfish.postMessage(`isready`);
-
-                const stm = $("#label-stm").innerText;
-                play_move =
-                    (play_white && stm == "white") || (play_black && stm == "black");
-                stockfish.postMessage(`go ${args}`);
-                output2 = "";
-            };
-
-            const setupTimer = () => {
-                $("#timeoutside").value = 0;
-                white_timer_type = $("#dropdown-whitetimemode").value;
-                black_timer_type = $("#dropdown-blacktimemode").value;
-                white_remaining_time = $("#whitestarttime").value;
-                black_remaining_time = $("#blackstarttime").value;
-                if (white_remaining_time.length < 1 || white_remaining_time < 1) {
-                    white_remaining_time = 600000;
-                }
-                if (black_remaining_time.length < 1 || black_remaining_time < 1) {
-                    black_remaining_time = 600000;
-                }
-                white_time_gain = $("#whitetimegain").value;
-                black_time_gain = $("#blacktimegain").value;
-                if (white_time_gain.length < 1 || white_time_gain < 0) {
-                    white_time_gain = 0;
-                }
-                if (black_time_gain.length < 1 || black_time_gain < 0) {
-                    black_time_gain = 0;
-                }
-                white_time_margin = $("#whitetimemargin").value;
-                black_time_margin = $("#blacktimemargin").value;
-                if (white_time_margin.length < 1 || white_time_margin < 0) {
-                    white_time_margin = 0;
-                }
-                if (black_time_margin.length < 1 || black_time_margin < 0) {
-                    black_time_margin = 0;
-                }
-                white_moving_time_list = [];
-                black_moving_time_list = [];
-                white_moving_time_list.push(white_remaining_time);  //Start time white
-                black_moving_time_list.push(black_remaining_time);  //Start time black
-                $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 1000)}`;
-                $("#blacktime").innerHTML = `${parseInt(black_remaining_time / 1000)}`;
-                if (white_timer_type == "infinite") {
-                    $("#whitetime").innerHTML = "INFINITY";
-                }
-                if (black_timer_type == "infinite") {
-                    $("#blacktime").innerHTML = "INFINITY";
-                }
-                previous_mover = "";
-            }
-
-            const resetTimer = () => {
-                $("#whitetime").innerHTML = "--";
-                $("#blacktime").innerHTML = "--";
-                previous_mover = "";
-                $("#timeoutside").value = 0;
-            }
-
-            function updateTimer() {
-                if ($("#gamestatus").innerHTML == "END") {
-                    deleteTimer();
-                    gameEnd();
-                    return;
-                }
-                $("#gamestatus").click();
-                console.log(`${$("#gamestatus").innerHTML}`);
-                if ($("#gamestatus").innerHTML == "PLAYING_WHITE") {
-                    if (previous_mover == "") {
-                        if (white_timer_type == "tournament") {
-                            white_remaining_time = (+white_remaining_time) + (+white_time_gain) + (+timer_interval);
-                        }
-                        white_moving_time_list.push(white_remaining_time);  //Time stamp for white's turn begin
-                    }
-                    else if (previous_mover == "BLACK") {
-                        black_moving_time_list.push(black_remaining_time);  //Time stamp for black's turn end
-                        if (black_remaining_time < 0) {
-                            black_remaining_time = 0;
-                        }
-                        if (white_timer_type == "tournament") {
-                            white_remaining_time = (+white_remaining_time) + (+white_time_gain) + (+timer_interval);
-                        }
-                        else if (white_timer_type == "time per move") {
-                            white_remaining_time = (+white_moving_time_list[0]) + (+timer_interval);
-                        }
-                        if (black_timer_type == "hourglass") {
-                            white_remaining_time = (+white_remaining_time) + (+black_moving_time_list.at(-2)) - (+black_moving_time_list.at(-1)) + (+timer_interval);
-                        }
-                        white_moving_time_list.push(white_remaining_time);  //Time stamp for white's turn begin
-                    }
-                    if (white_timer_type == "infinite") {
-                        previous_mover = "WHITE";
-                        return;
-                    }
-                    white_remaining_time = white_remaining_time - timer_interval;
-                    if (white_remaining_time < -white_time_margin) {
-                        deleteTimer();
-                        $("#timeoutside").value = 1;
-                        timeIsUpFor("WHITE");
-                        return;
-                    }
-                    if (white_timer_type == "infinite") {
-                        $("#whitetime").innerHTML = "INFINITY";
-                    }
-                    else if (white_remaining_time >= 10000) {
-                        $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 1000)}`;
-                    }
-                    else {
-                        $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 100) / 10}`;
-                    }
-                    if (black_timer_type == "infinite") {
-                        $("#blacktime").innerHTML = "INFINITY";
-                    }
-                    else if (black_remaining_time >= 10000) {
-                        $("#blacktime").innerHTML = `${parseInt(black_remaining_time / 1000)}`;
-                    }
-                    else {
-                        $("#blacktime").innerHTML = `${parseInt(black_remaining_time / 100) / 10}`;
-                    }
-                    previous_mover = "WHITE";
-                }
-                else if ($("#gamestatus").innerHTML == "PLAYING_BLACK") {
-                    if (previous_mover == "") {
-                        if (black_timer_type == "tournament") {
-                            black_remaining_time = (+black_remaining_time) + (+black_time_gain) + (+timer_interval);
-                        }
-                        black_moving_time_list.push(black_remaining_time);  //Time stamp for black's turn begin
-                    }
-                    else if (previous_mover == "WHITE") {
-                        white_moving_time_list.push(white_remaining_time);  //Time stamp for white's turn end
-                        if (white_remaining_time < 0) {
-                            white_remaining_time = 0;
-                        }
-                        if (black_timer_type == "tournament") {
-                            black_remaining_time = (+black_remaining_time) + (+black_time_gain) + (+timer_interval);
-                        }
-                        else if (black_timer_type == "time per move") {
-                            black_remaining_time = (+black_moving_time_list[0]) + (+timer_interval);
-                        }
-                        if (white_timer_type == "hourglass") {
-                            black_remaining_time = (+black_remaining_time) + (+white_moving_time_list.at(-2)) - (+white_moving_time_list.at(-1)) + (+timer_interval);
-                        }
-                        black_moving_time_list.push(black_remaining_time);  //Time stamp for black's turn begin
-                    }
-                    if (black_timer_type == "infinite") {
-                        previous_mover = "BLACK";
-                        return;
-                    }
-                    black_remaining_time = black_remaining_time - timer_interval;
-                    if (black_remaining_time < -black_time_margin) {
-                        deleteTimer();
-                        $("#timeoutside").value = 2;
-                        timeIsUpFor("BLACK");
-                        return;
-                    }
-                    if (white_timer_type == "infinite") {
-                        $("#whitetime").innerHTML = "INFINITY";
-                    }
-                    else if (white_remaining_time >= 10000) {
-                        $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 1000)}`;
-                    }
-                    else {
-                        $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 100) / 10}`;
-                    }
-                    if (black_timer_type == "infinite") {
-                        $("#blacktime").innerHTML = "INFINITY";
-                    }
-                    else if (black_remaining_time >= 10000) {
-                        $("#blacktime").innerHTML = `${parseInt(black_remaining_time / 1000)}`;
-                    }
-                    else {
-                        $("#blacktime").innerHTML = `${parseInt(black_remaining_time / 100) / 10}`;
-                    }
-                    previous_mover = "BLACK";
-                }
-            }
-
-            const createTimer = () => {
-                timer = setInterval(() => {
-                    updateTimer();
-                }, timer_interval);
-                console.log(`${timer}`);
-            }
-
-            const deleteTimer = () => {
-                console.log("Timer delete!");
-                clearInterval(timer);
-            }
-
-            const timeIsUpFor = (side) => {
-                force_stop();
-                if (side == "WHITE") {
-                    white_remaining_time = 0;
-                    $("#timeoutside").value = 1;
-                    $("#whitetime").innerHTML = "Out Of Time";
-                }
-                else if (side == "BLACK") {
-                    black_remaining_time = 0;
-                    $("#timeoutside").value = 2;
-                    $("#blacktime").innerHTML = "Out Of Time";
-                }
-                $("#gamestatus").click();
-                gameEnd();
-            }
-
-            const gameEnd = () => {
-                during_play = false;
-                //advanced_time_control = false;
-                force_stop();
-                $("#currentposition").click();
-                $("#input").style.display = "";
-                $("#input2").style.display = "";
-                $("#posvariantdiv").style.display = "";
-            }
-
-            const gameAbort = () => {
-                deleteTimer();
-                $("#gamestatus").innerHTML = "END";
-                gameEnd();
-            }
-
-            const goWithTimeControl = () => {
-                if ($("#gamestatus").innerHTML != "END") {
-                    return;
-                }
-                //We need to prevent user from doing unnecessary actions during countdown, so we'll hide these divs
-                $("#input").style.display = "none";  //These divs are unable to be hidden by {hidden: during_play}
-                $("#input2").style.display = "none";
-                $("#posvariantdiv").style.display = "none";
-                //$("#movecontrol").style.display = "none";
-                resetTimer();
-                setupTimer();
-                $("#gamestatus").click();
-                during_play = true;
-                $("#currentposition").click();
-                createTimer();
-                const stm = $("#label-stm").innerText;
-                console.log(`white: ${play_white} black: ${play_black} move: ${(play_white && stm == "white") || (play_black && stm == "black")}`);
-                if ((play_white && stm == "white") || (play_black && stm == "black")) {
-                    console.log("Go!");
-                    go();
-                }
-            }
-
-            const stop = () => {
-                stockfish.postMessage(`stop`);
-            };
-
-            const force_stop = () => {
-                play_white = play_black = false;
-                stop();
-            };
-
-            const changePieces = (onlyChangeWhenInvalid) => {
-                let index = 0;
-                let themename = "";
-                let classes = [];
-                let DOMListValue = "";
-                const el = $("#chessground-container-div");
-                index = themes[0].indexOf($("#dropdown-variant").value);
-                if (index < 0 || $("#dropdown-variant").value == "") {
-                    index = themes[0].indexOf("");
-                }
-                if (index < 0) {
-                    themename = "default";
-                }
-                else {
-                    classes = themes[1][index];
-                    if (classes.length < 1) {
-                        classes = themes[1][themes[0].indexOf("")];
-                    }
-                }
-                DOMListValue = el.classList.value.split(' ');
-                if (classes.length > 0) {
-                    index = classes.indexOf(DOMListValue[1]) + 1;
-                    if (onlyChangeWhenInvalid) {
-                        if (index != 0) {
-                            console.log("No need to change piece.");
-                            return;
-                        }
-                    }
-                    if (index >= classes.length) {
-                        index = 0;
-                    }
-                    themename = classes[index];
-                }
-                else {
-                    themename = "default";
-                }
-                DOMListValue[1] = themename;
-                el.classList.value = DOMListValue.join(' ');
-                console.log(`Piece theme: ${themename}`);
-                //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
-                //const nextIndex = (activeIndex + 1) % classes.length;
-                //el.classList.replace(classes[activeIndex], classes[nextIndex]);
-            };
-
-            const changeBoard = (onlyChangeWhenInvalid) => {
-                let index = 0;
-                let boardthemename = "";
-                let classes = [];
-                let DOMListValue = "";
-                const el = $("#chessground-container-div");
-                index = themes[0].indexOf($("#dropdown-variant").value);
-                if (index < 0 || $("#dropdown-variant").value == "") {
-                    index = themes[0].indexOf("");
-                }
-                if (index < 0) {
-                    boardthemename = "defaultboard";
-                }
-                else {
-                    classes = themes[2][index];
-                    if (classes.length < 1) {
-                        classes = themes[2][themes[0].indexOf("")];
-                    }
-                }
-                DOMListValue = el.classList.value.split(' ');
-                if (classes.length > 0) {
-                    index = classes.indexOf(DOMListValue[0]) + 1;
-                    if (onlyChangeWhenInvalid) {
-                        if (index != 0) {
-                            console.log("No need to change board.");
-                            return;
-                        }
-                    }
-                    if (index >= classes.length) {
-                        index = 0;
-                    }
-                    boardthemename = classes[index];
-                }
-                else {
-                    boardthemename = "defaultboard";
-                }
-                DOMListValue[0] = boardthemename;
-                el.classList.value = DOMListValue.join(' ');
-                console.log(`Board theme: ${boardthemename}`);
-                //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
-                //const nextIndex = (activeIndex + 1) % classes.length;
-                //el.classList.replace(classes[activeIndex], classes[nextIndex]);
-            };
-
-            const scrollOutput = () => {
-                $("#output2").scrollTo({
-                    top: $("#output2").scrollHeight,
-                    behavior: "smooth",
-                });
-            };
-
-            const displayGameResult = () => {
-                let i = 0;
-                let chi = document.getElementsByTagName("spangameresult");
-                for (i = 0; i < chi.length; i++) {
-                    document.body.removeChild(chi[i]);
-                }
-                if (review_mode) {
-                    return;
-                }
-                var span = document.createElement("spangameresult");
-                span.innerHTML = $("#gameresult").value;
-                span.style.left = (window.innerWidth / 2) + "px";
-                span.style.top = (window.innerHeight / 2) + "px";
-                setTimeout(function () {
-                    span.style.opacity = "1";
-                    span.style.transform = "scale(40)";
-                }, 100);
-                setTimeout(function () {
-                    span.style.opacity = "0";
-                    span.style.transform = "scale(0.02)";
-                }, 2600);
-                document.body.appendChild(span);
-            }
-
-            // Make error catchable
-            const loadStockfish = async (params) => {
-                return await Stockfish(params);
-            };
-
-            const onFinishDownload = (data) => {
-                if (!data) {
-                    stockfish_state = "FAILED";
-                    m.redraw();
-                    return;
-                }
-
-                loadStockfish({ wasmBinary: data })
-                    .then((_stockfish) => {
-                        stockfish = _stockfish;
-                        stockfish_state = "READY";
-                        stockfish.addMessageListener((line) => {
-                            if (line.startsWith("option")) {
-                                if (line.startsWith("option name UCI_Variant")) {
-                                    variants = line
-                                        .replace(
-                                            "option name UCI_Variant type combo default chess var ",
-                                            ""
-                                        )
-                                        .replace(/ var /g, " ")
-                                        .split(" ");
-                                }
-                            } else if (line.startsWith(" ")) {
-                            } else {
-                                if (!review_mode && line.startsWith("bestmove") && play_move) {
-                                    play_move = false;
-                                    $("#move").value += " " + line.split(" ")[1];
-                                    $("#set").click();
-                                }
-                                output2 += line + "\n";
-                            }
-                            m.redraw();
-                        });
-                        getVariants();
-                    })
-                    .catch((e) => {
-                        stockfish_state = "FAILED";
-                        throw e;
-                    })
-                    .finally(() => m.redraw());
-            };
-
-            const onSelectNnueFile = async (e) => {
-                const selected = e.currentTarget.files[0];
-                if (selected) {
-                    //
-                    // TODO:
-                    // On Archlinux Chromium 92.0.4515.107, most of times this code fails with the error saying:
-                    //   TypeError: Failed to execute 'decode' on 'TextDecoder': The provided ArrayBufferView value must not be shared.
-                    // On the other hand, either Chrome with the same version or Firefox never fail.
-                    //
-                    const FS = stockfish.FS;
-                    const buffer = await selected.arrayBuffer();
-                    const array = new Uint8Array(buffer);
-                    const filename = "/" + selected.name;
-                    FS.writeFile(filename, array);
-                    stockfish.postMessage(`setoption name EvalFile value ${filename}`);
-                    // Automatically set variant
-                    const variant = selected.name.split(/[_.-]+/)[0];
-                    $("#dropdown-variant").value = variant;
-                    $("#dropdown-variant").dispatchEvent(new Event("change"));
-                }
-            };
-
-            const onSelectVariantsFile = async (e) => {
-                const selected = e.currentTarget.files[0];
-                //console.log(`${selected}`);
-                if (selected) {
-                    const FS = stockfish.FS;
-                    const buffer = await selected.arrayBuffer();
-                    const array = new Uint8Array(buffer);
-                    const filename = "/" + selected.name;
-                    FS.writeFile(filename, array);
-                    stockfish.postMessage(`check ${filename}`);
-                    stockfish.postMessage(`load ${filename}`);
-                    getVariants();
-                }
-            };
-
-            const oninit = () => {
-                stockfish_state = "LOADING";
-            };
-
-            const view = () => {
-                const is_ready = stockfish_state == "READY";
-
-                return m("main", [
-                    m("p#pagetitle", "Advanced"),
-                    m("div#misc", [
-                        m("div", [
-                            `Fairy-Stockfish: ${stockfish_state} - download: `,
-                            m(RequestProgress, {
-                                url: "./lib/stockfish.wasm",
-                                onFinishDownload,
-                            }),
-                        ]),
-                        m("div", { hidden: during_play }, [
-                            "- nnue file: ",
-                            m("input", {
-                                type: "file",
-                                disabled: !is_ready,
-                                onchange: onSelectNnueFile,
-                            }),
-                            m(
-                                "span",
-                                {
-                                    style: "cursor: pointer;",
-                                    onclick: () =>
-                                        window.alert(
-                                            "You can upload a Fairy-Stockfish compatible .nnue file. Downloads: https://fairy-stockfish.github.io/nnue/#current-best-nnue-networks."
-                                        ),
-                                },
-                                "[?]"
-                            ),
-                        ]),
-                        m("div", { hidden: during_play }, [
-                            "- variants.ini: ",
-                            m("input#variants-ini", {
-                                type: "file",
-                                disabled: !is_ready || review_mode || board_setup_mode,
-                                onchange: onSelectVariantsFile,
-                            }),
-                            m(
-                                "span",
-                                {
-                                    style: "cursor: pointer;",
-                                    onclick: () =>
-                                        window.alert(
-                                            "You can upload a Fairy-Stockfish compatible variants.ini file. See here for details: https://github.com/ianfab/Fairy-Stockfish/wiki/Variant-configuration."
-                                        ),
-                                },
-                                "[?]"
-                            ),
-                        ]),
-                        m("div", { hidden: during_play }, [
-                            "- positionvariants.txt: ",
-                            m("input#posvariant-txt", {
-                                type: "file",
-                                disabled: !is_ready || review_mode || board_setup_mode,
-                            }),
-                            m(
-                                "span",
-                                {
-                                    style: "cursor: pointer;",
-                                    onclick: () =>
-                                        window.alert(
-                                            "You can select a Position Variant file to load different positions for different variants. Contents will be appended to the position variants provided by the server."
-                                        ),
-                                },
-                                "[?]"
-                            ),
-                        ]),
-                    ]),
-                    m("div#input", { hidden: during_play }, [
-                        m(
-                            "select#dropdown-variant",
-                            {
-                                disabled: !is_ready || review_mode || board_setup_mode,
-                                onchange: (e) => {
-                                    window.setTimeout(setVariant, 10);
-                                },
-                            },
-                            [
-                                m("option", { value: "" }, "-- VARIANT --"),
-                                ...variants.map((ex, index) => m("option", { value: ex }, ex)),
-                            ]
-                        ),
-                        m("input#fen", {
-                            placeholder: "Input FEN Here",
-                            disabled: !is_ready || review_mode,
-                            onkeyup: (e) => {
-                                if (e.keyCode != 13) {
-                                    e.redraw = false;
-                                    return;
-                                }
-                                setFen();
-                            },
-                        }),
-                        m("input#move", {
-                            placeholder: "Input Move Here",
-                            disabled: !is_ready || review_mode,
-                            onkeyup: (e) => {
-                                if (e.keyCode != 13) {
-                                    e.redraw = false;
-                                    return;
-                                }
-                                setFen();
-                            },
-                        }),
-                        m(
-                            "button#setpos",
-                            {
-                                disabled: !is_ready || review_mode,
-                                onclick: () => {
-                                    if (review_mode) {
-                                        return;
-                                    }
-                                    resetTimer();
-                                    window.setTimeout(setFen, 10);
-                                    $("#currentposition").click();
-                                },
-                            },
-                            "Set"
-                        ),
-                        m("button#reset", { disabled: !is_ready, onclick: reset }, "Reset"),
-                        m("button#undo", { disabled: !is_ready || review_mode || board_setup_mode, hidden: review_mode, onclick: undo }, "Undo"),
-                    ]),
-                    m("div#posvariantdiv", [
-                        m("p", "Position Variant Type:"),
-                        m(
-                            "select#dropdown-posvarianttype",
-                            {
-                                disabled: !is_ready || review_mode,
-                            },
-                            [
-                                m("option", { value: "(default)" }, "(default)"),
-                            ]
-                        ),
-                        m("p", "Position Variant Name:"),
-                        m(
-                            "select#dropdown-posvariantname",
-                            {
-                                disabled: !is_ready || review_mode,
-                            },
-                            []
-                        ),
-                        m("button#aboutposition", {
-                            disabled: !is_ready || review_mode,
-                        }, "About this position"),
-                    ]),
-                    m("div#input2", { hidden: during_play }, [
-                        m("input[type=number]#depth", {
-                            placeholder: "Depth",
-                            disabled: !is_ready || analysis_mode,
-                            min: 1,
-                            max: 255,
-                        }),
-                        m("input[type=number]#movetime", {
-                            placeholder: "Movetime",
-                            disabled: !is_ready || analysis_mode,
-                            min: 0,
-                        }),
-                        m("input[type=number]#threads", {
-                            placeholder: "Threads",
-                            disabled: !is_ready,
-                            min: 1,
-                            max: 512,
-                        }),
-                        m("input[type=number]#hash", {
-                            placeholder: "Hash",
-                            disabled: !is_ready,
-                            min: 1,
-                            max: 33554432,
-                        }),
-                        m("input[type=number]#multipv", {
-                            placeholder: "MultiPV",
-                            disabled: !is_ready,
-                            min: 1,
-                            max: 500,
-                        }),
-                        m("button#go", {
-                            disabled: !is_ready, onclick: () => {
-                                if ($("#advtimectrl").checked == true) {
-                                    $("#advtimectrl").click();
-                                }
-                                go();
-                            }
-                        }, "Go"),
-                        m(
-                            "button#stop",
-                            { disabled: !is_ready, onclick: force_stop },
-                            "Stop"
-                        ),
-                        m(
-                            "label#label-analysis",
-                            m("input[type=checkbox]#analysis", {
-                                checked: analysis_mode,
-                                disabled: play_white || play_black || advanced_time_control || board_setup_mode,
-                                onclick: () => {
-                                    analysis_mode = !analysis_mode;
-                                },
-                            }),
-                            "Analysis"
-                        ),
-                        m(
-                            "label",
-                            m("input[type=checkbox]#playwhite", {
-                                checked: play_white,
-                                disabled: analysis_mode || review_mode || board_setup_mode,
-                                onclick: () => {
-                                    play_white = !play_white;
-                                },
-                            }),
-                            "Engine white"
-                        ),
-                        m(
-                            "label",
-                            m("input[type=checkbox]#playblack", {
-                                checked: play_black,
-                                disabled: analysis_mode || review_mode || board_setup_mode,
-                                onclick: () => {
-                                    play_black = !play_black;
-                                },
-                            }),
-                            "Engine black"
-                        ),
-                        m(
-                            "label#label-advtimectrl",
-                            m("input[type=checkbox]#advtimectrl", {
-                                checked: advanced_time_control,
-                                disabled: analysis_mode || review_mode || board_setup_mode,
-                                onclick: () => {
-                                    advanced_time_control = !advanced_time_control;
-                                },
-                            }),
-                            "Advanced Time Control"
-                        ),
-                        m(
-                            "label#label-boardsetup",
-                            m("input[type=checkbox]#isboardsetup", {
-                                checked: board_setup_mode,
-                                disabled: analysis_mode || review_mode || advanced_time_control,
-                                onclick: () => {
-                                    board_setup_mode = !board_setup_mode;
-                                },
-                            }),
-                            "Board Setup"
-                        ),
-                        m("p#label-stm", { hidden: true }),
-                        m("input#displaymoves", {
-                            placeholder: "Moves displayed on board for analysis",
-                            hidden: true,
-                        }),
-                        m("input[type=number]#displayready", {
-                            placeholder: "Board display update ready status",
-                            hidden: true,
-                        }),
-                        m("input[type=number]#isreviewmode", {
-                            placeholder: "Stores value to judge whether it is in review mode",
-                            hidden: true,
-                        }),
-                        m("input#gameresult", {
-                            placeholder: "The game result",
-                            hidden: true,
-                            onclick: () => {
-                                displayGameResult();
-                            },
-                        }),
-                        m("p#gamestatus", {
-                            hidden: true,
-                        }, "END"),
-                        m("input[type=number]#timeoutside", {
-                            placeholder: "Stores value that the side that run out of time",
-                            hidden: true,
-                        }),
-                        m("p#set", {
-                            onclick: () => {
-                                if (review_mode) {
-                                    return;
-                                }
-                                window.setTimeout(setFen, 10);
-                            },
-                            hidden: true,
-                        }, "Set position (internal)"),
-                        m("p#loadthemes", {
-                            hidden: true,
-                            onclick: () => {
-                                LoadThemes();
-                            }
-                        }, "Load Themes (internal)"),
-                        m("p#initializethemes", {
-                            hidden: true,
-                            onclick: () => {
-                                changePieces(true);
-                                changeBoard(true);
-                            }
-                        }, "Initialize Themes (internal)"),
-                        m("p#copysetfen", {
-                            hidden: true,
-                            onclick: () => {
-                                copyText($("#fen").value);
-                            }
-                        }, "Copy Set FEN (internal)"),
-                    ]),
-                    m("div#advancedtimesettings", { hidden: !advanced_time_control || during_play }, [
-                        m("div#whitetimesettings", [
-                            m("p", "White Time Settings:  "),
-                            m(
-                                "select#dropdown-whitetimemode",
-                                {
-                                    disabled: !is_ready || review_mode,
-                                    onchange: () => {
-                                        $("#whitetimetype").innerHTML = $("#dropdown-whitetimemode").value;
-                                        //white_timer_type = $("#dropdown-whitetimemode").value;
-                                    },
-                                },
-                                [
-                                    m("option", { value: "infinite" }, "Infinite"),
-                                    m("option", { value: "tournament" }, "Tournament"),
-                                    m("option", { value: "time per move" }, "Time Per Move"),
-                                    m("option", { value: "hourglass" }, "Hourglass"),
-                                ]
-                            ),
-                            m("input[type=number]#whitestarttime", {
-                                placeholder: "Start time (ms)",
-                                disabled: !is_ready || review_mode || $("#whitetimetype").innerHTML == "infinite",
-                                min: 1,
-                            }),
-                            m("input[type=number]#whitetimegain", {
-                                placeholder: "Time gain (ms)",
-                                disabled: !is_ready || review_mode || $("#whitetimetype").innerHTML == "infinite" || $("#whitetimetype").innerHTML == "time per move" || $("#whitetimetype").innerHTML == "hourglass",
-                                min: 0,
-                            }),
-                            m("input[type=number]#whitetimemargin", {
-                                placeholder: "Time margin (ms)",
-                                disabled: !is_ready || review_mode || $("#whitetimetype").innerHTML == "infinite",
-                                min: 0,
-                            }),
-                        ]),
-                        m("div#blacktimesettings", [
-                            m("p", "Black Time Settings:  "),
-                            m(
-                                "select#dropdown-blacktimemode",
-                                {
-                                    disabled: !is_ready || review_mode,
-                                    onchange: () => {
-                                        $("#blacktimetype").innerHTML = $("#dropdown-blacktimemode").value;
-                                        //black_timer_type = $("#dropdown-blacktimemode").value;
-                                    },
-                                },
-                                [
-                                    m("option", { value: "infinite" }, "Infinite"),
-                                    m("option", { value: "tournament" }, "Tournament"),
-                                    m("option", { value: "time per move" }, "Time Per Move"),
-                                    m("option", { value: "hourglass" }, "Hourglass"),
-                                ]
-                            ),
-                            m("input[type=number]#blackstarttime", {
-                                placeholder: "Start time (ms)",
-                                disabled: !is_ready || review_mode || $("#blacktimetype").innerHTML == "infinite",
-                                min: 1,
-                            }),
-                            m("input[type=number]#blacktimegain", {
-                                placeholder: "Time gain (ms)",
-                                disabled: !is_ready || review_mode || $("#blacktimetype").innerHTML == "infinite" || $("#blacktimetype").innerHTML == "time per move" || $("#blacktimetype").innerHTML == "hourglass",
-                                min: 0,
-                            }),
-                            m("input[type=number]#blacktimemargin", {
-                                placeholder: "Time margin (ms)",
-                                disabled: !is_ready || review_mode || $("#blacktimetype").innerHTML == "infinite",
-                                min: 0,
-                            }),
-                        ]),
-                        m("div#gamecontrol-start", [
-                            m("button#gamestart", { disabled: !is_ready || review_mode, onclick: goWithTimeControl }, "Start Game"),
-                            m("p", {
-                                onclick: () => {
-                                    alert("This time control system allows user select different time modes for two sides and gives user more choice on time odds settings.\nThe time modes are:\nInfinite: Selected side has infinite time\nTournament: Selected side has limited time and may get a time increment after a move\nTime per move: Selected side need to make each move within a fixed time limit\nHourglass: Selected side has limited time and used time will be added to opponent's time.\nNote: if you set engine's time mode to infinite, it will think forever!");
-                                }
-                            }, "[Why can I choose different time modes for two sides?]"),
-                            m("p", {
-                                onclick: () => {
-                                    alert("Start time: The initial time at the beginning of the game. Not applicable to infinite.\nTime gain: Get a time increment of this many milliseconds after every move. Only applicable to tournament.\nTime margin: The time can be exceeded by this many milliseconds. The remaining time will be shown as minus numbers if exceeded. Not applicable to infinite.");
-                                }
-                            }, "  [What are these parameters?]"),
-                        ]),
-                    ]),
-                    m("div#gamesettings", [
-                        m("p", {}, "Quick promote/demote to piece: "),
-                        m(
-                            "select#dropdown-quickpromotion",
-                            {
-                                disabled: !is_ready || review_mode || board_setup_mode,
-                            },
-                            [
-                                m("option", { value: "" }, "<DISABLED>"),
-                                m("option", { value: "a" }, "a"),
-                                m("option", { value: "b" }, "b"),
-                                m("option", { value: "c" }, "c"),
-                                m("option", { value: "d" }, "d"),
-                                m("option", { value: "e" }, "e"),
-                                m("option", { value: "f" }, "f"),
-                                m("option", { value: "g" }, "g"),
-                                m("option", { value: "h" }, "h"),
-                                m("option", { value: "i" }, "i"),
-                                m("option", { value: "j" }, "j"),
-                                m("option", { value: "k" }, "k"),
-                                m("option", { value: "l" }, "l"),
-                                m("option", { value: "m" }, "m"),
-                                m("option", { value: "n" }, "n"),
-                                m("option", { value: "o" }, "o"),
-                                m("option", { value: "p" }, "p"),
-                                m("option", { value: "q" }, "q"),
-                                m("option", { value: "r" }, "r"),
-                                m("option", { value: "s" }, "s"),
-                                m("option", { value: "t" }, "t"),
-                                m("option", { value: "u" }, "u"),
-                                m("option", { value: "v" }, "v"),
-                                m("option", { value: "w" }, "w"),
-                                m("option", { value: "x" }, "x"),
-                                m("option", { value: "y" }, "y"),
-                                m("option", { value: "z" }, "z"),
-                                m("option", { value: "+" }, "Promote (+)"),
-                                m("option", { value: "-" }, "Demote (-)"),
-                                m("option", { value: "=" }, "Keep (=)"),
-                            ]
-                        ),
-                        m(
-                            "label",
-                            m("input[type=checkbox]#clickclickmove", { disabled: review_mode }),
-                            "Click-click move"
-                        ),
-                    ]),
-                    m("div#boardsetupsettings", { hidden: !board_setup_mode }, [
-                        m("p", "Board Setup:"),
-                        m("div#boardpiecechange", { disabled: !is_ready }, [
-                            m("select#dropdown-setpiece", [
-                                m("option", { value: "<move>" }, "<move>"),
-                                m("option", { value: "<delete>" }, "<delete>"),
-                                m("option", { value: "b" }, "b"),
-                                m("option", { value: "k" }, "k"),
-                                m("option", { value: "n" }, "n"),
-                                m("option", { value: "p" }, "p"),
-                                m("option", { value: "q" }, "q"),
-                                m("option", { value: "r" }, "r"),
-                                m("option", { value: "B" }, "B"),
-                                m("option", { value: "K" }, "K"),
-                                m("option", { value: "N" }, "N"),
-                                m("option", { value: "P" }, "P"),
-                                m("option", { value: "Q" }, "Q"),
-                                m("option", { value: "R" }, "R"),
-                            ]),
-                            m(
-                                "button#addtopocket",
-                                { disabled: !is_ready },
-                                "Add piece to pocket"
-                            ),
-                            m(
-                                "button#clearboard",
-                                { disabled: !is_ready },
-                                "Clear Board"
-                            ),
-                            m(
-                                "button#initboardpos",
-                                { disabled: !is_ready },
-                                "Reset Board"
-                            ),
-                            m(
-                                "button#validatepos",
-                                { disabled: !is_ready },
-                                "Validate Position"
-                            ),
-                            m(
-                                "button#boardsetupcopyfen",
-                                { disabled: !is_ready },
-                                "Copy FEN"
-                            ),
-                        ]),
-                        m("div#pocketpiecechange", { hidden: true }, [
-                            m("form#pieceinpocket", { disabled: !is_ready }, [
-                                m("table#tablepieceinpocket", [
-                                    m("tr", [
-                                        m("td", "Piece ID"),
-                                        m("td", "Amount"),
-                                    ]),
-                                ]),
-                            ]),
-                        ]),
-                    ]),
-                    m("div#outputs", [
-                        m("div", [
-                            m("div#chessground-container-div.defaultboard.default.board8x8", [
-                                m("div.cg-wrap.pocket-top", [m("div#pocket-top")]),
-                                m("div#chessground-board"),
-                                m("div.cg-wrap.pocket-bottom", [m("div#pocket-bottom")]),
-                            ]),
-                            m("div#boardsetupsettings2", { hidden: !board_setup_mode }, [
-                                m("div", [
-                                    m("p","Side to move:"),
-                                    m("select#dropdown-sidetomove", [
-                                        m("option", { value: "white/red/sente" }, "white/red/sente"),
-                                        m("option", { value: "black/black/gote" }, "black/black/gote"),
-                                    ]),
-                                ]),
-                                m("div", [
-                                    m(
-                                        "label",
-                                        m("input[type=checkbox]#whitekingsidecastle"),
-                                        "White O-O"
-                                    ),
-                                    m(
-                                        "label",
-                                        m("input[type=checkbox]#whitequeensidecastle"),
-                                        "White O-O-O"
-                                    ),
-                                    m(
-                                        "label",
-                                        m("input[type=checkbox]#blackkingsidecastle"),
-                                        "Black O-O"
-                                    ),
-                                    m(
-                                        "label",
-                                        m("input[type=checkbox]#blackqueensidecastle"),
-                                        "Black O-O-O"
-                                    ),
-                                ]),
-                                m("div", [
-                                    m("input[type=number]#halfmoveclock", {
-                                        placeholder: "Half move clock",
-                                        min: 0,
-                                    }),
-                                    m("input[type=number]#whiteremainingchecks", {
-                                        placeholder: "White remaining checks",
-                                        min: 0,
-                                    }),
-                                    m("input[type=number]#blackremainingchecks", {
-                                        placeholder: "Black remaining checks",
-                                        min: 0,
-                                    }),
-                                    m("input[type=number]#currentmovenum", {
-                                        placeholder: "Current move number",
-                                        min: 1,
-                                    }),
-                                ]),
-                                m("div", [
-                                    m("input[type=number]#enpassantfile", {
-                                        placeholder: "En passant file number",
-                                        min: 1,
-                                    }),
-                                    m("input[type=number]#enpassantrank", {
-                                        placeholder: "En passant rank number",
-                                        min: 1,
-                                    }),
-                                ]),
-                                m("div", [
-                                    m("input#seirwangatingfiles", {
-                                        placeholder: "Seirawan gating files (e.g. ABab)",
-                                    }),
-                                ]),
-                            ]),
-                            m("div#movecontrol", { hidden: during_play }, [
-                                m("button#initialposition", { onclick: displayInitialPosition, disabled: !is_ready }, "Initial Position"),
-                                m("button#currentposition", { onclick: displayCurrentPosition, disabled: !is_ready }, "Current Position"),
-                                m("button#previousposition", { onclick: displayPreviousMove, disabled: !is_ready }, "Previous Position"),
-                                m("button#nextposition", { onclick: displayNextMove, disabled: !is_ready }, "Next Position"),
-                                m("input[type=number]#gotomovenum", {
-                                    placeholder: "Half Move Number",
-                                    disabled: !is_ready,
-                                    min: 0,
-                                }),
-                                m("button#specifiedposition", { onclick: displaySpecifiedPosition, disabled: !is_ready }, "Go to Move"),
-                            ]),
-                            m("p", { hidden: !review_mode }, "Review mode enabled."),
-                            m("p", { hidden: !review_mode }, "You can go to previous moves played to analyze your game, but you cannot make changes to the game. To exit review mode, click <reset> or <current position>."),
-                            m("div#controls", [
-                                m("div", [
-                                    m("button", {
-                                        onclick: () => {
-                                            changePieces(false);
-                                        }
-                                    }, "Change pieces"),
-                                    m("button", {
-                                        onclick: () => {
-                                            changeBoard(false);
-                                        }
-                                    }, "Change board"),
-                                    m("button#button-flip", "Flip Board"),
-                                ]),
-                                m("div", [
-                                    m(
-                                        "input[type=range]#range-volume",
-                                        { min: 0, max: 1, step: 0.05 },
-                                        "range"
-                                    ),
-                                    m(
-                                        "label",
-                                        m("input[type=checkbox]#check-dests", {
-                                            checked: show_dests,
-                                            onclick: () => {
-                                                show_dests = !show_dests;
-                                            },
-                                        }),
-                                        "Show Legal Moves"
-                                    ),
-                                    m(
-                                        "label",
-                                        m("input[type=checkbox]#check-adjudicate", {
-                                            checked: adjudicate,
-                                            onclick: () => {
-                                                adjudicate = !adjudicate;
-                                            },
-                                        }),
-                                        "Adjudicate"
-                                    ),
-                                ]),
-                            ]),
-                            m("div#links", [
-                                m("a[href='./index.html']", "play"),
-                                m("a[href='./advanced.html']", "advanced"),
-                                m("a[href='https://github.com/ianfab/fairyground']", "github"),
-                            ]),
-                        ]),
-                        m("div#info", [
-                            m("p#positioninfo", ""),
-                            m("p#currentboardfen"),
-                            m("p#label-pgn"),
-                            m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
-                            m("div#timers", { hidden: !advanced_time_control }, [
-                                m("div#whitetimer", [
-                                    m("p", "White Time"),
-                                    m("p#whitetime", "--"),
-                                    m("p#whitetimetype", "infinite"),
-                                ]),
-                                m("div#blacktimer", [
-                                    m("p", "Black Time"),
-                                    m("p#blacktime", "--"),
-                                    m("p#blacktimetype", "infinite"),
-                                ]),
-                            ]),
-                            m("div#timecontrolduringplay", { hidden: !advanced_time_control || !during_play }, [
-                                m("button#addtimeforwhite", {
-                                    onclick: () => {
-                                        white_remaining_time = (+white_remaining_time) + 10000;
-                                    },
-                                }, "Add 10s for white"),
-                                m("button#addtimeforblack", {
-                                    onclick: () => {
-                                        black_remaining_time = (+black_remaining_time) + 10000;
-                                    },
-                                }, "Add 10s for black"),
-                                m("button#gameabort", {
-                                    onclick: () => {
-                                        if (confirm("Are you sure to abort the game?")) {
-                                            gameAbort();
-                                        }
-                                    },
-                                }, "ABORT GAME"),
-                            ]),
-                        ]),
-                    ]),
-                ]);
-            };
-
-            return { oninit, view };
-        };
-
-        if (!isSupported()) {
-            window.alert(
-                "Your browser is not supported. For more information, please take a look at https://github.com/hi-ogawa/Stockfish/wiki."
+    const LoadThemes = () => {
+      themes = [[], [], []];
+      function StartLoad(data) {
+        console.log(`${typeof data}`);
+        data = data.replace(/\r\n/g, "\n");
+        data = data.replace(/\r/g, "\n");
+        let rawText = data.split("\n");
+        console.log("raw:", rawText);
+        let i = 0;
+        let j = 0;
+        let css_name = "";
+        let index = 0;
+        let require_list = [];
+        let themesettings = [];
+        let apply_to_all_list = [];
+        let loaded_css_list = [];
+        let require_board_list = [];
+        let board_apply_to_all_list = [];
+        let themeavailable = [];
+        let boardthemeavailable = [];
+        let link = null;
+        for (i = 0; i < rawText.length; i++) {
+          if (rawText[i].length < 1 || rawText[i].charAt(0) == "#") {
+            continue;
+          }
+          themesettings = rawText[i].trim().split("|");
+          if (themesettings.length != 3) {
+            console.warn(
+              `At line ${i} in paragraph of themes.html: Bad syntax\n`
             );
-        } else {
-            m.mount($("#root"), App);
+            continue;
+          }
+          themeavailable = themesettings[1].split(",");
+          boardthemeavailable = themesettings[2].split(",");
+          if (themeavailable.length == 1 && themeavailable[0] == "") {
+            themeavailable = [];
+          }
+          if (boardthemeavailable.length == 1 && boardthemeavailable[0] == "") {
+            boardthemeavailable = [];
+          }
+          if (
+            (themesettings[1].length < 1 && themesettings[2].length < 1) ||
+            themeavailable.includes("") ||
+            boardthemeavailable.includes("")
+          ) {
+            console.warn(
+              `At line ${i} in paragraph of themes.html: Piece and Board style names must not be both null or contain null element\n`
+            );
+            continue;
+          }
+          if (themesettings[1].length > 0) {
+            require_list = themeavailable.filter((element) => {
+              return element.charAt(0) == "@";
+            });
+            themeavailable = themeavailable.filter((element) => {
+              return element.charAt(0) != "@";
+            });
+            for (j = 0; j < require_list.length; j++) {
+              if (themes[0].includes(require_list[j].substring(1))) {
+                index = themes[0].indexOf(require_list[j].substring(1));
+                themeavailable = themeavailable.concat(themes[1][index]);
+              } else {
+                console.warn(
+                  `At line ${i} in paragraph of themes.html: Variant ${require_list[
+                    j
+                  ].substring(
+                    1
+                  )} has not been defined yet. You need to put it before this line.\n`
+                );
+              }
+            }
+            themeavailable = uniqArr(themeavailable);
+          }
+          if (themesettings[2].length > 0) {
+            require_board_list = boardthemeavailable.filter((element) => {
+              return element.charAt(0) == "@";
+            });
+            boardthemeavailable = boardthemeavailable.filter((element) => {
+              return element.charAt(0) != "@";
+            });
+            for (j = 0; j < require_board_list.length; j++) {
+              if (themes[0].includes(require_board_list[j].substring(1))) {
+                index = themes[0].indexOf(require_board_list[j].substring(1));
+                boardthemeavailable = boardthemeavailable.concat(
+                  themes[2][index]
+                );
+              } else {
+                console.warn(
+                  `At line ${i} in paragraph of themes.html: Variant ${require_board_list[
+                    j
+                  ].substring(
+                    1
+                  )} has not been defined yet. You need to put it before this line.\n`
+                );
+              }
+            }
+            boardthemeavailable = uniqArr(boardthemeavailable);
+          }
+          if (themesettings[0] == "*") {
+            if (themesettings[1].length > 0) {
+              apply_to_all_list = apply_to_all_list.concat(themeavailable);
+            }
+            if (themesettings[2].length > 0) {
+              board_apply_to_all_list =
+                board_apply_to_all_list.concat(boardthemeavailable);
+            }
+          } else if (themes[0].includes(themesettings[0])) {
+            if (themesettings[1].length > 0) {
+              index = themes[0].indexOf(themesettings[0]);
+              themes[1][index] = uniqArr(
+                themes[1][index].concat(themeavailable)
+              );
+            }
+            if (themesettings[2].length > 0) {
+              index = themes[0].indexOf(themesettings[0]);
+              themes[2][index] = uniqArr(
+                themes[2][index].concat(boardthemeavailable)
+              );
+            }
+          } else {
+            themeavailable = uniqArr(themeavailable.concat(apply_to_all_list));
+            boardthemeavailable = uniqArr(
+              boardthemeavailable.concat(board_apply_to_all_list)
+            );
+            themes[0].push(themesettings[0]);
+            themes[1].push(themeavailable);
+            themes[2].push(boardthemeavailable);
+          }
         }
-    </script>
+        for (i = 0; i < themes[0].length; i++) {
+          for (j = 0; j < themes[1][i].length; j++) {
+            css_name = "theme-piece-" + themes[1][i][j];
+            if (loaded_css_list.includes(css_name)) {
+              continue;
+            }
+            loaded_css_list.push(css_name);
+            link = document.createElement("link");
+            link.setAttribute("rel", "stylesheet");
+            link.setAttribute("href", "./assets/" + css_name + ".css");
+            document.head.appendChild(link);
+          }
+          for (j = 0; j < themes[2][i].length; j++) {
+            css_name = "theme-board-" + themes[2][i][j];
+            if (loaded_css_list.includes(css_name)) {
+              continue;
+            }
+            loaded_css_list.push(css_name);
+            link = document.createElement("link");
+            link.setAttribute("rel", "stylesheet");
+            link.setAttribute("href", "./assets/" + css_name + ".css");
+            document.head.appendChild(link);
+          }
+        }
+        console.log(themes);
+      }
+      let data = "";
+      this.getFileFromServer("./themes.txt", (res) => {
+        console.log("res:", res);
+        StartLoad(res);
+      });
+    };
+
+    const App = () => {
+      let stockfish = null;
+      let stockfish_state = "INIT"; // 'READY', 'FAILED'
+      let output2 = "";
+      let show_dests = true;
+      let adjudicate = true;
+      let analysis_mode = false;
+      let play_white = false;
+      let play_black = false;
+      let play_move = false;
+      let review_mode = false;
+      let board_setup_mode = false;
+      let advanced_time_control = false;
+      let during_play = false;
+      let white_remaining_time = 0;
+      let black_remaining_time = 0;
+      let white_moving_time_list = [];
+      let black_moving_time_list = [];
+      let white_time_gain = 0;
+      let black_time_gain = 0;
+      let white_timer_type = "infinite";
+      let black_timer_type = "infinite";
+      let timer_interval = 100;
+      let white_time_margin = 0;
+      let black_time_margin = 0;
+      let previous_mover = "";
+      let timer;
+
+      let variants = [];
+
+      const getVariants = () => {
+        stockfish.postMessage(`uci`);
+      };
+
+      const setVariant = () => {
+        play_move = false;
+        stop();
+        const variant = $("#dropdown-variant").value;
+        stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
+        stockfish.postMessage(`position startpos`);
+        $("#fen").value = "";
+        $("#move").value = "";
+        resetTimer();
+      };
+
+      const setFen = () => {
+        stop();
+        const fen = $("#fen").value;
+        const moves = $("#move").value;
+
+        if (fen.length > 0) {
+          stockfish.postMessage(`position fen ${fen} moves ${moves}`);
+        } else {
+          stockfish.postMessage(`position startpos moves ${moves}`);
+        }
+        const stm = $("#label-stm").innerText;
+        if (
+          stm != "undefined" &&
+          (analysis_mode ||
+            (play_white && stm == "white") ||
+            (play_black && stm == "black"))
+        )
+          setTimeout(go(), 10);
+      };
+
+      const totalMoveNumber = () => {
+        let listlength = 0;
+        let i = 0;
+        moves_split = $("#move").value.split(" ");
+        for (i = 0; i < moves_split.length; i++) {
+          if (moves_split[i].length == 0) {
+            continue;
+          }
+          listlength++;
+        }
+        return listlength;
+      };
+
+      const displayMove = (movenum, is_force_stop) => {
+        if (
+          $("#displayready").value.length > 0 &&
+          $("#displayready").value > 0
+        ) {
+          //$("#displayready").value = 0, displayMove() is ready
+          return;
+        }
+        $("#displayready").value = 2; //2 = displayMove() working
+        let i = 0;
+        let j = 0;
+        moves_split = $("#move").value.split(" ");
+        if (movenum == -1) {
+          if (is_force_stop) {
+            force_stop();
+          } else {
+            stop();
+          }
+          $("#displaymoves").value = $("#move").value;
+          review_mode = false;
+          $("#isreviewmode").value = 0;
+        } else if (movenum > totalMoveNumber() || movenum < -1) {
+          console.log(`${movenum} is out of range for move number.`);
+          return;
+        } else {
+          if (is_force_stop) {
+            force_stop();
+          } else {
+            stop();
+          }
+          review_mode = true;
+          $("#isreviewmode").value = 1;
+          $("#displaymoves").value = "";
+          for (i = 0, j = 0; j < movenum; i++, j++) {
+            if (moves_split[i].length == 0) {
+              j--;
+              continue;
+            }
+            $("#displaymoves").value = $("#displaymoves").value.concat(
+              moves_split[i]
+            );
+            if (j < movenum - 1) {
+              $("#displaymoves").value = $("#displaymoves").value.concat(" ");
+            }
+          }
+        }
+        const fen = $("#fen").value;
+        const display_moves = $("#displaymoves").value;
+        if (fen.length > 0) {
+          stockfish.postMessage(`position fen ${fen} moves ${display_moves}`);
+        } else {
+          stockfish.postMessage(`position startpos moves ${display_moves}`);
+        }
+        console.log(`${display_moves}`);
+        $("#displayready").value = 1; //1 = updateChessBoardToPosition() working
+      };
+
+      const displayNextMove = () => {
+        if ($("#gotomovenum").value.length <= 0) {
+          $("#gotomovenum").value = totalMoveNumber();
+        } else {
+          if ($("#gotomovenum").value < 0) {
+            $("#gotomovenum").value = 0;
+          } else if ($("#gotomovenum").value >= totalMoveNumber()) {
+            $("#gotomovenum").value = totalMoveNumber();
+          } else {
+            $("#gotomovenum").value++;
+          }
+        }
+        if ($("#advtimectrl").checked == true) {
+          $("#advtimectrl").click();
+        }
+        displayMove($("#gotomovenum").value, true);
+      };
+
+      const displayPreviousMove = () => {
+        if ($("#gotomovenum").value.length <= 0) {
+          $("#gotomovenum").value = totalMoveNumber();
+        } else {
+          if ($("#gotomovenum").value <= 0) {
+            $("#gotomovenum").value = 0;
+          } else if ($("#gotomovenum").value > totalMoveNumber()) {
+            $("#gotomovenum").value = totalMoveNumber();
+          } else {
+            $("#gotomovenum").value--;
+          }
+        }
+        if ($("#advtimectrl").checked == true) {
+          $("#advtimectrl").click();
+        }
+        displayMove($("#gotomovenum").value, true);
+      };
+
+      const displayInitialPosition = () => {
+        $("#gotomovenum").value = 0;
+        if ($("#advtimectrl").checked == true) {
+          $("#advtimectrl").click();
+        }
+        displayMove(0, true);
+      };
+
+      const displayCurrentPosition = () => {
+        $("#gotomovenum").value = totalMoveNumber();
+        console.log(`Current: ${!during_play}`);
+        displayMove(-1, !during_play);
+      };
+
+      const displaySpecifiedPosition = () => {
+        if ($("#gotomovenum").value.length <= 0) {
+          $("#gotomovenum").value = totalMoveNumber();
+        }
+        if ($("#gotomovenum").value < 0) {
+          $("#gotomovenum").value = 0;
+        } else if ($("#gotomovenum").value > totalMoveNumber()) {
+          $("#gotomovenum").value = totalMoveNumber();
+        }
+        if ($("#advtimectrl").checked == true) {
+          $("#advtimectrl").click();
+        }
+        displayMove($("#gotomovenum").value, true);
+      };
+
+      const reset = () => {
+        review_mode = false;
+        board_setup_mode = false;
+        $("#fen").value = "";
+        $("#move").value = "";
+        resetTimer();
+        setFen();
+        $("#currentposition").click();
+      };
+
+      const undo = () => {
+        if (review_mode || board_setup_mode) {
+          return;
+        }
+        const moves = $("#move").value;
+        $("#move").value = moves.substring(0, moves.lastIndexOf(" "));
+        resetTimer();
+        setFen();
+      };
+
+      const go = () => {
+        if (board_setup_mode) {
+          return;
+        }
+        return_early = play_move;
+        stop();
+        console.log(`return early: ${return_early}`);
+        if (return_early) return; // avoid race condition
+        let args = "";
+        const movetime = $("#movetime").value;
+        const depth = $("#depth").value;
+        const threadnum = $("#threads").value;
+        const hashsize = $("#hash").value;
+        const multiplepondervalue = $("#multipv").value;
+        let wtime = 0;
+        let btime = 0;
+        let winc = 0;
+        let binc = 0;
+        if (
+          !advanced_time_control &&
+          !analysis_mode &&
+          movetime.length > 0 &&
+          movetime > 0
+        ) {
+          args += `movetime ${movetime}`;
+        } else if (advanced_time_control) {
+          if (
+            white_timer_type == "infinite" &&
+            $("#label-stm").innerHTML == "white"
+          ) {
+            args += "infinite";
+            console.log("wtime infinite");
+          } else if (
+            black_timer_type == "infinite" &&
+            $("#label-stm").innerHTML == "black"
+          ) {
+            args += "infinite";
+            console.log("btime infinite");
+          } else {
+            if (white_timer_type == "time per move") {
+              wtime += +white_moving_time_list[0];
+              winc += +white_moving_time_list[0];
+            } else if (white_timer_type == "tournament") {
+              wtime += +(+white_remaining_time + +white_time_gain);
+              winc += +white_time_gain;
+            } else if (white_timer_type == "hourglass") {
+              //How to tell that it's hourglass to engine?
+              wtime += +white_remaining_time;
+            }
+            if (black_timer_type == "time per move") {
+              btime += +black_moving_time_list[0];
+              binc += +black_moving_time_list[0];
+            } else if (black_timer_type == "tournament") {
+              btime += +(+black_remaining_time + +black_time_gain);
+              binc = +black_time_gain;
+            } else if (black_timer_type == "hourglass") {
+              //How to tell that it's hourglass to engine?
+              btime += +black_remaining_time;
+            }
+            console.log(
+              `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`
+            );
+            args += `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`;
+            stockfish.postMessage(
+              `setoption name Move Overhead value ${timer_interval}`
+            );
+          }
+        }
+        if (!analysis_mode && depth.length > 0 && depth > 0) {
+          args += ` depth ${depth}`;
+        }
+
+        if (threadnum.length <= 0 || threadnum < 1) {
+          stockfish.postMessage(`setoption name Threads value 1`);
+        } else if (threadnum > 512) {
+          stockfish.postMessage(`setoption name Threads value 512`);
+        } else {
+          stockfish.postMessage(`setoption name Threads value ${threadnum}`);
+        }
+        stockfish.postMessage(`setoption name clear hash`);
+        if (hashsize.length <= 0 || hashsize < 1) {
+          stockfish.postMessage(`setoption name Hash value 16`);
+        } else if (hashsize > 33554432) {
+          stockfish.postMessage(`setoption name Hash value 33554432`);
+        } else {
+          stockfish.postMessage(`setoption name Hash value ${hashsize}`);
+        }
+        if (multiplepondervalue.length <= 0 || multiplepondervalue < 1) {
+          stockfish.postMessage(`setoption name MultiPV value 1`);
+        } else if (multiplepondervalue > 500) {
+          stockfish.postMessage(`setoption name Hash value 500`);
+        } else {
+          stockfish.postMessage(
+            `setoption name MultiPV value ${multiplepondervalue}`
+          );
+        }
+        stockfish.postMessage(`isready`);
+
+        const stm = $("#label-stm").innerText;
+        play_move =
+          (play_white && stm == "white") || (play_black && stm == "black");
+        stockfish.postMessage(`go ${args}`);
+        output2 = "";
+      };
+
+      const setupTimer = () => {
+        $("#timeoutside").value = 0;
+        white_timer_type = $("#dropdown-whitetimemode").value;
+        black_timer_type = $("#dropdown-blacktimemode").value;
+        white_remaining_time = $("#whitestarttime").value;
+        black_remaining_time = $("#blackstarttime").value;
+        if (white_remaining_time.length < 1 || white_remaining_time < 1) {
+          white_remaining_time = 600000;
+        }
+        if (black_remaining_time.length < 1 || black_remaining_time < 1) {
+          black_remaining_time = 600000;
+        }
+        white_time_gain = $("#whitetimegain").value;
+        black_time_gain = $("#blacktimegain").value;
+        if (white_time_gain.length < 1 || white_time_gain < 0) {
+          white_time_gain = 0;
+        }
+        if (black_time_gain.length < 1 || black_time_gain < 0) {
+          black_time_gain = 0;
+        }
+        white_time_margin = $("#whitetimemargin").value;
+        black_time_margin = $("#blacktimemargin").value;
+        if (white_time_margin.length < 1 || white_time_margin < 0) {
+          white_time_margin = 0;
+        }
+        if (black_time_margin.length < 1 || black_time_margin < 0) {
+          black_time_margin = 0;
+        }
+        white_moving_time_list = [];
+        black_moving_time_list = [];
+        white_moving_time_list.push(white_remaining_time); //Start time white
+        black_moving_time_list.push(black_remaining_time); //Start time black
+        $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 1000)}`;
+        $("#blacktime").innerHTML = `${parseInt(black_remaining_time / 1000)}`;
+        if (white_timer_type == "infinite") {
+          $("#whitetime").innerHTML = "INFINITY";
+        }
+        if (black_timer_type == "infinite") {
+          $("#blacktime").innerHTML = "INFINITY";
+        }
+        previous_mover = "";
+      };
+
+      const resetTimer = () => {
+        $("#whitetime").innerHTML = "--";
+        $("#blacktime").innerHTML = "--";
+        previous_mover = "";
+        $("#timeoutside").value = 0;
+      };
+
+      function updateTimer() {
+        if ($("#gamestatus").innerHTML == "END") {
+          deleteTimer();
+          gameEnd();
+          return;
+        }
+        $("#gamestatus").click();
+        console.log(`${$("#gamestatus").innerHTML}`);
+        if ($("#gamestatus").innerHTML == "PLAYING_WHITE") {
+          if (previous_mover == "") {
+            if (white_timer_type == "tournament") {
+              white_remaining_time =
+                +white_remaining_time + +white_time_gain + +timer_interval;
+            }
+            white_moving_time_list.push(white_remaining_time); //Time stamp for white's turn begin
+          } else if (previous_mover == "BLACK") {
+            black_moving_time_list.push(black_remaining_time); //Time stamp for black's turn end
+            if (black_remaining_time < 0) {
+              black_remaining_time = 0;
+            }
+            if (white_timer_type == "tournament") {
+              white_remaining_time =
+                +white_remaining_time + +white_time_gain + +timer_interval;
+            } else if (white_timer_type == "time per move") {
+              white_remaining_time =
+                +white_moving_time_list[0] + +timer_interval;
+            }
+            if (black_timer_type == "hourglass") {
+              white_remaining_time =
+                +white_remaining_time +
+                +black_moving_time_list.at(-2) -
+                +black_moving_time_list.at(-1) +
+                +timer_interval;
+            }
+            white_moving_time_list.push(white_remaining_time); //Time stamp for white's turn begin
+          }
+          if (white_timer_type == "infinite") {
+            previous_mover = "WHITE";
+            return;
+          }
+          white_remaining_time = white_remaining_time - timer_interval;
+          if (white_remaining_time < -white_time_margin) {
+            deleteTimer();
+            $("#timeoutside").value = 1;
+            timeIsUpFor("WHITE");
+            return;
+          }
+          if (white_timer_type == "infinite") {
+            $("#whitetime").innerHTML = "INFINITY";
+          } else if (white_remaining_time >= 10000) {
+            $("#whitetime").innerHTML = `${parseInt(
+              white_remaining_time / 1000
+            )}`;
+          } else {
+            $("#whitetime").innerHTML = `${
+              parseInt(white_remaining_time / 100) / 10
+            }`;
+          }
+          if (black_timer_type == "infinite") {
+            $("#blacktime").innerHTML = "INFINITY";
+          } else if (black_remaining_time >= 10000) {
+            $("#blacktime").innerHTML = `${parseInt(
+              black_remaining_time / 1000
+            )}`;
+          } else {
+            $("#blacktime").innerHTML = `${
+              parseInt(black_remaining_time / 100) / 10
+            }`;
+          }
+          previous_mover = "WHITE";
+        } else if ($("#gamestatus").innerHTML == "PLAYING_BLACK") {
+          if (previous_mover == "") {
+            if (black_timer_type == "tournament") {
+              black_remaining_time =
+                +black_remaining_time + +black_time_gain + +timer_interval;
+            }
+            black_moving_time_list.push(black_remaining_time); //Time stamp for black's turn begin
+          } else if (previous_mover == "WHITE") {
+            white_moving_time_list.push(white_remaining_time); //Time stamp for white's turn end
+            if (white_remaining_time < 0) {
+              white_remaining_time = 0;
+            }
+            if (black_timer_type == "tournament") {
+              black_remaining_time =
+                +black_remaining_time + +black_time_gain + +timer_interval;
+            } else if (black_timer_type == "time per move") {
+              black_remaining_time =
+                +black_moving_time_list[0] + +timer_interval;
+            }
+            if (white_timer_type == "hourglass") {
+              black_remaining_time =
+                +black_remaining_time +
+                +white_moving_time_list.at(-2) -
+                +white_moving_time_list.at(-1) +
+                +timer_interval;
+            }
+            black_moving_time_list.push(black_remaining_time); //Time stamp for black's turn begin
+          }
+          if (black_timer_type == "infinite") {
+            previous_mover = "BLACK";
+            return;
+          }
+          black_remaining_time = black_remaining_time - timer_interval;
+          if (black_remaining_time < -black_time_margin) {
+            deleteTimer();
+            $("#timeoutside").value = 2;
+            timeIsUpFor("BLACK");
+            return;
+          }
+          if (white_timer_type == "infinite") {
+            $("#whitetime").innerHTML = "INFINITY";
+          } else if (white_remaining_time >= 10000) {
+            $("#whitetime").innerHTML = `${parseInt(
+              white_remaining_time / 1000
+            )}`;
+          } else {
+            $("#whitetime").innerHTML = `${
+              parseInt(white_remaining_time / 100) / 10
+            }`;
+          }
+          if (black_timer_type == "infinite") {
+            $("#blacktime").innerHTML = "INFINITY";
+          } else if (black_remaining_time >= 10000) {
+            $("#blacktime").innerHTML = `${parseInt(
+              black_remaining_time / 1000
+            )}`;
+          } else {
+            $("#blacktime").innerHTML = `${
+              parseInt(black_remaining_time / 100) / 10
+            }`;
+          }
+          previous_mover = "BLACK";
+        }
+      }
+
+      const createTimer = () => {
+        timer = setInterval(() => {
+          updateTimer();
+        }, timer_interval);
+        console.log(`${timer}`);
+      };
+
+      const deleteTimer = () => {
+        console.log("Timer delete!");
+        clearInterval(timer);
+      };
+
+      const timeIsUpFor = (side) => {
+        force_stop();
+        if (side == "WHITE") {
+          white_remaining_time = 0;
+          $("#timeoutside").value = 1;
+          $("#whitetime").innerHTML = "Out Of Time";
+        } else if (side == "BLACK") {
+          black_remaining_time = 0;
+          $("#timeoutside").value = 2;
+          $("#blacktime").innerHTML = "Out Of Time";
+        }
+        $("#gamestatus").click();
+        gameEnd();
+      };
+
+      const gameEnd = () => {
+        during_play = false;
+        //advanced_time_control = false;
+        force_stop();
+        $("#currentposition").click();
+        $("#input").style.display = "";
+        $("#input2").style.display = "";
+        $("#posvariantdiv").style.display = "";
+      };
+
+      const gameAbort = () => {
+        deleteTimer();
+        $("#gamestatus").innerHTML = "END";
+        gameEnd();
+      };
+
+      const goWithTimeControl = () => {
+        if ($("#gamestatus").innerHTML != "END") {
+          return;
+        }
+        //We need to prevent user from doing unnecessary actions during countdown, so we'll hide these divs
+        $("#input").style.display = "none"; //These divs are unable to be hidden by {hidden: during_play}
+        $("#input2").style.display = "none";
+        $("#posvariantdiv").style.display = "none";
+        //$("#movecontrol").style.display = "none";
+        resetTimer();
+        setupTimer();
+        $("#gamestatus").click();
+        during_play = true;
+        $("#currentposition").click();
+        createTimer();
+        const stm = $("#label-stm").innerText;
+        console.log(
+          `white: ${play_white} black: ${play_black} move: ${
+            (play_white && stm == "white") || (play_black && stm == "black")
+          }`
+        );
+        if ((play_white && stm == "white") || (play_black && stm == "black")) {
+          console.log("Go!");
+          go();
+        }
+      };
+
+      const stop = () => {
+        stockfish.postMessage(`stop`);
+      };
+
+      const force_stop = () => {
+        play_white = play_black = false;
+        stop();
+      };
+
+      const changePieces = (onlyChangeWhenInvalid) => {
+        let index = 0;
+        let themename = "";
+        let classes = [];
+        let DOMListValue = "";
+        const el = $("#chessground-container-div");
+        index = themes[0].indexOf($("#dropdown-variant").value);
+        if (index < 0 || $("#dropdown-variant").value == "") {
+          index = themes[0].indexOf("");
+        }
+        if (index < 0) {
+          themename = "default";
+        } else {
+          classes = themes[1][index];
+          if (classes.length < 1) {
+            classes = themes[1][themes[0].indexOf("")];
+          }
+        }
+        DOMListValue = el.classList.value.split(" ");
+        if (classes.length > 0) {
+          index = classes.indexOf(DOMListValue[1]) + 1;
+          if (onlyChangeWhenInvalid) {
+            if (index != 0) {
+              console.log("No need to change piece.");
+              return;
+            }
+          }
+          if (index >= classes.length) {
+            index = 0;
+          }
+          themename = classes[index];
+        } else {
+          themename = "default";
+        }
+        DOMListValue[1] = themename;
+        el.classList.value = DOMListValue.join(" ");
+        console.log(`Piece theme: ${themename}`);
+        //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
+        //const nextIndex = (activeIndex + 1) % classes.length;
+        //el.classList.replace(classes[activeIndex], classes[nextIndex]);
+      };
+
+      const changeBoard = (onlyChangeWhenInvalid) => {
+        let index = 0;
+        let boardthemename = "";
+        let classes = [];
+        let DOMListValue = "";
+        const el = $("#chessground-container-div");
+        index = themes[0].indexOf($("#dropdown-variant").value);
+        if (index < 0 || $("#dropdown-variant").value == "") {
+          index = themes[0].indexOf("");
+        }
+        if (index < 0) {
+          boardthemename = "defaultboard";
+        } else {
+          classes = themes[2][index];
+          if (classes.length < 1) {
+            classes = themes[2][themes[0].indexOf("")];
+          }
+        }
+        DOMListValue = el.classList.value.split(" ");
+        if (classes.length > 0) {
+          index = classes.indexOf(DOMListValue[0]) + 1;
+          if (onlyChangeWhenInvalid) {
+            if (index != 0) {
+              console.log("No need to change board.");
+              return;
+            }
+          }
+          if (index >= classes.length) {
+            index = 0;
+          }
+          boardthemename = classes[index];
+        } else {
+          boardthemename = "defaultboard";
+        }
+        DOMListValue[0] = boardthemename;
+        el.classList.value = DOMListValue.join(" ");
+        console.log(`Board theme: ${boardthemename}`);
+        //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
+        //const nextIndex = (activeIndex + 1) % classes.length;
+        //el.classList.replace(classes[activeIndex], classes[nextIndex]);
+      };
+
+      const scrollOutput = () => {
+        $("#output2").scrollTo({
+          top: $("#output2").scrollHeight,
+          behavior: "smooth",
+        });
+      };
+
+      const displayGameResult = () => {
+        let i = 0;
+        let chi = document.getElementsByTagName("spangameresult");
+        for (i = 0; i < chi.length; i++) {
+          document.body.removeChild(chi[i]);
+        }
+        if (review_mode) {
+          return;
+        }
+        var span = document.createElement("spangameresult");
+        span.innerHTML = $("#gameresult").value;
+        span.style.left = window.innerWidth / 2 + "px";
+        span.style.top = window.innerHeight / 2 + "px";
+        setTimeout(function () {
+          span.style.opacity = "1";
+          span.style.transform = "scale(40)";
+        }, 100);
+        setTimeout(function () {
+          span.style.opacity = "0";
+          span.style.transform = "scale(0.02)";
+        }, 2600);
+        document.body.appendChild(span);
+      };
+
+      // Make error catchable
+      const loadStockfish = async (params) => {
+        return await Stockfish(params);
+      };
+
+      const onFinishDownload = (data) => {
+        if (!data) {
+          stockfish_state = "FAILED";
+          m.redraw();
+          return;
+        }
+
+        loadStockfish({ wasmBinary: data })
+          .then((_stockfish) => {
+            stockfish = _stockfish;
+            stockfish_state = "READY";
+            stockfish.addMessageListener((line) => {
+              if (line.startsWith("option")) {
+                if (line.startsWith("option name UCI_Variant")) {
+                  variants = line
+                    .replace(
+                      "option name UCI_Variant type combo default chess var ",
+                      ""
+                    )
+                    .replace(/ var /g, " ")
+                    .split(" ");
+                }
+              } else if (line.startsWith(" ")) {
+              } else {
+                if (!review_mode && line.startsWith("bestmove") && play_move) {
+                  play_move = false;
+                  $("#move").value += " " + line.split(" ")[1];
+                  $("#set").click();
+                }
+                output2 += line + "\n";
+              }
+              m.redraw();
+            });
+            getVariants();
+          })
+          .catch((e) => {
+            stockfish_state = "FAILED";
+            throw e;
+          })
+          .finally(() => m.redraw());
+      };
+
+      const onSelectNnueFile = async (e) => {
+        const selected = e.currentTarget.files[0];
+        if (selected) {
+          //
+          // TODO:
+          // On Archlinux Chromium 92.0.4515.107, most of times this code fails with the error saying:
+          //   TypeError: Failed to execute 'decode' on 'TextDecoder': The provided ArrayBufferView value must not be shared.
+          // On the other hand, either Chrome with the same version or Firefox never fail.
+          //
+          const FS = stockfish.FS;
+          const buffer = await selected.arrayBuffer();
+          const array = new Uint8Array(buffer);
+          const filename = "/" + selected.name;
+          FS.writeFile(filename, array);
+          stockfish.postMessage(`setoption name EvalFile value ${filename}`);
+          // Automatically set variant
+          const variant = selected.name.split(/[_.-]+/)[0];
+          $("#dropdown-variant").value = variant;
+          $("#dropdown-variant").dispatchEvent(new Event("change"));
+        }
+      };
+
+      const onSelectVariantsFile = async (e) => {
+        const selected = e.currentTarget.files[0];
+        //console.log(`${selected}`);
+        if (selected) {
+          const FS = stockfish.FS;
+          const buffer = await selected.arrayBuffer();
+          const array = new Uint8Array(buffer);
+          const filename = "/" + selected.name;
+          FS.writeFile(filename, array);
+          stockfish.postMessage(`check ${filename}`);
+          stockfish.postMessage(`load ${filename}`);
+          getVariants();
+        }
+      };
+
+      const oninit = () => {
+        stockfish_state = "LOADING";
+      };
+
+      const view = () => {
+        const is_ready = stockfish_state == "READY";
+
+        return m("main", [
+          m("p#pagetitle", "Advanced"),
+          m("div#misc", [
+            m("div", [
+              `Fairy-Stockfish: ${stockfish_state} - download: `,
+              m(RequestProgress, {
+                url: "./lib/stockfish.wasm",
+                onFinishDownload,
+              }),
+            ]),
+            m("div", { hidden: during_play }, [
+              "- nnue file: ",
+              m("input", {
+                type: "file",
+                disabled: !is_ready,
+                onchange: onSelectNnueFile,
+              }),
+              m(
+                "span",
+                {
+                  style: "cursor: pointer;",
+                  onclick: () =>
+                    window.alert(
+                      "You can upload a Fairy-Stockfish compatible .nnue file. Downloads: https://fairy-stockfish.github.io/nnue/#current-best-nnue-networks."
+                    ),
+                },
+                "[?]"
+              ),
+            ]),
+            m("div", { hidden: during_play }, [
+              "- variants.ini: ",
+              m("input#variants-ini", {
+                type: "file",
+                disabled: !is_ready || review_mode || board_setup_mode,
+                onchange: onSelectVariantsFile,
+              }),
+              m(
+                "span",
+                {
+                  style: "cursor: pointer;",
+                  onclick: () =>
+                    window.alert(
+                      "You can upload a Fairy-Stockfish compatible variants.ini file. See here for details: https://github.com/ianfab/Fairy-Stockfish/wiki/Variant-configuration."
+                    ),
+                },
+                "[?]"
+              ),
+            ]),
+            m("div", { hidden: during_play }, [
+              "- positionvariants.txt: ",
+              m("input#posvariant-txt", {
+                type: "file",
+                disabled: !is_ready || review_mode || board_setup_mode,
+              }),
+              m(
+                "span",
+                {
+                  style: "cursor: pointer;",
+                  onclick: () =>
+                    window.alert(
+                      "You can select a Position Variant file to load different positions for different variants. Contents will be appended to the position variants provided by the server."
+                    ),
+                },
+                "[?]"
+              ),
+            ]),
+          ]),
+          m("div#input", { hidden: during_play }, [
+            m(
+              "select#dropdown-variant",
+              {
+                disabled: !is_ready || review_mode || board_setup_mode,
+                onchange: (e) => {
+                  window.setTimeout(setVariant, 10);
+                },
+              },
+              [
+                m("option", { value: "" }, "-- VARIANT --"),
+                ...variants.map((ex, index) => m("option", { value: ex }, ex)),
+              ]
+            ),
+            m("input#fen", {
+              placeholder: "Input FEN Here",
+              disabled: !is_ready || review_mode,
+              onkeyup: (e) => {
+                if (e.keyCode != 13) {
+                  e.redraw = false;
+                  return;
+                }
+                setFen();
+              },
+            }),
+            m("input#move", {
+              placeholder: "Input Move Here",
+              disabled: !is_ready || review_mode,
+              onkeyup: (e) => {
+                if (e.keyCode != 13) {
+                  e.redraw = false;
+                  return;
+                }
+                setFen();
+              },
+            }),
+            m(
+              "button#setpos",
+              {
+                disabled: !is_ready || review_mode,
+                onclick: () => {
+                  if (review_mode) {
+                    return;
+                  }
+                  resetTimer();
+                  window.setTimeout(setFen, 10);
+                  $("#currentposition").click();
+                },
+              },
+              "Set"
+            ),
+            m("button#reset", { disabled: !is_ready, onclick: reset }, "Reset"),
+            m(
+              "button#undo",
+              {
+                disabled: !is_ready || review_mode || board_setup_mode,
+                hidden: review_mode,
+                onclick: undo,
+              },
+              "Undo"
+            ),
+          ]),
+          m("div#posvariantdiv", [
+            m("p", "Position Variant Type:"),
+            m(
+              "select#dropdown-posvarianttype",
+              {
+                disabled: !is_ready || review_mode,
+              },
+              [m("option", { value: "(default)" }, "(default)")]
+            ),
+            m("p", "Position Variant Name:"),
+            m(
+              "select#dropdown-posvariantname",
+              {
+                disabled: !is_ready || review_mode,
+              },
+              []
+            ),
+            m(
+              "button#aboutposition",
+              {
+                disabled: !is_ready || review_mode,
+              },
+              "About this position"
+            ),
+          ]),
+          m("div#input2", { hidden: during_play }, [
+            m("input[type=number]#depth", {
+              placeholder: "Depth",
+              disabled: !is_ready || analysis_mode,
+              min: 1,
+              max: 255,
+            }),
+            m("input[type=number]#movetime", {
+              placeholder: "Movetime",
+              disabled: !is_ready || analysis_mode,
+              min: 0,
+            }),
+            m("input[type=number]#threads", {
+              placeholder: "Threads",
+              disabled: !is_ready,
+              min: 1,
+              max: 512,
+            }),
+            m("input[type=number]#hash", {
+              placeholder: "Hash",
+              disabled: !is_ready,
+              min: 1,
+              max: 33554432,
+            }),
+            m("input[type=number]#multipv", {
+              placeholder: "MultiPV",
+              disabled: !is_ready,
+              min: 1,
+              max: 500,
+            }),
+            m(
+              "button#go",
+              {
+                disabled: !is_ready,
+                onclick: () => {
+                  if ($("#advtimectrl").checked == true) {
+                    $("#advtimectrl").click();
+                  }
+                  go();
+                },
+              },
+              "Go"
+            ),
+            m(
+              "button#stop",
+              { disabled: !is_ready, onclick: force_stop },
+              "Stop"
+            ),
+            m(
+              "label#label-analysis",
+              m("input[type=checkbox]#analysis", {
+                checked: analysis_mode,
+                disabled:
+                  play_white ||
+                  play_black ||
+                  advanced_time_control ||
+                  board_setup_mode,
+                onclick: () => {
+                  analysis_mode = !analysis_mode;
+                },
+              }),
+              "Analysis"
+            ),
+            m(
+              "label",
+              m("input[type=checkbox]#playwhite", {
+                checked: play_white,
+                disabled: analysis_mode || review_mode || board_setup_mode,
+                onclick: () => {
+                  play_white = !play_white;
+                },
+              }),
+              "Engine white"
+            ),
+            m(
+              "label",
+              m("input[type=checkbox]#playblack", {
+                checked: play_black,
+                disabled: analysis_mode || review_mode || board_setup_mode,
+                onclick: () => {
+                  play_black = !play_black;
+                },
+              }),
+              "Engine black"
+            ),
+            m(
+              "label#label-advtimectrl",
+              m("input[type=checkbox]#advtimectrl", {
+                checked: advanced_time_control,
+                disabled: analysis_mode || review_mode || board_setup_mode,
+                onclick: () => {
+                  advanced_time_control = !advanced_time_control;
+                },
+              }),
+              "Advanced Time Control"
+            ),
+            m(
+              "label#label-boardsetup",
+              m("input[type=checkbox]#isboardsetup", {
+                checked: board_setup_mode,
+                disabled: analysis_mode || review_mode || advanced_time_control,
+                onclick: () => {
+                  board_setup_mode = !board_setup_mode;
+                },
+              }),
+              "Board Setup"
+            ),
+            m("p#label-stm", { hidden: true }),
+            m("input#displaymoves", {
+              placeholder: "Moves displayed on board for analysis",
+              hidden: true,
+            }),
+            m("input[type=number]#displayready", {
+              placeholder: "Board display update ready status",
+              hidden: true,
+            }),
+            m("input[type=number]#isreviewmode", {
+              placeholder: "Stores value to judge whether it is in review mode",
+              hidden: true,
+            }),
+            m("input#gameresult", {
+              placeholder: "The game result",
+              hidden: true,
+              onclick: () => {
+                displayGameResult();
+              },
+            }),
+            m(
+              "p#gamestatus",
+              {
+                hidden: true,
+              },
+              "END"
+            ),
+            m("input[type=number]#timeoutside", {
+              placeholder: "Stores value that the side that run out of time",
+              hidden: true,
+            }),
+            m(
+              "p#set",
+              {
+                onclick: () => {
+                  if (review_mode) {
+                    return;
+                  }
+                  window.setTimeout(setFen, 10);
+                },
+                hidden: true,
+              },
+              "Set position (internal)"
+            ),
+            m(
+              "p#loadthemes",
+              {
+                hidden: true,
+                onclick: () => {
+                  LoadThemes();
+                },
+              },
+              "Load Themes (internal)"
+            ),
+            m(
+              "p#initializethemes",
+              {
+                hidden: true,
+                onclick: () => {
+                  changePieces(true);
+                  changeBoard(true);
+                },
+              },
+              "Initialize Themes (internal)"
+            ),
+            m(
+              "p#copysetfen",
+              {
+                hidden: true,
+                onclick: () => {
+                  copyText($("#fen").value);
+                },
+              },
+              "Copy Set FEN (internal)"
+            ),
+          ]),
+          m(
+            "div#advancedtimesettings",
+            { hidden: !advanced_time_control || during_play },
+            [
+              m("div#whitetimesettings", [
+                m("p", "White Time Settings:  "),
+                m(
+                  "select#dropdown-whitetimemode",
+                  {
+                    disabled: !is_ready || review_mode,
+                    onchange: () => {
+                      $("#whitetimetype").innerHTML = $(
+                        "#dropdown-whitetimemode"
+                      ).value;
+                      //white_timer_type = $("#dropdown-whitetimemode").value;
+                    },
+                  },
+                  [
+                    m("option", { value: "infinite" }, "Infinite"),
+                    m("option", { value: "tournament" }, "Tournament"),
+                    m("option", { value: "time per move" }, "Time Per Move"),
+                    m("option", { value: "hourglass" }, "Hourglass"),
+                  ]
+                ),
+                m("input[type=number]#whitestarttime", {
+                  placeholder: "Start time (ms)",
+                  disabled:
+                    !is_ready ||
+                    review_mode ||
+                    $("#whitetimetype").innerHTML == "infinite",
+                  min: 1,
+                }),
+                m("input[type=number]#whitetimegain", {
+                  placeholder: "Time gain (ms)",
+                  disabled:
+                    !is_ready ||
+                    review_mode ||
+                    $("#whitetimetype").innerHTML == "infinite" ||
+                    $("#whitetimetype").innerHTML == "time per move" ||
+                    $("#whitetimetype").innerHTML == "hourglass",
+                  min: 0,
+                }),
+                m("input[type=number]#whitetimemargin", {
+                  placeholder: "Time margin (ms)",
+                  disabled:
+                    !is_ready ||
+                    review_mode ||
+                    $("#whitetimetype").innerHTML == "infinite",
+                  min: 0,
+                }),
+              ]),
+              m("div#blacktimesettings", [
+                m("p", "Black Time Settings:  "),
+                m(
+                  "select#dropdown-blacktimemode",
+                  {
+                    disabled: !is_ready || review_mode,
+                    onchange: () => {
+                      $("#blacktimetype").innerHTML = $(
+                        "#dropdown-blacktimemode"
+                      ).value;
+                      //black_timer_type = $("#dropdown-blacktimemode").value;
+                    },
+                  },
+                  [
+                    m("option", { value: "infinite" }, "Infinite"),
+                    m("option", { value: "tournament" }, "Tournament"),
+                    m("option", { value: "time per move" }, "Time Per Move"),
+                    m("option", { value: "hourglass" }, "Hourglass"),
+                  ]
+                ),
+                m("input[type=number]#blackstarttime", {
+                  placeholder: "Start time (ms)",
+                  disabled:
+                    !is_ready ||
+                    review_mode ||
+                    $("#blacktimetype").innerHTML == "infinite",
+                  min: 1,
+                }),
+                m("input[type=number]#blacktimegain", {
+                  placeholder: "Time gain (ms)",
+                  disabled:
+                    !is_ready ||
+                    review_mode ||
+                    $("#blacktimetype").innerHTML == "infinite" ||
+                    $("#blacktimetype").innerHTML == "time per move" ||
+                    $("#blacktimetype").innerHTML == "hourglass",
+                  min: 0,
+                }),
+                m("input[type=number]#blacktimemargin", {
+                  placeholder: "Time margin (ms)",
+                  disabled:
+                    !is_ready ||
+                    review_mode ||
+                    $("#blacktimetype").innerHTML == "infinite",
+                  min: 0,
+                }),
+              ]),
+              m("div#gamecontrol-start", [
+                m(
+                  "button#gamestart",
+                  {
+                    disabled: !is_ready || review_mode,
+                    onclick: goWithTimeControl,
+                  },
+                  "Start Game"
+                ),
+                m(
+                  "p",
+                  {
+                    onclick: () => {
+                      alert(
+                        "This time control system allows user select different time modes for two sides and gives user more choice on time odds settings.\nThe time modes are:\nInfinite: Selected side has infinite time\nTournament: Selected side has limited time and may get a time increment after a move\nTime per move: Selected side need to make each move within a fixed time limit\nHourglass: Selected side has limited time and used time will be added to opponent's time.\nNote: if you set engine's time mode to infinite, it will think forever!"
+                      );
+                    },
+                  },
+                  "[Why can I choose different time modes for two sides?]"
+                ),
+                m(
+                  "p",
+                  {
+                    onclick: () => {
+                      alert(
+                        "Start time: The initial time at the beginning of the game. Not applicable to infinite.\nTime gain: Get a time increment of this many milliseconds after every move. Only applicable to tournament.\nTime margin: The time can be exceeded by this many milliseconds. The remaining time will be shown as minus numbers if exceeded. Not applicable to infinite."
+                      );
+                    },
+                  },
+                  "  [What are these parameters?]"
+                ),
+              ]),
+            ]
+          ),
+          m("div#gamesettings", [
+            m("p", {}, "Quick promote/demote to piece: "),
+            m(
+              "select#dropdown-quickpromotion",
+              {
+                disabled: !is_ready || review_mode || board_setup_mode,
+              },
+              [
+                m("option", { value: "" }, "<DISABLED>"),
+                m("option", { value: "a" }, "a"),
+                m("option", { value: "b" }, "b"),
+                m("option", { value: "c" }, "c"),
+                m("option", { value: "d" }, "d"),
+                m("option", { value: "e" }, "e"),
+                m("option", { value: "f" }, "f"),
+                m("option", { value: "g" }, "g"),
+                m("option", { value: "h" }, "h"),
+                m("option", { value: "i" }, "i"),
+                m("option", { value: "j" }, "j"),
+                m("option", { value: "k" }, "k"),
+                m("option", { value: "l" }, "l"),
+                m("option", { value: "m" }, "m"),
+                m("option", { value: "n" }, "n"),
+                m("option", { value: "o" }, "o"),
+                m("option", { value: "p" }, "p"),
+                m("option", { value: "q" }, "q"),
+                m("option", { value: "r" }, "r"),
+                m("option", { value: "s" }, "s"),
+                m("option", { value: "t" }, "t"),
+                m("option", { value: "u" }, "u"),
+                m("option", { value: "v" }, "v"),
+                m("option", { value: "w" }, "w"),
+                m("option", { value: "x" }, "x"),
+                m("option", { value: "y" }, "y"),
+                m("option", { value: "z" }, "z"),
+                m("option", { value: "+" }, "Promote (+)"),
+                m("option", { value: "-" }, "Demote (-)"),
+                m("option", { value: "=" }, "Keep (=)"),
+              ]
+            ),
+            m(
+              "label",
+              m("input[type=checkbox]#clickclickmove", {
+                disabled: review_mode,
+              }),
+              "Click-click move"
+            ),
+          ]),
+          m("div#boardsetupsettings", { hidden: !board_setup_mode }, [
+            m("p", "Board Setup:"),
+            m("div#boardpiecechange", { disabled: !is_ready }, [
+              m("select#dropdown-setpiece", [
+                m("option", { value: "<move>" }, "<move>"),
+                m("option", { value: "<delete>" }, "<delete>"),
+                m("option", { value: "b" }, "b"),
+                m("option", { value: "k" }, "k"),
+                m("option", { value: "n" }, "n"),
+                m("option", { value: "p" }, "p"),
+                m("option", { value: "q" }, "q"),
+                m("option", { value: "r" }, "r"),
+                m("option", { value: "B" }, "B"),
+                m("option", { value: "K" }, "K"),
+                m("option", { value: "N" }, "N"),
+                m("option", { value: "P" }, "P"),
+                m("option", { value: "Q" }, "Q"),
+                m("option", { value: "R" }, "R"),
+              ]),
+              m(
+                "button#addtopocket",
+                { disabled: !is_ready },
+                "Add piece to pocket"
+              ),
+              m("button#clearboard", { disabled: !is_ready }, "Clear Board"),
+              m("button#initboardpos", { disabled: !is_ready }, "Reset Board"),
+              m(
+                "button#validatepos",
+                { disabled: !is_ready },
+                "Validate Position"
+              ),
+              m(
+                "button#boardsetupcopyfen",
+                { disabled: !is_ready },
+                "Copy FEN"
+              ),
+            ]),
+            m("div#pocketpiecechange", { hidden: true }, [
+              m("form#pieceinpocket", { disabled: !is_ready }, [
+                m("table#tablepieceinpocket", [
+                  m("tr", [m("td", "Piece ID"), m("td", "Amount")]),
+                ]),
+              ]),
+            ]),
+          ]),
+          m("div#outputs", [
+            m("div", [
+              m("div#chessground-container-div.defaultboard.default.board8x8", [
+                m("div.cg-wrap.pocket-top", [m("div#pocket-top")]),
+                m("div#chessground-board"),
+                m("div.cg-wrap.pocket-bottom", [m("div#pocket-bottom")]),
+              ]),
+              m("div#boardsetupsettings2", { hidden: !board_setup_mode }, [
+                m("div", [
+                  m("p", "Side to move:"),
+                  m("select#dropdown-sidetomove", [
+                    m(
+                      "option",
+                      { value: "white/red/sente" },
+                      "white/red/sente"
+                    ),
+                    m(
+                      "option",
+                      { value: "black/black/gote" },
+                      "black/black/gote"
+                    ),
+                  ]),
+                ]),
+                m("div", [
+                  m(
+                    "label",
+                    m("input[type=checkbox]#whitekingsidecastle"),
+                    "White O-O"
+                  ),
+                  m(
+                    "label",
+                    m("input[type=checkbox]#whitequeensidecastle"),
+                    "White O-O-O"
+                  ),
+                  m(
+                    "label",
+                    m("input[type=checkbox]#blackkingsidecastle"),
+                    "Black O-O"
+                  ),
+                  m(
+                    "label",
+                    m("input[type=checkbox]#blackqueensidecastle"),
+                    "Black O-O-O"
+                  ),
+                ]),
+                m("div", [
+                  m("input[type=number]#halfmoveclock", {
+                    placeholder: "Half move clock",
+                    min: 0,
+                  }),
+                  m("input[type=number]#whiteremainingchecks", {
+                    placeholder: "White remaining checks",
+                    min: 0,
+                  }),
+                  m("input[type=number]#blackremainingchecks", {
+                    placeholder: "Black remaining checks",
+                    min: 0,
+                  }),
+                  m("input[type=number]#currentmovenum", {
+                    placeholder: "Current move number",
+                    min: 1,
+                  }),
+                ]),
+                m("div", [
+                  m("input[type=number]#enpassantfile", {
+                    placeholder: "En passant file number",
+                    min: 1,
+                  }),
+                  m("input[type=number]#enpassantrank", {
+                    placeholder: "En passant rank number",
+                    min: 1,
+                  }),
+                ]),
+                m("div", [
+                  m("input#seirwangatingfiles", {
+                    placeholder: "Seirawan gating files (e.g. ABab)",
+                  }),
+                ]),
+              ]),
+              m("div#movecontrol", { hidden: during_play }, [
+                m(
+                  "button#initialposition",
+                  { onclick: displayInitialPosition, disabled: !is_ready },
+                  "Initial Position"
+                ),
+                m(
+                  "button#currentposition",
+                  { onclick: displayCurrentPosition, disabled: !is_ready },
+                  "Current Position"
+                ),
+                m(
+                  "button#previousposition",
+                  { onclick: displayPreviousMove, disabled: !is_ready },
+                  "Previous Position"
+                ),
+                m(
+                  "button#nextposition",
+                  { onclick: displayNextMove, disabled: !is_ready },
+                  "Next Position"
+                ),
+                m("input[type=number]#gotomovenum", {
+                  placeholder: "Half Move Number",
+                  disabled: !is_ready,
+                  min: 0,
+                }),
+                m(
+                  "button#specifiedposition",
+                  { onclick: displaySpecifiedPosition, disabled: !is_ready },
+                  "Go to Move"
+                ),
+              ]),
+              m("p", { hidden: !review_mode }, "Review mode enabled."),
+              m(
+                "p",
+                { hidden: !review_mode },
+                "You can go to previous moves played to analyze your game, but you cannot make changes to the game. To exit review mode, click <reset> or <current position>."
+              ),
+              m("div#controls", [
+                m("div", [
+                  m(
+                    "button",
+                    {
+                      onclick: () => {
+                        changePieces(false);
+                      },
+                    },
+                    "Change pieces"
+                  ),
+                  m(
+                    "button",
+                    {
+                      onclick: () => {
+                        changeBoard(false);
+                      },
+                    },
+                    "Change board"
+                  ),
+                  m("button#button-flip", "Flip Board"),
+                ]),
+                m("div", [
+                  m(
+                    "input[type=range]#range-volume",
+                    { min: 0, max: 1, step: 0.05 },
+                    "range"
+                  ),
+                  m(
+                    "label",
+                    m("input[type=checkbox]#check-dests", {
+                      checked: show_dests,
+                      onclick: () => {
+                        show_dests = !show_dests;
+                      },
+                    }),
+                    "Show Legal Moves"
+                  ),
+                  m(
+                    "label",
+                    m("input[type=checkbox]#check-adjudicate", {
+                      checked: adjudicate,
+                      onclick: () => {
+                        adjudicate = !adjudicate;
+                      },
+                    }),
+                    "Adjudicate"
+                  ),
+                ]),
+              ]),
+              m("div#links", [
+                m("a[href='./index.html']", "play"),
+                m("a[href='./advanced.html']", "advanced"),
+                m("a[href='https://github.com/ianfab/fairyground']", "github"),
+              ]),
+            ]),
+            m("div#info", [
+              m("p#positioninfo", ""),
+              m("p#currentboardfen"),
+              m("p#label-pgn"),
+              m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
+              m("div#timers", { hidden: !advanced_time_control }, [
+                m("div#whitetimer", [
+                  m("p", "White Time"),
+                  m("p#whitetime", "--"),
+                  m("p#whitetimetype", "infinite"),
+                ]),
+                m("div#blacktimer", [
+                  m("p", "Black Time"),
+                  m("p#blacktime", "--"),
+                  m("p#blacktimetype", "infinite"),
+                ]),
+              ]),
+              m(
+                "div#timecontrolduringplay",
+                { hidden: !advanced_time_control || !during_play },
+                [
+                  m(
+                    "button#addtimeforwhite",
+                    {
+                      onclick: () => {
+                        white_remaining_time = +white_remaining_time + 10000;
+                      },
+                    },
+                    "Add 10s for white"
+                  ),
+                  m(
+                    "button#addtimeforblack",
+                    {
+                      onclick: () => {
+                        black_remaining_time = +black_remaining_time + 10000;
+                      },
+                    },
+                    "Add 10s for black"
+                  ),
+                  m(
+                    "button#gameabort",
+                    {
+                      onclick: () => {
+                        if (confirm("Are you sure to abort the game?")) {
+                          gameAbort();
+                        }
+                      },
+                    },
+                    "ABORT GAME"
+                  ),
+                ]
+              ),
+            ]),
+          ]),
+        ]);
+      };
+
+      return { oninit, view };
+    };
+
+    if (!isSupported()) {
+      window.alert(
+        "Your browser is not supported. For more information, please take a look at https://github.com/hi-ogawa/Stockfish/wiki."
+      );
+    } else {
+      m.mount($("#root"), App);
+    }
+  </script>
 </body>
