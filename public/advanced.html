@@ -1625,7 +1625,7 @@
 
         return m("main", [
           m("p#pagetitle", "Advanced analysis"),
-          m("div#misc", [
+          m("div#misc", { hidden: during_play }, [
             m("div", [
               `Fairy-Stockfish: ${stockfish_state} - download: `,
               m(RequestProgress, {
