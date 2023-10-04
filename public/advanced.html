@@ -164,11 +164,6 @@
     cursor: pointer;
   }
 
-  #input #dropdown-variant {
-    width: 120px;
-    background: #eee;
-  }
-
   #gamesettings #dropdown-quickpromotion {
     width: 120px;
     background: #eee;
@@ -196,6 +191,11 @@
   #posvariantdiv {
     display: flex;
     margin-bottom: 10px;
+  }
+
+  #posvariantdiv #dropdown-variant {
+    width: 150px;
+    background: #eee;
   }
 
   #posvariantdiv #dropdown-posvarianttype {
@@ -507,6 +507,7 @@
     background: #888;
     color: #fff;
     font-weight: bold;
+    font-size: 24px;
     margin-right: 6px;
     cursor: pointer;
   }
@@ -1690,7 +1691,8 @@
               ),
             ]),
           ]),
-          m("div#input", { hidden: during_play }, [
+          m("div#posvariantdiv", [
+            m("p", "Variant:"),
             m(
               "select#dropdown-variant",
               {
@@ -1704,6 +1706,32 @@
                 ...variants.map((ex, index) => m("option", { value: ex }, ex)),
               ]
             ),
+            m("p", "Custom Position Type:"),
+            m(
+              "select#dropdown-posvarianttype",
+              {
+                disabled: !is_ready || review_mode,
+              },
+              [m("option", { value: "(default)" }, "(default)")]
+            ),
+            m("p", "Custom Position Name:"),
+            m(
+              "select#dropdown-posvariantname",
+              {
+                disabled: !is_ready || review_mode,
+              },
+              []
+            ),
+            m(
+              "button#aboutposition",
+              {
+                disabled: !is_ready || review_mode,
+              },
+              "About this position"
+            ),
+          ]),
+          m("div#input", { hidden: during_play }, [
+            m("p", "Position:"),
             m("input#fen", {
               placeholder: "Input FEN Here",
               disabled: !is_ready || review_mode,
@@ -1752,32 +1780,8 @@
               "Undo"
             ),
           ]),
-          m("div#posvariantdiv", [
-            m("p", "Position Variant Type:"),
-            m(
-              "select#dropdown-posvarianttype",
-              {
-                disabled: !is_ready || review_mode,
-              },
-              [m("option", { value: "(default)" }, "(default)")]
-            ),
-            m("p", "Position Variant Name:"),
-            m(
-              "select#dropdown-posvariantname",
-              {
-                disabled: !is_ready || review_mode,
-              },
-              []
-            ),
-            m(
-              "button#aboutposition",
-              {
-                disabled: !is_ready || review_mode,
-              },
-              "About this position"
-            ),
-          ]),
           m("div#input2", { hidden: during_play }, [
+            m("p", "Settings:"),
             m("input[type=number]#depth", {
               placeholder: "Depth",
               disabled: !is_ready || analysis_mode,
