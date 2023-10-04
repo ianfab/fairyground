@@ -1,0 +1,48 @@
+.wikim .cg-wrap piece.p-piece.white {
+  background-image: url('images/pieces/wikim/wP.svg');
+}
+.wikim .cg-wrap piece.n-piece.white {
+  background-image: url('images/pieces/wikim/wN.svg');
+}
+.wikim .cg-wrap piece.r-piece.white {
+  background-image: url('images/pieces/wikim/wR.svg');
+}
+.wikim .cg-wrap piece.k-piece.white {
+  background-image: url('images/pieces/wikim/wK.svg');
+}
+.wikim .cg-wrap piece.a-piece.white {
+  background-image: url('images/pieces/wikim/wA.svg');
+}
+.wikim .cg-wrap piece.c-piece.white {
+  background-image: url('images/pieces/wikim/wC.svg');
+}
+.wikim .cg-wrap piece.b-piece.white {
+  background-image: url('images/pieces/wikim/wB.svg');
+}
+
+
+.wikim .cg-wrap piece.p-piece.black {
+  background-image: url('images/pieces/wikim/bP.svg');
+}
+.wikim .cg-wrap piece.b-piece.black {
+  background-image: url('images/pieces/wikim/bB.svg');
+}
+.wikim .cg-wrap piece.n-piece.black {
+  background-image: url('images/pieces/wikim/bN.svg');
+}
+.wikim .cg-wrap piece.r-piece.black {
+  background-image: url('images/pieces/wikim/bR.svg');
+}
+.wikim .cg-wrap piece.k-piece.black {
+  background-image: url('images/pieces/wikim/bK.svg');
+}
+.wikim .cg-wrap piece.a-piece.black {
+  background-image: url('images/pieces/wikim/bA.svg');
+}
+.wikim .cg-wrap piece.c-piece.black {
+  background-image: url('images/pieces/wikim/bC.svg');
+}
+
+.wikim .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

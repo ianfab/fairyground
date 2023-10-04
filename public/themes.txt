@@ -1,0 +1,100 @@
+#Theme settings file for fairyground (experimental)
+#Lines start with "#" are comments.
+
+#Syntax:
+#[variant_name]|[piece_theme_name][,...]|[board_theme_name][,...]
+#For example:
+#1  "chess|merida,cburnett|"
+#2  "minichess||miniboard"
+#3  "aaa|bbb|ccc"
+#Adding these 3 lines in this file will tell the main webpage that:
+#"chess" will use "merida" and "cburnett" as the piece theme.
+#"minichess" will use "miniboard" as the board theme.
+#"aaa" will use "bbb" as the piece theme and "ccc" as the board theme.
+#[piece_theme_name] and [board_theme_name] can't be both empty like: "variant||".
+#[piece_theme_name] and [board_theme_name] can't be the same.
+#[piece_theme_name] and [board_theme_name] can't start with non-letter(A-Z,a-z) characters like "2dletter" or "-mytheme". (This will mess up CSS class names)
+#The CSS File of piece theme will be automatically searched at path "./assets/theme-piece-[piece_theme_name].css" (if it's defined)
+#The CSS File of board theme will be automatically searched at path "./assets/theme-board-[board_theme_name].css" (if it's defined)
+#Where "." is the location of this file.
+#If you want to add themes here, make sure that the CSS file(s) is/are placed at the location above and named correctly. (Path to picture files are defined in CSS files.)
+#[piece_theme_name] and [board_theme_name] cannot be "default" or "defaultboard". They are reserved names for default values.
+#DO NOT ADD ANY SPACES IN ANY LINE!
+
+
+#Special values:
+
+#<variant_name>:
+#1. You can leave it as empty. This will make the piece/board themes specified in this line apply to all other variants that are not given an explicit definition on piece/board theme.
+#For example: 
+#1  "|merida,cburnett|blueboard,greenboard,brownboard"
+#2  "spartan|spartan|"
+#3  "xiangqi||xiangqiboard"
+#This line makes "merida" and "cburnett" piece theme apply to xiangqi variant, while "blueboard", "greenboard" and "brownboard" board theme apply to spartan variant.
+#Since spartan variant has explicitly required that it needs "spartan" piece theme, the first line has no effect to the piece theme of spartan variant.
+#So does the board theme of xiangqi.
+#2. You can use a single asteroid (*) to act as a wildcard to make the themes apply to all lines after this line.
+#For example:
+#1  "*|letters|"
+#2  "chess|merida|"
+#3  "*|theme001|theme001board"
+#4  "shogi|portella|"
+#In this case, "letters" piece theme (line 1) will be applied to line 2 and line 4, while "theme001" piece theme and "theme001board" board theme (line 3) will be only applied to line 4.
+#This is because this wildcard can only match lines behind it.
+#So if you want to make theme001 and theme001board applies to all, you need to move it ahead of all variant theme definition lines, like this:
+#1  "*|letters|"
+#2  "*|theme001|theme001board"
+#3  "chess|merida|"
+#4  "shogi|portella|"
+#Note that the order between wildcard lines does not make any difference, for example:
+#1  "*|letters|"
+#2  "*|theme001|theme001board"
+#and
+#1  "*|theme001|theme001board"
+#2  "*|letters|"
+#have the same effect.
+
+#[piece_theme_name] and [board_theme_name]:
+#1. You may use @ at the beginning of the name to indicate that it uses the themes of another variant (reference).
+#For example:
+#1  "seirawan|seirawan,merida|"
+#2  "shouse|@seirawan|"
+#This means that "shouse" variant will use the piece theme "seirwan" and "merida", which are defined in "seirwan" variant.(@seirwan)
+#However, the reference line must be behind the line to refer to.
+#For example:
+#1  "shouse|@seirawan|"
+#2  "seirawan|seirawan,merida|"
+#You will receive a warning in console that "seirwan" variant is not defined.
+#This is because you put a reference line (line 1) ahead of the definition line (line 2, line 1 is ahead of line 2).
+#"@" works on both piece theme and board theme.
+
+#There may be some bugs in the code reading this file. If you meet one, please report it as an issue at:
+#https://github.com/ianfab/fairyground/issues
+
+
+*|letters|
+|merida,cburnett|blueboard,greenboard,brownboard,purpleboard
+
+seirawan|seirawan|
+shouse|@seirawan|
+
+spartan|spartan|
+empire|empire|
+orda|orda|
+ordamirror|ordamirror|
+ordavsempire|ordavsempire|
+synochess|synochess|
+shinobi|shinobi|
+chak|chak|chakboard
+
+shogi|portella2kanji|shogiboard
+minishogi|@shogi|minishogiboard
+
+xiangqi|x2dhanzi,wikim|xiangqiboard
+xiangqihouse|@xiangqi|@xiangqi
+minixiangqi|@xiangqi|minixiangqiboard
+
+flipello|flipello|
+flipello10|@flipello|
+flipello6|@flipello|
+flipersi|@flipello|

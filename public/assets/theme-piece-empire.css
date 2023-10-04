@@ -1,0 +1,113 @@
+.empire .cg-wrap piece.p-piece.white {
+  background-image: url('images/pieces/empire/wP.svg');
+}
+.empire .cg-wrap piece.d-piece.white {
+  background-image: url('images/pieces/empire/wD.svg');
+}
+.empire .cg-wrap piece.b-piece.white {
+  background-image: url('images/pieces/empire/wB.svg');
+}
+.empire .cg-wrap piece.n-piece.white {
+  background-image: url('images/pieces/empire/wN.svg');
+}
+.empire .cg-wrap piece.r-piece.white {
+  background-image: url('images/pieces/empire/wR.svg');
+}
+.empire .cg-wrap piece.q-piece.white {
+  background-image: url('images/pieces/empire/wQ.svg');
+}
+.empire .cg-wrap piece.k-piece.white {
+  background-image: url('images/pieces/empire/wK.svg');
+}
+.empire .cg-wrap piece.a-piece.white {
+  background-image: url('images/pieces/empire/wA.svg');
+}
+.empire .cg-wrap piece.c-piece.white {
+  background-image: url('images/pieces/empire/wC.svg');
+}
+.empire .cg-wrap piece.m-piece.white {
+  background-image: url('images/pieces/empire/wM.svg');
+}
+.empire .cg-wrap piece.f-piece.white {
+  background-image: url('images/pieces/empire/wF.svg');
+}
+.empire .cg-wrap piece.s-piece.white {
+  background-image: url('images/pieces/empire/wS.svg');
+}
+.empire .cg-wrap piece.e-piece.white {
+  background-image: url('images/pieces/empire/wE.svg');
+}
+.empire .cg-wrap piece.h-piece.white {
+  background-image: url('images/pieces/empire/wH.svg');
+}
+.empire .cg-wrap piece.l-piece.white {
+  background-image: url('images/pieces/empire/wL.svg');
+}
+.empire .cg-wrap piece.g-piece.white {
+  background-image: url('images/pieces/empire/wG.svg');
+}
+.empire .cg-wrap piece.w-piece.white {
+  background-image: url('images/pieces/empire/wW.svg');
+}
+.empire .cg-wrap piece.j-piece.white {
+  background-image: url('images/pieces/empire/wJ.svg');
+}
+.empire .cg-wrap piece.t-piece.white {
+  background-image: url('images/pieces/empire/wT.svg');
+}
+
+.empire .cg-wrap piece.p-piece.black {
+  background-image: url('images/pieces/empire/bP.svg');
+}
+.empire .cg-wrap piece.b-piece.black {
+  background-image: url('images/pieces/empire/bB.svg');
+}
+.empire .cg-wrap piece.n-piece.black {
+  background-image: url('images/pieces/empire/bN.svg');
+}
+.empire .cg-wrap piece.r-piece.black {
+  background-image: url('images/pieces/empire/bR.svg');
+}
+.empire .cg-wrap piece.q-piece.black {
+  background-image: url('images/pieces/empire/bQ.svg');
+}
+.empire .cg-wrap piece.k-piece.black {
+  background-image: url('images/pieces/empire/bK.svg');
+}
+.empire .cg-wrap piece.a-piece.black {
+  background-image: url('images/pieces/empire/bA.svg');
+}
+.empire .cg-wrap piece.c-piece.black {
+  background-image: url('images/pieces/empire/bC.svg');
+}
+.empire .cg-wrap piece.m-piece.black {
+  background-image: url('images/pieces/empire/bM.svg');
+}
+.empire .cg-wrap piece.f-piece.black {
+  background-image: url('images/pieces/empire/bF.svg');
+}
+.empire .cg-wrap piece.s-piece.black {
+  background-image: url('images/pieces/empire/bS.svg');
+}
+.empire .cg-wrap piece.e-piece.black {
+  background-image: url('images/pieces/empire/bE.svg');
+}
+.empire .cg-wrap piece.h-piece.black {
+  background-image: url('images/pieces/empire/bH.svg');
+}
+.empire .cg-wrap piece.l-piece.black {
+  background-image: url('images/pieces/empire/bL.svg');
+}
+.empire .cg-wrap piece.g-piece.black {
+  background-image: url('images/pieces/empire/bG.svg');
+}
+.empire .cg-wrap piece.w-piece.black {
+  background-image: url('images/pieces/empire/bW.svg');
+}
+.empire .cg-wrap piece.j-piece.black {
+  background-image: url('images/pieces/empire/bJ.svg');
+}
+
+.empire .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}
