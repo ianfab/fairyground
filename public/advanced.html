@@ -1160,10 +1160,10 @@
         white_remaining_time = $("#whitestarttime").value;
         black_remaining_time = $("#blackstarttime").value;
         if (white_remaining_time.length < 1 || white_remaining_time < 1) {
-          white_remaining_time = 600000;
+          white_remaining_time = play_white ? 20000 : 600000;
         }
         if (black_remaining_time.length < 1 || black_remaining_time < 1) {
-          black_remaining_time = 600000;
+          black_remaining_time = play_black ? 20000 : 600000;
         }
         white_time_gain = $("#whitetimegain").value;
         black_time_gain = $("#blacktimegain").value;
