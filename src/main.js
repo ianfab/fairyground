@@ -925,7 +925,7 @@ function validateFEN(FEN) {
   if (FEN == null) {
     return false;
   }
-  let result = ffish.validateFen(FEN);
+  let result = ffish.validateFen(FEN, dropdownVariant.value);
   if (result >= 0) {
     window.alert("No errors found.");
     return true;
