@@ -1320,10 +1320,8 @@ function afterChessgroundMove(orig, dest, metadata) {
         ""
       );
       if (choice == null) {
-        alert(
-          `Bad input: <null>. You should enter exactly one character among ${possiblepromotions}.`
-        );
-        continue;
+        afterMove(false);
+        return;
       }
       if (choice.length == 0 || choice.length > 1) {
         alert(
@@ -1366,10 +1364,8 @@ function afterChessgroundMove(orig, dest, metadata) {
         ""
       );
       if (choice == null) {
-        alert(
-          `Bad input: <null>. You should enter one option among ${possiblegatings}.`
-        );
-        continue;
+        afterMove(false);
+        return;
       }
       if (possiblegatings.includes(choice)) {
         break;
@@ -1473,10 +1469,8 @@ function afterChessgroundDrop(piece, dest, metadata) {
         ""
       );
       if (choice == null) {
-        alert(
-          `Bad input: <null>. You should enter exactly one character among ${possiblepromotions}.`
-        );
-        continue;
+        afterMove(false);
+        return;
       }
       if (choice.length == 0 || choice.length > 1) {
         alert(
