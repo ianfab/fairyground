@@ -1218,11 +1218,20 @@ function getDests(board) {
   for (let i = 0; i < moves.length; i++) {
     const move = moves[i];
     const match = move.match(/(\D\d+)(\D\d+)/);
-    if (!match) continue;
-    const from = match[1].replace("10", ":");
-    const to = match[2].replace("10", ":");
-    if (dests.get(from) === undefined) dests.set(from, []);
-    dests.get(from).push(to);
+    if (match) {
+      const from = match[1].replace("10", ":");
+      const to = match[2].replace("10", ":");
+      if (dests.get(from) === undefined) dests.set(from, []);
+      dests.get(from).push(to);
+    }
+
+    const dropmatch = move.match(/([A-Z]+@)([a-z]+[0-9]+)/);
+    if (dropmatch) {
+      const dropfrom = dropmatch[1];
+      const dropto = dropmatch[2].replace("10", ":");
+      if (dests.get(dropfrom) === undefined) dests.set(dropfrom, []);
+      dests.get(dropfrom).push(dropto);
+    }
   }
 
   return dests;
@@ -1289,6 +1298,8 @@ function afterChessgroundMove(orig, dest, metadata) {
     });
     return;
   }
+
+  //console.log("move:", orig, dest, metadata);
 
   const move = orig.replace(":", "10") + dest.replace(":", "10");
   console.log(`${move}`);
@@ -1658,8 +1669,15 @@ function updateChessground() {
     buttonUndo.disabled = true;
   } else {
     const lastMove = moveStack.split(" ").pop();
-    const lastMoveFrom = lastMove.match(/[a-z]+[0-9]+/g)[0].replace("10", ":");
-    const lastMoveTo = lastMove.match(/[a-z]+[0-9]+/g)[1].replace("10", ":");
+    let lastMoveFrom = null;
+    let lastMoveTo = null;
+    if (lastMove.includes("@")) {
+      lastMoveFrom = lastMove.match(/[A-Z]+@/g)[0];
+      lastMoveTo = lastMove.match(/[a-z]+[0-9]+/g)[0].replace("10", ":");
+    } else {
+      lastMoveFrom = lastMove.match(/[a-z]+[0-9]+/g)[0].replace("10", ":");
+      lastMoveTo = lastMove.match(/[a-z]+[0-9]+/g)[1].replace("10", ":");
+    }
     chessground.set({
       lastMove: [lastMoveFrom, lastMoveTo],
     });
