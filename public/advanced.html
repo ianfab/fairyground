@@ -67,6 +67,17 @@
     margin-bottom: 10px;
   }
 
+  #gamesettings button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-left: 6px;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
   #input #fen {
     width: 50%;
     padding: 2px 0 2px 6px;
@@ -89,6 +100,13 @@
   }
 
   #input2 #depth {
+    width: 5%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #input2 #nodes {
     width: 5%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
@@ -1044,20 +1062,16 @@
         let args = "";
         const movetime = $("#movetime").value;
         const depth = $("#depth").value;
+        const nodes = $("#nodes").value;
         const threadnum = $("#threads").value;
         const hashsize = $("#hash").value;
-        const multiplepondervalue = $("#multipv").value;
+        const multipleprincipalvariation = $("#multipv").value;
         let wtime = 0;
         let btime = 0;
         let winc = 0;
         let binc = 0;
-        if (
-          !advanced_time_control &&
-          !analysis_mode &&
-          movetime.length > 0 &&
-          movetime > 0
-        ) {
-          args += `movetime ${movetime}`;
+        if (analysis_mode) {
+          args += " infinite";
         } else if (advanced_time_control) {
           if (
             white_timer_type == "infinite" &&
@@ -1100,9 +1114,24 @@
               `setoption name Move Overhead value ${timer_interval}`
             );
           }
-        }
-        if (!analysis_mode && depth.length > 0 && depth > 0) {
-          args += ` depth ${depth}`;
+        } else {
+          if (!analysis_mode && $("#depth").validity.valid && depth > 0) {
+            args += ` depth ${depth}`;
+          }
+          if (
+            !analysis_mode &&
+            $("#movetime").validity.valid &&
+            movetime.length > 0
+          ) {
+            args += ` movetime ${movetime}`;
+          }
+          if (
+            !analysis_mode &&
+            $("#nodes").validity.valid &&
+            nodes.length > 0
+          ) {
+            args += ` nodes ${nodes}`;
+          }
         }
 
         if (threadnum.length <= 0 || threadnum < 1) {
@@ -1120,13 +1149,16 @@
         } else {
           stockfish.postMessage(`setoption name Hash value ${hashsize}`);
         }
-        if (multiplepondervalue.length <= 0 || multiplepondervalue < 1) {
+        if (
+          multipleprincipalvariation.length <= 0 ||
+          multipleprincipalvariation < 1
+        ) {
           stockfish.postMessage(`setoption name MultiPV value 1`);
-        } else if (multiplepondervalue > 500) {
+        } else if (multipleprincipalvariation > 500) {
           stockfish.postMessage(`setoption name Hash value 500`);
         } else {
           stockfish.postMessage(
-            `setoption name MultiPV value ${multiplepondervalue}`
+            `setoption name MultiPV value ${multipleprincipalvariation}`
           );
         }
         stockfish.postMessage(`isready`);
@@ -1769,6 +1801,11 @@
               disabled: !is_ready || analysis_mode,
               min: 0,
             }),
+            m("input[type=number]#nodes", {
+              placeholder: "Nodes",
+              disabled: !is_ready || analysis_mode,
+              min: 1,
+            }),
             m("input[type=number]#threads", {
               placeholder: "Threads",
               disabled: !is_ready,
@@ -2103,6 +2140,7 @@
               }),
               "Click-click move"
             ),
+            m("button#passmove", { disabled: !is_ready }, "Pass This Turn"),
           ]),
           m("div#boardsetupsettings", { hidden: !board_setup_mode }, [
             m("p", "Board Setup:"),
@@ -2160,16 +2198,8 @@
                 m("div", [
                   m("p", "Side to move:"),
                   m("select#dropdown-sidetomove", [
-                    m(
-                      "option",
-                      { value: "white/red/sente" },
-                      "white/red/sente"
-                    ),
-                    m(
-                      "option",
-                      { value: "black/black/gote" },
-                      "black/black/gote"
-                    ),
+                    m("option", { value: "white/red/sente" }, "First Mover"),
+                    m("option", { value: "black/black/gote" }, "Second Mover"),
                   ]),
                 ]),
                 m("div", [
