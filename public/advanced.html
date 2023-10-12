@@ -1118,18 +1118,10 @@
           if (!analysis_mode && $("#depth").validity.valid && depth > 0) {
             args += ` depth ${depth}`;
           }
-          if (
-            !analysis_mode &&
-            $("#movetime").validity.valid &&
-            movetime.length > 0
-          ) {
+          if (!analysis_mode && $("#movetime").validity.valid && movetime > 0) {
             args += ` movetime ${movetime}`;
           }
-          if (
-            !analysis_mode &&
-            $("#nodes").validity.valid &&
-            nodes.length > 0
-          ) {
+          if (!analysis_mode && $("#nodes").validity.valid && nodes > 0) {
             args += ` nodes ${nodes}`;
           }
         }
