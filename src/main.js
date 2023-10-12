@@ -1658,8 +1658,8 @@ function updateChessground() {
     buttonUndo.disabled = true;
   } else {
     const lastMove = moveStack.split(" ").pop();
-    const lastMoveFrom = lastMove.substring(0, 2);
-    const lastMoveTo = lastMove.substring(2, 4);
+    const lastMoveFrom = lastMove.match(/[a-z]+[0-9]+/g)[0].replace("10",":");
+    const lastMoveTo = lastMove.match(/[a-z]+[0-9]+/g)[1].replace("10", ":");
     chessground.set({
       lastMove: [lastMoveFrom, lastMoveTo],
     });
