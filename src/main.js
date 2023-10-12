@@ -70,6 +70,7 @@ const positionInformation = document.getElementById("positioninfo");
 const clickClickMove = document.getElementById("clickclickmove");
 const positionVariantTxt = document.getElementById("posvariant-txt");
 const quickPromotionPiece = document.getElementById("dropdown-quickpromotion");
+const buttonPassMove = document.getElementById("passmove");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
@@ -767,6 +768,55 @@ new Module().then((loadedModule) => {
   buttonReset.onclick = function () {
     dropdownPositionVariantType.selectedIndex = 0;
     dropdownPositionVariantType.onchange();
+  };
+
+  buttonPassMove.onclick = function () {
+    if (
+      chessground.state.movable.color == "both" ||
+      chessground.state.movable.color == undefined
+    ) {
+      return;
+    }
+    const moves = board
+      .legalMoves()
+      .trim()
+      .split(" ")
+      .filter((element) => {
+        if (typeof element != "string" || element.length < 4) {
+          return false;
+        }
+        const files = element.split(/[0-9]+/).filter((elem1) => {
+          return elem1 != "";
+        });
+        const ranks = element.split(/[a-z]+/).filter((elem1) => {
+          return elem1 != "";
+        });
+        return files[0] == files[1] && ranks[0] == ranks[1];
+      });
+    if (moves == null || moves.length == 0) {
+      alert(
+        "Cannot pass your turn currently. This variant does not allow passing or there are restrictions on passing your turn."
+      );
+      return;
+    }
+    const passmove = {
+      orig: moves[0].match(/[a-z]+[0-9]+/g)[0],
+      dest: moves[0].match(/[a-z]+[0-9]+/g)[1],
+    };
+    if (passmove.orig == null || passmove.dest == null) {
+      return;
+    }
+    afterChessgroundMove(passmove.orig, passmove.dest, {
+      premove: false,
+      ctrlKey: false,
+      holdTime: 0,
+      captured: {
+        role: null,
+        color: null,
+        promoted: false,
+      },
+      predrop: false,
+    });
   };
 
   updateChessground();
