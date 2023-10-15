@@ -564,18 +564,7 @@
     }
 
     function setVariantStylesheet(variant) {
-		let css_file = `./assets/theme-variant-${variant}.css`;
-		let xhr = new XMLHttpRequest();
-		xhr.open("GET", css_file, true);
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState === 4) {
-		        if (xhr.status === 404) {
-        			css_file = "./assets/theme-variant-.css";
-		        }
-				document.getElementById("current-variant-stylesheet").href=css_file;
-		    }
-		};
-		xhr.send();
+		document.getElementById("current-variant-stylesheet").href=`./assets/theme-variant-${variant}.css`;
     }
 
     const copyText = async (val) => {
