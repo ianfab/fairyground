@@ -564,7 +564,9 @@
     }
 
     function setVariantStylesheet(variant) {
-		document.getElementById("current-variant-stylesheet").href=`./assets/theme-variant-${variant}.css`;
+      document.getElementById(
+        "current-variant-stylesheet"
+      ).href = `./assets/theme-variant-${variant}.css`;
     }
 
     const copyText = async (val) => {
@@ -829,17 +831,16 @@
           }
         }
 
-		// Needs to be after piece and board stylesheets to override them.
-		css_name = "theme-variant-";
-		if ( !loaded_css_list.includes(css_name))
-		{
-			loaded_css_list.push(css_name);
-			link = document.createElement("link");
-			link.setAttribute("rel", "stylesheet");
-			link.setAttribute("href", "./assets/" + css_name + ".css");
-			link.setAttribute("id", "current-variant-stylesheet");
-			document.head.appendChild(link);
-		}
+        // Needs to be after piece and board stylesheets to override them.
+        css_name = "theme-variant-";
+        if (!loaded_css_list.includes(css_name)) {
+          loaded_css_list.push(css_name);
+          link = document.createElement("link");
+          link.setAttribute("rel", "stylesheet");
+          link.setAttribute("href", "./assets/" + css_name + ".css");
+          link.setAttribute("id", "current-variant-stylesheet");
+          document.head.appendChild(link);
+        }
 
         console.log(themes);
       }
@@ -892,7 +893,7 @@
         $("#move").value = "";
         resetTimer();
 
-		setVariantStylesheet(variant);
+        setVariantStylesheet(variant);
       };
 
       const setFen = () => {
