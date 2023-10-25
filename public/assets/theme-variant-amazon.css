@@ -1,0 +1,12 @@
+.cburnett .cg-wrap piece.a-piece.white {
+  background-image: url('images/variants/amazon/pieces/cburnett/Chess_alt45.svg');
+}
+.cburnett .cg-wrap piece.a-piece.black {
+  background-image: url('images/variants/amazon/pieces/cburnett/Chess_adt45.svg');
+}
+.merida .cg-wrap piece.a-piece.white {
+  background-image: url('images/variants/amazon/pieces/merida/wA.svg');
+}
+.merida .cg-wrap piece.a-piece.black {
+  background-image: url('images/variants/amazon/pieces/merida/bA.svg');
+}
