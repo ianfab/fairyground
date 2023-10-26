@@ -310,3 +310,6 @@
 .lettertiles .cg-wrap piece.pz-piece.black {
   background-image: url('images/pieces/lettertiles/b+Z.svg');
 }
+.lettertiles .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/lettertilebarrier.svg');
+}
