@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg version="1.1" xmlns = "http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="700" height="100" viewBox="0 0 700 100">
+<style>
+.dl { fill:#6882a8; fill-opacity:1; fill-rule:nonzero; stroke:none; }
+.du { fill:#758fb4; fill-opacity:1; fill-rule:nonzero; stroke:none; }
+.lu { fill:#8ea9ce; fill-opacity:1; fill-rule:nonzero; stroke:none; }
+.ll { fill:#9bb5db; fill-opacity:1; fill-rule:nonzero; stroke:none; }
+</style>
+<g id="wd"><rect class="dl" width="100" height="100" /><rect class="du" width="98" height="100" x="0" y="0" /></g>
+<g id="cl"><rect class="ll" width="100" height="100" /><rect class="lu" width="96" height="100" x="2" y="0" /></g>
+<g id="cd"><rect class="dl" width="100" height="100" /><rect class="du" width="96" height="100" x="2" y="0" /></g>
+<g id="ed"><rect class="dl" width="100" height="100" /><rect class="du" width="98" height="100" x="2" y="0" /></g>
+<use x="0" y="0" xlink:href="#wd" />
+<use x="100" y="0" xlink:href="#cl" />
+<use x="200" y="0" xlink:href="#cd" />
+<use x="300" y="0" xlink:href="#cl" />
+<use x="400" y="0" xlink:href="#cd" />
+<use x="500" y="0" xlink:href="#cl" />
+<use x="600" y="0" xlink:href="#ed" />
+</svg>

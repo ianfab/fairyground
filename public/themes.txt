@@ -73,7 +73,7 @@
 
 
 *|lettertiles,letters|
-|merida,cburnett|blueboard,greenboard,brownboard,purpleboard
+|merida,cburnett|cobaltboard,blueboard,greenboard,brownboard,purpleboard
 
 seirawan|seirawan|
 shouse|@seirawan|
