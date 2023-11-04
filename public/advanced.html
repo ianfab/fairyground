@@ -475,6 +475,13 @@
     border-right: 0;
   }
 
+  #advancedtimesettings #whitetimesettings #whitetimemargin {
+    width: 15%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
   #advancedtimesettings #blacktimesettings {
     display: flex;
     margin-bottom: 10px;
@@ -494,6 +501,13 @@
   }
 
   #advancedtimesettings #blacktimesettings #blacktimegain {
+    width: 15%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-right: 0;
+  }
+
+  #advancedtimesettings #blacktimesettings #blacktimemargin {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
@@ -874,6 +888,8 @@
       let white_timer_type = "infinite";
       let black_timer_type = "infinite";
       let timer_interval = 100;
+      let white_time_margin = 0;
+      let black_time_margin = 0;
       let timeout_margin = 500;
       let previous_mover = "";
       let timer;
@@ -1203,6 +1219,14 @@
         if (black_time_gain.length < 1 || black_time_gain < 0) {
           black_time_gain = 0;
         }
+        white_time_margin = $("#whitetimemargin").value;
+        black_time_margin = $("#blacktimemargin").value;
+        if (white_time_margin.length < 1 || white_time_margin < 0) {
+          white_time_margin = timeout_margin;
+        }
+        if (black_time_margin.length < 1 || black_time_margin < 0) {
+          black_time_margin = timeout_margin;
+        }
         white_moving_time_list = [];
         black_moving_time_list = [];
         white_moving_time_list.push(white_remaining_time); //Start time white
@@ -1266,7 +1290,7 @@
             return;
           }
           white_remaining_time = white_remaining_time - timer_interval;
-          if (white_remaining_time < -timeout_margin) {
+          if (white_remaining_time < -white_time_margin) {
             deleteTimer();
             $("#timeoutside").value = 1;
             timeIsUpFor("WHITE");
@@ -1328,7 +1352,7 @@
             return;
           }
           black_remaining_time = black_remaining_time - timer_interval;
-          if (black_remaining_time < -timeout_margin) {
+          if (black_remaining_time < -black_time_margin) {
             deleteTimer();
             $("#timeoutside").value = 2;
             timeIsUpFor("BLACK");
@@ -2032,6 +2056,14 @@
                     $("#whitetimetype").innerHTML == "hourglass",
                   min: 0,
                 }),
+                m("input[type=number]#whitetimemargin", {
+                  placeholder: "Timeout margin (ms)",
+                  disabled:
+                    !is_ready ||
+                    review_mode ||
+                    $("#whitetimetype").innerHTML == "infinite",
+                  min: 0,
+                }),
               ]),
               m("div#blacktimesettings", [
                 m("p", "Black Time Settings:  "),
@@ -2071,6 +2103,14 @@
                     $("#blacktimetype").innerHTML == "hourglass",
                   min: 0,
                 }),
+                m("input[type=number]#blacktimemargin", {
+                  placeholder: "Timeout margin (ms)",
+                  disabled:
+                    !is_ready ||
+                    review_mode ||
+                    $("#blacktimetype").innerHTML == "infinite",
+                  min: 0,
+                }),
               ]),
               m("div#gamecontrol-start", [
                 m(
@@ -2097,7 +2137,7 @@
                   {
                     onclick: () => {
                       alert(
-                        "Start time: The initial time at the beginning of the game. Not applicable to infinite.\nTime gain: Get a time increment of this many milliseconds after every move. Only applicable to tournament."
+                        "Start time: The initial time at the beginning of the game. Not applicable to infinite.\nTime gain: Get a time increment of this many milliseconds after every move. Only applicable to tournament.\nTimeout margin (Only in Advanced Analysis): The time can be exceeded by this many milliseconds. Not applicable to infinite."
                       );
                     },
                   },
