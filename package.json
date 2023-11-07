@@ -1,7 +1,7 @@
 {
   "scripts": {
     "serve": "serve public --no-compression",
-    "build": "rm -rf public/lib && mkdir -p public/lib && cp node_modules/fairy-stockfish-nnue.wasm/* public/lib && cp node_modules/ffish-es6/ffish.wasm public/ && browserify -p esmify src/main.js -o public/bundle.js",
+    "build": "rm -rf public/lib && mkdir -p public/lib && cp node_modules/fairy-stockfish-nnue.wasm/* public/lib && cp node_modules/ffish-es6/ffish.wasm public/ && browserify -p esmify src/main.js -o public/bundle.js && cp node_modules/mithril/mithril.min.js public/lib",
     "watch-build": "watchify -p esmify src/main.js -o public/bundle.js",
     "format": "prettier --write src public/*.html",
     "format:check": "prettier --check src public/*.html"
@@ -12,6 +12,7 @@
     "express": "^4.17.1",
     "fairy-stockfish-nnue.wasm": "^1.1.2",
     "ffish-es6": "^0.7.4",
+    "mithril": "^2.2.2",
     "serve": "^12.0.0"
   },
   "devDependencies": {
