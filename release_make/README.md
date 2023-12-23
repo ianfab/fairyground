@@ -10,7 +10,9 @@ Running make scripts here will apply the changes you have made in fairyground at
 
 ## Usage
 
-Install dependencies (Make sure that the working directory is this directory!)
+First install dependencies in the parent directory.
+
+Install dependencies in this directory (Make sure that the working directory is this directory!)
 
 ```bash
 npm install
