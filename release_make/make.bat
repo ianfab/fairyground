@@ -18,10 +18,10 @@ md .\release-builds\linux\arm64 || goto error
 (start /wait "" pkg . --target linux-arm64 --output .\release-builds\linux\arm64\FairyGround ^& exit) || goto error
 cd ..
 (start /wait "" npm run buildwithcmd ^& exit) || goto error
-xcopy .\public .\release_make\release-builds\win\x64\public /E /H /C /I || goto error
-xcopy .\public .\release_make\release-builds\linux\x64\public /E /H /C /I || goto error
-xcopy .\public .\release_make\release-builds\win\arm64\public /E /H /C /I || goto error
-xcopy .\public .\release_make\release-builds\linux\arm64\public /E /H /C /I || goto error
+xcopy .\public .\release_make\release-builds\win\x64\public /E /H /C /I /Q || goto error
+xcopy .\public .\release_make\release-builds\linux\x64\public /E /H /C /I /Q || goto error
+xcopy .\public .\release_make\release-builds\win\arm64\public /E /H /C /I /Q || goto error
+xcopy .\public .\release_make\release-builds\linux\arm64\public /E /H /C /I /Q || goto error
 echo Release build finished. Check "%~dp0release-builds\" to see the results.
 pause
 exit /b 0
