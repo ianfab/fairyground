@@ -1662,9 +1662,9 @@
         }
       };
 
-      const oninit = () => {
-        stockfish_state = "LOADING";
-      };
+	  function isLetter(str) {
+		  return str.length === 1 && str.match(/[a-z]/i);
+	  }
 
       const onSelectUserGraphics = async (e) => {
         var files_count = e.currentTarget.files.length;
@@ -1725,6 +1725,10 @@
           console.log(`${style.textContent}`);
           document.head.appendChild(style);
         }
+      };
+
+      const oninit = () => {
+        stockfish_state = "LOADING";
       };
 
       const view = () => {
