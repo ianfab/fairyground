@@ -1685,7 +1685,7 @@
 
           for (let i = 0; i < files.length; i++) {
             const selected = files[i];
-            var urltest = URL.createObjectURL(selected);
+            var bloburl = URL.createObjectURL(selected);
             var filename = files[i].name.split(".")[0].toLowerCase();
             var piececolor = filename.substr(0,1);
             var pieceletter = filename.substr(1,2).replace("+","p");
@@ -1715,10 +1715,10 @@
             //console.log(filename);
             //console.log(piececolor);
             //console.log(pieceletter);
-            console.log(`${urltest}`);
+            console.log(`${bloburl}`);
             //console.log(`${selected}`);
             if (selected) {
-                style.textContent = style.textContent + `.userdefined .cg-wrap piece.${pieceletter}-piece.${piececolor} { background-image: url('${urltest}');} `
+                style.textContent = style.textContent + `.userdefined .cg-wrap piece.${pieceletter}-piece.${piececolor} { background-image: url('${bloburl}');} `
             }
           }
 
