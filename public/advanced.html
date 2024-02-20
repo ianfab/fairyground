@@ -1716,13 +1716,13 @@
             //console.log(piececolor);
             //console.log(pieceletter);
             console.log(`${urltest}`);
-            console.log(`${selected}`);
+            //console.log(`${selected}`);
             if (selected) {
                 style.textContent = style.textContent + `.userdefined .cg-wrap piece.${pieceletter}-piece.${piececolor} { background-image: url('${urltest}');} `
             }
           }
 
-          console.log(`${style.textContent}`);
+          //console.log(`${style.textContent}`);
           document.head.appendChild(style);
         }
       };
