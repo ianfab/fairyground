@@ -1662,6 +1662,95 @@
         }
       };
 
+      function isLetter(str) {
+        return str.length === 1 && str.match(/[a-z]/i);
+      }
+
+      function changePieceSet(piece_set) {
+        const el = $("#chessground-container-div");
+        let DOMListValue = el.classList.value.split(" ");
+        DOMListValue[1] = piece_set;
+        el.classList.value = DOMListValue.join(" ");
+      }
+
+      const onSelectUserGraphics = async (e) => {
+        var files_count = e.currentTarget.files.length;
+        var files = [];
+
+        if (!e.currentTarget.files.length) {
+        } else {
+          style = document.createElement("style");
+
+          // See what files are being loaded.
+          for (let i = 0; i < files_count; i++) {
+            const selected = e.currentTarget.files[i];
+            var filename = e.currentTarget.files[i].name.toLowerCase();
+
+            files[files.length] = e.currentTarget.files[i];
+          }
+
+          console.log("File count: " + files.length);
+
+          for (let i = 0; i < files.length; i++) {
+            const selected = files[i];
+            var bloburl = URL.createObjectURL(selected);
+            var filename = files[i].name.split(".")[0].toLowerCase();
+            var piececolor = filename.substr(0, 1);
+            var pieceletter = filename.substr(1, 2).replace("+", "p");
+            // Skip the file if it does not match the naming convention.
+            if (piececolor == "b") {
+              piececolor = "black";
+            } else if (piececolor == "w") {
+              piececolor = "white";
+            } else {
+              console.log(
+                `File '${filename}' does not match naming convention.`
+              );
+              continue;
+            }
+            if (filename.length != 2 && filename.length != 3) {
+              console.log(
+                `File '${filename}' does not match naming convention.`
+              );
+              continue;
+            }
+            if (filename.length == 2 && !isLetter(filename.substr(1, 1))) {
+              console.log(
+                `File '${filename}' does not match naming convention.`
+              );
+              continue;
+            }
+            if (filename.length == 3 && filename.substr(1, 1) != "+") {
+              console.log(
+                `File '${filename}' does not match naming convention.`
+              );
+              continue;
+            }
+            if (filename.length == 3 && !isLetter(filename.substr(2, 1))) {
+              console.log(
+                `File '${filename}' does not match naming convention.`
+              );
+              continue;
+            }
+            //console.log(filename);
+            //console.log(piececolor);
+            //console.log(pieceletter);
+            console.log(`${bloburl}`);
+            //console.log(`${selected}`);
+            if (selected) {
+              style.textContent =
+                style.textContent +
+                `.userdefined .cg-wrap piece.${pieceletter}-piece.${piececolor} { background-image: url('${bloburl}');} `;
+            }
+          }
+
+          //console.log(`${style.textContent}`);
+          document.head.appendChild(style);
+
+          changePieceSet("userdefined");
+        }
+      };
+
       const oninit = () => {
         stockfish_state = "LOADING";
       };
@@ -1730,6 +1819,26 @@
                   onclick: () =>
                     window.alert(
                       "You can select a Position Variant file to load different positions for different variants. Contents will be appended to the position variants provided by the server."
+                    ),
+                },
+                "[?]"
+              ),
+            ]),
+            m("div", { hidden: during_play }, [
+              "- User Piece Graphics: ",
+              m("input#user-graphics", {
+                type: "file",
+                multiple: true,
+                disabled: !is_ready || review_mode || board_setup_mode,
+                onchange: onSelectUserGraphics,
+              }),
+              m(
+                "span",
+                {
+                  style: "cursor: pointer;",
+                  onclick: () =>
+                    window.alert(
+                      "You can upload user defined piece graphics. They must be named as follows [piece colour][+][piece letter].svg."
                     ),
                 },
                 "[?]"
