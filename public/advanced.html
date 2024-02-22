@@ -1662,9 +1662,15 @@
         }
       };
 
-	  function isLetter(str) {
-		  return str.length === 1 && str.match(/[a-z]/i);
-	  }
+      function isLetter(str) {
+        return str.length === 1 && str.match(/[a-z]/i);
+      }
+
+      function changePieceSet(piece_set) {
+        let DOMListValue = el.classList.value.split(" ");
+        DOMListValue[1] = piece_set;
+        el.classList.value = DOMListValue.join(" ");
+      }
 
       const onSelectUserGraphics = async (e) => {
         var files_count = e.currentTarget.files.length;
@@ -1724,6 +1730,8 @@
 
           //console.log(`${style.textContent}`);
           document.head.appendChild(style);
+
+          changePieceSet("userdefined");
         }
       };
 
