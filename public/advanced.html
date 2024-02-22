@@ -1720,6 +1720,12 @@
               );
               continue;
             }
+            if (filename.length == 3 && filename.substr(1,1) != "+" ) {
+              console.log(
+                `File '${filename}' does not match naming convention.`
+              );
+              continue;
+            }
             if (filename.length == 3 && !isLetter(filename.substr(2, 1))) {
               console.log(
                 `File '${filename}' does not match naming convention.`
