@@ -1667,6 +1667,7 @@
       }
 
       function changePieceSet(piece_set) {
+        const el = $("#chessground-container-div");
         let DOMListValue = el.classList.value.split(" ");
         DOMListValue[1] = piece_set;
         el.classList.value = DOMListValue.join(" ");
