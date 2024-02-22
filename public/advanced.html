@@ -1677,7 +1677,8 @@
         var files_count = e.currentTarget.files.length;
         var files = [];
 
-        if (!e.currentTarget.files.length) {} else {
+        if (!e.currentTarget.files.length) {
+        } else {
           style = document.createElement("style");
 
           // See what files are being loaded.
@@ -1694,29 +1695,35 @@
             const selected = files[i];
             var bloburl = URL.createObjectURL(selected);
             var filename = files[i].name.split(".")[0].toLowerCase();
-            var piececolor = filename.substr(0,1);
-            var pieceletter = filename.substr(1,2).replace("+","p");
+            var piececolor = filename.substr(0, 1);
+            var pieceletter = filename.substr(1, 2).replace("+", "p");
             // Skip the file if it does not match the naming convention.
-            if ( piececolor == 'b' ) {
-                piececolor = "black";
-            }
-            else if ( piececolor == 'w' ) {
-                piececolor = "white";
-            }
-            else {
-              console.log(`File '${filename}' does not match naming convention.` );
+            if (piececolor == "b") {
+              piececolor = "black";
+            } else if (piececolor == "w") {
+              piececolor = "white";
+            } else {
+              console.log(
+                `File '${filename}' does not match naming convention.`
+              );
               continue;
             }
-            if ( filename.length != 2 && filename.length != 3 ) {
-              console.log(`File '${filename}' does not match naming convention.` );
+            if (filename.length != 2 && filename.length != 3) {
+              console.log(
+                `File '${filename}' does not match naming convention.`
+              );
               continue;
             }
-            if ( filename.length == 2 && !isLetter( filename.substr(1,1) ) ) {
-              console.log(`File '${filename}' does not match naming convention.` );
+            if (filename.length == 2 && !isLetter(filename.substr(1, 1))) {
+              console.log(
+                `File '${filename}' does not match naming convention.`
+              );
               continue;
             }
-            if ( filename.length == 3 && !isLetter( filename.substr(2,1) ) ) {
-              console.log(`File '${filename}' does not match naming convention.` );
+            if (filename.length == 3 && !isLetter(filename.substr(2, 1))) {
+              console.log(
+                `File '${filename}' does not match naming convention.`
+              );
               continue;
             }
             //console.log(filename);
@@ -1725,7 +1732,9 @@
             console.log(`${bloburl}`);
             //console.log(`${selected}`);
             if (selected) {
-                style.textContent = style.textContent + `.userdefined .cg-wrap piece.${pieceletter}-piece.${piececolor} { background-image: url('${bloburl}');} `
+              style.textContent =
+                style.textContent +
+                `.userdefined .cg-wrap piece.${pieceletter}-piece.${piececolor} { background-image: url('${bloburl}');} `;
             }
           }
 
