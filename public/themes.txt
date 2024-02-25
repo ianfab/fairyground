@@ -87,6 +87,7 @@ synochess|synochess|
 shinobi|shinobi|
 chak|chak|chakboard
 
+kyotoshogi|kyoto|
 shogi|portella2kanji|shogiboard
 minishogi|@shogi|minishogiboard
 
