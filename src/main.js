@@ -15,7 +15,7 @@ const pSetFen = document.getElementById("set");
 const labelPgn = document.getElementById("label-pgn");
 const labelStm = document.getElementById("label-stm");
 const chessgroundContainerEl = document.getElementById(
-  "chessground-container-div"
+  "chessground-container-div",
 );
 const chessgroundEl = document.getElementById("chessground-board");
 const pocketTopEl = document.getElementById("pocket-top");
@@ -60,10 +60,10 @@ const enPassantRank = document.getElementById("enpassantrank");
 const seirawanGatingFiles = document.getElementById("seirwangatingfiles");
 const copySetFEN = document.getElementById("copysetfen");
 const dropdownPositionVariantType = document.getElementById(
-  "dropdown-posvarianttype"
+  "dropdown-posvarianttype",
 );
 const dropdownPositionVariantName = document.getElementById(
-  "dropdown-posvariantname"
+  "dropdown-posvariantname",
 );
 const buttonAboutPosition = document.getElementById("aboutposition");
 const positionInformation = document.getElementById("positioninfo");
@@ -412,12 +412,12 @@ function addPieceToPocket(pieceid, color) {
   if (color == "white") {
     chessground.state.boardState.pockets.white.set(
       piecerole,
-      chessground.state.boardState.pockets.white.get(piecerole) + 1
+      chessground.state.boardState.pockets.white.get(piecerole) + 1,
     );
   } else if (color == "black") {
     chessground.state.boardState.pockets.black.set(
       piecerole,
-      chessground.state.boardState.pockets.black.get(piecerole) + 1
+      chessground.state.boardState.pockets.black.get(piecerole) + 1,
     );
   }
   chessground.set({
@@ -479,10 +479,10 @@ new Module().then((loadedModule) => {
     initBoard(dropdownVariant.value);
     const newDimensions = getDimensions();
     chessgroundContainerEl.classList.toggle(
-      `board${oldDimensions["width"]}x${oldDimensions["height"]}`
+      `board${oldDimensions["width"]}x${oldDimensions["height"]}`,
     );
     chessgroundContainerEl.classList.toggle(
-      `board${newDimensions["width"]}x${newDimensions["height"]}`
+      `board${newDimensions["width"]}x${newDimensions["height"]}`,
     );
 
     if (ffish.capturesToHand(dropdownVariant.value)) {
@@ -633,7 +633,7 @@ new Module().then((loadedModule) => {
     ) {
       if (dropdownSetPiece.value.includes("+")) {
         window.alert(
-          "Promoted pieces cannot go into pockets. If you have dropLoop = true, Please directly add the target piece. For example, if you have a:c, then instead of adding +a, you need to add c."
+          "Promoted pieces cannot go into pockets. If you have dropLoop = true, Please directly add the target piece. For example, if you have a:c, then instead of adding +a, you need to add c.",
         );
       } else if (
         "a" <= dropdownSetPiece.value &&
@@ -649,7 +649,7 @@ new Module().then((loadedModule) => {
         window.alert("Error: Cannot add wall squares to pocket.");
       } else {
         window.alert(
-          "Please select a piece (in a letter with or without promotion mark, such as 'a' or '+a') in order to add to pocket."
+          "Please select a piece (in a letter with or without promotion mark, such as 'a' or '+a') in order to add to pocket.",
         );
       }
     } else {
@@ -701,15 +701,15 @@ new Module().then((loadedModule) => {
     let VariantNameDirectory = null;
     if (PositionVariantsDirectory.has(dropdownVariant.value)) {
       VariantTypeDirectory = PositionVariantsDirectory.get(
-        dropdownVariant.value
+        dropdownVariant.value,
       );
       if (VariantTypeDirectory.has(dropdownPositionVariantType.value)) {
         VariantNameDirectory = VariantTypeDirectory.get(
-          dropdownPositionVariantType.value
+          dropdownPositionVariantType.value,
         );
         if (VariantNameDirectory.has(dropdownPositionVariantName.value)) {
           let game = VariantNameDirectory.get(
-            dropdownPositionVariantName.value
+            dropdownPositionVariantName.value,
           );
           textFen.value = game.FEN;
           positionInformation.innerHTML = game.Description;
@@ -732,7 +732,7 @@ new Module().then((loadedModule) => {
   buttonAboutPosition.onclick = function () {
     if (dropdownPositionVariantName.selectedIndex == -1) {
       window.alert(
-        'Please select a position in "Position Variant Name"!\nIf there is nothing, it means that this chess variant does not have any position variant!'
+        'Please select a position in "Position Variant Name"!\nIf there is nothing, it means that this chess variant does not have any position variant!',
       );
       return;
     }
@@ -743,7 +743,7 @@ new Module().then((loadedModule) => {
         "\\" +
         dropdownPositionVariantName.value +
         ":\n" +
-        positionInformation.innerHTML
+        positionInformation.innerHTML,
     );
   };
 
@@ -795,7 +795,7 @@ new Module().then((loadedModule) => {
       });
     if (moves == null || moves.length == 0) {
       alert(
-        "Cannot pass your turn currently. This variant does not allow passing or there are restrictions on passing your turn."
+        "Cannot pass your turn currently. This variant does not allow passing or there are restrictions on passing your turn.",
       );
       return;
     }
@@ -890,7 +890,7 @@ function getFEN() {
           files[width - 1].toUpperCase() +
           "a-" +
           files[width - 1].toLowerCase() +
-          "]"
+          "]",
       );
       if (!matcher.test(seirawanGatingFiles.value)) {
         castling += seirawanGatingFiles.value;
@@ -898,13 +898,13 @@ function getFEN() {
         window.alert(
           `Bad Seirawan gating files: File out of range. File range is A-${files[
             width - 1
-          ].toUpperCase()}`
+          ].toUpperCase()}`,
         );
         return null;
       }
     } else {
       window.alert(
-        "Bad Seirawan gating files: All files should be given in letters. (e.g. ABCDabcd)"
+        "Bad Seirawan gating files: All files should be given in letters. (e.g. ABCDabcd)",
       );
       return null;
     }
@@ -938,7 +938,7 @@ function getFEN() {
       FEN += ` ${whiteRemainingChecks.value}+${blackRemainingChecks.value}`;
     } else {
       window.alert(
-        "Bad remaining checks. Remaining checks should be larger than 0."
+        "Bad remaining checks. Remaining checks should be larger than 0.",
       );
       return null;
     }
@@ -948,7 +948,7 @@ function getFEN() {
       FEN += ` ${halfMoveClock.value}`;
     } else {
       window.alert(
-        "Bad half move clock. Half move clock should be larger than or equal to 0."
+        "Bad half move clock. Half move clock should be larger than or equal to 0.",
       );
       return null;
     }
@@ -960,7 +960,7 @@ function getFEN() {
       FEN += ` ${currentMoveNumber.value}`;
     } else {
       window.alert(
-        "Bad current move number. Current move number should be larger than 0."
+        "Bad current move number. Current move number should be larger than 0.",
       );
       return null;
     }
@@ -1061,13 +1061,13 @@ function LoadPositionVariant(side, file) {
       variantsettings = rawText[i].trim().split("|");
       if (variantsettings.length != 5) {
         console.warn(
-          `At line ${i} in paragraph of <position variant file>: Bad syntax\n`
+          `At line ${i} in paragraph of <position variant file>: Bad syntax\n`,
         );
         continue;
       }
       if (PositionVariantsDirectory.has(variantsettings[0])) {
         VariantTypeDirectory = PositionVariantsDirectory.get(
-          variantsettings[0]
+          variantsettings[0],
         );
       } else {
         VariantTypeDirectory = new Map();
@@ -1079,7 +1079,7 @@ function LoadPositionVariant(side, file) {
       }
       if (VariantNameDirectory.has(variantsettings[2])) {
         console.warn(
-          `Variant "<ROOT>\\${variantsettings[0]}\\${variantsettings[1]}\\${variantsettings[2]}" already exists. This position variant will not get loaded.\n`
+          `Variant "<ROOT>\\${variantsettings[0]}\\${variantsettings[1]}\\${variantsettings[2]}" already exists. This position variant will not get loaded.\n`,
         );
         continue;
       }
@@ -1143,7 +1143,7 @@ function UpdateVariantsPositionNameDropdown() {
     VariantTypeDirectory = PositionVariantsDirectory.get(dropdownVariant.value);
     if (VariantTypeDirectory.has(dropdownPositionVariantType.value)) {
       VariantNameDirectory = VariantTypeDirectory.get(
-        dropdownPositionVariantType.value
+        dropdownPositionVariantType.value,
       );
       VariantNameList = [...VariantNameDirectory];
       for (i = 0; i < VariantNameList.length; i++) {
@@ -1378,7 +1378,7 @@ function afterChessgroundMove(orig, dest, metadata) {
     while (true) {
       choice = prompt(
         `There are multiple chioces that you can keep/promote/demote your moved piece. They are\n${possiblepromotions}\n, where + means promote, - means demote, = means keep, letters mean target pawn promotion piece (e.g. q means pawn can promote to q piece which means queen in most times). Now please enter your choice: `,
-        ""
+        "",
       );
       if (choice == null) {
         afterMove(false);
@@ -1386,7 +1386,7 @@ function afterChessgroundMove(orig, dest, metadata) {
       }
       if (choice.length == 0 || choice.length > 1) {
         alert(
-          `Bad input: ${choice} . You should enter exactly one character among ${possiblepromotions}.`
+          `Bad input: ${choice} . You should enter exactly one character among ${possiblepromotions}.`,
         );
         continue;
       }
@@ -1394,7 +1394,7 @@ function afterChessgroundMove(orig, dest, metadata) {
         break;
       } else {
         alert(
-          `Bad input: ${choice} . You should enter exactly one character among ${possiblepromotions}.`
+          `Bad input: ${choice} . You should enter exactly one character among ${possiblepromotions}.`,
         );
         continue;
       }
@@ -1422,7 +1422,7 @@ function afterChessgroundMove(orig, dest, metadata) {
     while (true) {
       choice = prompt(
         `There are multiple chioces that you can gate a wall square. They are\n${possiblegatings}\n, where = means do not gate, letters with numbers mean destination square (e.g. e4e5 means your piece has moved to e4 and you gate a wall square to e5). Now please enter your choice: `,
-        ""
+        "",
       );
       if (choice == null) {
         afterMove(false);
@@ -1432,7 +1432,7 @@ function afterChessgroundMove(orig, dest, metadata) {
         break;
       } else {
         alert(
-          `Bad input: ${choice} . You should enter one option among ${possiblegatings}.`
+          `Bad input: ${choice} . You should enter one option among ${possiblegatings}.`,
         );
         continue;
       }
@@ -1527,7 +1527,7 @@ function afterChessgroundDrop(piece, dest, metadata) {
     while (true) {
       choice = prompt(
         `There are multiple chioces that you can keep/promote your dropped piece. They are\n${possiblepromotions}\n, where + means promote, = means keep. Now please enter your choice: `,
-        ""
+        "",
       );
       if (choice == null) {
         afterMove(false);
@@ -1535,7 +1535,7 @@ function afterChessgroundDrop(piece, dest, metadata) {
       }
       if (choice.length == 0 || choice.length > 1) {
         alert(
-          `Bad input: ${choice} . You should enter exactly one character among ${possiblepromotions}.`
+          `Bad input: ${choice} . You should enter exactly one character among ${possiblepromotions}.`,
         );
         continue;
       }
@@ -1543,7 +1543,7 @@ function afterChessgroundDrop(piece, dest, metadata) {
         break;
       } else {
         alert(
-          `Bad input: ${choice} . You should enter exactly one character among ${possiblepromotions}.`
+          `Bad input: ${choice} . You should enter exactly one character among ${possiblepromotions}.`,
         );
         continue;
       }
