@@ -8,19 +8,19 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "chessgroundx": "^10.2.2",
-    "express": "^4.17.1",
-    "fairy-stockfish-nnue.wasm": "^1.1.2",
-    "ffish-es6": "^0.7.4",
+    "chessgroundx": "^10.5.3",
+    "express": "^4.18.2",
+    "fairy-stockfish-nnue.wasm": "^1.1.5",
+    "ffish-es6": "^0.7.5",
     "mithril": "^2.2.2",
-    "serve": "^12.0.0"
+    "serve": "^14.2.1"
   },
   "devDependencies": {
     "browser-resolve": "^2.0.0",
     "browserify": "^17.0.0",
     "esmify": "^2.1.1",
-    "prettier": "^2.3.2",
+    "prettier": "^3.2.5",
     "watchify": "^4.0.0",
-    "vercel": "^23.0.1"
+    "vercel": "^33.5.2"
   }
 }
