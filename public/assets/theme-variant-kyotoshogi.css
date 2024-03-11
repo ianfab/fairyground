@@ -1,0 +1,57 @@
+.kyoto .cg-wrap piece.p-piece.white {
+    background-image: url('images/pieces/kyoto/wP.svg');
+}
+.kyoto .cg-wrap piece.pp-piece.white {
+    background-image: url('images/pieces/kyoto/w+P.svg');
+}
+.kyoto .cg-wrap piece.n-piece.white {
+    background-image: url('images/pieces/kyoto/wN.svg');
+}
+.kyoto .cg-wrap piece.pn-piece.white {
+    background-image: url('images/pieces/kyoto/w+N.svg');
+}
+.kyoto .cg-wrap piece.l-piece.white {
+    background-image: url('images/pieces/kyoto/wL.svg');
+}
+.kyoto .cg-wrap piece.pl-piece.white {
+    background-image: url('images/pieces/kyoto/w+L.svg');
+}
+.kyoto .cg-wrap piece.s-piece.white {
+    background-image: url('images/pieces/kyoto/wS.svg');
+}
+.kyoto .cg-wrap piece.ps-piece.white {
+    background-image: url('images/pieces/kyoto/w+S.svg');
+}
+.kyoto .cg-wrap piece.k-piece.white {
+    background-image: url('images/pieces/kyoto/wK.svg');
+}
+.kyoto .cg-wrap piece.p-piece.black {
+    background-image: url('images/pieces/kyoto/bP.svg');
+}
+.kyoto .cg-wrap piece.pp-piece.black {
+    background-image: url('images/pieces/kyoto/b+P.svg');
+}
+.kyoto .cg-wrap piece.n-piece.black {
+    background-image: url('images/pieces/kyoto/bN.svg');
+}
+.kyoto .cg-wrap piece.pn-piece.black {
+    background-image: url('images/pieces/kyoto/b+N.svg');
+}
+.kyoto .cg-wrap piece.l-piece.black {
+    background-image: url('images/pieces/kyoto/bL.svg');
+}
+.kyoto .cg-wrap piece.pl-piece.black {
+    background-image: url('images/pieces/kyoto/b+L.svg');
+}
+.kyoto .cg-wrap piece.s-piece.black {
+    background-image: url('images/pieces/kyoto/bS.svg');
+}
+.kyoto .cg-wrap piece.ps-piece.black {
+    background-image: url('images/pieces/kyoto/b+S.svg');
+}
+.kyoto .cg-wrap piece.k-piece.black {
+    background-image: url('images/pieces/kyoto/bK.svg');
+}
+.kyoto .cg-wrap piece._-piece {
+  background-image: url('images/wallsquare/barrier.svg');
+}

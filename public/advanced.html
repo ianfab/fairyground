@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <head>
   <meta charset="utf-8" />
   <title>Fairy-Stockfish playground</title>
@@ -578,9 +578,8 @@
     }
 
     function setVariantStylesheet(variant) {
-      document.getElementById(
-        "current-variant-stylesheet"
-      ).href = `./assets/theme-variant-${variant}.css`;
+      document.getElementById("current-variant-stylesheet").href =
+        `./assets/theme-variant-${variant}.css`;
     }
 
     const copyText = async (val) => {
@@ -651,7 +650,7 @@
               total =
                 e.total ||
                 Number(
-                  e.target.getResponseHeader("x-decompressed-content-length")
+                  e.target.getResponseHeader("x-decompressed-content-length"),
                 );
               m.redraw();
             };
@@ -665,7 +664,7 @@
             console.error(e);
             state = "FAILED";
             onFinishDownload(null);
-          }
+          },
         );
       };
 
@@ -680,10 +679,10 @@
               style: "cursor: pointer;",
               onclick: () =>
                 window.alert(
-                  "On some browsers, download size might look contradictory due to file compression."
+                  "On some browsers, download size might look contradictory due to file compression.",
                 ),
             },
-            "[?]"
+            "[?]",
           ),
         ]);
       };
@@ -719,7 +718,7 @@
           themesettings = rawText[i].trim().split("|");
           if (themesettings.length != 3) {
             console.warn(
-              `At line ${i} in paragraph of themes.html: Bad syntax\n`
+              `At line ${i} in paragraph of themes.html: Bad syntax\n`,
             );
             continue;
           }
@@ -737,7 +736,7 @@
             boardthemeavailable.includes("")
           ) {
             console.warn(
-              `At line ${i} in paragraph of themes.html: Piece and Board style names must not be both null or contain null element\n`
+              `At line ${i} in paragraph of themes.html: Piece and Board style names must not be both null or contain null element\n`,
             );
             continue;
           }
@@ -757,8 +756,8 @@
                   `At line ${i} in paragraph of themes.html: Variant ${require_list[
                     j
                   ].substring(
-                    1
-                  )} has not been defined yet. You need to put it before this line.\n`
+                    1,
+                  )} has not been defined yet. You need to put it before this line.\n`,
                 );
               }
             }
@@ -775,15 +774,15 @@
               if (themes[0].includes(require_board_list[j].substring(1))) {
                 index = themes[0].indexOf(require_board_list[j].substring(1));
                 boardthemeavailable = boardthemeavailable.concat(
-                  themes[2][index]
+                  themes[2][index],
                 );
               } else {
                 console.warn(
                   `At line ${i} in paragraph of themes.html: Variant ${require_board_list[
                     j
                   ].substring(
-                    1
-                  )} has not been defined yet. You need to put it before this line.\n`
+                    1,
+                  )} has not been defined yet. You need to put it before this line.\n`,
                 );
               }
             }
@@ -801,19 +800,19 @@
             if (themesettings[1].length > 0) {
               index = themes[0].indexOf(themesettings[0]);
               themes[1][index] = uniqArr(
-                themes[1][index].concat(themeavailable)
+                themes[1][index].concat(themeavailable),
               );
             }
             if (themesettings[2].length > 0) {
               index = themes[0].indexOf(themesettings[0]);
               themes[2][index] = uniqArr(
-                themes[2][index].concat(boardthemeavailable)
+                themes[2][index].concat(boardthemeavailable),
               );
             }
           } else {
             themeavailable = uniqArr(themeavailable.concat(apply_to_all_list));
             boardthemeavailable = uniqArr(
-              boardthemeavailable.concat(board_apply_to_all_list)
+              boardthemeavailable.concat(board_apply_to_all_list),
             );
             themes[0].push(themesettings[0]);
             themes[1].push(themeavailable);
@@ -985,7 +984,7 @@
               continue;
             }
             $("#displaymoves").value = $("#displaymoves").value.concat(
-              moves_split[i]
+              moves_split[i],
             );
             if (j < movenum - 1) {
               $("#displaymoves").value = $("#displaymoves").value.concat(" ");
@@ -1144,11 +1143,11 @@
               btime += +black_remaining_time;
             }
             console.log(
-              `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`
+              `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`,
             );
             args += `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`;
             stockfish.postMessage(
-              `setoption name Move Overhead value ${timer_interval}`
+              `setoption name Move Overhead value ${timer_interval}`,
             );
           }
         } else {
@@ -1187,7 +1186,7 @@
           stockfish.postMessage(`setoption name Hash value 500`);
         } else {
           stockfish.postMessage(
-            `setoption name MultiPV value ${multipleprincipalvariation}`
+            `setoption name MultiPV value ${multipleprincipalvariation}`,
           );
         }
         stockfish.postMessage(`isready`);
@@ -1300,7 +1299,7 @@
             $("#whitetime").innerHTML = "INFINITY";
           } else if (white_remaining_time >= 10000) {
             $("#whitetime").innerHTML = `${parseInt(
-              white_remaining_time / 1000
+              white_remaining_time / 1000,
             )}`;
           } else {
             $("#whitetime").innerHTML = `${
@@ -1311,7 +1310,7 @@
             $("#blacktime").innerHTML = "INFINITY";
           } else if (black_remaining_time >= 10000) {
             $("#blacktime").innerHTML = `${parseInt(
-              black_remaining_time / 1000
+              black_remaining_time / 1000,
             )}`;
           } else {
             $("#blacktime").innerHTML = `${
@@ -1362,7 +1361,7 @@
             $("#whitetime").innerHTML = "INFINITY";
           } else if (white_remaining_time >= 10000) {
             $("#whitetime").innerHTML = `${parseInt(
-              white_remaining_time / 1000
+              white_remaining_time / 1000,
             )}`;
           } else {
             $("#whitetime").innerHTML = `${
@@ -1373,7 +1372,7 @@
             $("#blacktime").innerHTML = "INFINITY";
           } else if (black_remaining_time >= 10000) {
             $("#blacktime").innerHTML = `${parseInt(
-              black_remaining_time / 1000
+              black_remaining_time / 1000,
             )}`;
           } else {
             $("#blacktime").innerHTML = `${
@@ -1446,7 +1445,7 @@
         console.log(
           `white: ${play_white} black: ${play_black} move: ${
             (play_white && stm == "white") || (play_black && stm == "black")
-          }`
+          }`,
         );
         if ((play_white && stm == "white") || (play_black && stm == "black")) {
           console.log("Go!");
@@ -1600,7 +1599,7 @@
                   variants = line
                     .replace(
                       "option name UCI_Variant type combo default chess var ",
-                      ""
+                      "",
                     )
                     .replace(/ var /g, " ")
                     .split(" ");
@@ -1662,6 +1661,95 @@
         }
       };
 
+      function isLetter(str) {
+        return str.length === 1 && str.match(/[a-z]/i);
+      }
+
+      function changePieceSet(piece_set) {
+        const el = $("#chessground-container-div");
+        let DOMListValue = el.classList.value.split(" ");
+        DOMListValue[1] = piece_set;
+        el.classList.value = DOMListValue.join(" ");
+      }
+
+      const onSelectUserGraphics = async (e) => {
+        var files_count = e.currentTarget.files.length;
+        var files = [];
+
+        if (!e.currentTarget.files.length) {
+        } else {
+          style = document.createElement("style");
+
+          // See what files are being loaded.
+          for (let i = 0; i < files_count; i++) {
+            const selected = e.currentTarget.files[i];
+            var filename = e.currentTarget.files[i].name.toLowerCase();
+
+            files[files.length] = e.currentTarget.files[i];
+          }
+
+          console.log("File count: " + files.length);
+
+          for (let i = 0; i < files.length; i++) {
+            const selected = files[i];
+            var bloburl = URL.createObjectURL(selected);
+            var filename = files[i].name.split(".")[0].toLowerCase();
+            var piececolor = filename.substr(0, 1);
+            var pieceletter = filename.substr(1, 2).replace("+", "p");
+            // Skip the file if it does not match the naming convention.
+            if (piececolor == "b") {
+              piececolor = "black";
+            } else if (piececolor == "w") {
+              piececolor = "white";
+            } else {
+              console.log(
+                `File '${filename}' does not match naming convention.`,
+              );
+              continue;
+            }
+            if (filename.length != 2 && filename.length != 3) {
+              console.log(
+                `File '${filename}' does not match naming convention.`,
+              );
+              continue;
+            }
+            if (filename.length == 2 && !isLetter(filename.substr(1, 1))) {
+              console.log(
+                `File '${filename}' does not match naming convention.`,
+              );
+              continue;
+            }
+            if (filename.length == 3 && filename.substr(1, 1) != "+") {
+              console.log(
+                `File '${filename}' does not match naming convention.`,
+              );
+              continue;
+            }
+            if (filename.length == 3 && !isLetter(filename.substr(2, 1))) {
+              console.log(
+                `File '${filename}' does not match naming convention.`,
+              );
+              continue;
+            }
+            //console.log(filename);
+            //console.log(piececolor);
+            //console.log(pieceletter);
+            console.log(`${bloburl}`);
+            //console.log(`${selected}`);
+            if (selected) {
+              style.textContent =
+                style.textContent +
+                `.userdefined .cg-wrap piece.${pieceletter}-piece.${piececolor} { background-image: url('${bloburl}');} `;
+            }
+          }
+
+          //console.log(`${style.textContent}`);
+          document.head.appendChild(style);
+
+          changePieceSet("userdefined");
+        }
+      };
+
       const oninit = () => {
         stockfish_state = "LOADING";
       };
@@ -1692,10 +1780,10 @@
                   style: "cursor: pointer;",
                   onclick: () =>
                     window.alert(
-                      "You can upload a Fairy-Stockfish compatible .nnue file. Downloads: https://fairy-stockfish.github.io/nnue/#current-best-nnue-networks."
+                      "You can upload a Fairy-Stockfish compatible .nnue file. Downloads: https://fairy-stockfish.github.io/nnue/#current-best-nnue-networks.",
                     ),
                 },
-                "[?]"
+                "[?]",
               ),
             ]),
             m("div", { hidden: during_play }, [
@@ -1711,10 +1799,10 @@
                   style: "cursor: pointer;",
                   onclick: () =>
                     window.alert(
-                      "You can upload a Fairy-Stockfish compatible variants.ini file. See here for details: https://github.com/ianfab/Fairy-Stockfish/wiki/Variant-configuration."
+                      "You can upload a Fairy-Stockfish compatible variants.ini file. See here for details: https://github.com/ianfab/Fairy-Stockfish/wiki/Variant-configuration.",
                     ),
                 },
-                "[?]"
+                "[?]",
               ),
             ]),
             m("div", { hidden: during_play }, [
@@ -1729,10 +1817,30 @@
                   style: "cursor: pointer;",
                   onclick: () =>
                     window.alert(
-                      "You can select a Position Variant file to load different positions for different variants. Contents will be appended to the position variants provided by the server."
+                      "You can select a Position Variant file to load different positions for different variants. Contents will be appended to the position variants provided by the server.",
                     ),
                 },
-                "[?]"
+                "[?]",
+              ),
+            ]),
+            m("div", { hidden: during_play }, [
+              "- User Piece Graphics: ",
+              m("input#user-graphics", {
+                type: "file",
+                multiple: true,
+                disabled: !is_ready || review_mode || board_setup_mode,
+                onchange: onSelectUserGraphics,
+              }),
+              m(
+                "span",
+                {
+                  style: "cursor: pointer;",
+                  onclick: () =>
+                    window.alert(
+                      "You can upload user defined piece graphics. They must be named as follows [piece colour][+][piece letter].svg.",
+                    ),
+                },
+                "[?]",
               ),
             ]),
           ]),
@@ -1749,7 +1857,7 @@
               [
                 m("option", { value: "" }, "-- VARIANT --"),
                 ...variants.map((ex, index) => m("option", { value: ex }, ex)),
-              ]
+              ],
             ),
             m("p", "Custom Position Type:"),
             m(
@@ -1757,7 +1865,7 @@
               {
                 disabled: !is_ready || review_mode,
               },
-              [m("option", { value: "(default)" }, "(default)")]
+              [m("option", { value: "(default)" }, "(default)")],
             ),
             m("p", "Custom Position Name:"),
             m(
@@ -1765,14 +1873,14 @@
               {
                 disabled: !is_ready || review_mode,
               },
-              []
+              [],
             ),
             m(
               "button#aboutposition",
               {
                 disabled: !is_ready || review_mode,
               },
-              "About this position"
+              "About this position",
             ),
           ]),
           m("div#input", { hidden: during_play }, [
@@ -1812,7 +1920,7 @@
                   $("#currentposition").click();
                 },
               },
-              "Set"
+              "Set",
             ),
             m("button#reset", { disabled: !is_ready, onclick: reset }, "Reset"),
             m(
@@ -1822,7 +1930,7 @@
                 hidden: review_mode,
                 onclick: undo,
               },
-              "Undo"
+              "Undo",
             ),
           ]),
           m("div#input2", { hidden: during_play }, [
@@ -1872,12 +1980,12 @@
                   go();
                 },
               },
-              "Go"
+              "Go",
             ),
             m(
               "button#stop",
               { disabled: !is_ready, onclick: force_stop },
-              "Stop"
+              "Stop",
             ),
             m(
               "label#label-analysis",
@@ -1892,7 +2000,7 @@
                   analysis_mode = !analysis_mode;
                 },
               }),
-              "Analysis"
+              "Analysis",
             ),
             m(
               "label",
@@ -1903,7 +2011,7 @@
                   play_white = !play_white;
                 },
               }),
-              "Engine white"
+              "Engine white",
             ),
             m(
               "label",
@@ -1914,7 +2022,7 @@
                   play_black = !play_black;
                 },
               }),
-              "Engine black"
+              "Engine black",
             ),
             m(
               "label#label-advtimectrl",
@@ -1925,7 +2033,7 @@
                   advanced_time_control = !advanced_time_control;
                 },
               }),
-              "Advanced Time Control"
+              "Advanced Time Control",
             ),
             m(
               "label#label-boardsetup",
@@ -1936,7 +2044,7 @@
                   board_setup_mode = !board_setup_mode;
                 },
               }),
-              "Board Setup"
+              "Board Setup",
             ),
             m("p#label-stm", { hidden: true }),
             m("input#displaymoves", {
@@ -1963,7 +2071,7 @@
               {
                 hidden: true,
               },
-              "END"
+              "END",
             ),
             m("input[type=number]#timeoutside", {
               placeholder: "Stores value that the side that run out of time",
@@ -1980,7 +2088,7 @@
                 },
                 hidden: true,
               },
-              "Set position (internal)"
+              "Set position (internal)",
             ),
             m(
               "p#loadthemes",
@@ -1990,7 +2098,7 @@
                   LoadThemes();
                 },
               },
-              "Load Themes (internal)"
+              "Load Themes (internal)",
             ),
             m(
               "p#initializethemes",
@@ -2001,7 +2109,7 @@
                   changeBoard(true);
                 },
               },
-              "Initialize Themes (internal)"
+              "Initialize Themes (internal)",
             ),
             m(
               "p#copysetfen",
@@ -2011,7 +2119,7 @@
                   copyText($("#fen").value);
                 },
               },
-              "Copy Set FEN (internal)"
+              "Copy Set FEN (internal)",
             ),
           ]),
           m(
@@ -2026,7 +2134,7 @@
                     disabled: !is_ready || review_mode,
                     onchange: () => {
                       $("#whitetimetype").innerHTML = $(
-                        "#dropdown-whitetimemode"
+                        "#dropdown-whitetimemode",
                       ).value;
                       //white_timer_type = $("#dropdown-whitetimemode").value;
                     },
@@ -2036,7 +2144,7 @@
                     m("option", { value: "tournament" }, "Tournament"),
                     m("option", { value: "time per move" }, "Time Per Move"),
                     m("option", { value: "hourglass" }, "Hourglass"),
-                  ]
+                  ],
                 ),
                 m("input[type=number]#whitestarttime", {
                   placeholder: "Start time (ms)",
@@ -2073,7 +2181,7 @@
                     disabled: !is_ready || review_mode,
                     onchange: () => {
                       $("#blacktimetype").innerHTML = $(
-                        "#dropdown-blacktimemode"
+                        "#dropdown-blacktimemode",
                       ).value;
                       //black_timer_type = $("#dropdown-blacktimemode").value;
                     },
@@ -2083,7 +2191,7 @@
                     m("option", { value: "tournament" }, "Tournament"),
                     m("option", { value: "time per move" }, "Time Per Move"),
                     m("option", { value: "hourglass" }, "Hourglass"),
-                  ]
+                  ],
                 ),
                 m("input[type=number]#blackstarttime", {
                   placeholder: "Start time (ms)",
@@ -2119,32 +2227,32 @@
                     disabled: !is_ready || review_mode,
                     onclick: goWithTimeControl,
                   },
-                  "Start Game"
+                  "Start Game",
                 ),
                 m(
                   "p",
                   {
                     onclick: () => {
                       alert(
-                        "This time control system allows user select different time modes for two sides and gives user more choice on time odds settings.\nThe time modes are:\nInfinite: Selected side has infinite time\nTournament: Selected side has limited time and may get a time increment after a move\nTime per move: Selected side need to make each move within a fixed time limit\nHourglass: Selected side has limited time and used time will be added to opponent's time.\nNote: if you set engine's time mode to infinite, it will think forever!"
+                        "This time control system allows user select different time modes for two sides and gives user more choice on time odds settings.\nThe time modes are:\nInfinite: Selected side has infinite time\nTournament: Selected side has limited time and may get a time increment after a move\nTime per move: Selected side need to make each move within a fixed time limit\nHourglass: Selected side has limited time and used time will be added to opponent's time.\nNote: if you set engine's time mode to infinite, it will think forever!",
                       );
                     },
                   },
-                  "[Why can I choose different time modes for two sides?]"
+                  "[Why can I choose different time modes for two sides?]",
                 ),
                 m(
                   "p",
                   {
                     onclick: () => {
                       alert(
-                        "Start time: The initial time at the beginning of the game. Not applicable to infinite.\nTime gain: Get a time increment of this many milliseconds after every move. Only applicable to tournament.\nTimeout margin (Only in Advanced Analysis): The time can be exceeded by this many milliseconds. Not applicable to infinite."
+                        "Start time: The initial time at the beginning of the game. Not applicable to infinite.\nTime gain: Get a time increment of this many milliseconds after every move. Only applicable to tournament.\nTimeout margin (Only in Advanced Analysis): The time can be exceeded by this many milliseconds. Not applicable to infinite.",
                       );
                     },
                   },
-                  "  [What are these parameters?]"
+                  "  [What are these parameters?]",
                 ),
               ]),
-            ]
+            ],
           ),
           m("div#gamesettings", [
             m("p", {}, "Quick promote/demote to piece: "),
@@ -2184,14 +2292,14 @@
                 m("option", { value: "+" }, "Promote (+)"),
                 m("option", { value: "-" }, "Demote (-)"),
                 m("option", { value: "=" }, "Keep (=)"),
-              ]
+              ],
             ),
             m(
               "label",
               m("input[type=checkbox]#clickclickmove", {
                 disabled: review_mode,
               }),
-              "Click-click move"
+              "Click-click move",
             ),
             m("button#passmove", { disabled: !is_ready }, "Pass This Turn"),
           ]),
@@ -2217,19 +2325,19 @@
               m(
                 "button#addtopocket",
                 { disabled: !is_ready },
-                "Add piece to pocket"
+                "Add piece to pocket",
               ),
               m("button#clearboard", { disabled: !is_ready }, "Clear Board"),
               m("button#initboardpos", { disabled: !is_ready }, "Reset Board"),
               m(
                 "button#validatepos",
                 { disabled: !is_ready },
-                "Validate Position"
+                "Validate Position",
               ),
               m(
                 "button#boardsetupcopyfen",
                 { disabled: !is_ready },
-                "Copy FEN"
+                "Copy FEN",
               ),
             ]),
             m("div#pocketpiecechange", { hidden: true }, [
@@ -2259,22 +2367,22 @@
                   m(
                     "label",
                     m("input[type=checkbox]#whitekingsidecastle"),
-                    "White O-O"
+                    "White O-O",
                   ),
                   m(
                     "label",
                     m("input[type=checkbox]#whitequeensidecastle"),
-                    "White O-O-O"
+                    "White O-O-O",
                   ),
                   m(
                     "label",
                     m("input[type=checkbox]#blackkingsidecastle"),
-                    "Black O-O"
+                    "Black O-O",
                   ),
                   m(
                     "label",
                     m("input[type=checkbox]#blackqueensidecastle"),
-                    "Black O-O-O"
+                    "Black O-O-O",
                   ),
                 ]),
                 m("div", [
@@ -2315,22 +2423,22 @@
                 m(
                   "button#initialposition",
                   { onclick: displayInitialPosition, disabled: !is_ready },
-                  "Initial Position"
+                  "Initial Position",
                 ),
                 m(
                   "button#currentposition",
                   { onclick: displayCurrentPosition, disabled: !is_ready },
-                  "Current Position"
+                  "Current Position",
                 ),
                 m(
                   "button#previousposition",
                   { onclick: displayPreviousMove, disabled: !is_ready },
-                  "Previous Position"
+                  "Previous Position",
                 ),
                 m(
                   "button#nextposition",
                   { onclick: displayNextMove, disabled: !is_ready },
-                  "Next Position"
+                  "Next Position",
                 ),
                 m("input[type=number]#gotomovenum", {
                   placeholder: "Half Move Number",
@@ -2340,14 +2448,14 @@
                 m(
                   "button#specifiedposition",
                   { onclick: displaySpecifiedPosition, disabled: !is_ready },
-                  "Go to Move"
+                  "Go to Move",
                 ),
               ]),
               m("p", { hidden: !review_mode }, "Review mode enabled."),
               m(
                 "p",
                 { hidden: !review_mode },
-                "You can go to previous moves played to analyze your game, but you cannot make changes to the game. To exit review mode, click <reset> or <current position>."
+                "You can go to previous moves played to analyze your game, but you cannot make changes to the game. To exit review mode, click <reset> or <current position>.",
               ),
               m("div#controls", [
                 m("div", [
@@ -2358,7 +2466,7 @@
                         changePieces(false);
                       },
                     },
-                    "Change pieces"
+                    "Change pieces",
                   ),
                   m(
                     "button",
@@ -2367,7 +2475,7 @@
                         changeBoard(false);
                       },
                     },
-                    "Change board"
+                    "Change board",
                   ),
                   m("button#button-flip", "Flip Board"),
                 ]),
@@ -2375,7 +2483,7 @@
                   m(
                     "input[type=range]#range-volume",
                     { min: 0, max: 1, step: 0.05 },
-                    "range"
+                    "range",
                   ),
                   m(
                     "label",
@@ -2385,7 +2493,7 @@
                         show_dests = !show_dests;
                       },
                     }),
-                    "Show Legal Moves & Drops"
+                    "Show Legal Moves & Drops",
                   ),
                   m(
                     "label",
@@ -2395,7 +2503,7 @@
                         adjudicate = !adjudicate;
                       },
                     }),
-                    "Adjudicate"
+                    "Adjudicate",
                   ),
                 ]),
               ]),
@@ -2433,7 +2541,7 @@
                         white_remaining_time = +white_remaining_time + 10000;
                       },
                     },
-                    "Add 10s for white"
+                    "Add 10s for white",
                   ),
                   m(
                     "button#addtimeforblack",
@@ -2442,7 +2550,7 @@
                         black_remaining_time = +black_remaining_time + 10000;
                       },
                     },
-                    "Add 10s for black"
+                    "Add 10s for black",
                   ),
                   m(
                     "button#gameabort",
@@ -2453,9 +2561,9 @@
                         }
                       },
                     },
-                    "ABORT GAME"
+                    "ABORT GAME",
                   ),
-                ]
+                ],
               ),
             ]),
           ]),
@@ -2467,7 +2575,7 @@
 
     if (!isSupported()) {
       window.alert(
-        "Your browser is not supported. For more information, please take a look at https://github.com/hi-ogawa/Stockfish/wiki."
+        "Your browser is not supported. For more information, please take a look at https://github.com/hi-ogawa/Stockfish/wiki.",
       );
     } else {
       m.mount($("#root"), App);
