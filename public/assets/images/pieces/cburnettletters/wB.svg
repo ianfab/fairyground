@@ -1,0 +1,6 @@
+<svg version="1.1" viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg">
+<path d="m22.5 9c-2.21 0-4 1.79-4 4 0 0.89 0.29 1.71 0.78 2.38-1.95 1.12-3.28 3.21-3.28 5.62 0 2.03 0.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62 0.49-0.67 0.78-1.49 0.78-2.38 0-2.21-1.79-4-4-4z" fill="#fff" stroke="#000" stroke-linecap="round" stroke-width="1.5"/>
+<circle cx="22.5" cy="20.25" r="11.25" fill="#fff" stroke="#000" stroke-linejoin="round" stroke-width="1.5"/>
+<path d="m15.022 30.12c0.41646 0.33307 0.95926 0.68192 1.5327 0.99351s1.1776 0.58592 1.7168 0.76997c0.46826 0.18257 1.2944 0.42039 2.1247 0.57101 0.82643 0.12719 1.2118 0.15936 2.1499 0.17672 0.78065-5e-3 1.602-0.0808 2.4259-0.25058 0.87417-0.18012 1.5662-0.40822 2.099-0.62829 0.2456-0.0888 0.70259-0.28949 1.2332-0.57162s1.1348-0.64574 1.6747-1.0605" fill="none" stroke="#fff" stroke-linecap="round" stroke-width=".75"/>
+<text transform="scale(1 .99999)" x="17.673815" y="25.993511" fill="#000000" font-family="Arial" font-size="16.058px" stroke="#000000" stroke-width=".2" style="line-height:1.25" xml:space="preserve"><tspan x="17.673815" y="25.993511" fill="#000000" font-family="'Droid Sans Mono'" font-size="16.058px" stroke="#000000" stroke-width=".2">B</tspan></text>
+</svg>
