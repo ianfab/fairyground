@@ -1,3 +1,160 @@
+.default .cg-wrap piece.a-piece.white {
+  background-image: url('images/pieces/meridaletters/wA.svg');
+}
+.default .cg-wrap piece.pa-piece.white {
+  background-image: url('images/pieces/meridaletters/w+A.svg');
+}
+.default .cg-wrap piece.b-piece.white {
+  background-image: url('images/pieces/meridaletters/wB.svg');
+}
+.default .cg-wrap piece.pb-piece.white {
+  background-image: url('images/pieces/meridaletters/w+B.svg');
+}
+.default .cg-wrap piece.c-piece.white {
+  background-image: url('images/pieces/meridaletters/wC.svg');
+}
+.default .cg-wrap piece.pc-piece.white {
+  background-image: url('images/pieces/meridaletters/w+C.svg');
+}
+.default .cg-wrap piece.d-piece.white {
+  background-image: url('images/pieces/meridaletters/wD.svg');
+}
+.default .cg-wrap piece.pd-piece.white {
+  background-image: url('images/pieces/meridaletters/w+D.svg');
+}
+.default .cg-wrap piece.e-piece.white {
+  background-image: url('images/pieces/meridaletters/wE.svg');
+}
+.default .cg-wrap piece.pe-piece.white {
+  background-image: url('images/pieces/meridaletters/w+E.svg');
+}
+.default .cg-wrap piece.f-piece.white {
+  background-image: url('images/pieces/meridaletters/wF.svg');
+}
+.default .cg-wrap piece.pf-piece.white {
+  background-image: url('images/pieces/meridaletters/w+F.svg');
+}
+.default .cg-wrap piece.g-piece.white {
+  background-image: url('images/pieces/meridaletters/wG.svg');
+}
+.default .cg-wrap piece.pg-piece.white {
+  background-image: url('images/pieces/meridaletters/w+G.svg');
+}
+.default .cg-wrap piece.h-piece.white {
+  background-image: url('images/pieces/meridaletters/wH.svg');
+}
+.default .cg-wrap piece.ph-piece.white {
+  background-image: url('images/pieces/meridaletters/w+H.svg');
+}
+.default .cg-wrap piece.i-piece.white {
+  background-image: url('images/pieces/meridaletters/wI.svg');
+}
+.default .cg-wrap piece.pi-piece.white {
+  background-image: url('images/pieces/meridaletters/w+I.svg');
+}
+.default .cg-wrap piece.j-piece.white {
+  background-image: url('images/pieces/meridaletters/wJ.svg');
+}
+.default .cg-wrap piece.pj-piece.white {
+  background-image: url('images/pieces/meridaletters/w+J.svg');
+}
+.default .cg-wrap piece.k-piece.white {
+  background-image: url('images/pieces/meridaletters/wK.svg');
+}
+.default .cg-wrap piece.pk-piece.white {
+  background-image: url('images/pieces/meridaletters/w+K.svg');
+}
+.default .cg-wrap piece.l-piece.white {
+  background-image: url('images/pieces/meridaletters/wL.svg');
+}
+.default .cg-wrap piece.pl-piece.white {
+  background-image: url('images/pieces/meridaletters/w+L.svg');
+}
+.default .cg-wrap piece.m-piece.white {
+  background-image: url('images/pieces/meridaletters/wM.svg');
+}
+.default .cg-wrap piece.pm-piece.white {
+  background-image: url('images/pieces/meridaletters/w+M.svg');
+}
+.default .cg-wrap piece.n-piece.white {
+  background-image: url('images/pieces/meridaletters/wN.svg');
+}
+.default .cg-wrap piece.pn-piece.white {
+  background-image: url('images/pieces/meridaletters/w+N.svg');
+}
+.default .cg-wrap piece.o-piece.white {
+  background-image: url('images/pieces/meridaletters/wO.svg');
+}
+.default .cg-wrap piece.po-piece.white {
+  background-image: url('images/pieces/meridaletters/w+O.svg');
+}
+.default .cg-wrap piece.p-piece.white {
+  background-image: url('images/pieces/meridaletters/wP.svg');
+}
+.default .cg-wrap piece.pp-piece.white {
+  background-image: url('images/pieces/meridaletters/w+P.svg');
+}
+.default .cg-wrap piece.q-piece.white {
+  background-image: url('images/pieces/meridaletters/wQ.svg');
+}
+.default .cg-wrap piece.pq-piece.white {
+  background-image: url('images/pieces/meridaletters/w+Q.svg');
+}
+.default .cg-wrap piece.r-piece.white {
+  background-image: url('images/pieces/meridaletters/wR.svg');
+}
+.default .cg-wrap piece.pr-piece.white {
+  background-image: url('images/pieces/meridaletters/w+R.svg');
+}
+.default .cg-wrap piece.s-piece.white {
+  background-image: url('images/pieces/meridaletters/wS.svg');
+}
+.default .cg-wrap piece.ps-piece.white {
+  background-image: url('images/pieces/meridaletters/w+S.svg');
+}
+.default .cg-wrap piece.t-piece.white {
+  background-image: url('images/pieces/meridaletters/wT.svg');
+}
+.default .cg-wrap piece.pt-piece.white {
+  background-image: url('images/pieces/meridaletters/w+T.svg');
+}
+.default .cg-wrap piece.u-piece.white {
+  background-image: url('images/pieces/meridaletters/wU.svg');
+}
+.default .cg-wrap piece.pu-piece.white {
+  background-image: url('images/pieces/meridaletters/w+U.svg');
+}
+.default .cg-wrap piece.v-piece.white {
+  background-image: url('images/pieces/meridaletters/wV.svg');
+}
+.default .cg-wrap piece.pv-piece.white {
+  background-image: url('images/pieces/meridaletters/w+V.svg');
+}
+.default .cg-wrap piece.w-piece.white {
+  background-image: url('images/pieces/meridaletters/wW.svg');
+}
+.default .cg-wrap piece.pw-piece.white {
+  background-image: url('images/pieces/meridaletters/w+W.svg');
+}
+.default .cg-wrap piece.x-piece.white {
+  background-image: url('images/pieces/meridaletters/wX.svg');
+}
+.default .cg-wrap piece.px-piece.white {
+  background-image: url('images/pieces/meridaletters/w+X.svg');
+}
+.default .cg-wrap piece.y-piece.white {
+  background-image: url('images/pieces/meridaletters/wY.svg');
+}
+.default .cg-wrap piece.py-piece.white {
+  background-image: url('images/pieces/meridaletters/w+Y.svg');
+}
+.default .cg-wrap piece.z-piece.white {
+  background-image: url('images/pieces/meridaletters/wZ.svg');
+}
+.default .cg-wrap piece.pz-piece.white {
+  background-image: url('images/pieces/meridaletters/w+Z.svg');
+}
+
 .default .cg-wrap piece.p-piece.white {
   background-image: url('images/pieces/default/wP.svg');
 }
