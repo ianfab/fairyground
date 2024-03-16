@@ -20,17 +20,17 @@ jobs:
       - run: mkdir -p ./release_make/release-builds/macos/arm64
       - run: npm install pkg
       - run: npm install express@4.18.2
-      - run: npx pkg ./release_make --target win-x64 --output ./release-builds/win/x64/FairyGround.exe
+      - run: npx pkg ./release_make --target win-x64 --output ./release-builds/win/x64/FairyGround.exe || exit 1
       - run: test -f ./release-builds/win/x64/FairyGround.exe
-      - run: npx pkg ./release_make --target linux-x64 --output ./release-builds/linux/x64/FairyGround
+      - run: npx pkg ./release_make --target linux-x64 --output ./release-builds/linux/x64/FairyGround || exit 1
       - run: test -f ./release-builds/linux/x64/FairyGround
-      - run: npx pkg ./release_make --target node16-win-arm64 --output ./release-builds/win/arm64/FairyGround.exe
+      - run: npx pkg ./release_make --target node16-win-arm64 --output ./release-builds/win/arm64/FairyGround.exe || exit 1
       - run: test -f ./release-builds/win/arm64/FairyGround.exe
-      - run: npx pkg ./release_make --target node16-linux-arm64 --output ./release-builds/linux/arm64/FairyGround
+      - run: npx pkg ./release_make --target node16-linux-arm64 --output ./release-builds/linux/arm64/FairyGround || exit 1
       - run: test -f ./release-builds/linux/arm64/FairyGround
-      - run: npx pkg ./release_make --target macos-x64 --output ./release-builds/macos/x64/FairyGround
+      - run: npx pkg ./release_make --target macos-x64 --output ./release-builds/macos/x64/FairyGround || exit 1
       - run: test -f ./release-builds/macos/x64/FairyGround
-      - run: npx pkg ./release_make --target node16-macos-arm64 --output ./release-builds/macos/arm64/FairyGround
+      - run: npx pkg ./release_make --target node16-macos-arm64 --output ./release-builds/macos/arm64/FairyGround || exit 1
       - run: test -f ./release-builds/macos/arm64/FairyGround
       - run: npm install
       - run: npm run build
