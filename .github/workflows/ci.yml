@@ -26,7 +26,7 @@ jobs:
       - run: npx pkg ./release_make --target linux-arm64 --output ./release-builds/linux/arm64/FairyGround
       - run: npx pkg ./release_make --target macos-x64 --output ./release-builds/macos/x64/FairyGround
       - run: npx pkg ./release_make --target macos-arm64 --output ./release-builds/macos/arm64/FairyGround
-      - run: npm run install
+      - run: npm install
       - run: npm run build
       - run: cp -r ./public ./release_make/release-builds/win/x64/
       - run: cp -r ./public ./release_make/release-builds/win/arm64/
