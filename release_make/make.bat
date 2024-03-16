@@ -20,7 +20,7 @@ md .\release-builds\macos\arm64 || goto error
 (start /wait "" pkg . --target win-arm64 --output .\release-builds\win\arm64\FairyGround.exe ^& exit) || goto error
 (start /wait "" pkg . --target linux-arm64 --output .\release-builds\linux\arm64\FairyGround ^& exit) || goto error
 (start /wait "" pkg . --target macos-x64 --output .\release-builds\macos\x64\FairyGround ^& exit) || goto error
-(start /wait "" pkg . --target macos-arm64 --output .\release-builds\macos\arm64\FairyGround.exe ^& exit) || goto error
+(start /wait "" pkg . --target macos-arm64 --output .\release-builds\macos\arm64\FairyGround ^& exit) || goto error
 cd ..
 (start /wait "" npm run buildwithcmd ^& exit) || goto error
 xcopy .\public .\release_make\release-builds\win\x64\public /E /H /C /I /Q || goto error
