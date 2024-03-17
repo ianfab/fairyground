@@ -530,6 +530,35 @@
     cursor: pointer;
   }
 
+  #evalbar {
+    width: 400px;
+    height: 30px;
+    overflow: hidden;
+    border-radius: 10px;
+    background-color: #111111;
+    position: relative;
+  }
+
+  #evalbar #evalbarprogress {
+    float: left;
+    height: 100%;
+    width: 50%;
+    background-color: #eeeeee;
+  }
+
+  #evalbar #cp {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    color: orange;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 28px;
+    font-weight: bold;
+  }
+
   spangameresult {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -1612,6 +1641,8 @@
                   $("#set").click();
                 }
                 output2 += line + "\n";
+                $("#engineoutputline").value = line;
+                $("#engineoutputline").click();
               }
               m.redraw();
             });
@@ -2073,6 +2104,7 @@
               },
               "END",
             ),
+            m("input#engineoutputline", { hidden: true }),
             m("input[type=number]#timeoutside", {
               placeholder: "Stores value that the side that run out of time",
               hidden: true,
@@ -2565,6 +2597,9 @@
                   ),
                 ],
               ),
+              m("div#evaluation", { hidden: !analysis_mode }, [
+                m("div#evalbar", [m("p#cp", "0.00"), m("div#evalbarprogress")]),
+              ]),
             ]),
           ]),
         ]);
