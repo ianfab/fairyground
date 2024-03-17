@@ -71,6 +71,11 @@ const clickClickMove = document.getElementById("clickclickmove");
 const positionVariantTxt = document.getElementById("posvariant-txt");
 const quickPromotionPiece = document.getElementById("dropdown-quickpromotion");
 const buttonPassMove = document.getElementById("passmove");
+const engineOutput = document.getElementById("engineoutputline");
+const isAnalysis = document.getElementById("analysis");
+const evaluationBar = document.getElementById("evalbarprogress");
+const evalscore = document.getElementById("cp");
+const multipv = document.getElementById("multipv");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
@@ -215,8 +220,20 @@ let EmptyMap = new Map();
 let ffish = null;
 let board = null;
 let chessground = null;
+var i = 0;
 const WHITE = true;
 const BLACK = false;
+var evaluation = 0.0;
+var multipvrecord = [];
+var evaluationindex = [];
+const mateevalfactor = 2147483647;
+const maxmultipvcount = 4096;
+var recordedmultipv = 1;
+
+for (i = 0; i < maxmultipvcount; i++) {
+  multipvrecord.push([null, null, null, null]);
+  evaluationindex.push(0);
+}
 
 function getPieceRoles(pieceLetters) {
   const uniqueLetters = new Set(pieceLetters.toLowerCase().split(""));
@@ -231,7 +248,7 @@ function initBoard(variant) {
   const fenBoard = board.fen().split(" ")[0];
   var pocketRoles = undefined;
   resetTimer();
-
+  recordedmultipv = 1;
   if (fenBoard.includes("[")) {
     const wpocket = board.pocket(WHITE);
     const bpocket = board.pocket(BLACK); // Variants with empty hands at start (zh, shogi, etc.)
@@ -253,6 +270,7 @@ function initBoard(variant) {
   }
 
   const config = {
+    autoCastle: false,
     dimensions: getDimensions(),
     fen: fenBoard,
     movable: {
@@ -352,6 +370,44 @@ function getWallSquarePosition() {
   }
   console.log(wall_square_list);
   return wall_square_list;
+}
+
+function parseUCIMove(ucimove) {
+  if (typeof ucimove != "string") {
+    throw TypeError;
+  }
+  let move = ucimove;
+  if (move.includes("@")) {
+    return [
+      move.slice(0, move.indexOf("@") + 1),
+      move.slice(move.indexOf("@") + 1),
+      "",
+    ];
+  }
+  let additional = "";
+  if (move.at(-1) == "+") {
+    additional = "+";
+    move = move.slice(0, -1);
+  } else if (move.at(-1) == "-") {
+    additional = "-";
+    move = move.slice(0, -1);
+  } else if (/^[a-z]{1}$/.test(move.at(-1))) {
+    additional = move.at(-1);
+    move = move.slice(0, -1);
+  }
+  let files = move.split(/[0-9]+/).filter(function (item) {
+    return item != null && item != undefined && item != "";
+  });
+  let ranks = move.split(/[a-z]+/).filter(function (item) {
+    return item != null && item != undefined && item != "";
+  });
+  if (files.length != 2) {
+    throw RangeError;
+  }
+  if (ranks.length != 2) {
+    throw RangeError;
+  }
+  return [files[0] + ranks[0], files[1] + ranks[1], additional];
 }
 
 function showWallSquares() {
@@ -460,6 +516,7 @@ new Module().then((loadedModule) => {
   variantsIni.onchange = function (e) {
     const selected = e.currentTarget.files[0];
     resetTimer();
+    recordedmultipv = 1;
 
     if (selected) {
       selected.text().then(function (ini) {
@@ -520,6 +577,7 @@ new Module().then((loadedModule) => {
     board.pop();
     updateChessground();
     chessground.cancelPremove();
+    recordedmultipv = 1;
   };
 
   rangeVolume.oninput = function () {
@@ -557,6 +615,7 @@ new Module().then((loadedModule) => {
     } else {
       alert("Invalid FEN");
     }
+    recordedmultipv = 1;
   };
 
   buttonNextPosition.onclick = function () {
@@ -727,6 +786,7 @@ new Module().then((loadedModule) => {
       dropdownPositionVariantName.selectedIndex = -1;
       positionInformation.innerHTML = "";
     }
+    recordedmultipv = 1;
   };
 
   buttonAboutPosition.onclick = function () {
@@ -766,6 +826,7 @@ new Module().then((loadedModule) => {
   };
 
   buttonReset.onclick = function () {
+    recordedmultipv = 1;
     dropdownPositionVariantType.selectedIndex = 0;
     dropdownPositionVariantType.onchange();
   };
@@ -819,6 +880,414 @@ new Module().then((loadedModule) => {
     });
   };
 
+  engineOutput.onclick = function () {
+    if (isAnalysis.checked == false) {
+      return;
+    }
+    let text = engineOutput.value;
+    let multipvid = 0;
+    let bestpv = 0;
+    if (text.includes(" multipv ")) {
+      let textparselist = text.split(" ");
+      multipvid =
+        parseInt(textparselist[textparselist.indexOf("multipv") + 1]) - 1;
+      if (multipvid + 1 > recordedmultipv) {
+        recordedmultipv = multipvid + 1;
+      }
+    }
+    let bestmove = [];
+    let ponder = [];
+    if (text.includes(" score ") && text.includes(" pv ")) {
+      let textparselist = text.split(" ");
+      let evaltext = textparselist.at(textparselist.indexOf("score") + 1);
+      if (evaltext == "mate") {
+        let matenum = parseInt(
+          textparselist.at(textparselist.indexOf("score") + 2),
+        );
+        if (!board.turn()) {
+          matenum = matenum * -1;
+        }
+        multipvrecord[multipvid][0] = true;
+        multipvrecord[multipvid][1] = matenum;
+        evaluationindex[multipvid] = mateevalfactor / matenum;
+        evaluation = evaluationindex[multipvid];
+      } else if (evaltext == "cp") {
+        let evalval =
+          parseInt(textparselist.at(textparselist.indexOf("score") + 2)) / 100;
+        if (!board.turn()) {
+          evalval = evalval * -1;
+        }
+        multipvrecord[multipvid][0] = false;
+        multipvrecord[multipvid][1] = evalval;
+        evaluationindex[multipvid] = evalval;
+        evaluation = evaluationindex[multipvid];
+      } else {
+        multipvrecord[multipvid][0] = false;
+        multipvrecord[multipvid][1] = 0;
+        evaluationindex[multipvid] = 0;
+        console.log("Detected bad evaluation");
+      }
+      let moves = textparselist.slice(textparselist.indexOf("pv") + 1);
+      if (moves.length == 0) {
+        return;
+      } else if (moves.length == 1) {
+        bestmove = parseUCIMove(moves[0]);
+      } else {
+        bestmove = parseUCIMove(moves[0]);
+        ponder = parseUCIMove(moves[1]);
+      }
+      multipvrecord[multipvid][2] = bestmove;
+      multipvrecord[multipvid][3] = ponder;
+    } else if (text.includes("bestmove")) {
+      let textparselist = text.split(" ");
+      if (board.turn()) {
+        bestpv = evaluationindex.indexOf(
+          Math.max(...evaluationindex.slice(0, recordedmultipv)),
+        );
+      } else {
+        bestpv = evaluationindex.indexOf(
+          Math.min(...evaluationindex.slice(0, recordedmultipv)),
+        );
+      }
+      bestmove = parseUCIMove(textparselist[1]);
+      if (textparselist[3] != undefined) {
+        ponder = parseUCIMove(textparselist[3]);
+      }
+      multipvrecord[bestpv][2] = bestmove;
+      multipvrecord[bestpv][3] = ponder;
+    } else if (text.includes("score mate 0")) {
+      if (board.turn()) {
+        evaluationBar.style.width = "0%";
+        evalscore.innerText = "Checkmate";
+      } else {
+        evaluationBar.style.width = "100%";
+        evalscore.innerText = "Checkmate";
+      }
+      return;
+    } else {
+      return;
+    }
+    console.log(
+      "MultiPV:",
+      multipvid,
+      "Bestmove:",
+      bestmove[0],
+      bestmove[1],
+      "Ponder:",
+      ponder[0],
+      ponder[1],
+      "Evaluation:",
+      evaluation,
+    );
+    if (board.turn()) {
+      bestpv = evaluationindex.indexOf(
+        Math.max(...evaluationindex.slice(0, recordedmultipv)),
+      );
+    } else {
+      bestpv = evaluationindex.indexOf(
+        Math.min(...evaluationindex.slice(0, recordedmultipv)),
+      );
+    }
+    console.log("Best PV:", bestpv + 1);
+    if (multipvrecord[bestpv][0]) {
+      let matemoves = multipvrecord[bestpv][1];
+      if (matemoves > 0) {
+        evaluationBar.style.width = "100%";
+        evalscore.innerText = "Mate in " + matemoves.toString();
+      } else if (matemoves < 0) {
+        evaluationBar.style.width = "0%";
+        evalscore.innerText = "Mate in " + (-1 * matemoves).toString();
+      } else {
+        if (board.turn()) {
+          evaluationBar.style.width = "0%";
+          evalscore.innerText = "Checkmate";
+        } else {
+          evaluationBar.style.width = "100%";
+          evalscore.innerText = "Checkmate";
+        }
+      }
+    } else {
+      evaluation = multipvrecord[bestpv][1];
+      if (evaluation > 0) {
+        evalscore.innerText = "+" + evaluation.toString();
+      } else {
+        evalscore.innerText = evaluation;
+      }
+      if (evaluation < -9.8) {
+        evaluationBar.style.width = "1%";
+      } else if (evaluation > 9.8) {
+        evaluationBar.style.width = "99%";
+      } else {
+        evaluationBar.style.width =
+          parseInt((evaluation * 100 + 1000) / 20).toString() + "%";
+      }
+    }
+    let autoshapes = [];
+    bestmove = multipvrecord[bestpv][2];
+    ponder = multipvrecord[bestpv][3];
+    console.log;
+    if (
+      bestmove[0] != undefined &&
+      bestmove[1] != undefined &&
+      bestmove[2] != undefined
+    ) {
+      if (bestmove[0].includes("@")) {
+        autoshapes.push({
+          brush: "blue",
+          orig: bestmove[1].replace("10", ":"),
+        });
+        if (board.turn()) {
+          if (bestmove[0].charAt(0) == "+") {
+            autoshapes.push({
+              brush: "blue",
+              dest: "a0",
+              orig: bestmove[1].replace("10", ":"),
+              piece: {
+                color: "white",
+                role: "p" + bestmove[0].toLowerCase().charAt(1) + "-piece",
+                scale: 0.7,
+              },
+              modifiers: { hilite: true },
+            });
+          } else {
+            autoshapes.push({
+              brush: "blue",
+              dest: "a0",
+              orig: bestmove[1].replace("10", ":"),
+              piece: {
+                color: "white",
+                role: bestmove[0].toLowerCase().charAt(0) + "-piece",
+                scale: 0.7,
+              },
+              modifiers: { hilite: true },
+            });
+          }
+        } else {
+          if (bestmove[0].charAt(0) == "+") {
+            autoshapes.push({
+              brush: "blue",
+              dest: "a0",
+              orig: bestmove[1].replace("10", ":"),
+              piece: {
+                color: "black",
+                role: "p" + bestmove[0].toLowerCase().charAt(1) + "-piece",
+                scale: 0.7,
+              },
+              modifiers: { hilite: true },
+            });
+          } else {
+            autoshapes.push({
+              brush: "blue",
+              dest: "a0",
+              orig: bestmove[1].replace("10", ":"),
+              piece: {
+                color: "black",
+                role: bestmove[0].toLowerCase().charAt(0) + "-piece",
+                scale: 0.7,
+              },
+              modifiers: { hilite: true },
+            });
+          }
+        }
+      } else {
+        autoshapes.push({
+          brush: "blue",
+          dest: bestmove[1].replace("10", ":"),
+          orig: bestmove[0].replace("10", ":"),
+        });
+        if (bestmove[2] != "") {
+          let piecerole = chessground.state.boardState.pieces.get(
+            bestmove[0].replace("10", ":"),
+          ).role;
+          if (bestmove[2] == "+") {
+            if (board.turn()) {
+              autoshapes.push({
+                brush: "blue",
+                orig: bestmove[1].replace("10", ":"),
+                dest: bestmove[0].replace("10", ":"),
+                piece: { color: "white", role: "p" + piecerole },
+              });
+            } else {
+              autoshapes.push({
+                brush: "blue",
+                orig: bestmove[1].replace("10", ":"),
+                dest: bestmove[0].replace("10", ":"),
+                piece: { color: "black", role: "p" + piecerole },
+              });
+            }
+          } else if (bestmove[2] == "-") {
+            if (board.turn()) {
+              autoshapes.push({
+                brush: "blue",
+                orig: bestmove[1].replace("10", ":"),
+                dest: bestmove[0].replace("10", ":"),
+                piece: { color: "white", role: piecerole.slice(1) },
+              });
+            } else {
+              autoshapes.push({
+                brush: "blue",
+                orig: bestmove[1].replace("10", ":"),
+                dest: bestmove[0].replace("10", ":"),
+                piece: { color: "black", role: piecerole.slice(1) },
+              });
+            }
+          } else {
+            if (board.turn()) {
+              autoshapes.push({
+                brush: "blue",
+                orig: bestmove[1].replace("10", ":"),
+                dest: bestmove[0].replace("10", ":"),
+                piece: { color: "white", role: bestmove[2] + "-piece" },
+              });
+            } else {
+              autoshapes.push({
+                brush: "blue",
+                orig: bestmove[1].replace("10", ":"),
+                dest: bestmove[0].replace("10", ":"),
+                piece: { color: "black", role: bestmove[2] + "-piece" },
+              });
+            }
+          }
+        }
+      }
+    }
+    if (
+      ponder[0] != undefined &&
+      ponder[1] != undefined &&
+      ponder[2] != undefined
+    ) {
+      if (ponder[0].includes("@")) {
+        autoshapes.push({ brush: "red", orig: ponder[1].replace("10", ":") });
+        if (board.turn()) {
+          if (ponder[0].charAt(0) == "+") {
+            autoshapes.push({
+              brush: "red",
+              dest: "a0",
+              orig: ponder[1].replace("10", ":"),
+              piece: {
+                color: "black",
+                role: "p" + ponder[0].toLowerCase().charAt(0) + "-piece",
+                scale: 0.7,
+              },
+              modifiers: { hilite: true },
+            });
+          } else {
+            autoshapes.push({
+              brush: "red",
+              dest: "a0",
+              orig: ponder[1].replace("10", ":"),
+              piece: {
+                color: "black",
+                role: ponder[0].toLowerCase().charAt(0) + "-piece",
+                scale: 0.7,
+              },
+              modifiers: { hilite: true },
+            });
+          }
+        } else {
+          if (ponder[0].charAt(0) == "+") {
+            autoshapes.push({
+              brush: "red",
+              dest: "a0",
+              orig: ponder[1].replace("10", ":"),
+              piece: {
+                color: "white",
+                role: "p" + ponder[0].toLowerCase().charAt(0) + "-piece",
+                scale: 0.7,
+              },
+              modifiers: { hilite: true },
+            });
+          } else {
+            autoshapes.push({
+              brush: "red",
+              dest: "a0",
+              orig: ponder[1].replace("10", ":"),
+              piece: {
+                color: "white",
+                role: ponder[0].toLowerCase().charAt(0) + "-piece",
+                scale: 0.7,
+              },
+              modifiers: { hilite: true },
+            });
+          }
+        }
+      } else {
+        autoshapes.push({
+          brush: "red",
+          dest: ponder[1].replace("10", ":"),
+          orig: ponder[0].replace("10", ":"),
+        });
+        if (ponder[2] != "") {
+          let piecerole = chessground.state.boardState.pieces.get(
+            ponder[0].replace("10", ":"),
+          ).role;
+          if (ponder[2] == "+") {
+            if (board.turn()) {
+              autoshapes.push({
+                brush: "red",
+                orig: ponder[1].replace("10", ":"),
+                dest: ponder[0].replace("10", ":"),
+                piece: { color: "black", role: "p" + piecerole },
+              });
+            } else {
+              autoshapes.push({
+                brush: "red",
+                orig: ponder[1].replace("10", ":"),
+                dest: ponder[0].replace("10", ":"),
+                piece: { color: "white", role: "p" + piecerole },
+              });
+            }
+          } else if (ponder[2] == "-") {
+            if (board.turn()) {
+              autoshapes.push({
+                brush: "red",
+                orig: ponder[1].replace("10", ":"),
+                dest: ponder[0].replace("10", ":"),
+                piece: { color: "black", role: piecerole.slice(1) },
+              });
+            } else {
+              autoshapes.push({
+                brush: "red",
+                orig: ponder[1].replace("10", ":"),
+                dest: ponder[0].replace("10", ":"),
+                piece: { color: "white", role: piecerole.slice(1) },
+              });
+            }
+          } else {
+            if (board.turn()) {
+              autoshapes.push({
+                brush: "red",
+                orig: ponder[1].replace("10", ":"),
+                dest: ponder[0].replace("10", ":"),
+                piece: { color: "black", role: ponder[2] + "-piece" },
+              });
+            } else {
+              autoshapes.push({
+                brush: "red",
+                orig: ponder[1].replace("10", ":"),
+                dest: ponder[0].replace("10", ":"),
+                piece: { color: "white", role: ponder[2] + "-piece" },
+              });
+            }
+          }
+        }
+      }
+    }
+    chessground.setAutoShapes(autoshapes);
+  };
+
+  isAnalysis.onchange = function () {
+    recordedmultipv = 1;
+    if (isAnalysis.checked) {
+      console.log("Observing.");
+      //observer.observe(engineOutput, observerconfig);
+    } else {
+      console.log("Clear auto shapes.");
+      chessground.setAutoShapes([]);
+      //observer.disconnect();
+    }
+  };
+
   updateChessground();
 }); // Chessground helper functions
 
@@ -847,6 +1316,7 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
     disableBoardMove();
   }
   displayReady.value = 0;
+  recordedmultipv = 1;
 }
 
 const onSelectPositionVariantsFile = async (e) => {
@@ -1588,6 +2058,7 @@ function afterMove(capture) {
     soundCheck.currentTime = 0.0;
     soundCheck.play();
   }
+  recordedmultipv = 1;
 }
 
 function getPgn(board) {
