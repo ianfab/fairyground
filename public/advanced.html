@@ -343,6 +343,27 @@
     overflow: hidden;
   }
 
+  #info #enginecmddiv {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  #info #enginecmddiv #enginecmd {
+    width: 600px;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+  }
+
+  #info #enginecmddiv #sendenginecmd {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
   #blacktime {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -557,7 +578,7 @@
     transform: translateX(-50%);
     font-size: 28px;
     font-weight: bold;
-    font-family: "Times New Roman", Georgia, Serif, Arial;
+    font-family: Arial, "Times New Roman", Georgia, Serif;
   }
 
   spangameresult {
@@ -960,6 +981,123 @@
             (play_black && stm == "black"))
         )
           setTimeout(go(), 10);
+      };
+
+      const sendCommandToEngine = () => {
+        let cmd = $("#enginecmd")
+          .value.split(" ")
+          .filter(function (item) {
+            return item != null && item != undefined && item != "";
+          });
+        if (cmd[0] == "quit") {
+          window.alert(
+            "Cannot send this command: Quitting engine will cause the engine to not work.",
+          );
+          return;
+        }
+        if (cmd[0] == "position") {
+          window.alert(
+            "Cannot send this command: Setting position will cause the UI's position and the engine's position to be different. Set the position in the \"Position\" section instead.",
+          );
+          return;
+        }
+        if (cmd[0] == "flip") {
+          window.alert(
+            "Cannot send this command: Flipping the side will cause the UI's position and the engine's position to be different. Set the position in the \"Position\" section instead.",
+          );
+          return;
+        }
+        if (cmd[0] == "go") {
+          window.alert(
+            "Cannot send this command: Perform this action in the UI instead.",
+          );
+          return;
+        }
+        if (cmd[0] == "stop") {
+          window.alert(
+            "Cannot send this command: Perform this action in the UI instead.",
+          );
+          return;
+        }
+        if (cmd[0] == "ucinewgame") {
+          window.alert(
+            "Cannot send this command: Perform this action in the UI instead.",
+          );
+          return;
+        }
+        if (cmd[0] == "ponderhit") {
+          window.alert(
+            "Cannot send this command: Fairyground does not allow engine pondering.",
+          );
+          return;
+        }
+        if (
+          cmd[0] == "setoption" &&
+          cmd[1] == "name" &&
+          cmd[2] == "VariantPath"
+        ) {
+          window.alert(
+            'Cannot send this command: To select variants.ini, select the ini file by clicking the "Select File" button of variants.ini at the top of the page.',
+          );
+          return;
+        }
+        if (
+          cmd[0] == "setoption" &&
+          cmd[1] == "name" &&
+          cmd[2] == "SyzygyPath"
+        ) {
+          window.alert(
+            "Cannot send this command: Syzygy tablebase files cannot be accessed by setting value here, as the engine is running in WASM binary in the browser and web browsers do not allow accessing client's files without consent.",
+          );
+          return;
+        }
+        if (
+          cmd[0] == "setoption" &&
+          cmd[1] == "name" &&
+          cmd[2] == "UCI_Variant"
+        ) {
+          window.alert(
+            "Cannot send this command: To change the variant, select the items in the variants dropdown.",
+          );
+          return;
+        }
+        if (cmd[0] == "setoption" && cmd[1] == "name" && cmd[2] == "Ponder") {
+          window.alert(
+            "Cannot send this command: Setting this value manually does not make sense.",
+          );
+          return;
+        }
+        if (cmd[0] == "usi") {
+          window.alert(
+            "Cannot send this command: Fairyground only accepts UCI protocol.",
+          );
+          return;
+        }
+        if (cmd[0] == "ucci") {
+          window.alert(
+            "Cannot send this command: Fairyground only accepts UCI protocol.",
+          );
+          return;
+        }
+        if (cmd[0] == "xboard") {
+          window.alert(
+            "Cannot send this command: Fairyground only accepts UCI protocol.",
+          );
+          return;
+        }
+        if (cmd[0] == "ucicyclone") {
+          window.alert(
+            "Cannot send this command: Fairyground only accepts UCI protocol.",
+          );
+          return;
+        }
+        if (cmd[0] == "uci") {
+          window.alert(
+            "Cannot send this command: This will reset engine status leaving UI status unchanged.",
+          );
+          return;
+        }
+        stockfish.postMessage($("#enginecmd").value);
       };
 
       const totalMoveNumber = () => {
@@ -2551,6 +2689,34 @@
               m("p#currentboardfen"),
               m("p#label-pgn"),
               m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
+              m("div#enginecmddiv", [
+                m("input#enginecmd", {
+                  placeholder: "Send command to engine...",
+                  disabled: !is_ready || during_play,
+                  onkeyup: (e) => {
+                    if (e.keyCode != 13) {
+                      e.redraw = false;
+                      return;
+                    }
+                    if (during_play) {
+                      return;
+                    }
+                    sendCommandToEngine();
+                  },
+                }),
+                m(
+                  "button#sendenginecmd",
+                  {
+                    onclick: () => {
+                      if (during_play) {
+                        return;
+                      }
+                      sendCommandToEngine();
+                    },
+                  },
+                  "SEND",
+                ),
+              ]),
               m("div#timers", { hidden: !advanced_time_control }, [
                 m("div#whitetimer", [
                   m("p", "White Time"),
