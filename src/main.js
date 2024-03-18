@@ -377,11 +377,24 @@ function parseUCIMove(ucimove) {
     throw TypeError;
   }
   let move = ucimove;
+  let gatingmove = "";
+  if (move.includes(",")) {
+    let gating = move.split(",")[1];
+    move = move.split(",")[0];
+    gatingmove =
+      gating.split(/[0-9]+/).filter(function (item) {
+        return item != null && item != undefined && item != "";
+      })[1] +
+      gating.split(/[a-z]+/).filter(function (item) {
+        return item != null && item != undefined && item != "";
+      })[1];
+  }
   if (move.includes("@")) {
     return [
       move.slice(0, move.indexOf("@") + 1),
       move.slice(move.indexOf("@") + 1),
       "",
+      gatingmove,
     ];
   }
   let additional = "";
@@ -407,7 +420,7 @@ function parseUCIMove(ucimove) {
   if (ranks.length != 2) {
     throw RangeError;
   }
-  return [files[0] + ranks[0], files[1] + ranks[1], additional];
+  return [files[0] + ranks[0], files[1] + ranks[1], additional, gatingmove];
 }
 
 function showWallSquares() {
@@ -1009,9 +1022,9 @@ new Module().then((loadedModule) => {
     } else {
       evaluation = multipvrecord[bestpv][1];
       if (evaluation > 0) {
-        evalscore.innerText = "+" + evaluation.toString();
+        evalscore.innerText = "+" + evaluation.toFixed(2).toString();
       } else {
-        evalscore.innerText = evaluation;
+        evalscore.innerText = evaluation.toFixed(2);
       }
       if (evaluation < -9.8) {
         evaluationBar.style.width = "1%";
@@ -1029,7 +1042,8 @@ new Module().then((loadedModule) => {
     if (
       bestmove[0] != undefined &&
       bestmove[1] != undefined &&
-      bestmove[2] != undefined
+      bestmove[2] != undefined &&
+      bestmove[3] != undefined
     ) {
       if (bestmove[0].includes("@")) {
         autoshapes.push({
@@ -1150,11 +1164,29 @@ new Module().then((loadedModule) => {
           }
         }
       }
+      if (bestmove[3] != "") {
+        autoshapes.push({
+          brush: "blue",
+          orig: bestmove[3].replace("10", ":"),
+        });
+        autoshapes.push({
+          brush: "blue",
+          dest: "a0",
+          orig: bestmove[3].replace("10", ":"),
+          piece: {
+            color: "black",
+            role: "_-piece",
+            scale: 0.7,
+          },
+          modifiers: { hilite: true },
+        });
+      }
     }
     if (
       ponder[0] != undefined &&
       ponder[1] != undefined &&
-      ponder[2] != undefined
+      ponder[2] != undefined &&
+      ponder[3] != undefined
     ) {
       if (ponder[0].includes("@")) {
         autoshapes.push({ brush: "red", orig: ponder[1].replace("10", ":") });
@@ -1271,6 +1303,20 @@ new Module().then((loadedModule) => {
             }
           }
         }
+      }
+      if (ponder[3] != "") {
+        autoshapes.push({ brush: "red", orig: ponder[3].replace("10", ":") });
+        autoshapes.push({
+          brush: "red",
+          dest: "a0",
+          orig: ponder[3].replace("10", ":"),
+          piece: {
+            color: "black",
+            role: "_-piece",
+            scale: 0.7,
+          },
+          modifiers: { hilite: true },
+        });
       }
     }
     chessground.setAutoShapes(autoshapes);
