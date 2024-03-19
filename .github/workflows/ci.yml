@@ -7,3 +7,32 @@ jobs:
       - uses: actions/checkout@v2
       - run: npm install prettier
       - run: npm run format:check
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: git clone https://github.com/daeken/ldid.git
+      - run: cd ldid && ./make.sh
+      - run: rm -rf ./release_make/release-builds
+      - run: mkdir -p ./release_make/release-builds/win/x64
+      - run: mkdir -p ./release_make/release-builds/linux/x64
+      - run: mkdir -p ./release_make/release-builds/macos/x64
+      - run: mkdir -p ./release_make/release-builds/win/arm64
+      - run: mkdir -p ./release_make/release-builds/linux/arm64
+      - run: mkdir -p ./release_make/release-builds/macos/arm64
+      - run: npm install pkg
+      - run: npm install express@4.18.2
+      - run: if [[ "$(npx pkg ./release_make --target win-x64 --output ./release-builds/win/x64/FairyGround.exe | grep 'Failed to make bytecode')" == "" ]]; then echo "Pass."; else echo "Fail： Bytecode generation failed. Trying --no-bytecode..." & npx pkg ./release_make --no-bytecode --public --public-packages --target win-x64 --output ./release-builds/win/x64/FairyGround.exe; fi
+      - run: if [[ "$(npx pkg ./release_make --target linux-x64 --output ./release-builds/linux/x64/FairyGround | grep 'Failed to make bytecode')" == "" ]]; then echo "Pass."; else echo "Fail： Bytecode generation failed. Trying --no-bytecode..." & npx pkg ./release_make --no-bytecode --public --public-packages --target linux-x64 --output ./release-builds/linux/x64/FairyGround; fi
+      - run: if [[ "$(npx pkg ./release_make --target win-arm64 --output ./release-builds/win/arm64/FairyGround.exe | grep 'Failed to make bytecode')" == "" ]]; then echo "Pass."; else echo "Fail： Bytecode generation failed. Trying --no-bytecode..." & npx pkg ./release_make --no-bytecode --public --public-packages --target win-arm64 --output ./release-builds/win/arm64/FairyGround.exe; fi
+      - run: if [[ "$(npx pkg ./release_make --target linux-arm64 --output ./release-builds/linux/arm64/FairyGround | grep 'Failed to make bytecode')" == "" ]]; then echo "Pass."; else echo "Fail： Bytecode generation failed. Trying --no-bytecode..." & npx pkg ./release_make --no-bytecode --public --public-packages --target linux-arm64 --output ./release-builds/linux/arm64/FairyGround; fi
+      - run: export PATH="$PATH:$(pwd)/ldid" && if [[ "$(npx pkg ./release_make --target macos-x64 --output ./release-builds/macos/x64/FairyGround.app | grep 'Failed to make bytecode')" == "" ]]; then echo "Pass."; else echo "Fail： Bytecode generation failed. Trying --no-bytecode..." & npx pkg ./release_make --no-bytecode --public --public-packages --target macos-x64 --output ./release-builds/macos/x64/FairyGround.app; fi
+      - run: export PATH="$PATH:$(pwd)/ldid" && if [[ "$(npx pkg ./release_make --target macos-arm64 --output ./release-builds/macos/arm64/FairyGround.app | grep 'Failed to make bytecode')" == "" ]]; then echo "Pass."; else echo "Fail： Bytecode generation failed. Trying --no-bytecode..." & npx pkg ./release_make --no-bytecode --public --public-packages --target macos-arm64 --output ./release-builds/macos/arm64/FairyGround.app; fi
+      - run: npm install
+      - run: npm run build
+      - run: cp -r ./public ./release_make/release-builds/win/x64/
+      - run: cp -r ./public ./release_make/release-builds/win/arm64/
+      - run: cp -r ./public ./release_make/release-builds/linux/x64/
+      - run: cp -r ./public ./release_make/release-builds/linux/arm64/
+      - run: cp -r ./public ./release_make/release-builds/macos/x64/
+      - run: cp -r ./public ./release_make/release-builds/macos/arm64/

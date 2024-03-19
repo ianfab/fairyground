@@ -1,0 +1,15 @@
+{
+  "name": "release_make",
+  "version": "1.0.0",
+  "description": "Make release for FairyGround server.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./index.js"
+  },
+  "author": "",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "bin": "./index.js"
+}

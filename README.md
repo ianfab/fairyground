@@ -32,6 +32,10 @@ Then, browse to http://localhost:5000
 
 Enjoy!
 
+## Make A Release
+
+See [README.md](./release_make/README.md)
+
 # Attribution
 
 See [COPYING.md](COPYING.md)

@@ -2,6 +2,7 @@
   "scripts": {
     "serve": "serve public --no-compression",
     "build": "rm -rf public/lib && mkdir -p public/lib && cp node_modules/fairy-stockfish-nnue.wasm/* public/lib && cp node_modules/ffish-es6/ffish.wasm public/ && browserify -p esmify src/main.js -o public/bundle.js && cp node_modules/mithril/mithril.min.js public/lib",
+    "buildwithcmd": "rd /s /q public\\lib & md public\\lib && copy /Y node_modules\\fairy-stockfish-nnue.wasm\\* public\\lib && copy /Y node_modules\\ffish-es6\\ffish.wasm public\\ && browserify -p esmify src/main.js -o public/bundle.js && copy /Y node_modules\\mithril\\mithril.min.js public\\lib",
     "watch-build": "watchify -p esmify src/main.js -o public/bundle.js",
     "format": "prettier --write src public/*.html",
     "format:check": "prettier --check src public/*.html"
