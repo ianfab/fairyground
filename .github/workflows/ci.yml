@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: git clone https://github.com/sbingner/ldid
-      - run: cd ldid && git submodule update --init && ./make.sh && cp -f ./ldid /usr/bin/ldid
+      - run: git clone https://github.com/daeken/ldid.git
+      - run: cd ldid && ./make.sh && cp -f ./ldid /usr/bin/ldid
       - run: rm -rf ./release_make/release-builds
       - run: mkdir -p ./release_make/release-builds/win/x64
       - run: mkdir -p ./release_make/release-builds/linux/x64
