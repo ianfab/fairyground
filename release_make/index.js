@@ -39,7 +39,7 @@ function openDefaultBrowser(url) {
       exec('start ' + url);
       break;
     default:
-      exec('xdg-open', [url]);
+      exec('xdg-open ' + url);
   }
 }
 
