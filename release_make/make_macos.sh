@@ -99,9 +99,9 @@ cp -r ./public ./release_make/release-builds/linux/arm64/
 cp -r ./public ./release_make/release-builds/macos/x64/
 cp -r ./public ./release_make/release-builds/macos/arm64/
 echo -e "Release build finished."
-#echo "[Warning] The macOS executables are not signed yet. If you want them to work, you need to be an Apple Developer and sign it with your signing certificate."
-#echo "[Warning] Use codesign on macOS to sign your executable. If you don't have a Mac, you can use a virtual machine."
-#echo "[Warning] If you want to build a macOS virtual machine, please visit https://www.sysnettechsolutions.com/en/install-macos-vmware/"
+echo "[Warning] The macOS executables are not suitably signed yet. If you want them to work, you need to be an Apple Developer and sign it with your signing certificate."
+echo "[Warning] Use codesign on macOS to sign your executable. If you don't have a Mac, you can use a virtual machine."
+echo "[Warning] If you want to build a macOS virtual machine, please visit https://www.sysnettechsolutions.com/en/install-macos-vmware/"
 echo "Press Enter to continue..."
 read -n 1
 echo

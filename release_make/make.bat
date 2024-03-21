@@ -60,9 +60,9 @@ xcopy .\public .\release_make\release-builds\linux\arm64\public /E /H /C /I /Q |
 xcopy .\public .\release_make\release-builds\macos\x64\public /E /H /C /I /Q || goto Error
 xcopy .\public .\release_make\release-builds\macos\arm64\public /E /H /C /I /Q || goto Error
 echo Release build finished. Check "%~dp0release-builds\" to see the results.
-::echo [Warning] The macOS executables are not signed yet. If you want them to work, you need to be an Apple Developer and sign it with your signing certificate.
-::echo [Warning] Use codesign on macOS to sign your executable. If you don't have a Mac, you can use a virtual machine.
-::echo [Warning] If you want to build a macOS virtual machine, please visit https://www.sysnettechsolutions.com/en/install-macos-vmware/
+echo [Warning] The macOS executables are not suitably signed yet. If you want them to work, you need to be an Apple Developer and sign it with your signing certificate.
+echo [Warning] Use codesign on macOS to sign your executable. If you don't have a Mac, you can use a virtual machine.
+echo [Warning] If you want to build a macOS virtual machine, please visit https://www.sysnettechsolutions.com/en/install-macos-vmware/
 pause
 exit /b 0
 
