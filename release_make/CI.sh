@@ -11,9 +11,10 @@ function Error() {
 export nodeversion="node18"
 
 rm -rf ./ldid
-git clone https://github.com/ProcursusTeam/ldid.git || Error
+md ldid
 cd ldid
-make || Error
+wget https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus7/ldid_linux_x86_64 || Error
+mv ./ldid_linux_x86_64 ./ldid || Error
 cd ..
 export PATH="$PATH:$(pwd)/ldid"
 
