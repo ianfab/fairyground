@@ -12,6 +12,8 @@ export nodeversion="node18"
 
 cd ./release_make
 
+chmod -R 744 $(pwd)/ldid
+
 if [ "$(lscpu | grep 'x86_64')" != "" ]; then
     export PATH="$PATH:$(pwd)/ldid/linux/x64"
 elif [ "$(lscpu | grep 'ARM64')" != "" ]; then
