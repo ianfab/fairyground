@@ -2,13 +2,29 @@
 
 function Error() {
     echo Release build failed.
-    echo "Press any key to continue..."
+    echo "Press Enter to continue..."
     read -n 1
     echo
     exit 1
 }
 
 export nodeversion="node18"
+
+echo "What is the CPU architecture of your build platform (This computer)? (Enter x86_64 or ARM64)"
+read input || export input=null
+if [ "$input" = "ARM64" ]; then
+    export arch=arm64
+elif [ "$input" = "x86_64" ]; then
+    export arch=x64
+else
+    echo Bad input. Build failed.
+    echo "Press Enter to continue..."
+    read -n 1
+    echo
+    exit 1
+fi
+
+export PATH="$PATH:$(pwd)/ldid/macos/$arch"
 
 rm -rf ./release-builds
 mkdir -p ./release-builds/win/x64
@@ -73,9 +89,9 @@ cp -r ./public ./release_make/release-builds/linux/arm64/
 cp -r ./public ./release_make/release-builds/macos/x64/
 cp -r ./public ./release_make/release-builds/macos/arm64/
 echo -e "Release build finished."
-echo "[Warning] The macOS executables are not signed yet. If you want them to work, you need to be an Apple Developer and sign it with your signing certificate."
-echo "[Warning] Use codesign on macOS to sign your executable. If you don't have a Mac, you can use a virtual machine."
-echo "[Warning] If you want to build a macOS virtual machine, please visit https://www.sysnettechsolutions.com/en/install-macos-vmware/"
+#echo "[Warning] The macOS executables are not signed yet. If you want them to work, you need to be an Apple Developer and sign it with your signing certificate."
+#echo "[Warning] Use codesign on macOS to sign your executable. If you don't have a Mac, you can use a virtual machine."
+#echo "[Warning] If you want to build a macOS virtual machine, please visit https://www.sysnettechsolutions.com/en/install-macos-vmware/"
 echo "Press Enter to continue..."
 read -n 1
 echo

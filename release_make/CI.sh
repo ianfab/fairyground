@@ -4,20 +4,16 @@ echo "[Warning] This script is intended to be run in Github Actions for continuo
 echo "[Warning] If this is your own platform instead of Github Actions platform, use \"./make.sh\"."
 
 function Error() {
-    echo CI build test failed.
+    echo "[Error] CI build test failed."
     exit 1
 }
-
-cd ./release_make
-
-npm install || Error
 
 export nodeversion="node18"
 
 rm -rf ./ldid
-git clone https://github.com/daeken/ldid.git || Error
+git clone https://github.com/ProcursusTeam/ldid.git || Error
 cd ldid
-./make.sh
+make || Error
 cd ..
 export PATH="$PATH:$(pwd)/ldid"
 
@@ -29,12 +25,13 @@ mkdir -p ./release-builds/linux/arm64
 mkdir -p ./release-builds/macos/x64
 mkdir -p ./release-builds/macos/arm64
 
+npm run install || Error
 npm install pkg || Error
 
 function TryNoByteCode() {
     npx pkg . --no-bytecode --public --public-packages --target $1 --output $2 >/tmp/make_fairyground.log 2>&1
     if [ "$(grep 'Error' /tmp/make_fairyground.log)" != "" ]; then
-        echo Error: CI failed. Check the log below to see what\'s going on. File: /tmp/make_fairyground.log
+        echo "[Error] CI failed. Check the log below to see what\'s going on. File: /tmp/make_fairyground.log"
         cat /tmp/make_fairyground.log
         return 11
     fi
@@ -44,20 +41,20 @@ function TryNoByteCode() {
 function Make() {
     npx pkg . --target $1 --output $2 >/tmp/make_fairyground.log 2>&1
     if [ "$(grep 'Error' /tmp/make_fairyground.log)" != "" ]; then
-        echo "Fail: Bytecode generation failed. Trying --no-bytecode..."
+        echo "[Warning] Fail: Bytecode generation failed. Trying --no-bytecode..."
         TryNoByteCode $1 $2
         if [ $? -eq 11 ]; then
             return 11
         fi
     fi
     if [ "$(grep 'Failed to make bytecode' /tmp/make_fairyground.log)" != "" ]; then
-        echo "Fail: Bytecode generation failed. Trying --no-bytecode..."
+        echo "[Warning] Fail: Bytecode generation failed. Trying --no-bytecode..."
         TryNoByteCode $1 $2
         if [ $? -eq 11 ]; then
             return 11
         fi
     fi
-    echo "Pass: $1"
+    echo "[Info] Pass: $1"
     return 0
 }
 
@@ -76,7 +73,7 @@ Make "$nodeversion"-macos-arm64 ./release-builds/macos/arm64/FairyGround.app
 if [ $? -eq 11 ]; then Error; fi
 
 cd ..
-npm install || Error
+npm run install || Error
 npm run build || Error
 cp -r ./public ./release_make/release-builds/win/x64/
 cp -r ./public ./release_make/release-builds/linux/x64/
@@ -84,5 +81,5 @@ cp -r ./public ./release_make/release-builds/win/arm64/
 cp -r ./public ./release_make/release-builds/linux/arm64/
 cp -r ./public ./release_make/release-builds/macos/x64/
 cp -r ./public ./release_make/release-builds/macos/arm64/
-echo -e "CI build test OK."
+echo "[Info] CI build test OK."
 exit 0
