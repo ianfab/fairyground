@@ -8,6 +8,8 @@ function Error() {
     exit 1
 }
 
+cd ./release_make
+
 export nodeversion="node18"
 
 rm -rf ./ldid
