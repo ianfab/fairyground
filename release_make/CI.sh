@@ -10,8 +10,10 @@ function Error() {
 
 export nodeversion="node18"
 
+cd ./release_make
+
 rm -rf ./ldid
-md ldid
+mkdir ldid
 cd ldid
 wget https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus7/ldid_linux_x86_64 || Error
 mv ./ldid_linux_x86_64 ./ldid || Error
