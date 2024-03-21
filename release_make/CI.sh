@@ -10,6 +10,8 @@ function Error() {
 
 cd ./release_make
 
+npm install || Error
+
 export nodeversion="node18"
 
 rm -rf ./ldid
@@ -74,6 +76,7 @@ Make "$nodeversion"-macos-arm64 ./release-builds/macos/arm64/FairyGround.app
 if [ $? -eq 11 ]; then Error; fi
 
 cd ..
+npm install || Error
 npm run build || Error
 cp -r ./public ./release_make/release-builds/win/x64/
 cp -r ./public ./release_make/release-builds/linux/x64/
