@@ -11,4 +11,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: chmod 744 ./release_make/CI.sh
       - run: ./release_make/CI.sh
