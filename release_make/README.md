@@ -10,27 +10,44 @@ Running make scripts here will apply the changes you have made in fairyground at
 
 ## Usage
 
-First install dependencies in the parent directory.
+Make sure that you have read & execute permission of this directory and its sub directories.
 
-Install dependencies in this directory (Make sure that the working directory is this directory!)
+First install dependencies in the parent directory (The root directory of fairyground). If you have done this before, you can skip this step.
 
 ```bash
+#In the parent directory
 npm install
 ```
 
-Run make script (Make sure that the working directory is this directory!)
+Install dependencies in this directory (Make sure that the working directory is this directory, same as the directory where this document is placed.). If you have done this before, you can skip this step.
+
+```bash
+#In this directory
+npm install
+```
+
+Run make script (Make sure that the working directory is this directory, same as the directory where this document is placed.)
 
 ```batch
-::Windows
+::If your build platform is Windows
 make.bat
 ```
 ```bash
-#Linux
+#If your build platform is Linux
 ./make.sh
 ```
+```zsh
+#If your build platform is macOS
+./make_macos.sh
+```
 
-If no errors occurred, you should see the make results at .\release-builds, containing both linux and windows version. You can see the binary files in "win" and "linux" directory.
+If no errors occurred, you should see the make results at .\release-builds, containing linux, windows and macOS versions. You can see the binary files in "win", "macos" and "linux" directory.
 
 You can execute these binary executables to check if it's working correctly.
 
+Note that macOS executables may be killed on launch due to signature problems. If this occurs, you will need to use codesign or ldid utility to sign the executable.
+
+If you want to run macOS in a virtual machine, you can visit [https://www.sysnettechsolutions.com/en/install-macos-vmware/](https://www.sysnettechsolutions.com/en/install-macos-vmware/) for guidance.
+
 Then you can put the "release-builds" directory into an archive (TAR.GZ, ZIP or others) and publish this release.
+
