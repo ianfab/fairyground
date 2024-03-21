@@ -1,16 +1,21 @@
 #!/bin/bash
 
+echo "[Warning] This script is intended to be run in Github Actions for continuous integration purposes."
+echo "[Warning] If this is your own platform instead of Github Actions platform, use \"./make.sh\"."
+
 function Error() {
-    echo Release build failed.
-    echo "Press any key to continue..."
-    read -n 1
-    echo
+    echo CI build test failed.
     exit 1
 }
 
 export nodeversion="node18"
 
-export PATH="$PATH:$(pwd)/ldid/linux_x64"
+rm -rf ./ldid
+git clone https://github.com/daeken/ldid.git || Error
+cd ldid
+./make.sh
+cd ..
+export PATH="$PATH:$(pwd)/ldid"
 
 rm -rf ./release-builds
 mkdir -p ./release-builds/win/x64
@@ -25,7 +30,7 @@ npm install pkg || Error
 function TryNoByteCode() {
     npx pkg . --no-bytecode --public --public-packages --target $1 --output $2 >/tmp/make_fairyground.log 2>&1
     if [ "$(grep 'Error' /tmp/make_fairyground.log)" != "" ]; then
-        echo Error: Build failed. Check the log below to see what\'s going on. File: /tmp/make_fairyground.log
+        echo Error: CI failed. Check the log below to see what\'s going on. File: /tmp/make_fairyground.log
         cat /tmp/make_fairyground.log
         return 11
     fi
@@ -74,11 +79,5 @@ cp -r ./public ./release_make/release-builds/win/arm64/
 cp -r ./public ./release_make/release-builds/linux/arm64/
 cp -r ./public ./release_make/release-builds/macos/x64/
 cp -r ./public ./release_make/release-builds/macos/arm64/
-echo -e "Release build finished."
-echo "[Warning] The macOS executables are not signed yet. If you want them to work, you need to be an Apple Developer and sign it with your signing certificate."
-echo "[Warning] Use codesign on macOS to sign your executable. If you don't have a Mac, you can use a virtual machine."
-echo "[Warning] If you want to build a macOS virtual machine, please visit https://www.sysnettechsolutions.com/en/install-macos-vmware/"
-echo "Press Enter to continue..."
-read -n 1
-echo
+echo -e "CI build test OK."
 exit 0

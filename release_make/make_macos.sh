@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 function Error() {
     echo Release build failed.
@@ -9,8 +9,6 @@ function Error() {
 }
 
 export nodeversion="node18"
-
-export PATH="$PATH:$(pwd)/ldid/linux_x64"
 
 rm -rf ./release-builds
 mkdir -p ./release-builds/win/x64
