@@ -28,7 +28,7 @@ mkdir -p ./release-builds/linux/arm64
 mkdir -p ./release-builds/macos/x64
 mkdir -p ./release-builds/macos/arm64
 
-npm run install || Error
+npm install || Error
 npm install pkg || Error
 
 function TryNoByteCode() {
@@ -76,7 +76,7 @@ Make "$nodeversion"-macos-arm64 ./release-builds/macos/arm64/FairyGround.app
 if [ $? -eq 11 ]; then Error; fi
 
 cd ..
-npm run install || Error
+npm install || Error
 npm run build || Error
 cp -r ./public ./release_make/release-builds/win/x64/
 cp -r ./public ./release_make/release-builds/linux/x64/
