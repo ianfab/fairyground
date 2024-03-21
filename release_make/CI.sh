@@ -38,6 +38,9 @@ function TryNoByteCode() {
         cat /tmp/make_fairyground.log
         return 11
     fi
+    if [ "$(grep 'Warning' /tmp/make_fairyground.log)" != "" ]; then
+        cat /tmp/make_fairyground.log
+    fi
     return 0
 }
 
@@ -49,6 +52,8 @@ function Make() {
         if [ $? -eq 11 ]; then
             return 11
         fi
+        echo "[Info] Pass: $1"
+        return 0
     fi
     if [ "$(grep 'Failed to make bytecode' /tmp/make_fairyground.log)" != "" ]; then
         echo "[Warning] Fail: Bytecode generation failed. Trying --no-bytecode..."
@@ -56,6 +61,11 @@ function Make() {
         if [ $? -eq 11 ]; then
             return 11
         fi
+        echo "[Info] Pass: $1"
+        return 0
+    fi
+    if [ "$(grep 'Warning' /tmp/make_fairyground.log)" != "" ]; then
+        cat /tmp/make_fairyground.log
     fi
     echo "[Info] Pass: $1"
     return 0

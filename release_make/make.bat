@@ -72,13 +72,15 @@ pause
 exit /b 1
 
 :Make
-start /WAIT "" cmd.exe /C ^(npx pkg . --target %~1 --output %2 ^& exit ^) ^> %TEMP%\make_fairyground.log 2^>^&1
+start /WAIT /MIN "" cmd.exe /C ^(npx pkg . --target %~1 --output %2 ^& exit ^) ^> %TEMP%\make_fairyground.log 2^>^&1
 set result=
 FOR /F "usebackq" %%i IN (`findstr /L /I "Error" "%TEMP%\make_fairyground.log"`) DO set result=%%i
 if not "%result%"=="" (
     echo Fail: Bytecode generation failed. Trying --no-bytecode...
     call :TryNoByteCode %~1 %2
     if "%errorlevel%"=="11" (exit /b 11)
+    echo Pass: %~1
+    exit /b 0
 )
 set result=
 FOR /F "usebackq" %%i IN (`findstr /L /I "Failed to make bytecode" "%TEMP%\make_fairyground.log"`) DO set result=%%i
@@ -86,17 +88,29 @@ if not "%result%"=="" (
     echo Fail: Bytecode generation failed. Trying --no-bytecode...
     call :TryNoByteCode %~1 %2
     if "%errorlevel%"=="11" (exit /b 11)
+    echo Pass: %~1
+    exit /b 0
+)
+set result=
+FOR /F "usebackq" %%i IN (`findstr /L /I "Warning" "%TEMP%\make_fairyground.log"`) DO set result=%%i
+if not "%result%"=="" (
+    type "%TEMP%\make_fairyground.log"
 )
 echo Pass: %~1
 exit /b 0
 
 :TryNoByteCode
-start /WAIT "" cmd.exe /C ^(npx pkg . --no-bytecode --public --public-packages --target %~1 --output %2 ^& exit ^)  ^> %TEMP%\make_fairyground.log 2^>^&1
+start /WAIT /MIN "" cmd.exe /C ^(npx pkg . --no-bytecode --public --public-packages --target %~1 --output %2 ^& exit ^)  ^> %TEMP%\make_fairyground.log 2^>^&1
 set result=
 FOR /F "usebackq" %%i IN (`findstr /L /I "Error" "%TEMP%\make_fairyground.log"`) DO set result=%%i
 if not "%result%"=="" (
     echo Error: Build failed. Check the log below to see what's going on. File: %TEMP%\make_fairyground.log
-    type %TEMP%\make_fairyground.log
+    type "%TEMP%\make_fairyground.log"
     exit /b 11
+)
+set result=
+FOR /F "usebackq" %%i IN (`findstr /L /I "Warning" "%TEMP%\make_fairyground.log"`) DO set result=%%i
+if not "%result%"=="" (
+    type "%TEMP%\make_fairyground.log"
 )
 exit /b 0
