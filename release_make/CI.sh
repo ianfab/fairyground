@@ -22,8 +22,6 @@ else
     Error
 fi
 
-cd ..
-
 rm -rf ./release-builds
 mkdir -p ./release-builds/win/x64
 mkdir -p ./release-builds/linux/x64
