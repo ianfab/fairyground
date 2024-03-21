@@ -15,8 +15,18 @@ cd ./release_make
 rm -rf ./ldid
 mkdir ldid
 cd ldid
-wget https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus7/ldid_linux_x86_64 || Error
-mv ./ldid_linux_x86_64 ./ldid || Error
+if [ "$(lscpu | grep 'x86_64')" != "" ]; then
+    wget https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus7/ldid_linux_x86_64 || Error
+    mv ./ldid_linux_x86_64 ./ldid || Error
+elif [ "$(lscpu | grep 'ARM64')" != "" ]; then
+    wget https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus7/ldid_linux_aarch64 || Error
+    mv ./ldid_linux_aarch64 ./ldid || Error
+else
+    echo Unknown CPU architecture:
+    lscpu | grep 'Architecture:'
+    Error
+fi
+
 cd ..
 export PATH="$PATH:$(pwd)/ldid"
 
@@ -52,7 +62,7 @@ function Make() {
         if [ $? -eq 11 ]; then
             return 11
         fi
-        echo "[Info] Pass: $1"
+        echo "[Information] Pass: $1"
         return 0
     fi
     if [ "$(grep 'Failed to make bytecode' /tmp/make_fairyground.log)" != "" ]; then
@@ -61,13 +71,13 @@ function Make() {
         if [ $? -eq 11 ]; then
             return 11
         fi
-        echo "[Info] Pass: $1"
+        echo "[Information] Pass: $1"
         return 0
     fi
     if [ "$(grep 'Warning' /tmp/make_fairyground.log)" != "" ]; then
         cat /tmp/make_fairyground.log
     fi
-    echo "[Info] Pass: $1"
+    echo "[Information] Pass: $1"
     return 0
 }
 
