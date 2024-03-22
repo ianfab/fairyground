@@ -240,6 +240,24 @@ function getPieceRoles(pieceLetters) {
   return [...uniqueLetters].map((char) => char + "-piece");
 }
 
+function generateMoveNotationSVG(text, backgroundcolor, textcolor) {
+  if (
+    typeof text != "string" ||
+    typeof backgroundcolor != "string" ||
+    typeof textcolor != "string"
+  ) {
+    return null;
+  }
+  return `
+    <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100px' height='100px'>
+    <path style="fill:${backgroundcolor};stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none" d="m 100,2 a 20,20 0 0 0 -20,19.999999 20,20 0 0 0 20,20 z" />
+    <g transform="scale(1.5)">
+    <text style="fill:${textcolor}" font-size="15" font-family="Arial" font-weight="bold" x="60" y="15" text-anchor="middle" dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text>
+    </g>
+    </svg>
+    `;
+}
+
 function initBoard(variant) {
   if (board !== null) board.delete();
   board = new ffish.Board(variant);
@@ -293,6 +311,12 @@ function initBoard(variant) {
     },
   };
   chessground = Chessground(chessgroundEl, config, pocketTopEl, pocketBottomEl);
+  chessground.state.drawable.brushes.black = {
+    key: "black",
+    color: "#000000",
+    opacity: 1,
+    lineWidth: 10,
+  };
 
   if (pocketRoles === undefined) {
     pocketTopEl.style.display = "none";
@@ -900,6 +924,9 @@ new Module().then((loadedModule) => {
     let text = engineOutput.value;
     let multipvid = 0;
     let bestpv = 0;
+    if (/( upperbound )|( lowerbound )/.test(text)) {
+      return;
+    }
     if (text.includes(" multipv ")) {
       let textparselist = text.split(" ");
       multipvid =
@@ -1038,7 +1065,6 @@ new Module().then((loadedModule) => {
     let autoshapes = [];
     bestmove = multipvrecord[bestpv][2];
     ponder = multipvrecord[bestpv][3];
-    console.log;
     if (
       bestmove[0] != undefined &&
       bestmove[1] != undefined &&
@@ -1113,6 +1139,15 @@ new Module().then((loadedModule) => {
           let piecerole = chessground.state.boardState.pieces.get(
             bestmove[0].replace("10", ":"),
           ).role;
+          autoshapes.push({
+            brush: "black",
+            orig: bestmove[1].replace("10", ":"),
+            customSvg: generateMoveNotationSVG(
+              bestmove[2],
+              "#003088",
+              "#ffffff",
+            ),
+          });
           if (bestmove[2] == "+") {
             if (board.turn()) {
               autoshapes.push({
@@ -1253,6 +1288,11 @@ new Module().then((loadedModule) => {
           let piecerole = chessground.state.boardState.pieces.get(
             ponder[0].replace("10", ":"),
           ).role;
+          autoshapes.push({
+            brush: "black",
+            orig: ponder[1].replace("10", ":"),
+            customSvg: generateMoveNotationSVG(ponder[2], "#882020", "#ffffff"),
+          });
           if (ponder[2] == "+") {
             if (board.turn()) {
               autoshapes.push({
