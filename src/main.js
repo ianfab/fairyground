@@ -240,22 +240,36 @@ function getPieceRoles(pieceLetters) {
   return [...uniqueLetters].map((char) => char + "-piece");
 }
 
-function generateMoveNotationSVG(text, backgroundcolor, textcolor) {
+function generateMoveNotationSVG(text, backgroundcolor, textcolor, position) {
   if (
     typeof text != "string" ||
     typeof backgroundcolor != "string" ||
-    typeof textcolor != "string"
+    typeof textcolor != "string" ||
+    typeof position != "string"
   ) {
     return null;
   }
-  return `
+  if (position == "TopRight") {
+    return `
     <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100px' height='100px'>
     <path style="fill:${backgroundcolor};stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none" d="m 100,2 a 20,20 0 0 0 -20,19.999999 20,20 0 0 0 20,20 z" />
     <g transform="scale(1.5)">
-    <text style="fill:${textcolor}" font-size="15" font-family="Arial" font-weight="bold" x="60" y="15" text-anchor="middle" dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text>
+    <text style="fill:${textcolor}" font-size="15" font-family="Consolas" font-weight="bold" x="60" y="15" text-anchor="middle" dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text>
     </g>
     </svg>
     `;
+  } else if (position == "TopLeft") {
+    return `
+    <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100px' height='100px'>
+    <path style="fill:${backgroundcolor};stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none" d="m 0,2 a 20,20 0 0 1 20,19.999999 20,20 0 0 1 -20,20 z" />
+    <g transform="scale(1.5)">
+    <text style="fill:${textcolor}" font-size="15" font-family="Consolas" font-weight="bold" x="5" y="15" text-anchor="middle" dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text>
+    </g>
+    </svg>
+    `;
+  } else {
+    return null;
+  }
 }
 
 function initBoard(variant) {
@@ -1146,6 +1160,7 @@ new Module().then((loadedModule) => {
               bestmove[2],
               "#003088",
               "#ffffff",
+              "TopRight",
             ),
           });
           if (bestmove[2] == "+") {
@@ -1291,7 +1306,12 @@ new Module().then((loadedModule) => {
           autoshapes.push({
             brush: "black",
             orig: ponder[1].replace("10", ":"),
-            customSvg: generateMoveNotationSVG(ponder[2], "#882020", "#ffffff"),
+            customSvg: generateMoveNotationSVG(
+              ponder[2],
+              "#882020",
+              "#ffffff",
+              "TopLeft",
+            ),
           });
           if (ponder[2] == "+") {
             if (board.turn()) {
