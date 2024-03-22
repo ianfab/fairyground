@@ -263,7 +263,7 @@ function generateMoveNotationSVG(text, backgroundcolor, textcolor, position) {
     <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100px' height='100px'>
     <path style="fill:${backgroundcolor};stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none" d="m 0,2 a 20,20 0 0 1 20,19.999999 20,20 0 0 1 -20,20 z" />
     <g transform="scale(1.5)">
-    <text style="fill:${textcolor}" font-size="15" font-family="Consolas" font-weight="bold" x="5" y="15" text-anchor="middle" dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text>
+    <text style="fill:${textcolor}" font-size="15" font-family="Consolas" font-weight="bold" x="6" y="15" text-anchor="middle" dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text>
     </g>
     </svg>
     `;
