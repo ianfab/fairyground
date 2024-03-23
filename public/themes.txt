@@ -96,6 +96,9 @@ xiangqihouse|@xiangqi|@xiangqi
 minixiangqi|@xiangqi|minixiangqiboard
 
 janggi|janggi|janggiboard
+janggicasual|@janggi|@janggi
+janggimodern|@janggi|@janggi
+janggitraditional|@janggi|@janggi
 
 makruk|makruk|makrukboard
 makpong|@makruk|@makruk
