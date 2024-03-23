@@ -581,6 +581,14 @@
     font-family: Arial, "Times New Roman", Georgia, Serif;
   }
 
+  #evalinfo {
+    white-space: pre-line;
+  }
+
+  #pvinfo {
+    white-space: pre-line;
+  }
+
   spangameresult {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -2505,11 +2513,7 @@
                 { disabled: !is_ready },
                 "Validate Position",
               ),
-              m(
-                "button#boardsetupcopyfen",
-                { disabled: !is_ready },
-                "Copy FEN",
-              ),
+              m("button#boardsetupcopyfen", { disabled: !is_ready }, "Apply"),
             ]),
             m("div#pocketpiecechange", { hidden: true }, [
               m("form#pieceinpocket", { disabled: !is_ready }, [
@@ -2766,6 +2770,8 @@
               ),
               m("div#evaluation", { hidden: !analysis_mode }, [
                 m("div#evalbar", [m("p#cp", "0.00"), m("div#evalbarprogress")]),
+                m("p#evalinfo", ""),
+                m("p#pvinfo", ""),
               ]),
             ]),
           ]),
