@@ -1401,10 +1401,10 @@
         $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 1000)}`;
         $("#blacktime").innerHTML = `${parseInt(black_remaining_time / 1000)}`;
         if (white_timer_type == "infinite") {
-          $("#whitetime").innerHTML = "INFINITY";
+          $("#whitetime").innerHTML = "∞";
         }
         if (black_timer_type == "infinite") {
-          $("#blacktime").innerHTML = "INFINITY";
+          $("#blacktime").innerHTML = "∞";
         }
         previous_mover = "";
       };
@@ -1464,7 +1464,7 @@
             return;
           }
           if (white_timer_type == "infinite") {
-            $("#whitetime").innerHTML = "INFINITY";
+            $("#whitetime").innerHTML = "∞";
           } else if (white_remaining_time >= 10000) {
             $("#whitetime").innerHTML = `${parseInt(
               white_remaining_time / 1000,
@@ -1475,7 +1475,7 @@
             }`;
           }
           if (black_timer_type == "infinite") {
-            $("#blacktime").innerHTML = "INFINITY";
+            $("#blacktime").innerHTML = "∞";
           } else if (black_remaining_time >= 10000) {
             $("#blacktime").innerHTML = `${parseInt(
               black_remaining_time / 1000,
@@ -1526,7 +1526,7 @@
             return;
           }
           if (white_timer_type == "infinite") {
-            $("#whitetime").innerHTML = "INFINITY";
+            $("#whitetime").innerHTML = "∞";
           } else if (white_remaining_time >= 10000) {
             $("#whitetime").innerHTML = `${parseInt(
               white_remaining_time / 1000,
@@ -1537,7 +1537,7 @@
             }`;
           }
           if (black_timer_type == "infinite") {
-            $("#blacktime").innerHTML = "INFINITY";
+            $("#blacktime").innerHTML = "∞";
           } else if (black_remaining_time >= 10000) {
             $("#blacktime").innerHTML = `${parseInt(
               black_remaining_time / 1000,
