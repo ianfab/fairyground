@@ -76,6 +76,8 @@ const isAnalysis = document.getElementById("analysis");
 const evaluationBar = document.getElementById("evalbarprogress");
 const evalscore = document.getElementById("cp");
 const multipv = document.getElementById("multipv");
+const evalinfo = document.getElementById("evalinfo");
+const pvinfo = document.getElementById("pvinfo");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
@@ -231,7 +233,7 @@ const maxmultipvcount = 4096;
 var recordedmultipv = 1;
 
 for (i = 0; i < maxmultipvcount; i++) {
-  multipvrecord.push([null, null, null, null]);
+  multipvrecord.push([null, null, null, null, null, null, null]);
   evaluationindex.push(0);
 }
 
@@ -254,7 +256,7 @@ function generateMoveNotationSVG(text, backgroundcolor, textcolor, position) {
     <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100px' height='100px'>
     <path style="fill:${backgroundcolor};stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none" d="m 100,2 a 20,20 0 0 0 -20,19.999999 20,20 0 0 0 20,20 z" />
     <g transform="scale(1.5)">
-    <text style="fill:${textcolor}" font-size="15" font-family="Consolas" font-weight="bold" x="60" y="15" text-anchor="middle" dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text>
+    <text style="fill:${textcolor}" font-size="15" font-family="Arial" font-weight="bold" x="60" y="15" text-anchor="middle" dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text>
     </g>
     </svg>
     `;
@@ -263,7 +265,7 @@ function generateMoveNotationSVG(text, backgroundcolor, textcolor, position) {
     <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100px' height='100px'>
     <path style="fill:${backgroundcolor};stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none" d="m 0,2 a 20,20 0 0 1 20,19.999999 20,20 0 0 1 -20,20 z" />
     <g transform="scale(1.5)">
-    <text style="fill:${textcolor}" font-size="15" font-family="Consolas" font-weight="bold" x="6" y="15" text-anchor="middle" dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text>
+    <text style="fill:${textcolor}" font-size="15" font-family="Arial" font-weight="bold" x="6" y="15" text-anchor="middle" dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text>
     </g>
     </svg>
     `;
@@ -772,12 +774,16 @@ new Module().then((loadedModule) => {
     if (FEN == null) {
       return;
     }
-    textFen.value = FEN;
-    copySetFEN.click();
+    if (validateFEN(FEN, false)) {
+      textFen.value = FEN;
+      copySetFEN.click();
+    } else {
+      window.alert("Failed to apply the position. There are errors in it.");
+    }
   };
 
   buttonValidatePosition.onclick = function () {
-    validateFEN(getFEN());
+    validateFEN(getFEN(), true);
   };
 
   dropdownSetPiece.onchange = function () {
@@ -992,6 +998,41 @@ new Module().then((loadedModule) => {
       }
       multipvrecord[multipvid][2] = bestmove;
       multipvrecord[multipvid][3] = ponder;
+      multipvrecord[multipvid][4] = board.variationSan(
+        textparselist.slice(textparselist.indexOf("pv") + 1).join(" "),
+      );
+      multipvrecord[multipvid][5] = parseInt(
+        textparselist[textparselist.indexOf("depth") + 1],
+      );
+      multipvrecord[multipvid][6] = parseInt(
+        textparselist[textparselist.indexOf("seldepth") + 1],
+      );
+      //Update Evaluation Section
+      let k = 0;
+      let pvinfostr = "";
+      let showevalnum = "";
+      let seldepthlist = [];
+      let depthlist = [];
+      for (k = 0; k < recordedmultipv; k++) {
+        if (multipvrecord[k][0]) {
+          if (multipvrecord[k][1] > 0) {
+            showevalnum = `#+${parseInt(multipvrecord[k][1])}`;
+          } else {
+            showevalnum = `#${parseInt(multipvrecord[k][1])}`;
+          }
+        } else {
+          if (multipvrecord[k][1] > 0) {
+            showevalnum = `+${multipvrecord[k][1].toFixed(2)}`;
+          } else {
+            showevalnum = multipvrecord[k][1].toFixed(2).toString();
+          }
+        }
+        pvinfostr += `Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5]} Max ${multipvrecord[k][6]}) ${showevalnum} → ${multipvrecord[k][4]}\n`;
+        depthlist.push(multipvrecord[k][5]);
+        seldepthlist.push(multipvrecord[k][6]);
+      }
+      pvinfo.innerText = pvinfostr;
+      evalinfo.innerText = `Depth (Average): ${Math.min(...depthlist)}\nDepth (Max): ${Math.max(...seldepthlist)}\nNodes: ${textparselist[textparselist.indexOf("nodes") + 1]}\nNodes Per Second: ${textparselist[textparselist.indexOf("nps") + 1]}`;
     } else if (text.includes("bestmove")) {
       let textparselist = text.split(" ");
       if (board.turn()) {
@@ -1547,13 +1588,15 @@ function getFEN() {
   return FEN;
 }
 
-function validateFEN(FEN) {
+function validateFEN(FEN, showNoErrorMessage) {
   if (FEN == null) {
     return false;
   }
   let result = ffish.validateFen(FEN, dropdownVariant.value);
   if (result >= 0) {
-    window.alert("No errors found.");
+    if (showNoErrorMessage) {
+      window.alert("No errors found.");
+    }
     return true;
   }
   //-10 Contains invalid piece characters or syntax error
@@ -1567,43 +1610,43 @@ function validateFEN(FEN) {
   //-2 Bad half move clock
   //-1 Bad move number
   if (result == -10) {
-    window.alert("Contains invalid piece characters or syntax error.");
+    window.alert("Error: Contains invalid piece characters or syntax error.");
     return false;
   }
   if (result == -9) {
-    window.alert("Bad piece position.");
+    window.alert("Error: Bad piece position.");
     return false;
   }
   if (result == -8) {
-    window.alert("Line/column amount invalid.");
+    window.alert("Error: Line/column amount invalid.");
     return false;
   }
   if (result == -7) {
-    window.alert("Bad piece character in pocket.");
+    window.alert("Error: Bad piece character in pocket.");
     return false;
   }
   if (result == -6) {
-    window.alert("Bad side to move flag.");
+    window.alert("Error: Bad side to move flag.");
     return false;
   }
   if (result == -5) {
-    window.alert("Bad castling position or notation.");
+    window.alert("Error: Bad castling position or notation.");
     return false;
   }
   if (result == -4) {
-    window.alert("Bad en passant square.");
+    window.alert("Error: Bad en passant square.");
     return false;
   }
   if (result == -3) {
-    window.alert("Multiple kings or no kings.");
+    window.alert("Error: Multiple kings or no kings.");
     return false;
   }
   if (result == -2) {
-    window.alert("Bad half move clock.");
+    window.alert("Error: Bad half move clock.");
     return false;
   }
   if (result == -1) {
-    window.alert("Bad move number.");
+    window.alert("Error: Bad move number.");
     return false;
   }
 }
