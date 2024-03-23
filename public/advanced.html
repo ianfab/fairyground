@@ -319,6 +319,7 @@
     border: 2px solid #eee;
     background-color: gray;
     overflow: hidden;
+    margin-bottom: 5px;
   }
 
   #info #timers #whitetimer {
@@ -587,6 +588,14 @@
 
   #pvinfo {
     white-space: pre-line;
+  }
+
+  #timecontrolduringplay {
+    margin-bottom: 5px;
+  }
+
+  #evaluation {
+    margin-bottom: 10px;
   }
 
   spangameresult {
@@ -2690,37 +2699,6 @@
             ]),
             m("div#info", [
               m("p#positioninfo", ""),
-              m("p#currentboardfen"),
-              m("p#label-pgn"),
-              m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
-              m("div#enginecmddiv", [
-                m("input#enginecmd", {
-                  placeholder: "Send command to engine...",
-                  disabled: !is_ready || during_play,
-                  onkeyup: (e) => {
-                    if (e.keyCode != 13) {
-                      e.redraw = false;
-                      return;
-                    }
-                    if (during_play) {
-                      return;
-                    }
-                    sendCommandToEngine();
-                  },
-                }),
-                m(
-                  "button#sendenginecmd",
-                  {
-                    onclick: () => {
-                      if (during_play) {
-                        return;
-                      }
-                      sendCommandToEngine();
-                    },
-                  },
-                  "SEND",
-                ),
-              ]),
               m("div#timers", { hidden: !advanced_time_control }, [
                 m("div#whitetimer", [
                   m("p", "White Time"),
@@ -2772,6 +2750,37 @@
                 m("div#evalbar", [m("p#cp", "0.00"), m("div#evalbarprogress")]),
                 m("p#evalinfo", ""),
                 m("p#pvinfo", ""),
+              ]),
+              m("p#currentboardfen"),
+              m("p#label-pgn"),
+              m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
+              m("div#enginecmddiv", [
+                m("input#enginecmd", {
+                  placeholder: "Send command to engine...",
+                  disabled: !is_ready || during_play,
+                  onkeyup: (e) => {
+                    if (e.keyCode != 13) {
+                      e.redraw = false;
+                      return;
+                    }
+                    if (during_play) {
+                      return;
+                    }
+                    sendCommandToEngine();
+                  },
+                }),
+                m(
+                  "button#sendenginecmd",
+                  {
+                    onclick: () => {
+                      if (during_play) {
+                        return;
+                      }
+                      sendCommandToEngine();
+                    },
+                  },
+                  "SEND",
+                ),
               ]),
             ]),
           ]),
