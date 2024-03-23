@@ -136,7 +136,9 @@ cg-board piece.fading {
   height: 100%;
   pointer-events: none;
   z-index: 2;
-  opacity: 0.6;
+  opacity: 0.9;
+  font-family: "Consolas";
+  font-weight: "bold";
 }
 .cg-wrap coords {
   position: absolute;
@@ -251,4 +253,8 @@ cg-board piece.fading {
   text-shadow: 0 1px 0 #000 !important;
   background: #d85000 !important;
   box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15) inset !important;
+}
+
+cg-auto-pieces piece {
+  opacity: 0.6;
 }

@@ -581,6 +581,14 @@
     font-family: Arial, "Times New Roman", Georgia, Serif;
   }
 
+  #evalinfo {
+    white-space: pre-line;
+  }
+
+  #pvinfo {
+    white-space: pre-line;
+  }
+
   spangameresult {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -1351,7 +1359,7 @@
         ) {
           stockfish.postMessage(`setoption name MultiPV value 1`);
         } else if (multipleprincipalvariation > 500) {
-          stockfish.postMessage(`setoption name Hash value 500`);
+          stockfish.postMessage(`setoption name MultiPV value 500`);
         } else {
           stockfish.postMessage(
             `setoption name MultiPV value ${multipleprincipalvariation}`,
@@ -1401,10 +1409,10 @@
         $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 1000)}`;
         $("#blacktime").innerHTML = `${parseInt(black_remaining_time / 1000)}`;
         if (white_timer_type == "infinite") {
-          $("#whitetime").innerHTML = "INFINITY";
+          $("#whitetime").innerHTML = "∞";
         }
         if (black_timer_type == "infinite") {
-          $("#blacktime").innerHTML = "INFINITY";
+          $("#blacktime").innerHTML = "∞";
         }
         previous_mover = "";
       };
@@ -1464,7 +1472,7 @@
             return;
           }
           if (white_timer_type == "infinite") {
-            $("#whitetime").innerHTML = "INFINITY";
+            $("#whitetime").innerHTML = "∞";
           } else if (white_remaining_time >= 10000) {
             $("#whitetime").innerHTML = `${parseInt(
               white_remaining_time / 1000,
@@ -1475,7 +1483,7 @@
             }`;
           }
           if (black_timer_type == "infinite") {
-            $("#blacktime").innerHTML = "INFINITY";
+            $("#blacktime").innerHTML = "∞";
           } else if (black_remaining_time >= 10000) {
             $("#blacktime").innerHTML = `${parseInt(
               black_remaining_time / 1000,
@@ -1526,7 +1534,7 @@
             return;
           }
           if (white_timer_type == "infinite") {
-            $("#whitetime").innerHTML = "INFINITY";
+            $("#whitetime").innerHTML = "∞";
           } else if (white_remaining_time >= 10000) {
             $("#whitetime").innerHTML = `${parseInt(
               white_remaining_time / 1000,
@@ -1537,7 +1545,7 @@
             }`;
           }
           if (black_timer_type == "infinite") {
-            $("#blacktime").innerHTML = "INFINITY";
+            $("#blacktime").innerHTML = "∞";
           } else if (black_remaining_time >= 10000) {
             $("#blacktime").innerHTML = `${parseInt(
               black_remaining_time / 1000,
@@ -2505,11 +2513,7 @@
                 { disabled: !is_ready },
                 "Validate Position",
               ),
-              m(
-                "button#boardsetupcopyfen",
-                { disabled: !is_ready },
-                "Copy FEN",
-              ),
+              m("button#boardsetupcopyfen", { disabled: !is_ready }, "Apply"),
             ]),
             m("div#pocketpiecechange", { hidden: true }, [
               m("form#pieceinpocket", { disabled: !is_ready }, [
@@ -2766,6 +2770,8 @@
               ),
               m("div#evaluation", { hidden: !analysis_mode }, [
                 m("div#evalbar", [m("p#cp", "0.00"), m("div#evalbarprogress")]),
+                m("p#evalinfo", ""),
+                m("p#pvinfo", ""),
               ]),
             ]),
           ]),
