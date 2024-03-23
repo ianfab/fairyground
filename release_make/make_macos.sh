@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 function Error() {
     echo Release build failed.
@@ -12,9 +12,9 @@ export nodeversion="node18"
 
 echo "What is the CPU architecture of your build platform (This computer)? (Enter x86_64 or ARM64)"
 read input || export input=null
-if [ "$input" == "ARM64" ]; then
+if [ "$input" = "ARM64" ]; then
     export arch=arm64
-elif [ "$input" == "x86_64" ]; then
+elif [ "$input" = "x86_64" ]; then
     export arch=x64
 else
     echo Bad input. Build failed.
@@ -24,7 +24,7 @@ else
     exit 1
 fi
 
-export PATH="$PATH:$(pwd)/ldid/linux/$arch"
+export PATH="$PATH:$(pwd)/ldid/macos/$arch"
 
 rm -rf ./release-builds
 mkdir -p ./release-builds/win/x64
