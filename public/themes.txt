@@ -95,6 +95,17 @@ xiangqi|x2dhanzi,wikim|xiangqiboard
 xiangqihouse|@xiangqi|@xiangqi
 minixiangqi|@xiangqi|minixiangqiboard
 
+janggi|janggi|janggiboard
+janggicasual|@janggi|@janggi
+janggimodern|@janggi|@janggi
+janggitraditional|@janggi|@janggi
+
+makruk|makruk|makrukboard
+makpong|@makruk|@makruk
+cambodian|@makruk|@makruk
+
+sittuyin|sittuyin|sittuyinboard
+
 flipello|flipello|
 flipello10|@flipello|
 flipello6|@flipello|
