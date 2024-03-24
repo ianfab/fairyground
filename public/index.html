@@ -80,8 +80,8 @@
       }
       dropdown_whitetimemode.selectedIndex = 1;
       dropdown_blacktimemode.selectedIndex = 1;
-      whitetimetype.innerHTML = "tournament";
-      blacktimetype.innerHTML = "tournament";
+      dropdown_whitetimemode.dispatchEvent(new Event("change"));
+      dropdown_blacktimemode.dispatchEvent(new Event("change"));
       whitestarttime.disabled = false;
       blackstarttime.disabled = false;
       whitetimegain.disabled = false;

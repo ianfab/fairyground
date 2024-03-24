@@ -178,8 +178,9 @@
     background: #888;
     color: #fff;
     font-weight: bold;
-    margin-right: 6px;
+    margin-right: 5px;
     cursor: pointer;
+    margin-bottom: 5px;
   }
 
   #gamesettings #dropdown-quickpromotion {
@@ -187,6 +188,18 @@
     background: #eee;
     margin-left: 10px;
     margin-right: 10px;
+  }
+
+  #dropdown-boardtheme {
+    min-width: 100px;
+    background: #eee;
+    margin-right: 5px;
+  }
+
+  #dropdown-piecetheme {
+    min-width: 100px;
+    background: #eee;
+    margin-right: 5px;
   }
 
   #misc {
@@ -487,21 +500,34 @@
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
-    border-right: 0;
   }
 
   #advancedtimesettings #whitetimesettings #whitetimegain {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
-    border-right: 0;
+    border-left: 0;
+  }
+
+  #advancedtimesettings #whitetimesettings #whitebyoyomitime {
+    width: 15%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-left: 0;
+  }
+
+  #advancedtimesettings #whitetimesettings #whitebyoyomiperiodcount {
+    width: 15%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-left: 0;
   }
 
   #advancedtimesettings #whitetimesettings #whitetimemargin {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
-    border-right: 0;
+    border-left: 0;
   }
 
   #advancedtimesettings #blacktimesettings {
@@ -519,21 +545,34 @@
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
-    border-right: 0;
   }
 
   #advancedtimesettings #blacktimesettings #blacktimegain {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
-    border-right: 0;
+    border-left: 0;
+  }
+
+  #advancedtimesettings #blacktimesettings #blackbyoyomitime {
+    width: 15%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-left: 0;
+  }
+
+  #advancedtimesettings #blacktimesettings #blackbyoyomiperiodcount {
+    width: 15%;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    border-left: 0;
   }
 
   #advancedtimesettings #blacktimesettings #blacktimemargin {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
-    border-right: 0;
+    border-left: 0;
   }
 
   #advancedtimesettings #gamecontrol-start {
@@ -624,6 +663,7 @@
   <script src="./lib/mithril.min.js"></script>
   <script>
     let themes = [[], [], []];
+    let themenames = [[], []];
     const $ = (...args) => document.querySelector(...args);
 
     //Remove duplicated elements
@@ -632,7 +672,7 @@
       return Array.from(newArr);
     }
 
-    function getFileFromServer(url, doneCallback) {
+    function getFileFromServer(url, doneCallback, errorCallback) {
       var xhr;
       function handleStateChange() {
         if (xhr.readyState === 4) {
@@ -641,6 +681,7 @@
       }
       xhr = new XMLHttpRequest();
       xhr.onreadystatechange = handleStateChange;
+      xhr.onerror = errorCallback;
       xhr.open("GET", url, true);
       xhr.send();
     }
@@ -760,177 +801,231 @@
 
     const LoadThemes = () => {
       themes = [[], [], []];
-      function StartLoad(data) {
-        console.log(`${typeof data}`);
-        data = data.replace(/\r\n/g, "\n");
-        data = data.replace(/\r/g, "\n");
-        let rawText = data.split("\n");
-        console.log("raw:", rawText);
-        let i = 0;
-        let j = 0;
-        let css_name = "";
-        let index = 0;
-        let require_list = [];
-        let themesettings = [];
-        let apply_to_all_list = [];
-        let loaded_css_list = [];
-        let require_board_list = [];
-        let board_apply_to_all_list = [];
-        let themeavailable = [];
-        let boardthemeavailable = [];
-        let link = null;
-        for (i = 0; i < rawText.length; i++) {
-          if (rawText[i].length < 1 || rawText[i].charAt(0) == "#") {
-            continue;
-          }
-          themesettings = rawText[i].trim().split("|");
-          if (themesettings.length != 3) {
-            console.warn(
-              `At line ${i} in paragraph of themes.html: Bad syntax\n`,
-            );
-            continue;
-          }
-          themeavailable = themesettings[1].split(",");
-          boardthemeavailable = themesettings[2].split(",");
-          if (themeavailable.length == 1 && themeavailable[0] == "") {
-            themeavailable = [];
-          }
-          if (boardthemeavailable.length == 1 && boardthemeavailable[0] == "") {
-            boardthemeavailable = [];
-          }
-          if (
-            (themesettings[1].length < 1 && themesettings[2].length < 1) ||
-            themeavailable.includes("") ||
-            boardthemeavailable.includes("")
-          ) {
-            console.warn(
-              `At line ${i} in paragraph of themes.html: Piece and Board style names must not be both null or contain null element\n`,
-            );
-            continue;
-          }
-          if (themesettings[1].length > 0) {
-            require_list = themeavailable.filter((element) => {
-              return element.charAt(0) == "@";
-            });
-            themeavailable = themeavailable.filter((element) => {
-              return element.charAt(0) != "@";
-            });
-            for (j = 0; j < require_list.length; j++) {
-              if (themes[0].includes(require_list[j].substring(1))) {
-                index = themes[0].indexOf(require_list[j].substring(1));
-                themeavailable = themeavailable.concat(themes[1][index]);
-              } else {
-                console.warn(
-                  `At line ${i} in paragraph of themes.html: Variant ${require_list[
-                    j
-                  ].substring(
-                    1,
-                  )} has not been defined yet. You need to put it before this line.\n`,
-                );
-              }
-            }
-            themeavailable = uniqArr(themeavailable);
-          }
-          if (themesettings[2].length > 0) {
-            require_board_list = boardthemeavailable.filter((element) => {
-              return element.charAt(0) == "@";
-            });
-            boardthemeavailable = boardthemeavailable.filter((element) => {
-              return element.charAt(0) != "@";
-            });
-            for (j = 0; j < require_board_list.length; j++) {
-              if (themes[0].includes(require_board_list[j].substring(1))) {
-                index = themes[0].indexOf(require_board_list[j].substring(1));
-                boardthemeavailable = boardthemeavailable.concat(
-                  themes[2][index],
-                );
-              } else {
-                console.warn(
-                  `At line ${i} in paragraph of themes.html: Variant ${require_board_list[
-                    j
-                  ].substring(
-                    1,
-                  )} has not been defined yet. You need to put it before this line.\n`,
-                );
-              }
-            }
-            boardthemeavailable = uniqArr(boardthemeavailable);
-          }
-          if (themesettings[0] == "*") {
-            if (themesettings[1].length > 0) {
-              apply_to_all_list = apply_to_all_list.concat(themeavailable);
-            }
-            if (themesettings[2].length > 0) {
-              board_apply_to_all_list =
-                board_apply_to_all_list.concat(boardthemeavailable);
-            }
-          } else if (themes[0].includes(themesettings[0])) {
-            if (themesettings[1].length > 0) {
-              index = themes[0].indexOf(themesettings[0]);
-              themes[1][index] = uniqArr(
-                themes[1][index].concat(themeavailable),
-              );
-            }
-            if (themesettings[2].length > 0) {
-              index = themes[0].indexOf(themesettings[0]);
-              themes[2][index] = uniqArr(
-                themes[2][index].concat(boardthemeavailable),
-              );
-            }
-          } else {
-            themeavailable = uniqArr(themeavailable.concat(apply_to_all_list));
-            boardthemeavailable = uniqArr(
-              boardthemeavailable.concat(board_apply_to_all_list),
-            );
-            themes[0].push(themesettings[0]);
-            themes[1].push(themeavailable);
-            themes[2].push(boardthemeavailable);
-          }
-        }
-        for (i = 0; i < themes[0].length; i++) {
-          for (j = 0; j < themes[1][i].length; j++) {
-            css_name = "theme-piece-" + themes[1][i][j];
-            if (loaded_css_list.includes(css_name)) {
+      themenames = [[], []];
+      function StartLoad(data, namedata) {
+        if (typeof data == "string") {
+          data = data.replace(/\r\n/g, "\n");
+          data = data.replace(/\r/g, "\n");
+          let rawText = data.split("\n");
+          console.log("theme data:", rawText);
+          let i = 0;
+          let j = 0;
+          let css_name = "";
+          let index = 0;
+          let require_list = [];
+          let themesettings = [];
+          let apply_to_all_list = [];
+          let loaded_css_list = [];
+          let require_board_list = [];
+          let board_apply_to_all_list = [];
+          let themeavailable = [];
+          let boardthemeavailable = [];
+          let link = null;
+          for (i = 0; i < rawText.length; i++) {
+            if (rawText[i].length < 1 || rawText[i].charAt(0) == "#") {
               continue;
             }
+            themesettings = rawText[i].trim().split("|");
+            if (themesettings.length != 3) {
+              console.warn(`At line ${i} in themes.txt: Bad syntax\n`);
+              continue;
+            }
+            themeavailable = themesettings[1].split(",");
+            boardthemeavailable = themesettings[2].split(",");
+            if (themeavailable.length == 1 && themeavailable[0] == "") {
+              themeavailable = [];
+            }
+            if (
+              boardthemeavailable.length == 1 &&
+              boardthemeavailable[0] == ""
+            ) {
+              boardthemeavailable = [];
+            }
+            if (
+              (themesettings[1].length < 1 && themesettings[2].length < 1) ||
+              themeavailable.includes("") ||
+              boardthemeavailable.includes("")
+            ) {
+              console.warn(
+                `At line ${i} in themes.txt: Piece and Board style names must not be both null or contain null element\n`,
+              );
+              continue;
+            }
+            if (themesettings[1].length > 0) {
+              require_list = themeavailable.filter((element) => {
+                return element.charAt(0) == "@";
+              });
+              themeavailable = themeavailable.filter((element) => {
+                return element.charAt(0) != "@";
+              });
+              for (j = 0; j < require_list.length; j++) {
+                if (themes[0].includes(require_list[j].substring(1))) {
+                  index = themes[0].indexOf(require_list[j].substring(1));
+                  themeavailable = themeavailable.concat(themes[1][index]);
+                } else {
+                  console.warn(
+                    `At line ${i} in themes.txt: Variant ${require_list[
+                      j
+                    ].substring(
+                      1,
+                    )} has not been defined yet. You need to put it before this line.\n`,
+                  );
+                }
+              }
+              themeavailable = uniqArr(themeavailable);
+            }
+            if (themesettings[2].length > 0) {
+              require_board_list = boardthemeavailable.filter((element) => {
+                return element.charAt(0) == "@";
+              });
+              boardthemeavailable = boardthemeavailable.filter((element) => {
+                return element.charAt(0) != "@";
+              });
+              for (j = 0; j < require_board_list.length; j++) {
+                if (themes[0].includes(require_board_list[j].substring(1))) {
+                  index = themes[0].indexOf(require_board_list[j].substring(1));
+                  boardthemeavailable = boardthemeavailable.concat(
+                    themes[2][index],
+                  );
+                } else {
+                  console.warn(
+                    `At line ${i} in themes.txt: Variant ${require_board_list[
+                      j
+                    ].substring(
+                      1,
+                    )} has not been defined yet. You need to put it before this line.\n`,
+                  );
+                }
+              }
+              boardthemeavailable = uniqArr(boardthemeavailable);
+            }
+            if (themesettings[0] == "*") {
+              if (themesettings[1].length > 0) {
+                apply_to_all_list = apply_to_all_list.concat(themeavailable);
+              }
+              if (themesettings[2].length > 0) {
+                board_apply_to_all_list =
+                  board_apply_to_all_list.concat(boardthemeavailable);
+              }
+            } else if (themes[0].includes(themesettings[0])) {
+              if (themesettings[1].length > 0) {
+                index = themes[0].indexOf(themesettings[0]);
+                themes[1][index] = uniqArr(
+                  themes[1][index].concat(themeavailable),
+                );
+              }
+              if (themesettings[2].length > 0) {
+                index = themes[0].indexOf(themesettings[0]);
+                themes[2][index] = uniqArr(
+                  themes[2][index].concat(boardthemeavailable),
+                );
+              }
+            } else {
+              themeavailable = uniqArr(
+                themeavailable.concat(apply_to_all_list),
+              );
+              boardthemeavailable = uniqArr(
+                boardthemeavailable.concat(board_apply_to_all_list),
+              );
+              themes[0].push(themesettings[0]);
+              themes[1].push(themeavailable);
+              themes[2].push(boardthemeavailable);
+            }
+          }
+          for (i = 0; i < themes[0].length; i++) {
+            for (j = 0; j < themes[1][i].length; j++) {
+              css_name = "theme-piece-" + themes[1][i][j];
+              if (loaded_css_list.includes(css_name)) {
+                continue;
+              }
+              loaded_css_list.push(css_name);
+              link = document.createElement("link");
+              link.setAttribute("rel", "stylesheet");
+              link.setAttribute("href", "./assets/" + css_name + ".css");
+              document.head.appendChild(link);
+            }
+            for (j = 0; j < themes[2][i].length; j++) {
+              css_name = "theme-board-" + themes[2][i][j];
+              if (loaded_css_list.includes(css_name)) {
+                continue;
+              }
+              loaded_css_list.push(css_name);
+              link = document.createElement("link");
+              link.setAttribute("rel", "stylesheet");
+              link.setAttribute("href", "./assets/" + css_name + ".css");
+              document.head.appendChild(link);
+            }
+          }
+
+          // Needs to be after piece and board stylesheets to override them.
+          css_name = "theme-variant-";
+          if (!loaded_css_list.includes(css_name)) {
             loaded_css_list.push(css_name);
             link = document.createElement("link");
             link.setAttribute("rel", "stylesheet");
             link.setAttribute("href", "./assets/" + css_name + ".css");
+            link.setAttribute("id", "current-variant-stylesheet");
             document.head.appendChild(link);
           }
-          for (j = 0; j < themes[2][i].length; j++) {
-            css_name = "theme-board-" + themes[2][i][j];
-            if (loaded_css_list.includes(css_name)) {
+
+          console.log(themes);
+        } else {
+          console.error(`Bad data type from themes.txt: ${typeof data}`);
+        }
+
+        if (typeof namedata == "string") {
+          namedata = namedata.replace(/\r\n/g, "\n");
+          namedata = namedata.replace(/\r/g, "\n");
+          rawText = namedata.split("\n");
+          console.log("theme name:", rawText);
+          for (i = 0; i < rawText.length; i++) {
+            if (rawText[i].length < 1 || rawText[i].charAt(0) == "#") {
               continue;
             }
-            loaded_css_list.push(css_name);
-            link = document.createElement("link");
-            link.setAttribute("rel", "stylesheet");
-            link.setAttribute("href", "./assets/" + css_name + ".css");
-            document.head.appendChild(link);
+            themesettings = rawText[i].trim().split("|");
+            if (themesettings.length != 2) {
+              console.warn(`At line ${i} in themename.txt: Bad syntax\n`);
+              continue;
+            }
+            themenames[0].push(themesettings[0]);
+            themenames[1].push(themesettings[1]);
           }
-        }
 
-        // Needs to be after piece and board stylesheets to override them.
-        css_name = "theme-variant-";
-        if (!loaded_css_list.includes(css_name)) {
-          loaded_css_list.push(css_name);
-          link = document.createElement("link");
-          link.setAttribute("rel", "stylesheet");
-          link.setAttribute("href", "./assets/" + css_name + ".css");
-          link.setAttribute("id", "current-variant-stylesheet");
-          document.head.appendChild(link);
+          console.log(themenames);
+        } else {
+          console.error(`Bad data type from themename.txt: ${typeof namedata}`);
         }
-
-        console.log(themes);
       }
-      let data = "";
       this.getFileFromServer("./themes.txt", (res) => {
         console.log("res:", res);
-        StartLoad(res);
+        this.getFileFromServer(
+          "./themenames.txt",
+          (res2) => {
+            console.log("res2:", res2);
+            StartLoad(res, res2);
+          },
+          () => {
+            console.warn("themes.txt load failed.");
+            this.getFileFromServer("./themenames.txt", (res2) => {
+              console.log("res2:", res2);
+              StartLoad("", res2);
+            });
+          },
+        );
       });
     };
+
+    function getThemeName(themeid) {
+      if (typeof themeid != "string") {
+        return null;
+      }
+      let index = themenames[0].indexOf(themeid);
+      if (index < 0) {
+        return themeid + " ⚠";
+      } else {
+        return themenames[1][index];
+      }
+    }
 
     const App = () => {
       let stockfish = null;
@@ -955,6 +1050,12 @@
       let white_timer_type = "infinite";
       let black_timer_type = "infinite";
       let timer_interval = 100;
+      let white_byoyomi_time_per_period = 0;
+      let black_byoyomi_time_per_period = 0;
+      let white_byoyomi_period_count = 0;
+      let black_byoyomi_period_count = 0;
+      let white_remaining_byoyomi_periods = 0;
+      let black_remaining_byoyomi_periods = 0;
       let white_time_margin = 0;
       let black_time_margin = 0;
       let timeout_margin = 500;
@@ -1316,6 +1417,14 @@
             } else if (white_timer_type == "hourglass") {
               //How to tell that it's hourglass to engine?
               wtime += +white_remaining_time;
+            } else if (white_timer_type == "byoyomi") {
+              wtime += +white_remaining_time;
+              if (
+                white_remaining_time < white_byoyomi_time_per_period &&
+                white_remaining_byoyomi_periods > 0
+              ) {
+                winc += +white_byoyomi_time_per_period;
+              }
             }
             if (black_timer_type == "time per move") {
               btime += +black_moving_time_list[0];
@@ -1326,6 +1435,14 @@
             } else if (black_timer_type == "hourglass") {
               //How to tell that it's hourglass to engine?
               btime += +black_remaining_time;
+            } else if (black_timer_type == "byoyomi") {
+              btime += +black_remaining_time;
+              if (
+                black_remaining_time < black_byoyomi_time_per_period &&
+                black_remaining_byoyomi_periods > 0
+              ) {
+                binc += +black_byoyomi_time_per_period;
+              }
             }
             console.log(
               `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`,
@@ -1387,28 +1504,90 @@
         $("#timeoutside").value = 0;
         white_timer_type = $("#dropdown-whitetimemode").value;
         black_timer_type = $("#dropdown-blacktimemode").value;
-        white_remaining_time = $("#whitestarttime").value;
-        black_remaining_time = $("#blackstarttime").value;
-        if (white_remaining_time.length < 1 || white_remaining_time < 1) {
+        white_remaining_time = parseInt($("#whitestarttime").value);
+        black_remaining_time = parseInt($("#blackstarttime").value);
+        if (
+          isNaN(white_remaining_time) ||
+          white_remaining_time.length < 1 ||
+          white_remaining_time < 1
+        ) {
           white_remaining_time = play_white ? 20000 : 600000;
         }
-        if (black_remaining_time.length < 1 || black_remaining_time < 1) {
+        if (
+          isNaN(black_remaining_time) ||
+          black_remaining_time.length < 1 ||
+          black_remaining_time < 1
+        ) {
           black_remaining_time = play_black ? 20000 : 600000;
         }
-        white_time_gain = $("#whitetimegain").value;
-        black_time_gain = $("#blacktimegain").value;
-        if (white_time_gain.length < 1 || white_time_gain < 0) {
+        white_time_gain = parseInt($("#whitetimegain").value);
+        black_time_gain = parseInt($("#blacktimegain").value);
+        if (
+          isNaN(white_time_gain) ||
+          white_time_gain.length < 1 ||
+          white_time_gain < 0
+        ) {
           white_time_gain = 0;
         }
-        if (black_time_gain.length < 1 || black_time_gain < 0) {
+        if (
+          isNaN(black_time_gain) ||
+          black_time_gain.length < 1 ||
+          black_time_gain < 0
+        ) {
           black_time_gain = 0;
         }
-        white_time_margin = $("#whitetimemargin").value;
-        black_time_margin = $("#blacktimemargin").value;
-        if (white_time_margin.length < 1 || white_time_margin < 0) {
+        white_byoyomi_time_per_period = parseInt($("#whitebyoyomitime").value);
+        black_byoyomi_time_per_period = parseInt($("#blackbyoyomitime").value);
+        if (
+          isNaN(white_byoyomi_time_per_period) ||
+          white_byoyomi_time_per_period.length < 1 ||
+          white_byoyomi_time_per_period < 1
+        ) {
+          white_byoyomi_time_per_period = 30000;
+        }
+        if (
+          isNaN(black_byoyomi_time_per_period) ||
+          black_byoyomi_time_per_period.length < 1 ||
+          black_byoyomi_time_per_period < 1
+        ) {
+          black_byoyomi_time_per_period = 30000;
+        }
+        white_byoyomi_period_count = parseInt(
+          $("#whitebyoyomiperiodcount").value,
+        );
+        black_byoyomi_period_count = parseInt(
+          $("#blackbyoyomiperiodcount").value,
+        );
+        if (
+          isNaN(white_byoyomi_period_count) ||
+          white_byoyomi_period_count.length < 1 ||
+          white_byoyomi_period_count < 1
+        ) {
+          white_byoyomi_period_count = 1;
+        }
+        if (
+          isNaN(black_byoyomi_period_count) ||
+          black_byoyomi_period_count.length < 1 ||
+          black_byoyomi_period_count < 1
+        ) {
+          black_byoyomi_period_count = 1;
+        }
+        white_remaining_byoyomi_periods = white_byoyomi_period_count;
+        black_remaining_byoyomi_periods = black_byoyomi_period_count;
+        white_time_margin = parseInt($("#whitetimemargin").value);
+        black_time_margin = parseInt($("#blacktimemargin").value);
+        if (
+          isNaN(white_time_margin) ||
+          white_time_margin.length < 1 ||
+          white_time_margin < 0
+        ) {
           white_time_margin = timeout_margin;
         }
-        if (black_time_margin.length < 1 || black_time_margin < 0) {
+        if (
+          isNaN(black_time_margin) ||
+          black_time_margin.length < 1 ||
+          black_time_margin < 0
+        ) {
           black_time_margin = timeout_margin;
         }
         white_moving_time_list = [];
@@ -1459,6 +1638,15 @@
             } else if (white_timer_type == "time per move") {
               white_remaining_time =
                 +white_moving_time_list[0] + +timer_interval;
+            } else if (white_timer_type == "byoyomi") {
+              if (
+                white_remaining_byoyomi_periods < white_byoyomi_period_count
+              ) {
+                white_remaining_time =
+                  +white_byoyomi_time_per_period + +timer_interval;
+              } else {
+                white_remaining_time = +white_remaining_time + +timer_interval;
+              }
             }
             if (black_timer_type == "hourglass") {
               white_remaining_time =
@@ -1474,6 +1662,17 @@
             return;
           }
           white_remaining_time = white_remaining_time - timer_interval;
+          if (white_timer_type == "byoyomi" && white_remaining_time <= 0) {
+            if (white_remaining_byoyomi_periods == 0) {
+            } else {
+              white_remaining_byoyomi_periods--;
+              white_remaining_time = +white_byoyomi_time_per_period;
+              console.log(
+                "WHITE byoyomi remaining periods: " +
+                  white_remaining_byoyomi_periods,
+              );
+            }
+          }
           if (white_remaining_time < -white_time_margin) {
             deleteTimer();
             $("#timeoutside").value = 1;
@@ -1502,6 +1701,14 @@
               parseInt(Math.max(black_remaining_time, 0) / 100) / 10
             }`;
           }
+          if (white_timer_type == "byoyomi") {
+            $("#whitetime").innerText +=
+              ` (${white_remaining_byoyomi_periods})`;
+          }
+          if (black_timer_type == "byoyomi") {
+            $("#blacktime").innerText +=
+              ` (${black_remaining_byoyomi_periods})`;
+          }
           previous_mover = "WHITE";
         } else if ($("#gamestatus").innerHTML == "PLAYING_BLACK") {
           if (previous_mover == "") {
@@ -1521,6 +1728,15 @@
             } else if (black_timer_type == "time per move") {
               black_remaining_time =
                 +black_moving_time_list[0] + +timer_interval;
+            } else if (black_timer_type == "byoyomi") {
+              if (
+                black_remaining_byoyomi_periods < black_byoyomi_period_count
+              ) {
+                black_remaining_time =
+                  +black_byoyomi_time_per_period + +timer_interval;
+              } else {
+                black_remaining_time = +black_remaining_time + +timer_interval;
+              }
             }
             if (white_timer_type == "hourglass") {
               black_remaining_time =
@@ -1536,6 +1752,17 @@
             return;
           }
           black_remaining_time = black_remaining_time - timer_interval;
+          if (black_timer_type == "byoyomi" && black_remaining_time <= 0) {
+            if (black_remaining_byoyomi_periods == 0) {
+            } else {
+              black_remaining_byoyomi_periods--;
+              black_remaining_time = +black_byoyomi_time_per_period;
+              console.log(
+                "BLACK byoyomi remaining periods: " +
+                  black_remaining_byoyomi_periods,
+              );
+            }
+          }
           if (black_remaining_time < -black_time_margin) {
             deleteTimer();
             $("#timeoutside").value = 2;
@@ -1563,6 +1790,14 @@
             $("#blacktime").innerHTML = `${
               parseInt(Math.max(black_remaining_time, 0) / 100) / 10
             }`;
+          }
+          if (white_timer_type == "byoyomi") {
+            $("#whitetime").innerText +=
+              ` (${white_remaining_byoyomi_periods})`;
+          }
+          if (black_timer_type == "byoyomi") {
+            $("#blacktime").innerText +=
+              ` (${black_remaining_byoyomi_periods})`;
           }
           previous_mover = "BLACK";
         }
@@ -1671,6 +1906,7 @@
           if (onlyChangeWhenInvalid) {
             if (index != 0) {
               console.log("No need to change piece.");
+              updateThemeDropdowns(DOMListValue[1], null);
               return;
             }
           }
@@ -1684,6 +1920,7 @@
         DOMListValue[1] = themename;
         el.classList.value = DOMListValue.join(" ");
         console.log(`Piece theme: ${themename}`);
+        updateThemeDropdowns(themename, null);
         //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
         //const nextIndex = (activeIndex + 1) % classes.length;
         //el.classList.replace(classes[activeIndex], classes[nextIndex]);
@@ -1713,6 +1950,7 @@
           if (onlyChangeWhenInvalid) {
             if (index != 0) {
               console.log("No need to change board.");
+              updateThemeDropdowns(null, DOMListValue[0]);
               return;
             }
           }
@@ -1726,9 +1964,100 @@
         DOMListValue[0] = boardthemename;
         el.classList.value = DOMListValue.join(" ");
         console.log(`Board theme: ${boardthemename}`);
+        updateThemeDropdowns(null, boardthemename);
         //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
         //const nextIndex = (activeIndex + 1) % classes.length;
         //el.classList.replace(classes[activeIndex], classes[nextIndex]);
+      };
+
+      const setupThemeDropdowns = () => {
+        let piecethemedropdown = $("#dropdown-piecetheme");
+        let boardthemedropdown = $("#dropdown-boardtheme");
+        while (piecethemedropdown.options.length > 0) {
+          piecethemedropdown.remove(0);
+        }
+        while (boardthemedropdown.options.length > 0) {
+          boardthemedropdown.remove(0);
+        }
+        let index = 0;
+        let piececlasses = [];
+        let boardclasses = [];
+        index = themes[0].indexOf($("#dropdown-variant").value);
+        if (index < 0 || $("#dropdown-variant").value == "") {
+          index = themes[0].indexOf("");
+        }
+        if (index < 0) {
+          null;
+        } else {
+          piececlasses = themes[1][index];
+          if (piececlasses.length < 1) {
+            piececlasses = themes[1][themes[0].indexOf("")];
+          }
+          boardclasses = themes[2][index];
+          if (boardclasses.length < 1) {
+            boardclasses = themes[2][themes[0].indexOf("")];
+          }
+        }
+        if (piececlasses.length > 0) {
+          piececlasses.forEach((val) => {
+            let newOption = document.createElement("option");
+            newOption.text = getThemeName(val);
+            newOption.value = val;
+            piecethemedropdown.add(newOption);
+            console.log(val);
+          });
+        } else {
+          let newOption = document.createElement("option");
+          newOption.text = "Default Pieces";
+          newOption.value = "default";
+          piecethemedropdown.add(newOption);
+          newOption = document.createElement("option");
+          newOption.text = getThemeName("userdefined");
+          newOption.value = "userdefined";
+          piecethemedropdown.add(newOption);
+        }
+        if (boardclasses.length > 0) {
+          boardclasses.forEach((val) => {
+            let newOption = document.createElement("option");
+            newOption.text = getThemeName(val);
+            newOption.value = val;
+            boardthemedropdown.add(newOption);
+            console.log(val);
+          });
+        } else {
+          let newOption = document.createElement("option");
+          newOption.text = "Default Board";
+          newOption.value = "defaultboard";
+          boardthemedropdown.add(newOption);
+        }
+      };
+
+      const updateThemeDropdowns = (piecethemeid, boardthemeid) => {
+        let piecethemedropdown = $("#dropdown-piecetheme");
+        let boardthemedropdown = $("#dropdown-boardtheme");
+        let i = 0;
+        if (piecethemeid) {
+          for (i = 0; i < piecethemedropdown.options.length; i++) {
+            if (piecethemedropdown[i].value == piecethemeid) {
+              piecethemedropdown.selectedIndex = i;
+              break;
+            }
+          }
+          if (i == piecethemedropdown.options.length) {
+            piecethemedropdown.selectedIndex = -1;
+          }
+        }
+        if (boardthemeid) {
+          for (i = 0; i < boardthemedropdown.options.length; i++) {
+            if (boardthemedropdown[i].value == boardthemeid) {
+              boardthemedropdown.selectedIndex = i;
+              break;
+            }
+          }
+          if (i == boardthemedropdown.options.length) {
+            boardthemedropdown.selectedIndex = -1;
+          }
+        }
       };
 
       const scrollOutput = () => {
@@ -1857,6 +2186,15 @@
         let DOMListValue = el.classList.value.split(" ");
         DOMListValue[1] = piece_set;
         el.classList.value = DOMListValue.join(" ");
+        updateThemeDropdowns(piece_set, null);
+      }
+
+      function changeBoardSet(board_set) {
+        const el = $("#chessground-container-div");
+        let DOMListValue = el.classList.value.split(" ");
+        DOMListValue[0] = board_set;
+        el.classList.value = DOMListValue.join(" ");
+        updateThemeDropdowns(null, board_set);
       }
 
       const onSelectUserGraphics = async (e) => {
@@ -2042,7 +2380,7 @@
                 },
               },
               [
-                m("option", { value: "" }, "-- VARIANT --"),
+                m("option", { value: "" }, "    (default)    "),
                 ...variants.map((ex, index) => m("option", { value: ex }, ex)),
               ],
             ),
@@ -2107,9 +2445,13 @@
                   $("#currentposition").click();
                 },
               },
-              "Set",
+              "☑️Set",
             ),
-            m("button#reset", { disabled: !is_ready, onclick: reset }, "Reset"),
+            m(
+              "button#reset",
+              { disabled: !is_ready, onclick: reset },
+              "⏏️Reset",
+            ),
             m(
               "button#undo",
               {
@@ -2117,7 +2459,7 @@
                 hidden: review_mode,
                 onclick: undo,
               },
-              "Undo",
+              "◀️Undo",
             ),
           ]),
           m("div#input2", { hidden: during_play }, [
@@ -2167,12 +2509,12 @@
                   go();
                 },
               },
-              "Go",
+              "▶️Go",
             ),
             m(
               "button#stop",
               { disabled: !is_ready, onclick: force_stop },
-              "Stop",
+              "⏹Stop",
             ),
             m(
               "label#label-analysis",
@@ -2293,6 +2635,7 @@
               {
                 hidden: true,
                 onclick: () => {
+                  setupThemeDropdowns();
                   changePieces(true);
                   changeBoard(true);
                 },
@@ -2324,7 +2667,7 @@
                       $("#whitetimetype").innerHTML = $(
                         "#dropdown-whitetimemode",
                       ).value;
-                      //white_timer_type = $("#dropdown-whitetimemode").value;
+                      white_timer_type = $("#dropdown-whitetimemode").value;
                     },
                   },
                   [
@@ -2332,14 +2675,14 @@
                     m("option", { value: "tournament" }, "Tournament"),
                     m("option", { value: "time per move" }, "Time Per Move"),
                     m("option", { value: "hourglass" }, "Hourglass"),
+                    m("option", { value: "byoyomi" }, "Byo-yomi"),
                   ],
                 ),
                 m("input[type=number]#whitestarttime", {
                   placeholder: "Start time (ms)",
                   disabled:
-                    !is_ready ||
-                    review_mode ||
-                    $("#whitetimetype").innerHTML == "infinite",
+                    !is_ready || review_mode || white_timer_type == "infinite",
+                  hidden: white_timer_type == "infinite",
                   min: 1,
                 }),
                 m("input[type=number]#whitetimegain", {
@@ -2347,17 +2690,29 @@
                   disabled:
                     !is_ready ||
                     review_mode ||
-                    $("#whitetimetype").innerHTML == "infinite" ||
-                    $("#whitetimetype").innerHTML == "time per move" ||
-                    $("#whitetimetype").innerHTML == "hourglass",
+                    white_timer_type != "tournament",
+                  hidden: white_timer_type != "tournament",
                   min: 0,
+                }),
+                m("input[type=number]#whitebyoyomitime", {
+                  placeholder: "Byoyomi period length (ms)",
+                  disabled:
+                    !is_ready || review_mode || white_timer_type != "byoyomi",
+                  hidden: white_timer_type != "byoyomi",
+                  min: 1,
+                }),
+                m("input[type=number]#whitebyoyomiperiodcount", {
+                  placeholder: "Byoyomi period count",
+                  disabled:
+                    !is_ready || review_mode || white_timer_type != "byoyomi",
+                  hidden: white_timer_type != "byoyomi",
+                  min: 1,
                 }),
                 m("input[type=number]#whitetimemargin", {
                   placeholder: "Timeout margin (ms)",
                   disabled:
-                    !is_ready ||
-                    review_mode ||
-                    $("#whitetimetype").innerHTML == "infinite",
+                    !is_ready || review_mode || white_timer_type == "infinite",
+                  hidden: white_timer_type == "infinite",
                   min: 0,
                 }),
               ]),
@@ -2371,7 +2726,7 @@
                       $("#blacktimetype").innerHTML = $(
                         "#dropdown-blacktimemode",
                       ).value;
-                      //black_timer_type = $("#dropdown-blacktimemode").value;
+                      black_timer_type = $("#dropdown-blacktimemode").value;
                     },
                   },
                   [
@@ -2379,14 +2734,14 @@
                     m("option", { value: "tournament" }, "Tournament"),
                     m("option", { value: "time per move" }, "Time Per Move"),
                     m("option", { value: "hourglass" }, "Hourglass"),
+                    m("option", { value: "byoyomi" }, "Byo-yomi"),
                   ],
                 ),
                 m("input[type=number]#blackstarttime", {
                   placeholder: "Start time (ms)",
                   disabled:
-                    !is_ready ||
-                    review_mode ||
-                    $("#blacktimetype").innerHTML == "infinite",
+                    !is_ready || review_mode || black_timer_type == "infinite",
+                  hidden: black_timer_type == "infinite",
                   min: 1,
                 }),
                 m("input[type=number]#blacktimegain", {
@@ -2394,17 +2749,29 @@
                   disabled:
                     !is_ready ||
                     review_mode ||
-                    $("#blacktimetype").innerHTML == "infinite" ||
-                    $("#blacktimetype").innerHTML == "time per move" ||
-                    $("#blacktimetype").innerHTML == "hourglass",
+                    black_timer_type != "tournament",
+                  hidden: black_timer_type != "tournament",
                   min: 0,
+                }),
+                m("input[type=number]#blackbyoyomitime", {
+                  placeholder: "Byoyomi period length (ms)",
+                  disabled:
+                    !is_ready || review_mode || black_timer_type != "byoyomi",
+                  hidden: black_timer_type != "byoyomi",
+                  min: 1,
+                }),
+                m("input[type=number]#blackbyoyomiperiodcount", {
+                  placeholder: "Byoyomi period count",
+                  disabled:
+                    !is_ready || review_mode || black_timer_type != "byoyomi",
+                  hidden: black_timer_type != "byoyomi",
+                  min: 1,
                 }),
                 m("input[type=number]#blacktimemargin", {
                   placeholder: "Timeout margin (ms)",
                   disabled:
-                    !is_ready ||
-                    review_mode ||
-                    $("#blacktimetype").innerHTML == "infinite",
+                    !is_ready || review_mode || black_timer_type == "infinite",
+                  hidden: black_timer_type == "infinite",
                   min: 0,
                 }),
               ]),
@@ -2422,7 +2789,7 @@
                   {
                     onclick: () => {
                       alert(
-                        "This time control system allows user select different time modes for two sides and gives user more choice on time odds settings.\nThe time modes are:\nInfinite: Selected side has infinite time\nTournament: Selected side has limited time and may get a time increment after a move\nTime per move: Selected side need to make each move within a fixed time limit\nHourglass: Selected side has limited time and used time will be added to opponent's time.\nNote: if you set engine's time mode to infinite, it will think forever!",
+                        'This time control system allows user select different time modes for two sides and gives user more choice on time odds settings.\nThe time modes are:\nInfinite: Selected side has infinite time.\nTournament: Selected side has limited time and may get a time increment after a move.\nTime per move: Selected side need to make each move within a fixed time limit.\nHourglass: Selected side has limited time and used time will be added to opponent\'s time.\nByo-yomi: Selected side will enter the countdown(byoyomi) period(s) after their initial time runs out. During countdown periods, if the player make a move before the countdown period time runs out, the time will be reset to full time of countdown periods(Specified in "Byoyomi period length"), otherwise the remaining period count will be decreased by 1 and the time will be reset to full time of countdown periods(Specified in "Byoyomi period length"). If there\'s no countdown periods (Specified in "Byoyomi period count") left and the remaining time runs out, this side runs out of time.\nNote: if you set engine\'s time mode to infinite, it will think forever!',
                       );
                     },
                   },
@@ -2433,7 +2800,7 @@
                   {
                     onclick: () => {
                       alert(
-                        "Start time: The initial time at the beginning of the game. Not applicable to infinite.\nTime gain: Get a time increment of this many milliseconds after every move. Only applicable to tournament.\nTimeout margin (Only in Advanced Analysis): The time can be exceeded by this many milliseconds. Not applicable to infinite.",
+                        "Start time: The initial time (in milliseconds) at the beginning of the game. Not applicable to infinite.\nTime gain: Get a time increment of this many milliseconds after every move. Only applicable to tournament.\nByoyomi period length: The time (in milliseconds) of each period when in extra countdown(byoyomi) periods. Only applicable to byo-yomi.\nByoyomi period count: The count of countdown(byoyomi) periods. Only applicable to byo-yomi.\nTimeout margin: The time can be exceeded by this many milliseconds. The remaining time will be shown as minus numbers if exceeded. Not applicable to infinite.",
                       );
                     },
                   },
@@ -2489,7 +2856,7 @@
               }),
               "Click-click move",
             ),
-            m("button#passmove", { disabled: !is_ready }, "Pass This Turn"),
+            m("button#passmove", { disabled: !is_ready }, "🔄Pass This Turn"),
           ]),
           m("div#boardsetupsettings", { hidden: !board_setup_mode }, [
             m("p", "Board Setup:"),
@@ -2607,22 +2974,22 @@
                 m(
                   "button#initialposition",
                   { onclick: displayInitialPosition, disabled: !is_ready },
-                  "Initial Position",
+                  "⏮Initial Position",
                 ),
                 m(
                   "button#currentposition",
                   { onclick: displayCurrentPosition, disabled: !is_ready },
-                  "Current Position",
+                  "⏭Current Position",
                 ),
                 m(
                   "button#previousposition",
                   { onclick: displayPreviousMove, disabled: !is_ready },
-                  "Previous Position",
+                  "⏪Previous Position",
                 ),
                 m(
                   "button#nextposition",
                   { onclick: displayNextMove, disabled: !is_ready },
-                  "Next Position",
+                  "⏩Next Position",
                 ),
                 m("input[type=number]#gotomovenum", {
                   placeholder: "Half Move Number",
@@ -2632,7 +2999,7 @@
                 m(
                   "button#specifiedposition",
                   { onclick: displaySpecifiedPosition, disabled: !is_ready },
-                  "Go to Move",
+                  "↩️Go to Move",
                 ),
               ]),
               m("p", { hidden: !review_mode }, "Review mode enabled."),
@@ -2653,6 +3020,26 @@
                     "Change pieces",
                   ),
                   m(
+                    "select#dropdown-piecetheme",
+                    {
+                      onchange: () => {
+                        changePieceSet(
+                          $("#dropdown-piecetheme")[
+                            $("#dropdown-piecetheme").selectedIndex
+                          ].value,
+                        );
+                      },
+                    },
+                    [
+                      m("option", { value: "default" }, "Default Pieces"),
+                      m(
+                        "option",
+                        { value: "userdefined" },
+                        getThemeName("userdefined"),
+                      ),
+                    ],
+                  ),
+                  m(
                     "button",
                     {
                       onclick: () => {
@@ -2661,7 +3048,20 @@
                     },
                     "Change board",
                   ),
-                  m("button#button-flip", "Flip Board"),
+                  m(
+                    "select#dropdown-boardtheme",
+                    {
+                      onchange: () => {
+                        changeBoardSet(
+                          $("#dropdown-boardtheme")[
+                            $("#dropdown-boardtheme").selectedIndex
+                          ].value,
+                        );
+                      },
+                    },
+                    [m("option", { value: "defaultboard" }, "Default Board")],
+                  ),
+                  m("button#button-flip", "🔃Flip Board"),
                 ]),
                 m("div", [
                   m(

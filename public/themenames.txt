@@ -1,0 +1,16 @@
+﻿#Fairyground theme name dictionary file
+#Syntax: <theme name defined in themes.txt>|<Name to show in dropdown list>
+#If a theme name defined in themes.txt is not given a name here, you will see a ⚠ at the end.
+#For example, "userdefined|User Defined Graphics" means the theme "userdefined" declared in themes.txt will be shown as "User Defined Graphics" in the dropdown.
+
+merida|Merida
+cburnett|Cburnett
+lettertiles|Letter Tiles
+letters|FEN Style Letters
+userdefined|User Defined Graphics
+
+blueboard|Blue
+greenboard|Green
+brownboard|Brown
+purpleboard|Purple
+cobaltboard|Cobalt
