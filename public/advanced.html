@@ -1425,6 +1425,12 @@
               ) {
                 winc += +white_byoyomi_time_per_period;
               }
+              if (
+                white_remaining_byoyomi_periods == white_byoyomi_period_count
+              ) {
+                wtime += +white_byoyomi_time_per_period;
+                winc = 0;
+              }
             }
             if (black_timer_type == "time per move") {
               btime += +black_moving_time_list[0];
@@ -1442,6 +1448,12 @@
                 black_remaining_byoyomi_periods > 0
               ) {
                 binc += +black_byoyomi_time_per_period;
+              }
+              if (
+                black_remaining_byoyomi_periods == black_byoyomi_period_count
+              ) {
+                btime += +black_byoyomi_time_per_period;
+                binc = 0;
               }
             }
             console.log(
@@ -1680,26 +1692,26 @@
             return;
           }
           if (white_timer_type == "infinite") {
-            $("#whitetime").innerHTML = "∞";
+            $("#whitetime").innerText = "∞";
           } else if (white_remaining_time >= 10000) {
-            $("#whitetime").innerHTML = `${parseInt(
+            $("#whitetime").innerText = `${parseInt(
               white_remaining_time / 1000,
             )}`;
           } else {
-            $("#whitetime").innerHTML = `${
+            $("#whitetime").innerText = `${(
               parseInt(Math.max(white_remaining_time, 0) / 100) / 10
-            }`;
+            ).toFixed(1)}`;
           }
           if (black_timer_type == "infinite") {
-            $("#blacktime").innerHTML = "∞";
+            $("#blacktime").innerText = "∞";
           } else if (black_remaining_time >= 10000) {
-            $("#blacktime").innerHTML = `${parseInt(
+            $("#blacktime").innerText = `${parseInt(
               black_remaining_time / 1000,
             )}`;
           } else {
-            $("#blacktime").innerHTML = `${
+            $("#blacktime").innerText = `${(
               parseInt(Math.max(black_remaining_time, 0) / 100) / 10
-            }`;
+            ).toFixed(1)}`;
           }
           if (white_timer_type == "byoyomi") {
             $("#whitetime").innerText +=
@@ -1770,26 +1782,26 @@
             return;
           }
           if (white_timer_type == "infinite") {
-            $("#whitetime").innerHTML = "∞";
+            $("#whitetime").innerText = "∞";
           } else if (white_remaining_time >= 10000) {
-            $("#whitetime").innerHTML = `${parseInt(
+            $("#whitetime").innerText = `${parseInt(
               white_remaining_time / 1000,
             )}`;
           } else {
-            $("#whitetime").innerHTML = `${
+            $("#whitetime").innerText = `${(
               parseInt(Math.max(white_remaining_time, 0) / 100) / 10
-            }`;
+            ).toFixed(1)}`;
           }
           if (black_timer_type == "infinite") {
-            $("#blacktime").innerHTML = "∞";
+            $("#blacktime").innerText = "∞";
           } else if (black_remaining_time >= 10000) {
-            $("#blacktime").innerHTML = `${parseInt(
+            $("#blacktime").innerText = `${parseInt(
               black_remaining_time / 1000,
             )}`;
           } else {
-            $("#blacktime").innerHTML = `${
+            $("#blacktime").innerText = `${(
               parseInt(Math.max(black_remaining_time, 0) / 100) / 10
-            }`;
+            ).toFixed(1)}`;
           }
           if (white_timer_type == "byoyomi") {
             $("#whitetime").innerText +=
