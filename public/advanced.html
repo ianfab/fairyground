@@ -672,7 +672,7 @@
       return Array.from(newArr);
     }
 
-    function getFileFromServer(url, doneCallback) {
+    function getFileFromServer(url, doneCallback, errorCallback) {
       var xhr;
       function handleStateChange() {
         if (xhr.readyState === 4) {
@@ -681,6 +681,7 @@
       }
       xhr = new XMLHttpRequest();
       xhr.onreadystatechange = handleStateChange;
+      xhr.onerror = errorCallback;
       xhr.open("GET", url, true);
       xhr.send();
     }
@@ -802,193 +803,215 @@
       themes = [[], [], []];
       themenames = [[], []];
       function StartLoad(data, namedata) {
-        console.log(`${typeof data}`);
-        data = data.replace(/\r\n/g, "\n");
-        data = data.replace(/\r/g, "\n");
-        namedata = namedata.replace(/\r\n/g, "\n");
-        namedata = namedata.replace(/\r/g, "\n");
-        let rawText = data.split("\n");
-        console.log("theme data:", rawText);
-        let i = 0;
-        let j = 0;
-        let css_name = "";
-        let index = 0;
-        let require_list = [];
-        let themesettings = [];
-        let apply_to_all_list = [];
-        let loaded_css_list = [];
-        let require_board_list = [];
-        let board_apply_to_all_list = [];
-        let themeavailable = [];
-        let boardthemeavailable = [];
-        let link = null;
-        for (i = 0; i < rawText.length; i++) {
-          if (rawText[i].length < 1 || rawText[i].charAt(0) == "#") {
-            continue;
-          }
-          themesettings = rawText[i].trim().split("|");
-          if (themesettings.length != 3) {
-            console.warn(`At line ${i} in themes.txt: Bad syntax\n`);
-            continue;
-          }
-          themeavailable = themesettings[1].split(",");
-          boardthemeavailable = themesettings[2].split(",");
-          if (themeavailable.length == 1 && themeavailable[0] == "") {
-            themeavailable = [];
-          }
-          if (boardthemeavailable.length == 1 && boardthemeavailable[0] == "") {
-            boardthemeavailable = [];
-          }
-          if (
-            (themesettings[1].length < 1 && themesettings[2].length < 1) ||
-            themeavailable.includes("") ||
-            boardthemeavailable.includes("")
-          ) {
-            console.warn(
-              `At line ${i} in themes.txt: Piece and Board style names must not be both null or contain null element\n`,
-            );
-            continue;
-          }
-          if (themesettings[1].length > 0) {
-            require_list = themeavailable.filter((element) => {
-              return element.charAt(0) == "@";
-            });
-            themeavailable = themeavailable.filter((element) => {
-              return element.charAt(0) != "@";
-            });
-            for (j = 0; j < require_list.length; j++) {
-              if (themes[0].includes(require_list[j].substring(1))) {
-                index = themes[0].indexOf(require_list[j].substring(1));
-                themeavailable = themeavailable.concat(themes[1][index]);
-              } else {
-                console.warn(
-                  `At line ${i} in themes.txt: Variant ${require_list[
-                    j
-                  ].substring(
-                    1,
-                  )} has not been defined yet. You need to put it before this line.\n`,
-                );
-              }
-            }
-            themeavailable = uniqArr(themeavailable);
-          }
-          if (themesettings[2].length > 0) {
-            require_board_list = boardthemeavailable.filter((element) => {
-              return element.charAt(0) == "@";
-            });
-            boardthemeavailable = boardthemeavailable.filter((element) => {
-              return element.charAt(0) != "@";
-            });
-            for (j = 0; j < require_board_list.length; j++) {
-              if (themes[0].includes(require_board_list[j].substring(1))) {
-                index = themes[0].indexOf(require_board_list[j].substring(1));
-                boardthemeavailable = boardthemeavailable.concat(
-                  themes[2][index],
-                );
-              } else {
-                console.warn(
-                  `At line ${i} in themes.txt: Variant ${require_board_list[
-                    j
-                  ].substring(
-                    1,
-                  )} has not been defined yet. You need to put it before this line.\n`,
-                );
-              }
-            }
-            boardthemeavailable = uniqArr(boardthemeavailable);
-          }
-          if (themesettings[0] == "*") {
-            if (themesettings[1].length > 0) {
-              apply_to_all_list = apply_to_all_list.concat(themeavailable);
-            }
-            if (themesettings[2].length > 0) {
-              board_apply_to_all_list =
-                board_apply_to_all_list.concat(boardthemeavailable);
-            }
-          } else if (themes[0].includes(themesettings[0])) {
-            if (themesettings[1].length > 0) {
-              index = themes[0].indexOf(themesettings[0]);
-              themes[1][index] = uniqArr(
-                themes[1][index].concat(themeavailable),
-              );
-            }
-            if (themesettings[2].length > 0) {
-              index = themes[0].indexOf(themesettings[0]);
-              themes[2][index] = uniqArr(
-                themes[2][index].concat(boardthemeavailable),
-              );
-            }
-          } else {
-            themeavailable = uniqArr(themeavailable.concat(apply_to_all_list));
-            boardthemeavailable = uniqArr(
-              boardthemeavailable.concat(board_apply_to_all_list),
-            );
-            themes[0].push(themesettings[0]);
-            themes[1].push(themeavailable);
-            themes[2].push(boardthemeavailable);
-          }
-        }
-        for (i = 0; i < themes[0].length; i++) {
-          for (j = 0; j < themes[1][i].length; j++) {
-            css_name = "theme-piece-" + themes[1][i][j];
-            if (loaded_css_list.includes(css_name)) {
+        if (typeof data == "string") {
+          data = data.replace(/\r\n/g, "\n");
+          data = data.replace(/\r/g, "\n");
+          let rawText = data.split("\n");
+          console.log("theme data:", rawText);
+          let i = 0;
+          let j = 0;
+          let css_name = "";
+          let index = 0;
+          let require_list = [];
+          let themesettings = [];
+          let apply_to_all_list = [];
+          let loaded_css_list = [];
+          let require_board_list = [];
+          let board_apply_to_all_list = [];
+          let themeavailable = [];
+          let boardthemeavailable = [];
+          let link = null;
+          for (i = 0; i < rawText.length; i++) {
+            if (rawText[i].length < 1 || rawText[i].charAt(0) == "#") {
               continue;
             }
+            themesettings = rawText[i].trim().split("|");
+            if (themesettings.length != 3) {
+              console.warn(`At line ${i} in themes.txt: Bad syntax\n`);
+              continue;
+            }
+            themeavailable = themesettings[1].split(",");
+            boardthemeavailable = themesettings[2].split(",");
+            if (themeavailable.length == 1 && themeavailable[0] == "") {
+              themeavailable = [];
+            }
+            if (
+              boardthemeavailable.length == 1 &&
+              boardthemeavailable[0] == ""
+            ) {
+              boardthemeavailable = [];
+            }
+            if (
+              (themesettings[1].length < 1 && themesettings[2].length < 1) ||
+              themeavailable.includes("") ||
+              boardthemeavailable.includes("")
+            ) {
+              console.warn(
+                `At line ${i} in themes.txt: Piece and Board style names must not be both null or contain null element\n`,
+              );
+              continue;
+            }
+            if (themesettings[1].length > 0) {
+              require_list = themeavailable.filter((element) => {
+                return element.charAt(0) == "@";
+              });
+              themeavailable = themeavailable.filter((element) => {
+                return element.charAt(0) != "@";
+              });
+              for (j = 0; j < require_list.length; j++) {
+                if (themes[0].includes(require_list[j].substring(1))) {
+                  index = themes[0].indexOf(require_list[j].substring(1));
+                  themeavailable = themeavailable.concat(themes[1][index]);
+                } else {
+                  console.warn(
+                    `At line ${i} in themes.txt: Variant ${require_list[
+                      j
+                    ].substring(
+                      1,
+                    )} has not been defined yet. You need to put it before this line.\n`,
+                  );
+                }
+              }
+              themeavailable = uniqArr(themeavailable);
+            }
+            if (themesettings[2].length > 0) {
+              require_board_list = boardthemeavailable.filter((element) => {
+                return element.charAt(0) == "@";
+              });
+              boardthemeavailable = boardthemeavailable.filter((element) => {
+                return element.charAt(0) != "@";
+              });
+              for (j = 0; j < require_board_list.length; j++) {
+                if (themes[0].includes(require_board_list[j].substring(1))) {
+                  index = themes[0].indexOf(require_board_list[j].substring(1));
+                  boardthemeavailable = boardthemeavailable.concat(
+                    themes[2][index],
+                  );
+                } else {
+                  console.warn(
+                    `At line ${i} in themes.txt: Variant ${require_board_list[
+                      j
+                    ].substring(
+                      1,
+                    )} has not been defined yet. You need to put it before this line.\n`,
+                  );
+                }
+              }
+              boardthemeavailable = uniqArr(boardthemeavailable);
+            }
+            if (themesettings[0] == "*") {
+              if (themesettings[1].length > 0) {
+                apply_to_all_list = apply_to_all_list.concat(themeavailable);
+              }
+              if (themesettings[2].length > 0) {
+                board_apply_to_all_list =
+                  board_apply_to_all_list.concat(boardthemeavailable);
+              }
+            } else if (themes[0].includes(themesettings[0])) {
+              if (themesettings[1].length > 0) {
+                index = themes[0].indexOf(themesettings[0]);
+                themes[1][index] = uniqArr(
+                  themes[1][index].concat(themeavailable),
+                );
+              }
+              if (themesettings[2].length > 0) {
+                index = themes[0].indexOf(themesettings[0]);
+                themes[2][index] = uniqArr(
+                  themes[2][index].concat(boardthemeavailable),
+                );
+              }
+            } else {
+              themeavailable = uniqArr(
+                themeavailable.concat(apply_to_all_list),
+              );
+              boardthemeavailable = uniqArr(
+                boardthemeavailable.concat(board_apply_to_all_list),
+              );
+              themes[0].push(themesettings[0]);
+              themes[1].push(themeavailable);
+              themes[2].push(boardthemeavailable);
+            }
+          }
+          for (i = 0; i < themes[0].length; i++) {
+            for (j = 0; j < themes[1][i].length; j++) {
+              css_name = "theme-piece-" + themes[1][i][j];
+              if (loaded_css_list.includes(css_name)) {
+                continue;
+              }
+              loaded_css_list.push(css_name);
+              link = document.createElement("link");
+              link.setAttribute("rel", "stylesheet");
+              link.setAttribute("href", "./assets/" + css_name + ".css");
+              document.head.appendChild(link);
+            }
+            for (j = 0; j < themes[2][i].length; j++) {
+              css_name = "theme-board-" + themes[2][i][j];
+              if (loaded_css_list.includes(css_name)) {
+                continue;
+              }
+              loaded_css_list.push(css_name);
+              link = document.createElement("link");
+              link.setAttribute("rel", "stylesheet");
+              link.setAttribute("href", "./assets/" + css_name + ".css");
+              document.head.appendChild(link);
+            }
+          }
+
+          // Needs to be after piece and board stylesheets to override them.
+          css_name = "theme-variant-";
+          if (!loaded_css_list.includes(css_name)) {
             loaded_css_list.push(css_name);
             link = document.createElement("link");
             link.setAttribute("rel", "stylesheet");
             link.setAttribute("href", "./assets/" + css_name + ".css");
+            link.setAttribute("id", "current-variant-stylesheet");
             document.head.appendChild(link);
           }
-          for (j = 0; j < themes[2][i].length; j++) {
-            css_name = "theme-board-" + themes[2][i][j];
-            if (loaded_css_list.includes(css_name)) {
+
+          console.log(themes);
+        } else {
+          console.error(`Bad data type from themes.txt: ${typeof data}`);
+        }
+
+        if (typeof namedata == "string") {
+          namedata = namedata.replace(/\r\n/g, "\n");
+          namedata = namedata.replace(/\r/g, "\n");
+          rawText = namedata.split("\n");
+          console.log("theme name:", rawText);
+          for (i = 0; i < rawText.length; i++) {
+            if (rawText[i].length < 1 || rawText[i].charAt(0) == "#") {
               continue;
             }
-            loaded_css_list.push(css_name);
-            link = document.createElement("link");
-            link.setAttribute("rel", "stylesheet");
-            link.setAttribute("href", "./assets/" + css_name + ".css");
-            document.head.appendChild(link);
+            themesettings = rawText[i].trim().split("|");
+            if (themesettings.length != 2) {
+              console.warn(`At line ${i} in themename.txt: Bad syntax\n`);
+              continue;
+            }
+            themenames[0].push(themesettings[0]);
+            themenames[1].push(themesettings[1]);
           }
+
+          console.log(themenames);
+        } else {
+          console.error(`Bad data type from themename.txt: ${typeof namedata}`);
         }
-
-        // Needs to be after piece and board stylesheets to override them.
-        css_name = "theme-variant-";
-        if (!loaded_css_list.includes(css_name)) {
-          loaded_css_list.push(css_name);
-          link = document.createElement("link");
-          link.setAttribute("rel", "stylesheet");
-          link.setAttribute("href", "./assets/" + css_name + ".css");
-          link.setAttribute("id", "current-variant-stylesheet");
-          document.head.appendChild(link);
-        }
-
-        console.log(themes);
-
-        rawText = namedata.split("\n");
-        console.log("theme name:", rawText);
-        for (i = 0; i < rawText.length; i++) {
-          if (rawText[i].length < 1 || rawText[i].charAt(0) == "#") {
-            continue;
-          }
-          themesettings = rawText[i].trim().split("|");
-          if (themesettings.length != 2) {
-            console.warn(`At line ${i} in themename.txt: Bad syntax\n`);
-            continue;
-          }
-          themenames[0].push(themesettings[0]);
-          themenames[1].push(themesettings[1]);
-        }
-
-        console.log(themenames);
       }
       this.getFileFromServer("./themes.txt", (res) => {
         console.log("res:", res);
-        this.getFileFromServer("./themenames.txt", (res2) => {
-          console.log("res2:", res2);
-          StartLoad(res, res2);
-        });
+        this.getFileFromServer(
+          "./themenames.txt",
+          (res2) => {
+            console.log("res2:", res2);
+            StartLoad(res, res2);
+          },
+          () => {
+            console.warn("themes.txt load failed.");
+            this.getFileFromServer("./themenames.txt", (res2) => {
+              console.log("res2:", res2);
+              StartLoad("", res2);
+            });
+          },
+        );
       });
     };
 
@@ -1988,6 +2011,10 @@
           newOption.text = "Default Pieces";
           newOption.value = "default";
           piecethemedropdown.add(newOption);
+          newOption = document.createElement("option");
+          newOption.text = getThemeName("userdefined");
+          newOption.value = "userdefined";
+          piecethemedropdown.add(newOption);
         }
         if (boardclasses.length > 0) {
           boardclasses.forEach((val) => {
@@ -2353,7 +2380,7 @@
                 },
               },
               [
-                m("option", { value: "" }, "(default)"),
+                m("option", { value: "" }, "    (default)    "),
                 ...variants.map((ex, index) => m("option", { value: ex }, ex)),
               ],
             ),
