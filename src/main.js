@@ -1472,7 +1472,9 @@ const onSelectPositionVariantsFile = async (e) => {
     const reader = new FileReader();
     reader.onload = function () {
       console.log(reader.result);
-      LoadPositionVariant("client", reader.result);
+      if (LoadPositionVariant("client", reader.result)) {
+        UpdateVariantsPositionTypeDropdown();
+      }
     };
     reader.readAsText(selected);
   }
