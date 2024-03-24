@@ -1394,6 +1394,14 @@
             } else if (white_timer_type == "hourglass") {
               //How to tell that it's hourglass to engine?
               wtime += +white_remaining_time;
+            } else if (white_timer_type == "byoyomi") {
+              wtime += +white_remaining_time;
+              if (
+                white_remaining_time < white_byoyomi_time_per_period &&
+                white_remaining_byoyomi_periods > 0
+              ) {
+                winc += +white_byoyomi_time_per_period;
+              }
             }
             if (black_timer_type == "time per move") {
               btime += +black_moving_time_list[0];
@@ -1404,6 +1412,14 @@
             } else if (black_timer_type == "hourglass") {
               //How to tell that it's hourglass to engine?
               btime += +black_remaining_time;
+            } else if (black_timer_type == "byoyomi") {
+              btime += +black_remaining_time;
+              if (
+                black_remaining_time < black_byoyomi_time_per_period &&
+                black_remaining_byoyomi_periods > 0
+              ) {
+                binc += +black_byoyomi_time_per_period;
+              }
             }
             console.log(
               `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`,
