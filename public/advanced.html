@@ -647,7 +647,51 @@
     transition: 0.5s linear;
     font-weight: bold;
     font-family: "Times New Roman", Georgia, Serif, Arial;
+    z-index: 3;
+  }
+
+  #moveselectiondialog {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 700px;
+    padding: 10px;
+    background-color: #000000;
+    color: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
     z-index: 2;
+  }
+
+  #moveselectiondialog button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+
+  #moveselectiondialog #moveslectdiv {
+    display: flex;
+    flex-direction: row;
+  }
+
+  #moveselectiondialog #movefilters {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #moveselectiondialog #availablemovelist {
+    width: 150px;
+    background: #eee;
+    margin-right: 5px;
+  }
+
+  #separatormoveselectiondialog {
+    border: dashed #ffffff;
   }
 </style>
 
@@ -1041,6 +1085,7 @@
       let board_setup_mode = false;
       let advanced_time_control = false;
       let during_play = false;
+      let select_move_dialog = false;
       let white_remaining_time = 0;
       let black_remaining_time = 0;
       let white_moving_time_list = [];
@@ -1260,6 +1305,9 @@
             force_stop();
           } else {
             stop();
+          }
+          if ($("#showmovediv").checked) {
+            $("#showmovediv").click();
           }
           review_mode = true;
           $("#isreviewmode").value = 1;
@@ -2580,7 +2628,11 @@
               "label#label-boardsetup",
               m("input[type=checkbox]#isboardsetup", {
                 checked: board_setup_mode,
-                disabled: analysis_mode || review_mode || advanced_time_control,
+                disabled:
+                  analysis_mode ||
+                  review_mode ||
+                  advanced_time_control ||
+                  select_move_dialog,
                 onclick: () => {
                   board_setup_mode = !board_setup_mode;
                 },
@@ -2869,6 +2921,28 @@
               "Click-click move",
             ),
             m("button#passmove", { disabled: !is_ready }, "🔄Pass This Turn"),
+            m(
+              "label#label-showmovediv",
+              m("input[type=checkbox]#showmovediv", {
+                checked: select_move_dialog,
+                disabled: analysis_mode || review_mode || board_setup_mode,
+                onclick: () => {
+                  select_move_dialog = !select_move_dialog;
+                },
+              }),
+              "Show moves dialog",
+            ),
+            m(
+              "span",
+              {
+                style: "cursor: pointer;",
+                onclick: () =>
+                  window.alert(
+                    "If you cannot make your move on the board (For example, ATAXX drops), you can open this dialog to make the move.",
+                  ),
+              },
+              "[?]",
+            ),
           ]),
           m("div#boardsetupsettings", { hidden: !board_setup_mode }, [
             m("p", "Board Setup:"),
@@ -3194,6 +3268,72 @@
                   "SEND",
                 ),
               ]),
+            ]),
+          ]),
+          m("div#moveselectiondialog", { hidden: !select_move_dialog }, [
+            m("div#moveslectdiv", [
+              m("p", "Moves:"),
+              m("select#availablemovelist", [
+                m("option", { value: "" }, "--SELECT MOVE--"),
+              ]),
+              m("input#movesearchfilter", {
+                placeholder: "Search for move...",
+              }),
+              m(
+                "label#label-regexp1",
+                m("input[type=checkbox]#regexp1", {
+                  disabled: review_mode || board_setup_mode,
+                }),
+                "Regular Expression",
+              ),
+              m("button#searchmove", "Search Moves"),
+            ]),
+            m("div#movefilters", [
+              m(
+                "p",
+                "Note: Click <Search Moves> to find available moves with filter. Leave the search field blank to find all moves. Click <Make Move> to make selected move. Click <Highlight Move> to show the move on the board. If you are in analysis mode, the highlighted move can be replaced by recommended move (Blue) and threat move (Red) and you need to highlight it again.",
+              ),
+              m(
+                "p",
+                "Check <Regular Expression> to search with your input as a regular expression, e.g. /[a-z]+/g",
+              ),
+              m("br"),
+              m("hr#separatormoveselectiondialog"),
+              m("p", "Additional Search Restrictions:"),
+              m("input#origfilter", {
+                placeholder:
+                  "Original Square... (e.g. e2, leave empty to search all, useless for drops)",
+              }),
+              m("input#destfilter", {
+                placeholder:
+                  "Destination Square... (e.g. e4, leave empty to search all, effective on drops)",
+              }),
+              m(
+                "label#label-isdrop",
+                m("input[type=checkbox]#isdrop", {
+                  disabled: review_mode || board_setup_mode,
+                  checked: true,
+                }),
+                "Include drops",
+              ),
+              m(
+                "label#label-haswallgating",
+                m("input[type=checkbox]#haswallgating", {
+                  disabled: review_mode || board_setup_mode,
+                  checked: true,
+                }),
+                "Include moves having wall gating",
+              ),
+              m(
+                "label#label-haspiecechange",
+                m("input[type=checkbox]#haspiecechange", {
+                  disabled: review_mode || board_setup_mode,
+                  checked: true,
+                }),
+                "Include moves having promotion/demotion or seirawan gating",
+              ),
+              m("button#makemove", "Make Move"),
+              m("button#highlightmove", "Highlight Move (Yellow Marks)"),
             ]),
           ]),
         ]);
