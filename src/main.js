@@ -78,6 +78,17 @@ const evalscore = document.getElementById("cp");
 const multipv = document.getElementById("multipv");
 const evalinfo = document.getElementById("evalinfo");
 const pvinfo = document.getElementById("pvinfo");
+const availablemovelist = document.getElementById("availablemovelist");
+const movesearchfilter = document.getElementById("movesearchfilter");
+const issearchregexp = document.getElementById("regexp1");
+const buttonsearchmove = document.getElementById("searchmove");
+const origfilter = document.getElementById("origfilter");
+const destfilter = document.getElementById("destfilter");
+const isdrop = document.getElementById("isdrop");
+const haswallgating = document.getElementById("haswallgating");
+const haspiecechange = document.getElementById("haspiecechange");
+const buttonmakemove = document.getElementById("makemove");
+const buttonhighlightmove = document.getElementById("highlightmove");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
@@ -282,6 +293,7 @@ function initBoard(variant) {
   const fenBoard = board.fen().split(" ")[0];
   var pocketRoles = undefined;
   resetTimer();
+  clearMovesList();
   recordedmultipv = 1;
   if (fenBoard.includes("[")) {
     const wpocket = board.pocket(WHITE);
@@ -538,6 +550,262 @@ function addPieceToPocket(pieceid, color) {
   });
 }
 
+function clearMovesList() {
+  while (availablemovelist.length > 1) {
+    availablemovelist.removeChild(availablemovelist[1]);
+  }
+}
+
+function generateRegExp(expstr) {
+  if (typeof expstr != "string") {
+    return null;
+  }
+  if (expstr.trim().charAt(0) == "/") {
+    let params = expstr.trim().slice(1).split("/");
+    if (params.length == 2) {
+      try {
+        let regexp = new RegExp(params[0], params[1]);
+        return regexp;
+      } catch {
+        window.alert(
+          'There is a syntax error in the regular expression. The syntax is /<search items...>/<flags...>. You can google "regular expression" to get more informaion.',
+        );
+        return null;
+      }
+    } else {
+      window.alert(
+        'There is a syntax error in the regular expression. The syntax is /<search items...>/<flags...>. You can google "regular expression" to get more informaion.',
+      );
+      return null;
+    }
+  } else {
+    window.alert(
+      "There is a syntax error in the regular expression. It must start with '/'. E.G. /[a-z]+/g",
+    );
+    return null;
+  }
+}
+
+function filterMoves(
+  moveslist,
+  searchstr,
+  isregexp,
+  orig,
+  dest,
+  isdrop,
+  haswallgating,
+  haspiecechange,
+) {
+  if (
+    typeof moveslist != typeof [""] ||
+    typeof searchstr != "string" ||
+    typeof isregexp != "boolean" ||
+    typeof orig != "string" ||
+    typeof dest != "string" ||
+    typeof isdrop != "boolean" ||
+    typeof haswallgating != "boolean" ||
+    typeof haspiecechange != "boolean"
+  ) {
+    return null;
+  }
+  let result = [];
+  if (isregexp) {
+    let regexp = generateRegExp(searchstr);
+    if (regexp == null) {
+      return null;
+    }
+    moveslist.forEach((val) => {
+      if (regexp.test(val)) {
+        let res = parseUCIMove(val);
+        if (!isdrop && res[0].includes("@")) {
+          return;
+        }
+        if (!haspiecechange && res[2] != "") {
+          return;
+        }
+        if (!haswallgating && res[3] != "") {
+          return;
+        }
+        if (orig != "" && !res[0].includes("@") && orig != res[0]) {
+          return;
+        }
+        if (dest != "" && res[1] != dest) {
+          return;
+        }
+        result.push(val);
+      }
+    });
+  } else {
+    let str = searchstr.trim();
+    moveslist.forEach((val) => {
+      if (val.includes(str)) {
+        let res = parseUCIMove(val);
+        console.log(res);
+        if (!isdrop && res[0].includes("@")) {
+          console.log(111);
+          return;
+        }
+        if (!haspiecechange && res[2] != "") {
+          console.log(222);
+          return;
+        }
+        if (!haswallgating && res[3] != "") {
+          console.log(333);
+          return;
+        }
+        if (orig != "" && !res[0].includes("@") && orig != res[0]) {
+          console.log(444);
+          return;
+        }
+        if (dest != "" && res[1] != dest) {
+          console.log(555);
+          return;
+        }
+        result.push(val);
+      }
+    });
+  }
+  return result;
+}
+
+function highlightMoveOnBoard(move) {
+  if (typeof move != "string") {
+    return;
+  }
+  let bestmove = parseUCIMove(move);
+  let autoshapes = [];
+  if (bestmove[0].includes("@")) {
+    autoshapes.push({
+      brush: "yellow",
+      orig: bestmove[1].replace("10", ":"),
+    });
+    if (board.turn()) {
+      if (bestmove[0].charAt(0) == "+") {
+        autoshapes.push({
+          brush: "yellow",
+          dest: "a0",
+          orig: bestmove[1].replace("10", ":"),
+          piece: {
+            color: "white",
+            role: "p" + bestmove[0].toLowerCase().charAt(1) + "-piece",
+            scale: 0.7,
+          },
+          modifiers: { hilite: true },
+        });
+      } else {
+        autoshapes.push({
+          brush: "yellow",
+          dest: "a0",
+          orig: bestmove[1].replace("10", ":"),
+          piece: {
+            color: "white",
+            role: bestmove[0].toLowerCase().charAt(0) + "-piece",
+            scale: 0.7,
+          },
+          modifiers: { hilite: true },
+        });
+      }
+    } else {
+      if (bestmove[0].charAt(0) == "+") {
+        autoshapes.push({
+          brush: "yellow",
+          dest: "a0",
+          orig: bestmove[1].replace("10", ":"),
+          piece: {
+            color: "black",
+            role: "p" + bestmove[0].toLowerCase().charAt(1) + "-piece",
+            scale: 0.7,
+          },
+          modifiers: { hilite: true },
+        });
+      } else {
+        autoshapes.push({
+          brush: "yellow",
+          dest: "a0",
+          orig: bestmove[1].replace("10", ":"),
+          piece: {
+            color: "black",
+            role: bestmove[0].toLowerCase().charAt(0) + "-piece",
+            scale: 0.7,
+          },
+          modifiers: { hilite: true },
+        });
+      }
+    }
+  } else {
+    autoshapes.push({
+      brush: "yellow",
+      dest: bestmove[1].replace("10", ":"),
+      orig: bestmove[0].replace("10", ":"),
+    });
+    if (bestmove[2] != "") {
+      let piecerole = chessground.state.boardState.pieces.get(
+        bestmove[0].replace("10", ":"),
+      ).role;
+      autoshapes.push({
+        brush: "black",
+        orig: bestmove[1].replace("10", ":"),
+        customSvg: generateMoveNotationSVG(
+          bestmove[2],
+          "#e68f00",
+          "#ffffff",
+          "TopRight",
+        ),
+      });
+      if (bestmove[2] == "+") {
+        if (board.turn()) {
+          autoshapes.push({
+            brush: "yellow",
+            orig: bestmove[1].replace("10", ":"),
+            dest: bestmove[0].replace("10", ":"),
+            piece: { color: "white", role: "p" + piecerole },
+          });
+        } else {
+          autoshapes.push({
+            brush: "yellow",
+            orig: bestmove[1].replace("10", ":"),
+            dest: bestmove[0].replace("10", ":"),
+            piece: { color: "black", role: "p" + piecerole },
+          });
+        }
+      } else if (bestmove[2] == "-") {
+        if (board.turn()) {
+          autoshapes.push({
+            brush: "yellow",
+            orig: bestmove[1].replace("10", ":"),
+            dest: bestmove[0].replace("10", ":"),
+            piece: { color: "white", role: piecerole.slice(1) },
+          });
+        } else {
+          autoshapes.push({
+            brush: "yellow",
+            orig: bestmove[1].replace("10", ":"),
+            dest: bestmove[0].replace("10", ":"),
+            piece: { color: "black", role: piecerole.slice(1) },
+          });
+        }
+      } else {
+        if (board.turn()) {
+          autoshapes.push({
+            brush: "yellow",
+            orig: bestmove[1].replace("10", ":"),
+            dest: bestmove[0].replace("10", ":"),
+            piece: { color: "white", role: bestmove[2] + "-piece" },
+          });
+        } else {
+          autoshapes.push({
+            brush: "yellow",
+            orig: bestmove[1].replace("10", ":"),
+            dest: bestmove[0].replace("10", ":"),
+            piece: { color: "black", role: bestmove[2] + "-piece" },
+          });
+        }
+      }
+    }
+  }
+  chessground.setAutoShapes(autoshapes);
+}
+
 function getDimensions() {
   const fenBoard = board.fen().split(" ")[0];
   const ranks = fenBoard.split("/").length;
@@ -600,6 +868,7 @@ new Module().then((loadedModule) => {
       chessgroundContainerEl.classList.add(`pockets`);
     } else chessgroundContainerEl.classList.remove(`pockets`);
     resetTimer();
+    clearMovesList();
     let play_white = playWhite.checked;
     let play_black = playBlack.checked;
     buttonCurrentPosition.click();
@@ -886,6 +1155,7 @@ new Module().then((loadedModule) => {
     recordedmultipv = 1;
     dropdownPositionVariantType.selectedIndex = 0;
     dropdownPositionVariantType.onchange();
+    clearMovesList();
   };
 
   buttonPassMove.onclick = function () {
@@ -1433,6 +1703,61 @@ new Module().then((loadedModule) => {
       chessground.setAutoShapes([]);
       //observer.disconnect();
     }
+  };
+
+  buttonsearchmove.onclick = function () {
+    let legalmoves = board.legalMoves().trim().split(" ");
+    let moves = filterMoves(
+      legalmoves,
+      movesearchfilter.value,
+      issearchregexp.checked,
+      origfilter.value,
+      destfilter.value,
+      isdrop.checked,
+      haswallgating.checked,
+      haspiecechange.checked,
+    );
+    console.log(moves);
+    if (moves == null || moves == undefined) {
+      return;
+    }
+    while (availablemovelist.length > 1) {
+      availablemovelist.removeChild(availablemovelist[1]);
+    }
+    moves.forEach((val) => {
+      let opt = document.createElement("option");
+      opt.value = val;
+      opt.text = `${val} (${board.sanMove(val)})`;
+      availablemovelist.appendChild(opt);
+    });
+  };
+
+  buttonmakemove.onclick = function () {
+    const move = availablemovelist[availablemovelist.selectedIndex].value;
+    if (move == null || move == undefined || move == "") {
+      window.alert(
+        "Select a move in the drop down list first. If there are no moves listed, search for a move first. You can read the note to know how to make a search.",
+      );
+      return;
+    }
+    const capture = isCapture(board, move);
+    if (!board.push(move)) {
+      const foundmove = board.legalMoves().match(new RegExp(`${move}[^ ]+`));
+      if (foundmove) board.push(foundmove[0]);
+    }
+
+    afterMove(capture);
+  };
+
+  buttonhighlightmove.onclick = function () {
+    const move = availablemovelist[availablemovelist.selectedIndex].value;
+    if (move == null || move == undefined || move == "") {
+      window.alert(
+        "Select a move in the drop down list first. If there are no moves listed, search for a move first. You can read the note to know how to make a search.",
+      );
+      return;
+    }
+    highlightMoveOnBoard(move);
   };
 
   updateChessground();
@@ -2283,6 +2608,8 @@ function updateChessground() {
     },
   });
   const moveStack = board.moveStack();
+  chessground.setAutoShapes([]);
+  clearMovesList();
 
   if (moveStack.length === 0) {
     chessground.set({
