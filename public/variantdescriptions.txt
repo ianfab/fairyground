@@ -1,6 +1,7 @@
 #Fairyground Variant Description File
-#Syntax: <variant name (should be the same as the name in the dropdown)>|<variant description>
-#The description will be displayed in the dropdown as tooltips, you can hover your cursor on an option to view that.
+#Syntax: <variant ID (delcared in variants.ini)>|<variant display name>|<variant description>
+#The display name will be displayed in the variant dropdown as the item name.
+#The description will be displayed in the dropdown as tooltips, you can hover your cursor on an item to view that.
 #This can also be accessed from <About This Variant> button.
 
 chess|Chess|Chess, unmodified, as it's played by FIDE standards.
