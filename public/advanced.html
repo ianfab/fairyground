@@ -2855,6 +2855,7 @@
                 m(
                   "p",
                   {
+                    style: "cursor: pointer;",
                     onclick: () => {
                       alert(
                         'This time control system allows user select different time modes for two sides and gives user more choice on time odds settings.\nThe time modes are:\nInfinite: Selected side has infinite time.\nTournament: Selected side has limited time and may get a time increment after a move.\nTime per move: Selected side need to make each move within a fixed time limit.\nHourglass: Selected side has limited time and used time will be added to opponent\'s time.\nByo-yomi: Selected side will enter the countdown(byoyomi) period(s) after their initial time runs out. During countdown periods, if the player make a move before the countdown period time runs out, the time will be reset to full time of countdown periods(Specified in "Byoyomi period length"), otherwise the remaining period count will be decreased by 1 and the time will be reset to full time of countdown periods(Specified in "Byoyomi period length"). If there\'s no countdown periods (Specified in "Byoyomi period count") left and the remaining time runs out, this side runs out of time.\nNote: if you set engine\'s time mode to infinite, it will think forever!',
@@ -2866,6 +2867,7 @@
                 m(
                   "p",
                   {
+                    style: "cursor: pointer;",
                     onclick: () => {
                       alert(
                         "Start time: The initial time (in milliseconds) at the beginning of the game. Not applicable to infinite.\nTime gain: Get a time increment of this many milliseconds after every move. Only applicable to tournament.\nByoyomi period length: The time (in milliseconds) of each period when in extra countdown(byoyomi) periods. Only applicable to byo-yomi.\nByoyomi period count: The count of countdown(byoyomi) periods. Only applicable to byo-yomi.\nTimeout margin: The time can be exceeded by this many milliseconds. The remaining time will be shown as minus numbers if exceeded. Not applicable to infinite.",
