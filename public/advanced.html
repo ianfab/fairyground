@@ -1124,8 +1124,12 @@
       }
     }
 
-    function getVariantName(variant, useplaceholder) {
-      if (typeof variant != "string" || typeof useplaceholder != "boolean") {
+    function getVariantName(variant, useplaceholder, showid) {
+      if (
+        typeof variant != "string" ||
+        typeof useplaceholder != "boolean" ||
+        typeof showid != "boolean"
+      ) {
         return null;
       }
       let index = variantdescriptions[0].indexOf(variant);
@@ -1136,7 +1140,11 @@
           return undefined;
         }
       } else {
-        return variantdescriptions[1][index];
+        if (showid) {
+          return variantdescriptions[1][index] + ` (${variant})`;
+        } else {
+          return variantdescriptions[1][index];
+        }
       }
     }
 
@@ -2217,7 +2225,11 @@
             continue;
           }
           variantdropdown.children[i].title = variantdescriptions[2][index];
-          variantdropdown.children[i].text = variantdescriptions[1][index];
+          variantdropdown.children[i].text = getVariantName(
+            variantdropdown.children[i].value,
+            true,
+            true,
+          );
         }
       };
 
@@ -2579,7 +2591,7 @@
                   m(
                     "option",
                     { value: ex, title: getVariantDescription(ex, true) },
-                    getVariantName(ex, true),
+                    getVariantName(ex, true, true),
                   ),
                 ),
               ],
@@ -2612,7 +2624,11 @@
               {
                 disabled: !is_ready || review_mode,
                 onclick: () => {
-                  let name = getVariantName($("#dropdown-variant").value, true);
+                  let name = getVariantName(
+                    $("#dropdown-variant").value,
+                    true,
+                    false,
+                  );
                   let description = getVariantDescription(
                     $("#dropdown-variant").value,
                     false,

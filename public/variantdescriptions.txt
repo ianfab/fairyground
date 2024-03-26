@@ -14,13 +14,13 @@ duck|Duck Chess|The duck (a wall square that blocks any piece from moving to it)
 racingkings|Racing Kings|Hinder the opponent's king and make your king reach the 8th rank first to win. Checks are not allowed.
 giveaway|Giveaway Chess|Lose all your pieces or get stalemated to win. Capturing is compulsory.
 torpedo|Torpedo|Pawns can always move forward one or two squares.
-nocastle|No Castle|Castling is not allowed.
-pawnsideways|Sideway Pawns|Pawns can also move sideways one square.
-knightmate|Knight Mate|The king moves like a knight while the knights moves like a king.
+nocastle|No Castling|Castling is not allowed.
+pawnsideways|Pawns Sideways|Pawns can also move sideways one square.
+knightmate|Knight Mate|The king moves like a knight while the knights move like a king.
 
 makruk|Makruk|Thai Chess. A game closely resembling the original Chaturanga. Similar to Chess but with a different queen and bishop.
 makpong|Makpong|Makruk variant where kings cannot move to escape out of check.
-cambodian|Ouk Chaktrang|Cambodian Chess. Makruk with a few additional opening abilities.
+cambodian|Cambodian Chess|Makruk with a few additional opening abilities.
 sittuyin|Sittuyin|Burmese Chess. Similar to Makruk, but pieces are placed at the start of the match.
 asean|Asean|Makruk using the board/pieces from International Chess as well as pawn promotion rules.
 
@@ -45,10 +45,10 @@ grand|Grand Chess|Play with the hybrid pieces, archbishop (B+N) and chancellor (
 grandhouse|Grand House|Grand Chess with Crazyhouse drop rules.
 shako|Shako|Introduces the cannon and elephant from Xiangqi into a 10x10 chess board.
 shogun|Shogun|Pieces promote and can be dropped, similar to Shogi.
-hoppelpoppel|Hoppel-Poppel|Knights capture as bishops; bishops  capture as knights.
+hoppelpoppel|Hoppel-Poppel|Knights capture as bishops; bishops capture as knights.
 amazon|Amazon|Replace the Queen with Amazon (Q + N).
 gothic|Gothic Chess|Gothic chess. Capablanca chess with better starting positon.
-chaturanga|Chaturanga|Ancient form of chess. Pawns, bishops(elephants), and queen(ferz) are from modern chess.
+chaturanga|Chaturanga|Ancient form of chess. Pawns, bishops(elephants), and queen(ferz) are different from the ones in modern chess.
 
 orda|Orda Chess|Asymmetric variant where one army has pieces that move like knights but capture differently.
 synochess|Syno Chess|Asymmetric East vs. West variant which pits the western Chess army against a Xiangqi and Janggi-styled army.
@@ -59,6 +59,6 @@ chak|Chak|Mayan chess. Inspired by cultural elements of Mesoamerica.
 chennis|Chennis|Pieces alternate between two forms with each move.
 spartan|Spartan|Asymmetric Spartans vs. Persians variant.
 
-ataxx|ATAXX|Infection game. Pieces can turn the enemy pieces around the 8 squares around it into friendly pieces after move.
+ataxx|ATAXX|Infection game. Pieces can turn the enemy pieces in the 8 squares around the destination square into friendly pieces after move.
 snailtrail|Snail Trail|The squares that pieces have moved from will be blocked. The one who gets stuck loses.
 horde|Horde|Lots of pawns VS chess army. White wins when checkmating black while black wins when capturing all white pieces.
