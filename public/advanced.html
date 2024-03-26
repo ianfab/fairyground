@@ -712,6 +712,7 @@
   <script>
     let themes = [[], [], []];
     let themenames = [[], []];
+    let variantdescriptions = [[], []];
     const $ = (...args) => document.querySelector(...args);
 
     //Remove duplicated elements
@@ -845,6 +846,47 @@
       };
 
       return { oninit, view };
+    };
+
+    const LoadVariantDescription = (side, clientdata) => {
+      function StartLoad(data) {
+        if (typeof data == "string") {
+          let rawText = data
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .split("\n");
+          let i = 0;
+          let index = 0;
+          let variantdescriptionitem = [];
+          for (i = 0; i < rawText.length; i++) {
+            if (rawText[i].length < 1 || rawText[i].charAt(0) == "#") {
+              continue;
+            }
+            variantdescriptionitem = rawText[i].split("|");
+            if (variantdescriptions[0].includes(variantdescriptionitem[0])) {
+              console.warn(
+                `At line ${i} in variantdescriptions.txt: Variant ${variantdescriptionitem[0]} already exists.`,
+              );
+              continue;
+            }
+            variantdescriptions[0].push(variantdescriptionitem[0]);
+            variantdescriptions[1].push(variantdescriptionitem[1]);
+          }
+          console.log(variantdescriptions);
+        } else {
+          console.error(
+            `Bad data type from variantdescriptions.txt: ${typeof data}`,
+          );
+        }
+      }
+      if (side == "server") {
+        this.getFileFromServer("./variantdescriptions.txt", (res) => {
+          console.log("res3:", res);
+          StartLoad(res);
+        });
+      } else if (side == "client") {
+        StartLoad(clientdata);
+      }
     };
 
     const LoadThemes = () => {
@@ -1072,6 +1114,22 @@
         return themeid + " ⚠";
       } else {
         return themenames[1][index];
+      }
+    }
+
+    function getVariantDescription(variant, useplaceholder) {
+      if (typeof variant != "string" || typeof useplaceholder != "boolean") {
+        return null;
+      }
+      let index = variantdescriptions[0].indexOf(variant);
+      if (index < 0) {
+        if (useplaceholder) {
+          return variant;
+        } else {
+          return undefined;
+        }
+      } else {
+        return variantdescriptions[1][index];
       }
     }
 
@@ -2124,6 +2182,21 @@
         }
       };
 
+      const updateVariantDropdownTitles = () => {
+        const variantdropdown = $("#dropdown-variant");
+        let i = 0;
+        let index = 0;
+        for (i = 0; i < variantdropdown.children.length; i++) {
+          index = variantdescriptions[0].indexOf(
+            variantdropdown.children[i].value,
+          );
+          if (index < 0) {
+            continue;
+          }
+          variantdropdown.children[i].title = variantdescriptions[1][index];
+        }
+      };
+
       const scrollOutput = () => {
         $("#output2").scrollTo({
           top: $("#output2").scrollHeight,
@@ -2339,6 +2412,20 @@
         }
       };
 
+      const onSelectVariantDescriptions = async (e) => {
+        const selected = e.currentTarget.files[0];
+        if (selected) {
+          console.log(selected);
+          let reader = new FileReader();
+          reader.readAsText(selected);
+          reader.onload = function () {
+            console.log(reader.result);
+            LoadVariantDescription("client", reader.result);
+            updateVariantDropdownTitles();
+          };
+        }
+      };
+
       const oninit = () => {
         stockfish_state = "LOADING";
       };
@@ -2432,6 +2519,25 @@
                 "[?]",
               ),
             ]),
+            m("div", { hidden: during_play }, [
+              "- variantdescriptions.txt: ",
+              m("input#variantdescriptions-txt", {
+                type: "file",
+                disabled: !is_ready || review_mode || board_setup_mode,
+                onchange: onSelectVariantDescriptions,
+              }),
+              m(
+                "span",
+                {
+                  style: "cursor: pointer;",
+                  onclick: () =>
+                    window.alert(
+                      "You can upload a Variant Description file to load descriptions for the variants. Contents will be appended to the variant descriptions provided by the server.",
+                    ),
+                },
+                "[?]",
+              ),
+            ]),
           ]),
           m("div#posvariantdiv", [
             m("p", "Variant:"),
@@ -2445,7 +2551,13 @@
               },
               [
                 m("option", { value: "" }, "    (default)    "),
-                ...variants.map((ex, index) => m("option", { value: ex }, ex)),
+                ...variants.map((ex, index) =>
+                  m(
+                    "option",
+                    { value: ex, title: getVariantDescription(ex, true) },
+                    ex,
+                  ),
+                ),
               ],
             ),
             m("p", "Custom Position Type:"),
@@ -2470,6 +2582,28 @@
                 disabled: !is_ready || review_mode,
               },
               "About this position",
+            ),
+            m(
+              "button#aboutvariant",
+              {
+                disabled: !is_ready || review_mode,
+                onclick: () => {
+                  let result = getVariantDescription(
+                    $("#dropdown-variant").value,
+                    false,
+                  );
+                  if (result) {
+                    window.alert(
+                      `Variant ${$("#dropdown-variant").value}:\n${result}`,
+                    );
+                  } else {
+                    window.alert(
+                      "This variant does not provide a description. You can upload a variantdescriptions.txt yourself to add a description for it.",
+                    );
+                  }
+                },
+              },
+              "About this variant",
             ),
           ]),
           m("div#input", { hidden: during_play }, [
@@ -2694,6 +2828,7 @@
                 hidden: true,
                 onclick: () => {
                   LoadThemes();
+                  LoadVariantDescription("server", null);
                 },
               },
               "Load Themes (internal)",
