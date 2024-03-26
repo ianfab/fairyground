@@ -874,13 +874,19 @@
             variantdescriptionitem = rawText[i].split("|");
             if (variantdescriptionitem.length != 4) {
               console.warn(
-                `At line ${i} in variantsettings.txt: Syntax error.`,
+                `At line ${i + 1} in variantsettings.txt: Syntax error.`,
               );
               continue;
             }
             if (variantsettings[0].includes(variantdescriptionitem[0])) {
               console.warn(
-                `At line ${i} in variantsettings.txt: Variant ${variantdescriptionitem[0]} already exists.`,
+                `At line ${i + 1} in variantsettings.txt: Variant ${variantdescriptionitem[0]} already exists.`,
+              );
+              continue;
+            }
+            if (variantdescriptionitem[0] == "") {
+              console.warn(
+                `At line ${i + 1} in variantsettings.txt: Variant ID must not be null.`,
               );
               continue;
             }
@@ -934,7 +940,7 @@
             }
             themesettings = rawText[i].trim().split("|");
             if (themesettings.length != 3) {
-              console.warn(`At line ${i} in themes.txt: Bad syntax\n`);
+              console.warn(`At line ${i + 1} in themes.txt: Bad syntax\n`);
               continue;
             }
             themeavailable = themesettings[1].split(",");
@@ -954,7 +960,7 @@
               boardthemeavailable.includes("")
             ) {
               console.warn(
-                `At line ${i} in themes.txt: Piece and Board style names must not be both null or contain null element\n`,
+                `At line ${i + 1} in themes.txt: Piece and Board style names must not be both null or contain null element\n`,
               );
               continue;
             }
@@ -971,7 +977,7 @@
                   themeavailable = themeavailable.concat(themes[1][index]);
                 } else {
                   console.warn(
-                    `At line ${i} in themes.txt: Variant ${require_list[
+                    `At line ${i + 1} in themes.txt: Variant ${require_list[
                       j
                     ].substring(
                       1,
@@ -996,7 +1002,7 @@
                   );
                 } else {
                   console.warn(
-                    `At line ${i} in themes.txt: Variant ${require_board_list[
+                    `At line ${i + 1} in themes.txt: Variant ${require_board_list[
                       j
                     ].substring(
                       1,
@@ -1091,7 +1097,7 @@
             }
             themesettings = rawText[i].trim().split("|");
             if (themesettings.length != 2) {
-              console.warn(`At line ${i} in themename.txt: Bad syntax\n`);
+              console.warn(`At line ${i + 1} in themename.txt: Bad syntax\n`);
               continue;
             }
             themenames[0].push(themesettings[0]);
