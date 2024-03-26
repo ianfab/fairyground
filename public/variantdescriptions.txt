@@ -3,54 +3,61 @@
 #The description will be displayed in the dropdown as tooltips, you can hover your cursor on an option to view that.
 #This can also be accessed from <About This Variant> button.
 
-chess|Chess, unmodified, as it's played by FIDE standards.
-crazyhouse|Take captured pieces and drop them back on to the board as your own.
-atomic|Pieces explode upon capture.
-kingofthehill|Bring your King to the center to win the game.
-3check|Check your opponent 3 times to win the game.
-placement|Choose where your pieces start.
-duck|The duck (a wall square that blocks any piece from movingto it) must be moved to a new square after every turn.
-racingkings|Hinder the opponent's king and make your king reach the other side of the board first to win. You may not give checks.
+chess|Chess|Chess, unmodified, as it's played by FIDE standards.
+crazyhouse|Crazy House|Take captured pieces and drop them back on to the board as your own.
+atomic|Atomic Chess|Pieces explode upon capture, destroying all pieces except pawns in the 8 square around the destination square and itself.
+kingofthehill|King Of The Hill|Bring your King to the center to win the game.
+3check|3 Check|Check your opponent 3 times to win the game.
+placement|Placement Chess|Choose where your pieces start.
+duck|Duck Chess|The duck (a wall square that blocks any piece from moving to it) must be moved to a new square after every turn.
+racingkings|Racing Kings|Hinder the opponent's king and make your king reach the 8th rank first to win. Checks are not allowed.
+giveaway|Giveaway Chess|Lose all your pieces or get stalemated to win. Capturing is compulsory.
+torpedo|Torpedo|Pawns can always move forward one or two squares.
+nocastle|No Castle|Castling is not allowed.
+pawnsideways|Sideway Pawns|Pawns can also move sideways one square.
+knightmate|Knight Mate|The king moves like a knight while the knights moves like a king.
 
-makruk|Thai Chess. A game closely resembling the original Chaturanga. Similar to Chess but with a different queen and bishop.
-makpong|Makruk variant where kings cannot move to escape out of check.
-cambodian|Cambodian Chess. Makruk with a few additional opening abilities.
-sittuyin|Burmese Chess. Similar to Makruk, but pieces are placed at the start of the match.
-asean|Makruk using the board/pieces from International Chess as well as pawn promotion rules.
+makruk|Makruk|Thai Chess. A game closely resembling the original Chaturanga. Similar to Chess but with a different queen and bishop.
+makpong|Makpong|Makruk variant where kings cannot move to escape out of check.
+cambodian|Ouk Chaktrang|Cambodian Chess. Makruk with a few additional opening abilities.
+sittuyin|Sittuyin|Burmese Chess. Similar to Makruk, but pieces are placed at the start of the match.
+asean|Asean|Makruk using the board/pieces from International Chess as well as pawn promotion rules.
 
-shogi|Japanese Chess, the standard 9x9 version played today with drops and promotions.
-minishogi|5x5 Shogi for more compact and faster games. There are no knights or lances.
-kyotoshogi|A wild Shogi variant on a 5x5 board where pieces flip into a different piece after each move.
-dobutsu|3x4 game with cute animals, designed to teach children how to play Shogi.
-gorogoroplus|5x6 Shogi designed to introduce tactics with the generals.
-torishogi|A confrontational 7x7 variant with unique pieces each named after different birds.
-shoshogi|A new piece called Drunk Elephant is introduced, which can promote to a new king. You can lose one of the 2 kings after the promotion.
+shogi|Shogi|Japanese Chess, the standard 9x9 version played today with drops and promotions.
+minishogi|Mini Shogi|5x5 Shogi for more compact and faster games. There are no knights or lances.
+kyotoshogi|Kyoto Shogi|A wild Shogi variant on a 5x5 board where pieces flip into a different piece after each move.
+dobutsu|Dobutsu|3x4 game with cute animals, designed to teach children how to play Shogi.
+gorogoroplus|Gorogoro+|5x6 Shogi designed to introduce tactics with the generals.
+torishogi|Tori Shogi|A confrontational 7x7 variant with unique pieces each named after different birds.
+shoshogi|Sho Shogi|A new piece called Drunk Elephant is introduced, which can promote to a new king. You can lose one of the 2 kings after the promotion.
 
-xiangqi|Chinese Chess, one of the oldest and most played board games in the world.
-manchu|Xiangqi variant where one side has a chariot that can also move as a cannon or horse.
-janggi|Korean Chess, similar to Xiangqi but plays much differently. Tournament rules are used.
-minixiangqi|Compact version of Xiangqi played on a 7x7 board without a river.
+xiangqi|Xiangqi|Chinese Chess, one of the oldest and most played board games in the world.
+manchu|Manchu Xiangqi|Xiangqi variant where one side has a chariot that can also move as a cannon or horse.
+janggi|Janggi|Korean Chess, similar to Xiangqi but plays much differently. Tournament rules are used.
+minixiangqi|Mini Xiangqi|Compact version of Xiangqi played on a 7x7 board without a river.
 
-capablanca|Play with the hybrid pieces, archbishop (B+N) and chancellor (R+N), on a 10x8 board.
-capahouse|Capablanca with Crazyhouse drop rules.
-seirawan|S-Chess. Hybrid pieces, the hawk (B+N) and elephant (R+N), can enter the board after moving a back rank piece.
-shouse|S-Chess with Crazyhouse drop rules.
-grand|Play with the hybrid pieces, archbishop (B+N) and chancellor (R+N), on a grand 10x10 board.
-grandhouse|Grand Chess with Crazyhouse drop rules.
-shako|Introduces the cannon and elephant from Xiangqi into a 10x10 chess board.
-shogun|Pieces promote and can be dropped, similar to Shogi.
-hoppelpoppel|Knights capture as bishops; bishops  capture as knights.
-amazon|Replace the Queen with Amazon (Q + N).
+capablanca|Capablanca Chess|Play with the hybrid pieces, archbishop (B+N) and chancellor (R+N), on a 10x8 board.
+capahouse|Capablanca House|Capablanca with Crazyhouse drop rules.
+seirawan|Seirawan Chess|S-Chess. Hybrid pieces, the hawk (B+N) and elephant (R+N), can enter the board after moving a back rank piece.
+shouse|Seirawan House|S-Chess with Crazyhouse drop rules.
+grand|Grand Chess|Play with the hybrid pieces, archbishop (B+N) and chancellor (R+N), on a grand 10x10 board.
+grandhouse|Grand House|Grand Chess with Crazyhouse drop rules.
+shako|Shako|Introduces the cannon and elephant from Xiangqi into a 10x10 chess board.
+shogun|Shogun|Pieces promote and can be dropped, similar to Shogi.
+hoppelpoppel|Hoppel-Poppel|Knights capture as bishops; bishops  capture as knights.
+amazon|Amazon|Replace the Queen with Amazon (Q + N).
+gothic|Gothic Chess|Gothic chess. Capablanca chess with better starting positon.
+chaturanga|Chaturanga|Ancient form of chess. Pawns, bishops(elephants), and queen(ferz) are from modern chess.
 
-orda|Asymmetric variant where one army has pieces that move like knights but capture differently.
-synochess|Asymmetric East vs. West variant which pits the western Chess army against a Xiangqi and Janggi-styled army.
-shinobiplus|Asymmetric variant which pits the western Chess army against a drop-based, Shogi-styled army.
-empire|Asymmetric variant where one army has pieces that move like queens but capture as usual.
-ordamirror|Orda Chess variant with two Horde armies. The Falcon replaces the Yurt.
-chak|Mayan chess. Inspired by cultural elements of Mesoamerica.
-chennis|Pieces alternate between two forms with each move.
-spartan|Asymmetric Spartans vs. Persians variant.
+orda|Orda Chess|Asymmetric variant where one army has pieces that move like knights but capture differently.
+synochess|Syno Chess|Asymmetric East vs. West variant which pits the western Chess army against a Xiangqi and Janggi-styled army.
+shinobiplus|Shinobi+|Asymmetric variant which pits the western Chess army against a drop-based, Shogi-styled army.
+empire|Empire Chess|Asymmetric variant where one army has pieces that move like queens but capture as usual.
+ordamirror|Orda Mirror|Orda Chess variant with two Horde armies. The Falcon replaces the Yurt.
+chak|Chak|Mayan chess. Inspired by cultural elements of Mesoamerica.
+chennis|Chennis|Pieces alternate between two forms with each move.
+spartan|Spartan|Asymmetric Spartans vs. Persians variant.
 
-ataxx|Infection game. Pieces can turn the enemy pieces around the 8 squares around it into friendly pieces after move.
-snailtrail|The squares that pieces have moved from will be blocked. The one who gets stuck loses.
-horde|Lots of pawns VS chess army. White wins when checkmating black while black wins when capturing all white pieces.
+ataxx|ATAXX|Infection game. Pieces can turn the enemy pieces around the 8 squares around it into friendly pieces after move.
+snailtrail|Snail Trail|The squares that pieces have moved from will be blocked. The one who gets stuck loses.
+horde|Horde|Lots of pawns VS chess army. White wins when checkmating black while black wins when capturing all white pieces.

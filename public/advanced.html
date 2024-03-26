@@ -712,7 +712,7 @@
   <script>
     let themes = [[], [], []];
     let themenames = [[], []];
-    let variantdescriptions = [[], []];
+    let variantdescriptions = [[], [], []];
     const $ = (...args) => document.querySelector(...args);
 
     //Remove duplicated elements
@@ -863,6 +863,12 @@
               continue;
             }
             variantdescriptionitem = rawText[i].split("|");
+            if (variantdescriptionitem.length != 3) {
+              console.warn(
+                `At line ${i} in variantdescriptions.txt: Syntax error.`,
+              );
+              continue;
+            }
             if (variantdescriptions[0].includes(variantdescriptionitem[0])) {
               console.warn(
                 `At line ${i} in variantdescriptions.txt: Variant ${variantdescriptionitem[0]} already exists.`,
@@ -871,6 +877,7 @@
             }
             variantdescriptions[0].push(variantdescriptionitem[0]);
             variantdescriptions[1].push(variantdescriptionitem[1]);
+            variantdescriptions[2].push(variantdescriptionitem[2]);
           }
           console.log(variantdescriptions);
         } else {
@@ -1117,7 +1124,7 @@
       }
     }
 
-    function getVariantDescription(variant, useplaceholder) {
+    function getVariantName(variant, useplaceholder) {
       if (typeof variant != "string" || typeof useplaceholder != "boolean") {
         return null;
       }
@@ -1130,6 +1137,22 @@
         }
       } else {
         return variantdescriptions[1][index];
+      }
+    }
+
+    function getVariantDescription(variant, useplaceholder) {
+      if (typeof variant != "string" || typeof useplaceholder != "boolean") {
+        return null;
+      }
+      let index = variantdescriptions[0].indexOf(variant);
+      if (index < 0) {
+        if (useplaceholder) {
+          return variant;
+        } else {
+          return undefined;
+        }
+      } else {
+        return variantdescriptions[2][index];
       }
     }
 
@@ -2193,7 +2216,8 @@
           if (index < 0) {
             continue;
           }
-          variantdropdown.children[i].title = variantdescriptions[1][index];
+          variantdropdown.children[i].title = variantdescriptions[2][index];
+          variantdropdown.children[i].text = variantdescriptions[1][index];
         }
       };
 
@@ -2555,7 +2579,7 @@
                   m(
                     "option",
                     { value: ex, title: getVariantDescription(ex, true) },
-                    ex,
+                    getVariantName(ex, true),
                   ),
                 ),
               ],
@@ -2588,13 +2612,14 @@
               {
                 disabled: !is_ready || review_mode,
                 onclick: () => {
-                  let result = getVariantDescription(
+                  let name = getVariantName($("#dropdown-variant").value, true);
+                  let description = getVariantDescription(
                     $("#dropdown-variant").value,
                     false,
                   );
-                  if (result) {
+                  if (description) {
                     window.alert(
-                      `Variant ${$("#dropdown-variant").value}:\n${result}`,
+                      `Variant ${name} (ID: ${$("#dropdown-variant").value}):\n${description}`,
                     );
                   } else {
                     window.alert(
