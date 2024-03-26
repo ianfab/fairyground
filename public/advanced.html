@@ -2257,7 +2257,7 @@
         if (selectedtype == "") {
           variants = [""].concat(allvariants);
         } else if (selectedtype == "<|NC|>") {
-          let tmpvariants = [];
+          let tmpvariants = [""];
           allvariants.forEach((val) => {
             if (!variantsettings[0].includes(val)) {
               tmpvariants.push(val);
