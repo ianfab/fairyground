@@ -1,4 +1,4 @@
-// ffish.js test using chessgroundx
+﻿// ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
 const variantsIni = document.getElementById("variants-ini");
@@ -284,6 +284,39 @@ function generateMoveNotationSVG(text, backgroundcolor, textcolor, position) {
   } else {
     return null;
   }
+}
+
+function generatePassTurnNotationSVG(backgroundcolor) {
+  if (typeof backgroundcolor != "string") {
+    return null;
+  }
+  let bgcolor = "#0078d7";
+  if (backgroundcolor != "") {
+    bgcolor = backgroundcolor;
+  }
+  return `
+    <svg
+   width="100"
+   height="100"
+   viewBox="0 0 26.458333 26.458333"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <g>
+    <ellipse
+       style="fill:${bgcolor};stroke:#000000;stroke-width:1.05833333;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+       id="background"
+       cx="13.229165"
+       cy="13.229164"
+       rx="11.906248"
+       ry="11.906247" />
+    <path
+       id="foreground"
+       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0;stroke-linecap:butt;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;image-rendering:auto"
+       d="m 13.229166,3.9687505 -2.778125,2.7781249 2.778125,2.7781248 V 7.672917 a 5.5562497,5.5562497 0 0 1 5.55625,5.556251 5.5562497,5.5562497 0 0 1 -3.271893,5.06248 l 1.377486,1.377487 a 7.4083326,7.4083326 0 0 0 3.74649,-6.439967 7.4083326,7.4083326 0 0 0 -7.408333,-7.4083344 z m -3.6607575,2.821533 a 7.4083326,7.4083326 0 0 0 -3.7475747,6.4388845 7.4083326,7.4083326 0 0 0 7.4083322,7.408331 v 1.852084 l 2.778125,-2.778125 -2.778125,-2.778125 v 1.852083 A 5.5562497,5.5562497 0 0 1 7.672917,13.229168 5.5562497,5.5562497 0 0 1 10.945171,8.1670469 Z" />
+  </g>
+</svg>
+  `;
 }
 
 function initBoard(variant) {
@@ -735,11 +768,19 @@ function highlightMoveOnBoard(move) {
       }
     }
   } else {
-    autoshapes.push({
-      brush: "yellow",
-      dest: bestmove[1].replace("10", ":"),
-      orig: bestmove[0].replace("10", ":"),
-    });
+    if (bestmove[0] == bestmove[1]) {
+      autoshapes.push({
+        brush: "black",
+        orig: bestmove[0].replace("10", ":"),
+        customSvg: generatePassTurnNotationSVG(""),
+      });
+    } else {
+      autoshapes.push({
+        brush: "yellow",
+        dest: bestmove[1].replace("10", ":"),
+        orig: bestmove[0].replace("10", ":"),
+      });
+    }
     if (bestmove[2] != "") {
       let piecerole = chessground.state.boardState.pieces.get(
         bestmove[0].replace("10", ":"),
@@ -1457,11 +1498,19 @@ new Module().then((loadedModule) => {
           }
         }
       } else {
-        autoshapes.push({
-          brush: "blue",
-          dest: bestmove[1].replace("10", ":"),
-          orig: bestmove[0].replace("10", ":"),
-        });
+        if (bestmove[0] == bestmove[1]) {
+          autoshapes.push({
+            brush: "black",
+            orig: bestmove[0].replace("10", ":"),
+            customSvg: generatePassTurnNotationSVG("#003088"),
+          });
+        } else {
+          autoshapes.push({
+            brush: "blue",
+            dest: bestmove[1].replace("10", ":"),
+            orig: bestmove[0].replace("10", ":"),
+          });
+        }
         if (bestmove[2] != "") {
           let piecerole = chessground.state.boardState.pieces.get(
             bestmove[0].replace("10", ":"),
@@ -1607,11 +1656,19 @@ new Module().then((loadedModule) => {
           }
         }
       } else {
-        autoshapes.push({
-          brush: "red",
-          dest: ponder[1].replace("10", ":"),
-          orig: ponder[0].replace("10", ":"),
-        });
+        if (ponder[0] == ponder[1]) {
+          autoshapes.push({
+            brush: "black",
+            orig: ponder[0].replace("10", ":"),
+            customSvg: generatePassTurnNotationSVG("#882020"),
+          });
+        } else {
+          autoshapes.push({
+            brush: "red",
+            dest: ponder[1].replace("10", ":"),
+            orig: ponder[0].replace("10", ":"),
+          });
+        }
         if (ponder[2] != "") {
           let piecerole = chessground.state.boardState.pieces.get(
             ponder[0].replace("10", ":"),
