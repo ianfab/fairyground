@@ -89,6 +89,7 @@ const haswallgating = document.getElementById("haswallgating");
 const haspiecechange = document.getElementById("haspiecechange");
 const buttonmakemove = document.getElementById("makemove");
 const buttonhighlightmove = document.getElementById("highlightmove");
+const searchresultinfo = document.getElementById("searchresultinfo");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
@@ -554,6 +555,7 @@ function clearMovesList() {
   while (availablemovelist.length > 1) {
     availablemovelist.removeChild(availablemovelist[1]);
   }
+  searchresultinfo.innerText = "Click <Search Moves> to search!";
 }
 
 function generateRegExp(expstr) {
@@ -1730,6 +1732,10 @@ new Module().then((loadedModule) => {
       opt.text = `${val} (${board.sanMove(val)})`;
       availablemovelist.appendChild(opt);
     });
+    if (moves.length < 1) {
+      window.alert("No matches found with given search restriction.");
+    }
+    searchresultinfo.innerText = `Found ${moves.length} result(s).`;
   };
 
   buttonmakemove.onclick = function () {
@@ -1809,9 +1815,9 @@ function getFEN() {
   let FEN = chessground.getFen();
   let width = chessground.state.dimensions.width;
   let height = chessground.state.dimensions.height;
-  if (dropdownSideToMove.value == "white/red/sente") {
+  if (dropdownSideToMove.value == "First Mover") {
     FEN += " w";
-  } else if (dropdownSideToMove.value == "black/black/gote") {
+  } else if (dropdownSideToMove.value == "Second Mover") {
     FEN += " b";
   }
   let castling = " ";
@@ -2215,6 +2221,9 @@ function squareGetCoords(square) {
 }
 
 function isCapture(board, move) {
+  if (move.includes("@")) {
+    return false;
+  }
   const pieces = getPiecesAsArray(board);
   const moveFromStr = move.charAt(0) + parseInt(move.substring(1));
   const moveToStr =
