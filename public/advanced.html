@@ -693,6 +693,10 @@
   #separatormoveselectiondialog {
     border: dashed #ffffff;
   }
+
+  #separatorsearchresult {
+    border: double #ffffff;
+  }
 </style>
 
 <body>
@@ -2925,7 +2929,7 @@
               "label#label-showmovediv",
               m("input[type=checkbox]#showmovediv", {
                 checked: select_move_dialog,
-                disabled: analysis_mode || review_mode || board_setup_mode,
+                disabled: review_mode || board_setup_mode,
                 onclick: () => {
                   select_move_dialog = !select_move_dialog;
                 },
@@ -2996,8 +3000,8 @@
                 m("div", [
                   m("p", "Side to move:"),
                   m("select#dropdown-sidetomove", [
-                    m("option", { value: "white/red/sente" }, "First Mover"),
-                    m("option", { value: "black/black/gote" }, "Second Mover"),
+                    m("option", { value: "First Mover" }, "First Mover"),
+                    m("option", { value: "Second Mover" }, "Second Mover"),
                   ]),
                 ]),
                 m("div", [
@@ -3289,15 +3293,16 @@
               m("button#searchmove", "Search Moves"),
             ]),
             m("div#movefilters", [
+              m("p#searchresultinfo", "Click <Search Moves> to search!"),
+              m("hr#separatorsearchresult"),
               m(
                 "p",
                 "Note: Click <Search Moves> to find available moves with filter. Leave the search field blank to find all moves. Click <Make Move> to make selected move. Click <Highlight Move> to show the move on the board. If you are in analysis mode, the highlighted move can be replaced by recommended move (Blue) and threat move (Red) and you need to highlight it again.",
               ),
               m(
                 "p",
-                "Check <Regular Expression> to search with your input as a regular expression, e.g. /[a-z]+/g",
+                "Check <Regular Expression> to search with regular expression, e.g. /[a-z]+/g",
               ),
-              m("br"),
               m("hr#separatormoveselectiondialog"),
               m("p", "Additional Search Restrictions:"),
               m("input#origfilter", {
