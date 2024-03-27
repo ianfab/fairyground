@@ -513,6 +513,19 @@
     cursor: pointer;
   }
 
+  #info #enginecmddiv #sendenginecmd:hover {
+    background: #aaa;
+  }
+
+  #info #enginecmddiv #sendenginecmd:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #info #enginecmddiv #sendenginecmd:active {
+    background: #000;
+  }
+
   #blacktime {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -3807,6 +3820,7 @@
                 m(
                   "button#sendenginecmd",
                   {
+                    disabled: during_play,
                     onclick: () => {
                       if (during_play) {
                         return;
