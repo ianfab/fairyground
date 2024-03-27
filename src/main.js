@@ -675,25 +675,19 @@ function filterMoves(
     moveslist.forEach((val) => {
       if (val.includes(str)) {
         let res = parseUCIMove(val);
-        console.log(res);
         if (!isdrop && res[0].includes("@")) {
-          console.log(111);
           return;
         }
         if (!haspiecechange && res[2] != "") {
-          console.log(222);
           return;
         }
         if (!haswallgating && res[3] != "") {
-          console.log(333);
           return;
         }
         if (orig != "" && !res[0].includes("@") && orig != res[0]) {
-          console.log(444);
           return;
         }
         if (dest != "" && res[1] != dest) {
-          console.log(555);
           return;
         }
         result.push(val);
