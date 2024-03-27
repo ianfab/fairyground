@@ -890,6 +890,18 @@
               );
               continue;
             }
+            if (variantdescriptionitem[1] == "") {
+              console.warn(
+                `At line ${i + 1} in variantsettings.txt: Variant type must not be null.`,
+              );
+              continue;
+            }
+            if (variantdescriptionitem[2] == "") {
+              console.warn(
+                `At line ${i + 1} in variantsettings.txt: Variant name must not be null.`,
+              );
+              continue;
+            }
             variantsettings[0].push(variantdescriptionitem[0]);
             variantsettings[1].push(variantdescriptionitem[1]);
             variantsettings[2].push(variantdescriptionitem[2]);
@@ -2306,11 +2318,32 @@
         while (varianttypedropdown.children.length > 2) {
           varianttypedropdown.removeChild(varianttypedropdown[2]);
         }
+        let varianttypevariantcount = [[], []];
         variantsettings[1].forEach((val) => {
-          if (varianttypes.includes(val)) {
+          if (varianttypevariantcount[0].includes(val)) {
             return;
           }
-          varianttypes.push(val);
+          varianttypevariantcount[0].push(val);
+          varianttypevariantcount[1].push(0);
+        });
+        console.log(allvariants);
+        variantsettings[0].forEach((val, ind) => {
+          if (allvariants.includes(val)) {
+            let index = varianttypevariantcount[0].indexOf(
+              variantsettings[1][ind],
+            );
+            if (index >= 0) {
+              varianttypevariantcount[1][index]++;
+            }
+          }
+        });
+        console.log(varianttypevariantcount);
+        varianttypevariantcount[0].forEach((val, ind) => {
+          if (varianttypevariantcount[1][ind] > 0) {
+            if (!varianttypes.includes(val)) {
+              varianttypes.push(val);
+            }
+          }
         });
         varianttypes.sort();
         varianttypes.forEach((val) => {
@@ -2544,7 +2577,6 @@
       const onSelectVariantSettings = async (e) => {
         const selected = e.currentTarget.files[0];
         if (selected) {
-          console.log(selected);
           let reader = new FileReader();
           reader.readAsText(selected);
           reader.onload = function () {
