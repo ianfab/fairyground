@@ -78,6 +78,19 @@
     cursor: pointer;
   }
 
+  #gamesettings button:hover {
+    background: #aaa;
+  }
+
+  #gamesettings button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #gamesettings button:active {
+    background: #000;
+  }
+
   #input #fen {
     width: 50%;
     padding: 2px 0 2px 6px;
@@ -99,11 +112,21 @@
     border-right: 0;
   }
 
+  #input2 #movetime:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #input2 #depth {
     width: 5%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #input2 #depth:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #input2 #nodes {
@@ -113,11 +136,21 @@
     border-right: 0;
   }
 
+  #input2 #nodes:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #input2 #threads {
     width: 5%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #input2 #threads:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #input2 #hash {
@@ -127,11 +160,21 @@
     border-right: 0;
   }
 
+  #input2 #hash:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #input2 #multipv {
     width: 5%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #input2 #multipv:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #input button {
@@ -144,6 +187,19 @@
     cursor: pointer;
   }
 
+  #input button:hover {
+    background: #aaa;
+  }
+
+  #input button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #input button:active {
+    background: #000;
+  }
+
   #input2 button {
     display: inline-block;
     padding: 3px 6px 3px 6px;
@@ -152,6 +208,19 @@
     font-weight: bold;
     margin-right: 6px;
     cursor: pointer;
+  }
+
+  #input2 button:hover {
+    background: #aaa;
+  }
+
+  #input2 button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #input2 button:active {
+    background: #000;
   }
 
   #movecontrol button {
@@ -165,11 +234,29 @@
     cursor: pointer;
   }
 
+  #movecontrol button:hover {
+    background: #aaa;
+  }
+
+  #movecontrol button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #movecontrol button:active {
+    background: #000;
+  }
+
   #movecontrol #gotomovenum {
     width: 45%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #movecontrol #gotomovenum:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #controls button {
@@ -181,6 +268,19 @@
     margin-right: 5px;
     cursor: pointer;
     margin-bottom: 5px;
+  }
+
+  #controls button:hover {
+    background: #aaa;
+  }
+
+  #controls button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #controls button:active {
+    background: #000;
   }
 
   #gamesettings #dropdown-quickpromotion {
@@ -260,6 +360,19 @@
     cursor: pointer;
   }
 
+  #posvariantdiv button:hover {
+    background: #aaa;
+  }
+
+  #posvariantdiv button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #posvariantdiv button:active {
+    background: #000;
+  }
+
   #controls {
     margin-top: 20px;
     margin-bottom: 10px;
@@ -286,6 +399,19 @@
     font-weight: bold;
     margin-right: 6px;
     cursor: pointer;
+  }
+
+  #info #timecontrolduringplay button:hover {
+    background: #aaa;
+  }
+
+  #info #timecontrolduringplay button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #info #timecontrolduringplay button:active {
+    background: #000;
   }
 
   #currentboardfen {
@@ -431,6 +557,19 @@
     cursor: pointer;
   }
 
+  #boardsetupsettings #boardpiecechange button:hover {
+    background: #aaa;
+  }
+
+  #boardsetupsettings #boardpiecechange button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #boardsetupsettings #boardpiecechange button:active {
+    background: #000;
+  }
+
   #boardsetupsettings2 {
     margin-top: 20px;
     margin-bottom: 10px;
@@ -448,11 +587,21 @@
     border-right: 0;
   }
 
+  #boardsetupsettings2 #halfmoveclock:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #boardsetupsettings2 #whiteremainingchecks {
     width: 25%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #boardsetupsettings2 #whiteremainingchecks:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #boardsetupsettings2 #blackremainingchecks {
@@ -462,11 +611,21 @@
     border-right: 0;
   }
 
+  #boardsetupsettings2 #blackremainingchecks:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #boardsetupsettings2 #currentmovenum {
     width: 25%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #boardsetupsettings2 #currentmovenum:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #boardsetupsettings2 #enpassantfile {
@@ -476,11 +635,21 @@
     border-right: 0;
   }
 
+  #boardsetupsettings2 #enpassantfile:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #boardsetupsettings2 #enpassantrank {
     width: 35%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #boardsetupsettings2 #enpassantfile:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #boardsetupsettings2 #seirwangatingfiles {
@@ -511,11 +680,21 @@
     border: 1px solid #ddd;
   }
 
+  #advancedtimesettings #whitetimesettings #whitestarttime:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #advancedtimesettings #whitetimesettings #whitetimegain {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-left: 0;
+  }
+
+  #advancedtimesettings #whitetimesettings #whitetimegain:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #advancedtimesettings #whitetimesettings #whitebyoyomitime {
@@ -525,6 +704,11 @@
     border-left: 0;
   }
 
+  #advancedtimesettings #whitetimesettings #whitebyoyomitime:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #advancedtimesettings #whitetimesettings #whitebyoyomiperiodcount {
     width: 15%;
     padding: 2px 0 2px 6px;
@@ -532,11 +716,21 @@
     border-left: 0;
   }
 
+  #advancedtimesettings #whitetimesettings #whitebyoyomiperiodcount:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #advancedtimesettings #whitetimesettings #whitetimemargin {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-left: 0;
+  }
+
+  #advancedtimesettings #whitetimesettings #whitetimemargin:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #advancedtimesettings #blacktimesettings {
@@ -556,11 +750,21 @@
     border: 1px solid #ddd;
   }
 
+  #advancedtimesettings #blacktimesettings #blackstarttime:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #advancedtimesettings #blacktimesettings #blacktimegain {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-left: 0;
+  }
+
+  #advancedtimesettings #blacktimesettings #blacktimegain:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #advancedtimesettings #blacktimesettings #blackbyoyomitime {
@@ -570,6 +774,11 @@
     border-left: 0;
   }
 
+  #advancedtimesettings #blacktimesettings #blackbyoyomitime:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #advancedtimesettings #blacktimesettings #blackbyoyomiperiodcount {
     width: 15%;
     padding: 2px 0 2px 6px;
@@ -577,11 +786,21 @@
     border-left: 0;
   }
 
+  #advancedtimesettings #blacktimesettings #blackbyoyomiperiodcount:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #advancedtimesettings #blacktimesettings #blacktimemargin {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-left: 0;
+  }
+
+  #advancedtimesettings #blacktimesettings #blacktimemargin:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #advancedtimesettings #gamecontrol-start {
@@ -681,6 +900,19 @@
     margin-right: 5px;
     margin-bottom: 5px;
     cursor: pointer;
+  }
+
+  #moveselectiondialog button:hover {
+    background: #aaa;
+  }
+
+  #moveselectiondialog button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #moveselectiondialog button:active {
+    background: #000;
   }
 
   #moveselectiondialog #moveslectdiv {
@@ -3344,11 +3576,11 @@
                   }),
                   m("input[type=number]#whiteremainingchecks", {
                     placeholder: "White remaining checks",
-                    min: 0,
+                    min: 1,
                   }),
                   m("input[type=number]#blackremainingchecks", {
                     placeholder: "Black remaining checks",
-                    min: 0,
+                    min: 1,
                   }),
                   m("input[type=number]#currentmovenum", {
                     placeholder: "Current move number",
@@ -3359,10 +3591,12 @@
                   m("input[type=number]#enpassantfile", {
                     placeholder: "En passant file number",
                     min: 1,
+                    max: 12,
                   }),
                   m("input[type=number]#enpassantrank", {
                     placeholder: "En passant rank number",
                     min: 1,
+                    max: 10,
                   }),
                 ]),
                 m("div", [
