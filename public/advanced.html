@@ -78,6 +78,19 @@
     cursor: pointer;
   }
 
+  #gamesettings button:hover {
+    background: #aaa;
+  }
+
+  #gamesettings button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #gamesettings button:active {
+    background: #000;
+  }
+
   #input #fen {
     width: 50%;
     padding: 2px 0 2px 6px;
@@ -99,11 +112,21 @@
     border-right: 0;
   }
 
+  #input2 #movetime:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #input2 #depth {
     width: 5%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #input2 #depth:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #input2 #nodes {
@@ -113,11 +136,21 @@
     border-right: 0;
   }
 
+  #input2 #nodes:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #input2 #threads {
     width: 5%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #input2 #threads:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #input2 #hash {
@@ -127,11 +160,21 @@
     border-right: 0;
   }
 
+  #input2 #hash:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #input2 #multipv {
     width: 5%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #input2 #multipv:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #input button {
@@ -144,6 +187,19 @@
     cursor: pointer;
   }
 
+  #input button:hover {
+    background: #aaa;
+  }
+
+  #input button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #input button:active {
+    background: #000;
+  }
+
   #input2 button {
     display: inline-block;
     padding: 3px 6px 3px 6px;
@@ -152,6 +208,19 @@
     font-weight: bold;
     margin-right: 6px;
     cursor: pointer;
+  }
+
+  #input2 button:hover {
+    background: #aaa;
+  }
+
+  #input2 button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #input2 button:active {
+    background: #000;
   }
 
   #movecontrol button {
@@ -165,11 +234,29 @@
     cursor: pointer;
   }
 
+  #movecontrol button:hover {
+    background: #aaa;
+  }
+
+  #movecontrol button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #movecontrol button:active {
+    background: #000;
+  }
+
   #movecontrol #gotomovenum {
     width: 45%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #movecontrol #gotomovenum:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #controls button {
@@ -181,6 +268,19 @@
     margin-right: 5px;
     cursor: pointer;
     margin-bottom: 5px;
+  }
+
+  #controls button:hover {
+    background: #aaa;
+  }
+
+  #controls button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #controls button:active {
+    background: #000;
   }
 
   #gamesettings #dropdown-quickpromotion {
@@ -227,18 +327,27 @@
   #posvariantdiv #dropdown-variant {
     width: 150px;
     background: #eee;
+    margin-left: 5px;
+  }
+
+  #posvariantdiv #dropdown-varianttype {
+    width: 150px;
+    background: #eee;
+    margin-left: 5px;
   }
 
   #posvariantdiv #dropdown-posvarianttype {
     min-width: 120px;
+    max-width: 200px;
     background: #eee;
-    margin-left: 10px;
+    margin-left: 5px;
   }
 
   #posvariantdiv #dropdown-posvariantname {
     min-width: 120px;
+    max-width: 200px;
     background: #eee;
-    margin-left: 10px;
+    margin-left: 5px;
   }
 
   #posvariantdiv button {
@@ -249,6 +358,19 @@
     font-weight: bold;
     margin-right: 6px;
     cursor: pointer;
+  }
+
+  #posvariantdiv button:hover {
+    background: #aaa;
+  }
+
+  #posvariantdiv button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #posvariantdiv button:active {
+    background: #000;
   }
 
   #controls {
@@ -277,6 +399,19 @@
     font-weight: bold;
     margin-right: 6px;
     cursor: pointer;
+  }
+
+  #info #timecontrolduringplay button:hover {
+    background: #aaa;
+  }
+
+  #info #timecontrolduringplay button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #info #timecontrolduringplay button:active {
+    background: #000;
   }
 
   #currentboardfen {
@@ -378,6 +513,19 @@
     cursor: pointer;
   }
 
+  #info #enginecmddiv #sendenginecmd:hover {
+    background: #aaa;
+  }
+
+  #info #enginecmddiv #sendenginecmd:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #info #enginecmddiv #sendenginecmd:active {
+    background: #000;
+  }
+
   #blacktime {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -422,6 +570,19 @@
     cursor: pointer;
   }
 
+  #boardsetupsettings #boardpiecechange button:hover {
+    background: #aaa;
+  }
+
+  #boardsetupsettings #boardpiecechange button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #boardsetupsettings #boardpiecechange button:active {
+    background: #000;
+  }
+
   #boardsetupsettings2 {
     margin-top: 20px;
     margin-bottom: 10px;
@@ -439,11 +600,21 @@
     border-right: 0;
   }
 
+  #boardsetupsettings2 #halfmoveclock:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #boardsetupsettings2 #whiteremainingchecks {
     width: 25%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #boardsetupsettings2 #whiteremainingchecks:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #boardsetupsettings2 #blackremainingchecks {
@@ -453,11 +624,21 @@
     border-right: 0;
   }
 
+  #boardsetupsettings2 #blackremainingchecks:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #boardsetupsettings2 #currentmovenum {
     width: 25%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #boardsetupsettings2 #currentmovenum:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #boardsetupsettings2 #enpassantfile {
@@ -467,11 +648,21 @@
     border-right: 0;
   }
 
+  #boardsetupsettings2 #enpassantfile:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #boardsetupsettings2 #enpassantrank {
     width: 35%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
+  }
+
+  #boardsetupsettings2 #enpassantfile:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #boardsetupsettings2 #seirwangatingfiles {
@@ -502,11 +693,21 @@
     border: 1px solid #ddd;
   }
 
+  #advancedtimesettings #whitetimesettings #whitestarttime:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #advancedtimesettings #whitetimesettings #whitetimegain {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-left: 0;
+  }
+
+  #advancedtimesettings #whitetimesettings #whitetimegain:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #advancedtimesettings #whitetimesettings #whitebyoyomitime {
@@ -516,6 +717,11 @@
     border-left: 0;
   }
 
+  #advancedtimesettings #whitetimesettings #whitebyoyomitime:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #advancedtimesettings #whitetimesettings #whitebyoyomiperiodcount {
     width: 15%;
     padding: 2px 0 2px 6px;
@@ -523,11 +729,21 @@
     border-left: 0;
   }
 
+  #advancedtimesettings #whitetimesettings #whitebyoyomiperiodcount:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #advancedtimesettings #whitetimesettings #whitetimemargin {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-left: 0;
+  }
+
+  #advancedtimesettings #whitetimesettings #whitetimemargin:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #advancedtimesettings #blacktimesettings {
@@ -547,11 +763,21 @@
     border: 1px solid #ddd;
   }
 
+  #advancedtimesettings #blacktimesettings #blackstarttime:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #advancedtimesettings #blacktimesettings #blacktimegain {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-left: 0;
+  }
+
+  #advancedtimesettings #blacktimesettings #blacktimegain:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #advancedtimesettings #blacktimesettings #blackbyoyomitime {
@@ -561,6 +787,11 @@
     border-left: 0;
   }
 
+  #advancedtimesettings #blacktimesettings #blackbyoyomitime:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #advancedtimesettings #blacktimesettings #blackbyoyomiperiodcount {
     width: 15%;
     padding: 2px 0 2px 6px;
@@ -568,11 +799,21 @@
     border-left: 0;
   }
 
+  #advancedtimesettings #blacktimesettings #blackbyoyomiperiodcount:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
   #advancedtimesettings #blacktimesettings #blacktimemargin {
     width: 15%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-left: 0;
+  }
+
+  #advancedtimesettings #blacktimesettings #blacktimemargin:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
   }
 
   #advancedtimesettings #gamecontrol-start {
@@ -647,7 +888,68 @@
     transition: 0.5s linear;
     font-weight: bold;
     font-family: "Times New Roman", Georgia, Serif, Arial;
-    z-index: 2;
+    z-index: 1000;
+  }
+
+  #moveselectiondialog {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 700px;
+    padding: 10px;
+    background-color: #000000;
+    color: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+    z-index: 999;
+  }
+
+  #moveselectiondialog button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+
+  #moveselectiondialog button:hover {
+    background: #aaa;
+  }
+
+  #moveselectiondialog button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #moveselectiondialog button:active {
+    background: #000;
+  }
+
+  #moveselectiondialog #moveslectdiv {
+    display: flex;
+    flex-direction: row;
+  }
+
+  #moveselectiondialog #movefilters {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #moveselectiondialog #availablemovelist {
+    width: 150px;
+    background: #eee;
+    margin-right: 5px;
+  }
+
+  #separatormoveselectiondialog {
+    border: dashed #ffffff;
+  }
+
+  #separatorsearchresult {
+    border: double #ffffff;
   }
 </style>
 
@@ -664,6 +966,8 @@
   <script>
     let themes = [[], [], []];
     let themenames = [[], []];
+    let variantsettings = [[], [], [], []];
+    let allvariants = [];
     const $ = (...args) => document.querySelector(...args);
 
     //Remove duplicated elements
@@ -799,6 +1103,72 @@
       return { oninit, view };
     };
 
+    const LoadVariantSettings = (side, clientdata) => {
+      function StartLoad(data) {
+        if (typeof data == "string") {
+          let rawText = data
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .split("\n");
+          let i = 0;
+          let variantdescriptionitem = [];
+          for (i = 0; i < rawText.length; i++) {
+            if (rawText[i].length < 1 || rawText[i].charAt(0) == "#") {
+              continue;
+            }
+            variantdescriptionitem = rawText[i].split("|");
+            if (variantdescriptionitem.length != 4) {
+              console.warn(
+                `At line ${i + 1} in variantsettings.txt: Syntax error.`,
+              );
+              continue;
+            }
+            if (variantsettings[0].includes(variantdescriptionitem[0])) {
+              console.warn(
+                `At line ${i + 1} in variantsettings.txt: Variant ${variantdescriptionitem[0]} already exists.`,
+              );
+              continue;
+            }
+            if (variantdescriptionitem[0] == "") {
+              console.warn(
+                `At line ${i + 1} in variantsettings.txt: Variant ID must not be null.`,
+              );
+              continue;
+            }
+            if (variantdescriptionitem[1] == "") {
+              console.warn(
+                `At line ${i + 1} in variantsettings.txt: Variant type must not be null.`,
+              );
+              continue;
+            }
+            if (variantdescriptionitem[2] == "") {
+              console.warn(
+                `At line ${i + 1} in variantsettings.txt: Variant name must not be null.`,
+              );
+              continue;
+            }
+            variantsettings[0].push(variantdescriptionitem[0]);
+            variantsettings[1].push(variantdescriptionitem[1]);
+            variantsettings[2].push(variantdescriptionitem[2]);
+            variantsettings[3].push(variantdescriptionitem[3]);
+          }
+          console.log(variantsettings);
+        } else {
+          console.error(
+            `Bad data type from variantsettings.txt: ${typeof data}`,
+          );
+        }
+      }
+      if (side == "server") {
+        this.getFileFromServer("./variantsettings.txt", (res) => {
+          console.log("res3:", res);
+          StartLoad(res);
+        });
+      } else if (side == "client") {
+        StartLoad(clientdata);
+      }
+    };
+
     const LoadThemes = () => {
       themes = [[], [], []];
       themenames = [[], []];
@@ -827,7 +1197,7 @@
             }
             themesettings = rawText[i].trim().split("|");
             if (themesettings.length != 3) {
-              console.warn(`At line ${i} in themes.txt: Bad syntax\n`);
+              console.warn(`At line ${i + 1} in themes.txt: Bad syntax\n`);
               continue;
             }
             themeavailable = themesettings[1].split(",");
@@ -847,7 +1217,7 @@
               boardthemeavailable.includes("")
             ) {
               console.warn(
-                `At line ${i} in themes.txt: Piece and Board style names must not be both null or contain null element\n`,
+                `At line ${i + 1} in themes.txt: Piece and Board style names must not be both null or contain null element\n`,
               );
               continue;
             }
@@ -864,7 +1234,7 @@
                   themeavailable = themeavailable.concat(themes[1][index]);
                 } else {
                   console.warn(
-                    `At line ${i} in themes.txt: Variant ${require_list[
+                    `At line ${i + 1} in themes.txt: Variant ${require_list[
                       j
                     ].substring(
                       1,
@@ -889,7 +1259,7 @@
                   );
                 } else {
                   console.warn(
-                    `At line ${i} in themes.txt: Variant ${require_board_list[
+                    `At line ${i + 1} in themes.txt: Variant ${require_board_list[
                       j
                     ].substring(
                       1,
@@ -984,7 +1354,7 @@
             }
             themesettings = rawText[i].trim().split("|");
             if (themesettings.length != 2) {
-              console.warn(`At line ${i} in themename.txt: Bad syntax\n`);
+              console.warn(`At line ${i + 1} in themename.txt: Bad syntax\n`);
               continue;
             }
             themenames[0].push(themesettings[0]);
@@ -1027,6 +1397,58 @@
       }
     }
 
+    function getVariantType(variant) {
+      if (typeof variant != "string") {
+        return null;
+      }
+      let index = variantsettings[0].indexOf(variant);
+      if (index < 0) {
+        return "<|NC|>";
+      } else {
+        return variantsettings[1][index];
+      }
+    }
+
+    function getVariantName(variant, useplaceholder, showid) {
+      if (
+        typeof variant != "string" ||
+        typeof useplaceholder != "boolean" ||
+        typeof showid != "boolean"
+      ) {
+        return null;
+      }
+      let index = variantsettings[0].indexOf(variant);
+      if (index < 0) {
+        if (useplaceholder) {
+          return variant;
+        } else {
+          return undefined;
+        }
+      } else {
+        if (showid) {
+          return variantsettings[2][index] + ` (${variant})`;
+        } else {
+          return variantsettings[2][index];
+        }
+      }
+    }
+
+    function getVariantDescription(variant, useplaceholder) {
+      if (typeof variant != "string" || typeof useplaceholder != "boolean") {
+        return null;
+      }
+      let index = variantsettings[0].indexOf(variant);
+      if (index < 0) {
+        if (useplaceholder) {
+          return variant;
+        } else {
+          return undefined;
+        }
+      } else {
+        return variantsettings[3][index];
+      }
+    }
+
     const App = () => {
       let stockfish = null;
       let stockfish_state = "INIT"; // 'READY', 'FAILED'
@@ -1041,6 +1463,7 @@
       let board_setup_mode = false;
       let advanced_time_control = false;
       let during_play = false;
+      let select_move_dialog = false;
       let white_remaining_time = 0;
       let black_remaining_time = 0;
       let white_moving_time_list = [];
@@ -1063,6 +1486,7 @@
       let timer;
 
       let variants = [];
+      let varianttypes = [];
 
       const getVariants = () => {
         stockfish.postMessage(`uci`);
@@ -1260,6 +1684,9 @@
             force_stop();
           } else {
             stop();
+          }
+          if ($("#showmovediv").checked) {
+            $("#showmovediv").click();
           }
           review_mode = true;
           $("#isreviewmode").value = 1;
@@ -2072,6 +2499,108 @@
         }
       };
 
+      const updateVariantDropdownTitles = () => {
+        const variantdropdown = $("#dropdown-variant");
+        let i = 0;
+        let index = 0;
+        for (i = 0; i < variantdropdown.children.length; i++) {
+          index = variantsettings[0].indexOf(variantdropdown.children[i].value);
+          if (index < 0) {
+            continue;
+          }
+          variantdropdown.children[i].title = variantsettings[2][index];
+        }
+      };
+
+      const updateVariantDropdown = () => {
+        const varianttypedropdown = $("#dropdown-varianttype");
+        const variantdropdown = $("#dropdown-variant");
+        const selectedtype =
+          varianttypedropdown[varianttypedropdown.selectedIndex].value;
+        if (selectedtype == "") {
+          variants = [""].concat(allvariants);
+        } else if (selectedtype == "<|NC|>") {
+          let tmpvariants = [""];
+          allvariants.forEach((val) => {
+            if (!variantsettings[0].includes(val)) {
+              tmpvariants.push(val);
+            }
+          });
+          variants = tmpvariants;
+        } else {
+          let tmpvariants = [];
+          allvariants.forEach((val) => {
+            if (getVariantType(val) == selectedtype) {
+              tmpvariants.push(val);
+            }
+          });
+          variants = tmpvariants;
+        }
+        while (variantdropdown.children.length > 0) {
+          variantdropdown.removeChild(variantdropdown[0]);
+        }
+        variants.forEach((val) => {
+          let option = document.createElement("option");
+          let name = "(default)";
+          let title = getVariantDescription(val, true);
+          if (val != "") {
+            name = getVariantName(val, true, true);
+          }
+          option.value = val;
+          option.text = name;
+          if (title != "") {
+            option.title = title;
+          }
+          variantdropdown.appendChild(option);
+        });
+        variantdropdown.selectedIndex = 0;
+        //updateVariantDropdownTitles();
+        variantdropdown.dispatchEvent(new Event("change"));
+      };
+
+      const updateVariantTypeDropdown = () => {
+        const varianttypedropdown = $("#dropdown-varianttype");
+        while (varianttypedropdown.children.length > 2) {
+          varianttypedropdown.removeChild(varianttypedropdown[2]);
+        }
+        let varianttypevariantcount = [[], []];
+        variantsettings[1].forEach((val) => {
+          if (varianttypevariantcount[0].includes(val)) {
+            return;
+          }
+          varianttypevariantcount[0].push(val);
+          varianttypevariantcount[1].push(0);
+        });
+        console.log(allvariants);
+        variantsettings[0].forEach((val, ind) => {
+          if (allvariants.includes(val)) {
+            let index = varianttypevariantcount[0].indexOf(
+              variantsettings[1][ind],
+            );
+            if (index >= 0) {
+              varianttypevariantcount[1][index]++;
+            }
+          }
+        });
+        console.log(varianttypevariantcount);
+        varianttypevariantcount[0].forEach((val, ind) => {
+          if (varianttypevariantcount[1][ind] > 0) {
+            if (!varianttypes.includes(val)) {
+              varianttypes.push(val);
+            }
+          }
+        });
+        varianttypes.sort();
+        varianttypes.forEach((val) => {
+          let option = document.createElement("option");
+          option.text = val;
+          option.value = val;
+          varianttypedropdown.appendChild(option);
+        });
+        varianttypedropdown.selectedIndex = 0;
+        updateVariantDropdown();
+      };
+
       const scrollOutput = () => {
         $("#output2").scrollTo({
           top: $("#output2").scrollHeight,
@@ -2122,13 +2651,16 @@
             stockfish.addMessageListener((line) => {
               if (line.startsWith("option")) {
                 if (line.startsWith("option name UCI_Variant")) {
-                  variants = line
+                  allvariants = line
                     .replace(
                       "option name UCI_Variant type combo default chess var ",
                       "",
                     )
                     .replace(/ var /g, " ")
-                    .split(" ");
+                    .split(" ")
+                    .sort();
+                  //variants = allvariants;
+                  updateVariantTypeDropdown();
                 }
               } else if (line.startsWith(" ")) {
               } else {
@@ -2287,6 +2819,19 @@
         }
       };
 
+      const onSelectVariantSettings = async (e) => {
+        const selected = e.currentTarget.files[0];
+        if (selected) {
+          let reader = new FileReader();
+          reader.readAsText(selected);
+          reader.onload = function () {
+            console.log(reader.result);
+            LoadVariantSettings("client", reader.result);
+            updateVariantTypeDropdown();
+          };
+        }
+      };
+
       const oninit = () => {
         stockfish_state = "LOADING";
       };
@@ -2380,9 +2925,42 @@
                 "[?]",
               ),
             ]),
+            m("div", { hidden: during_play }, [
+              "- variantsettings.txt: ",
+              m("input#variantsettings-txt", {
+                type: "file",
+                disabled: !is_ready || review_mode || board_setup_mode,
+                onchange: onSelectVariantSettings,
+              }),
+              m(
+                "span",
+                {
+                  style: "cursor: pointer;",
+                  onclick: () =>
+                    window.alert(
+                      "You can upload a Variant Settings file to load settings for the variants including classification, names and descriptions. Contents will be appended to the variant descriptions provided by the server.",
+                    ),
+                },
+                "[?]",
+              ),
+            ]),
           ]),
           m("div#posvariantdiv", [
-            m("p", "Variant:"),
+            m("p", "Variant Type:"),
+            m(
+              "select#dropdown-varianttype",
+              {
+                disabled: !is_ready || review_mode || board_setup_mode,
+                onchange: (e) => {
+                  updateVariantDropdown();
+                },
+              },
+              [
+                m("option", { value: "" }, "(all)"),
+                m("option", { value: "<|NC|>" }, "(not classified)"),
+              ],
+            ),
+            m("p", "Name:"),
             m(
               "select#dropdown-variant",
               {
@@ -2392,8 +2970,8 @@
                 },
               },
               [
-                m("option", { value: "" }, "    (default)    "),
-                ...variants.map((ex, index) => m("option", { value: ex }, ex)),
+                m("option", { value: "" }, "(default)"),
+                //...variants.map((ex, index) => m("option", { value: ex, title: getVariantDescription(ex, true) }, getVariantName(ex,true,true))),
               ],
             ),
             m("p", "Custom Position Type:"),
@@ -2404,7 +2982,7 @@
               },
               [m("option", { value: "(default)" }, "(default)")],
             ),
-            m("p", "Custom Position Name:"),
+            m("p", "Name:"),
             m(
               "select#dropdown-posvariantname",
               {
@@ -2417,7 +2995,34 @@
               {
                 disabled: !is_ready || review_mode,
               },
-              "About this position",
+              "Position INFO",
+            ),
+            m(
+              "button#aboutvariant",
+              {
+                disabled: !is_ready || review_mode,
+                onclick: () => {
+                  let name = getVariantName(
+                    $("#dropdown-variant").value,
+                    true,
+                    false,
+                  );
+                  let description = getVariantDescription(
+                    $("#dropdown-variant").value,
+                    false,
+                  );
+                  if (description) {
+                    window.alert(
+                      `Variant ${name} (ID: ${$("#dropdown-variant").value}):\n${description}`,
+                    );
+                  } else {
+                    window.alert(
+                      "This variant does not provide a description. You can upload a variantsettings.txt yourself to add a description for it.",
+                    );
+                  }
+                },
+              },
+              "Variant INFO",
             ),
           ]),
           m("div#input", { hidden: during_play }, [
@@ -2580,7 +3185,11 @@
               "label#label-boardsetup",
               m("input[type=checkbox]#isboardsetup", {
                 checked: board_setup_mode,
-                disabled: analysis_mode || review_mode || advanced_time_control,
+                disabled:
+                  analysis_mode ||
+                  review_mode ||
+                  advanced_time_control ||
+                  select_move_dialog,
                 onclick: () => {
                   board_setup_mode = !board_setup_mode;
                 },
@@ -2638,6 +3247,7 @@
                 hidden: true,
                 onclick: () => {
                   LoadThemes();
+                  LoadVariantSettings("server", null);
                 },
               },
               "Load Themes (internal)",
@@ -2799,6 +3409,7 @@
                 m(
                   "p",
                   {
+                    style: "cursor: pointer;",
                     onclick: () => {
                       alert(
                         'This time control system allows user select different time modes for two sides and gives user more choice on time odds settings.\nThe time modes are:\nInfinite: Selected side has infinite time.\nTournament: Selected side has limited time and may get a time increment after a move.\nTime per move: Selected side need to make each move within a fixed time limit.\nHourglass: Selected side has limited time and used time will be added to opponent\'s time.\nByo-yomi: Selected side will enter the countdown(byoyomi) period(s) after their initial time runs out. During countdown periods, if the player make a move before the countdown period time runs out, the time will be reset to full time of countdown periods(Specified in "Byoyomi period length"), otherwise the remaining period count will be decreased by 1 and the time will be reset to full time of countdown periods(Specified in "Byoyomi period length"). If there\'s no countdown periods (Specified in "Byoyomi period count") left and the remaining time runs out, this side runs out of time.\nNote: if you set engine\'s time mode to infinite, it will think forever!',
@@ -2810,6 +3421,7 @@
                 m(
                   "p",
                   {
+                    style: "cursor: pointer;",
                     onclick: () => {
                       alert(
                         "Start time: The initial time (in milliseconds) at the beginning of the game. Not applicable to infinite.\nTime gain: Get a time increment of this many milliseconds after every move. Only applicable to tournament.\nByoyomi period length: The time (in milliseconds) of each period when in extra countdown(byoyomi) periods. Only applicable to byo-yomi.\nByoyomi period count: The count of countdown(byoyomi) periods. Only applicable to byo-yomi.\nTimeout margin: The time can be exceeded by this many milliseconds. The remaining time will be shown as minus numbers if exceeded. Not applicable to infinite.",
@@ -2869,6 +3481,28 @@
               "Click-click move",
             ),
             m("button#passmove", { disabled: !is_ready }, "🔄Pass This Turn"),
+            m(
+              "label#label-showmovediv",
+              m("input[type=checkbox]#showmovediv", {
+                checked: select_move_dialog,
+                disabled: review_mode || board_setup_mode,
+                onclick: () => {
+                  select_move_dialog = !select_move_dialog;
+                },
+              }),
+              "Show moves dialog",
+            ),
+            m(
+              "span",
+              {
+                style: "cursor: pointer;",
+                onclick: () =>
+                  window.alert(
+                    "If you cannot make your move on the board (For example, ATAXX drops), you can open this dialog to make the move.",
+                  ),
+              },
+              "[?]",
+            ),
           ]),
           m("div#boardsetupsettings", { hidden: !board_setup_mode }, [
             m("p", "Board Setup:"),
@@ -2922,8 +3556,8 @@
                 m("div", [
                   m("p", "Side to move:"),
                   m("select#dropdown-sidetomove", [
-                    m("option", { value: "white/red/sente" }, "First Mover"),
-                    m("option", { value: "black/black/gote" }, "Second Mover"),
+                    m("option", { value: "First Mover" }, "First Mover"),
+                    m("option", { value: "Second Mover" }, "Second Mover"),
                   ]),
                 ]),
                 m("div", [
@@ -2955,11 +3589,11 @@
                   }),
                   m("input[type=number]#whiteremainingchecks", {
                     placeholder: "White remaining checks",
-                    min: 0,
+                    min: 1,
                   }),
                   m("input[type=number]#blackremainingchecks", {
                     placeholder: "Black remaining checks",
-                    min: 0,
+                    min: 1,
                   }),
                   m("input[type=number]#currentmovenum", {
                     placeholder: "Current move number",
@@ -2970,10 +3604,12 @@
                   m("input[type=number]#enpassantfile", {
                     placeholder: "En passant file number",
                     min: 1,
+                    max: 12,
                   }),
                   m("input[type=number]#enpassantrank", {
                     placeholder: "En passant rank number",
                     min: 1,
+                    max: 10,
                   }),
                 ]),
                 m("div", [
@@ -3184,6 +3820,7 @@
                 m(
                   "button#sendenginecmd",
                   {
+                    disabled: during_play,
                     onclick: () => {
                       if (during_play) {
                         return;
@@ -3194,6 +3831,73 @@
                   "SEND",
                 ),
               ]),
+            ]),
+          ]),
+          m("div#moveselectiondialog", { hidden: !select_move_dialog }, [
+            m("div#moveslectdiv", [
+              m("p", "Moves:"),
+              m("select#availablemovelist", [
+                m("option", { value: "" }, "--SELECT MOVE--"),
+              ]),
+              m("input#movesearchfilter", {
+                placeholder: "Search for move...",
+              }),
+              m(
+                "label#label-regexp1",
+                m("input[type=checkbox]#regexp1", {
+                  disabled: review_mode || board_setup_mode,
+                }),
+                "Regular Expression",
+              ),
+              m("button#searchmove", "Search Moves"),
+            ]),
+            m("div#movefilters", [
+              m("p#searchresultinfo", "Click <Search Moves> to search!"),
+              m("hr#separatorsearchresult"),
+              m(
+                "p",
+                "Note: Click <Search Moves> to find available moves with filter. Leave the search field blank to find all moves. Click <Make Move> to make selected move. Click <Highlight Move> to show the move on the board. If you are in analysis mode, the highlighted move can be replaced by recommended move (Blue) and threat move (Red) and you need to highlight it again.",
+              ),
+              m(
+                "p",
+                "Check <Regular Expression> to search with regular expression, e.g. /[a-z]+/g",
+              ),
+              m("hr#separatormoveselectiondialog"),
+              m("p", "Additional Search Restrictions:"),
+              m("input#origfilter", {
+                placeholder:
+                  "Original Square... (e.g. e2, leave empty to search all, useless for drops)",
+              }),
+              m("input#destfilter", {
+                placeholder:
+                  "Destination Square... (e.g. e4, leave empty to search all, effective on drops)",
+              }),
+              m(
+                "label#label-isdrop",
+                m("input[type=checkbox]#isdrop", {
+                  disabled: review_mode || board_setup_mode,
+                  checked: true,
+                }),
+                "Include drops",
+              ),
+              m(
+                "label#label-haswallgating",
+                m("input[type=checkbox]#haswallgating", {
+                  disabled: review_mode || board_setup_mode,
+                  checked: true,
+                }),
+                "Include moves having wall gating",
+              ),
+              m(
+                "label#label-haspiecechange",
+                m("input[type=checkbox]#haspiecechange", {
+                  disabled: review_mode || board_setup_mode,
+                  checked: true,
+                }),
+                "Include moves having promotion/demotion or seirawan gating",
+              ),
+              m("button#makemove", "Make Move"),
+              m("button#highlightmove", "Highlight Move (Yellow Marks)"),
             ]),
           ]),
         ]);
