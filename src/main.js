@@ -1,4 +1,4 @@
-// ffish.js test using chessgroundx
+﻿// ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
 const variantsIni = document.getElementById("variants-ini");
@@ -78,6 +78,18 @@ const evalscore = document.getElementById("cp");
 const multipv = document.getElementById("multipv");
 const evalinfo = document.getElementById("evalinfo");
 const pvinfo = document.getElementById("pvinfo");
+const availablemovelist = document.getElementById("availablemovelist");
+const movesearchfilter = document.getElementById("movesearchfilter");
+const issearchregexp = document.getElementById("regexp1");
+const buttonsearchmove = document.getElementById("searchmove");
+const origfilter = document.getElementById("origfilter");
+const destfilter = document.getElementById("destfilter");
+const isdrop = document.getElementById("isdrop");
+const haswallgating = document.getElementById("haswallgating");
+const haspiecechange = document.getElementById("haspiecechange");
+const buttonmakemove = document.getElementById("makemove");
+const buttonhighlightmove = document.getElementById("highlightmove");
+const searchresultinfo = document.getElementById("searchresultinfo");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
@@ -274,6 +286,39 @@ function generateMoveNotationSVG(text, backgroundcolor, textcolor, position) {
   }
 }
 
+function generatePassTurnNotationSVG(backgroundcolor) {
+  if (typeof backgroundcolor != "string") {
+    return null;
+  }
+  let bgcolor = "#0078d7";
+  if (backgroundcolor != "") {
+    bgcolor = backgroundcolor;
+  }
+  return `
+    <svg
+   width="100"
+   height="100"
+   viewBox="0 0 26.458333 26.458333"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <g>
+    <ellipse
+       style="fill:${bgcolor};stroke:#000000;stroke-width:1.05833333;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+       id="background"
+       cx="13.229165"
+       cy="13.229164"
+       rx="11.906248"
+       ry="11.906247" />
+    <path
+       id="foreground"
+       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0;stroke-linecap:butt;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;image-rendering:auto"
+       d="m 13.229166,3.9687505 -2.778125,2.7781249 2.778125,2.7781248 V 7.672917 a 5.5562497,5.5562497 0 0 1 5.55625,5.556251 5.5562497,5.5562497 0 0 1 -3.271893,5.06248 l 1.377486,1.377487 a 7.4083326,7.4083326 0 0 0 3.74649,-6.439967 7.4083326,7.4083326 0 0 0 -7.408333,-7.4083344 z m -3.6607575,2.821533 a 7.4083326,7.4083326 0 0 0 -3.7475747,6.4388845 7.4083326,7.4083326 0 0 0 7.4083322,7.408331 v 1.852084 l 2.778125,-2.778125 -2.778125,-2.778125 v 1.852083 A 5.5562497,5.5562497 0 0 1 7.672917,13.229168 5.5562497,5.5562497 0 0 1 10.945171,8.1670469 Z" />
+  </g>
+</svg>
+  `;
+}
+
 function initBoard(variant) {
   if (board !== null) board.delete();
   board = new ffish.Board(variant);
@@ -282,6 +327,7 @@ function initBoard(variant) {
   const fenBoard = board.fen().split(" ")[0];
   var pocketRoles = undefined;
   resetTimer();
+  clearMovesList();
   recordedmultipv = 1;
   if (fenBoard.includes("[")) {
     const wpocket = board.pocket(WHITE);
@@ -538,6 +584,265 @@ function addPieceToPocket(pieceid, color) {
   });
 }
 
+function clearMovesList() {
+  while (availablemovelist.length > 1) {
+    availablemovelist.removeChild(availablemovelist[1]);
+  }
+  searchresultinfo.innerText = "Click <Search Moves> to search!";
+}
+
+function generateRegExp(expstr) {
+  if (typeof expstr != "string") {
+    return null;
+  }
+  if (expstr.trim().charAt(0) == "/") {
+    let params = expstr.trim().slice(1).split("/");
+    if (params.length == 2) {
+      try {
+        let regexp = new RegExp(params[0], params[1]);
+        return regexp;
+      } catch {
+        window.alert(
+          'There is a syntax error in the regular expression. The syntax is /<search items...>/<flags...>. You can google "regular expression" to get more informaion.',
+        );
+        return null;
+      }
+    } else {
+      window.alert(
+        'There is a syntax error in the regular expression. The syntax is /<search items...>/<flags...>. You can google "regular expression" to get more informaion.',
+      );
+      return null;
+    }
+  } else {
+    window.alert(
+      "There is a syntax error in the regular expression. It must start with '/'. E.G. /[a-z]+/g",
+    );
+    return null;
+  }
+}
+
+function filterMoves(
+  moveslist,
+  searchstr,
+  isregexp,
+  orig,
+  dest,
+  isdrop,
+  haswallgating,
+  haspiecechange,
+) {
+  if (
+    typeof moveslist != typeof [""] ||
+    typeof searchstr != "string" ||
+    typeof isregexp != "boolean" ||
+    typeof orig != "string" ||
+    typeof dest != "string" ||
+    typeof isdrop != "boolean" ||
+    typeof haswallgating != "boolean" ||
+    typeof haspiecechange != "boolean"
+  ) {
+    return null;
+  }
+  let result = [];
+  if (isregexp) {
+    let regexp = generateRegExp(searchstr);
+    if (regexp == null) {
+      return null;
+    }
+    moveslist.forEach((val) => {
+      if (regexp.test(val)) {
+        let res = parseUCIMove(val);
+        if (!isdrop && res[0].includes("@")) {
+          return;
+        }
+        if (!haspiecechange && res[2] != "") {
+          return;
+        }
+        if (!haswallgating && res[3] != "") {
+          return;
+        }
+        if (orig != "" && !res[0].includes("@") && orig != res[0]) {
+          return;
+        }
+        if (dest != "" && res[1] != dest) {
+          return;
+        }
+        result.push(val);
+      }
+    });
+  } else {
+    let str = searchstr.trim();
+    moveslist.forEach((val) => {
+      if (val.includes(str)) {
+        let res = parseUCIMove(val);
+        if (!isdrop && res[0].includes("@")) {
+          return;
+        }
+        if (!haspiecechange && res[2] != "") {
+          return;
+        }
+        if (!haswallgating && res[3] != "") {
+          return;
+        }
+        if (orig != "" && !res[0].includes("@") && orig != res[0]) {
+          return;
+        }
+        if (dest != "" && res[1] != dest) {
+          return;
+        }
+        result.push(val);
+      }
+    });
+  }
+  return result;
+}
+
+function highlightMoveOnBoard(move) {
+  if (typeof move != "string") {
+    return;
+  }
+  let bestmove = parseUCIMove(move);
+  let autoshapes = [];
+  if (bestmove[0].includes("@")) {
+    autoshapes.push({
+      brush: "yellow",
+      orig: bestmove[1].replace("10", ":"),
+    });
+    if (board.turn()) {
+      if (bestmove[0].charAt(0) == "+") {
+        autoshapes.push({
+          brush: "yellow",
+          dest: "a0",
+          orig: bestmove[1].replace("10", ":"),
+          piece: {
+            color: "white",
+            role: "p" + bestmove[0].toLowerCase().charAt(1) + "-piece",
+            scale: 0.7,
+          },
+          modifiers: { hilite: true },
+        });
+      } else {
+        autoshapes.push({
+          brush: "yellow",
+          dest: "a0",
+          orig: bestmove[1].replace("10", ":"),
+          piece: {
+            color: "white",
+            role: bestmove[0].toLowerCase().charAt(0) + "-piece",
+            scale: 0.7,
+          },
+          modifiers: { hilite: true },
+        });
+      }
+    } else {
+      if (bestmove[0].charAt(0) == "+") {
+        autoshapes.push({
+          brush: "yellow",
+          dest: "a0",
+          orig: bestmove[1].replace("10", ":"),
+          piece: {
+            color: "black",
+            role: "p" + bestmove[0].toLowerCase().charAt(1) + "-piece",
+            scale: 0.7,
+          },
+          modifiers: { hilite: true },
+        });
+      } else {
+        autoshapes.push({
+          brush: "yellow",
+          dest: "a0",
+          orig: bestmove[1].replace("10", ":"),
+          piece: {
+            color: "black",
+            role: bestmove[0].toLowerCase().charAt(0) + "-piece",
+            scale: 0.7,
+          },
+          modifiers: { hilite: true },
+        });
+      }
+    }
+  } else {
+    if (bestmove[0] == bestmove[1]) {
+      autoshapes.push({
+        brush: "black",
+        orig: bestmove[0].replace("10", ":"),
+        customSvg: generatePassTurnNotationSVG(""),
+      });
+    } else {
+      autoshapes.push({
+        brush: "yellow",
+        dest: bestmove[1].replace("10", ":"),
+        orig: bestmove[0].replace("10", ":"),
+      });
+    }
+    if (bestmove[2] != "") {
+      let piecerole = chessground.state.boardState.pieces.get(
+        bestmove[0].replace("10", ":"),
+      ).role;
+      autoshapes.push({
+        brush: "black",
+        orig: bestmove[1].replace("10", ":"),
+        customSvg: generateMoveNotationSVG(
+          bestmove[2],
+          "#e68f00",
+          "#ffffff",
+          "TopRight",
+        ),
+      });
+      if (bestmove[2] == "+") {
+        if (board.turn()) {
+          autoshapes.push({
+            brush: "yellow",
+            orig: bestmove[1].replace("10", ":"),
+            dest: bestmove[0].replace("10", ":"),
+            piece: { color: "white", role: "p" + piecerole },
+          });
+        } else {
+          autoshapes.push({
+            brush: "yellow",
+            orig: bestmove[1].replace("10", ":"),
+            dest: bestmove[0].replace("10", ":"),
+            piece: { color: "black", role: "p" + piecerole },
+          });
+        }
+      } else if (bestmove[2] == "-") {
+        if (board.turn()) {
+          autoshapes.push({
+            brush: "yellow",
+            orig: bestmove[1].replace("10", ":"),
+            dest: bestmove[0].replace("10", ":"),
+            piece: { color: "white", role: piecerole.slice(1) },
+          });
+        } else {
+          autoshapes.push({
+            brush: "yellow",
+            orig: bestmove[1].replace("10", ":"),
+            dest: bestmove[0].replace("10", ":"),
+            piece: { color: "black", role: piecerole.slice(1) },
+          });
+        }
+      } else {
+        if (board.turn()) {
+          autoshapes.push({
+            brush: "yellow",
+            orig: bestmove[1].replace("10", ":"),
+            dest: bestmove[0].replace("10", ":"),
+            piece: { color: "white", role: bestmove[2] + "-piece" },
+          });
+        } else {
+          autoshapes.push({
+            brush: "yellow",
+            orig: bestmove[1].replace("10", ":"),
+            dest: bestmove[0].replace("10", ":"),
+            piece: { color: "black", role: bestmove[2] + "-piece" },
+          });
+        }
+      }
+    }
+  }
+  chessground.setAutoShapes(autoshapes);
+}
+
 function getDimensions() {
   const fenBoard = board.fen().split(" ")[0];
   const ranks = fenBoard.split("/").length;
@@ -600,6 +905,7 @@ new Module().then((loadedModule) => {
       chessgroundContainerEl.classList.add(`pockets`);
     } else chessgroundContainerEl.classList.remove(`pockets`);
     resetTimer();
+    clearMovesList();
     let play_white = playWhite.checked;
     let play_black = playBlack.checked;
     buttonCurrentPosition.click();
@@ -886,6 +1192,7 @@ new Module().then((loadedModule) => {
     recordedmultipv = 1;
     dropdownPositionVariantType.selectedIndex = 0;
     dropdownPositionVariantType.onchange();
+    clearMovesList();
   };
 
   buttonPassMove.onclick = function () {
@@ -1185,11 +1492,19 @@ new Module().then((loadedModule) => {
           }
         }
       } else {
-        autoshapes.push({
-          brush: "blue",
-          dest: bestmove[1].replace("10", ":"),
-          orig: bestmove[0].replace("10", ":"),
-        });
+        if (bestmove[0] == bestmove[1]) {
+          autoshapes.push({
+            brush: "black",
+            orig: bestmove[0].replace("10", ":"),
+            customSvg: generatePassTurnNotationSVG("#003088"),
+          });
+        } else {
+          autoshapes.push({
+            brush: "blue",
+            dest: bestmove[1].replace("10", ":"),
+            orig: bestmove[0].replace("10", ":"),
+          });
+        }
         if (bestmove[2] != "") {
           let piecerole = chessground.state.boardState.pieces.get(
             bestmove[0].replace("10", ":"),
@@ -1335,11 +1650,19 @@ new Module().then((loadedModule) => {
           }
         }
       } else {
-        autoshapes.push({
-          brush: "red",
-          dest: ponder[1].replace("10", ":"),
-          orig: ponder[0].replace("10", ":"),
-        });
+        if (ponder[0] == ponder[1]) {
+          autoshapes.push({
+            brush: "black",
+            orig: ponder[0].replace("10", ":"),
+            customSvg: generatePassTurnNotationSVG("#882020"),
+          });
+        } else {
+          autoshapes.push({
+            brush: "red",
+            dest: ponder[1].replace("10", ":"),
+            orig: ponder[0].replace("10", ":"),
+          });
+        }
         if (ponder[2] != "") {
           let piecerole = chessground.state.boardState.pieces.get(
             ponder[0].replace("10", ":"),
@@ -1435,6 +1758,65 @@ new Module().then((loadedModule) => {
     }
   };
 
+  buttonsearchmove.onclick = function () {
+    let legalmoves = board.legalMoves().trim().split(" ");
+    let moves = filterMoves(
+      legalmoves,
+      movesearchfilter.value,
+      issearchregexp.checked,
+      origfilter.value,
+      destfilter.value,
+      isdrop.checked,
+      haswallgating.checked,
+      haspiecechange.checked,
+    );
+    console.log(moves);
+    if (moves == null || moves == undefined) {
+      return;
+    }
+    while (availablemovelist.length > 1) {
+      availablemovelist.removeChild(availablemovelist[1]);
+    }
+    moves.forEach((val) => {
+      let opt = document.createElement("option");
+      opt.value = val;
+      opt.text = `${val} (${board.sanMove(val)})`;
+      availablemovelist.appendChild(opt);
+    });
+    if (moves.length < 1) {
+      window.alert("No matches found with given search restriction.");
+    }
+    searchresultinfo.innerText = `Found ${moves.length} result(s).`;
+  };
+
+  buttonmakemove.onclick = function () {
+    const move = availablemovelist[availablemovelist.selectedIndex].value;
+    if (move == null || move == undefined || move == "") {
+      window.alert(
+        "Select a move in the drop down list first. If there are no moves listed, search for a move first. You can read the note to know how to make a search.",
+      );
+      return;
+    }
+    const capture = isCapture(board, move);
+    if (!board.push(move)) {
+      const foundmove = board.legalMoves().match(new RegExp(`${move}[^ ]+`));
+      if (foundmove) board.push(foundmove[0]);
+    }
+
+    afterMove(capture);
+  };
+
+  buttonhighlightmove.onclick = function () {
+    const move = availablemovelist[availablemovelist.selectedIndex].value;
+    if (move == null || move == undefined || move == "") {
+      window.alert(
+        "Select a move in the drop down list first. If there are no moves listed, search for a move first. You can read the note to know how to make a search.",
+      );
+      return;
+    }
+    highlightMoveOnBoard(move);
+  };
+
   updateChessground();
 }); // Chessground helper functions
 
@@ -1484,9 +1866,9 @@ function getFEN() {
   let FEN = chessground.getFen();
   let width = chessground.state.dimensions.width;
   let height = chessground.state.dimensions.height;
-  if (dropdownSideToMove.value == "white/red/sente") {
+  if (dropdownSideToMove.value == "First Mover") {
     FEN += " w";
-  } else if (dropdownSideToMove.value == "black/black/gote") {
+  } else if (dropdownSideToMove.value == "Second Mover") {
     FEN += " b";
   }
   let castling = " ";
@@ -1890,6 +2272,9 @@ function squareGetCoords(square) {
 }
 
 function isCapture(board, move) {
+  if (move.includes("@")) {
+    return false;
+  }
   const pieces = getPiecesAsArray(board);
   const moveFromStr = move.charAt(0) + parseInt(move.substring(1));
   const moveToStr =
@@ -2283,6 +2668,8 @@ function updateChessground() {
     },
   });
   const moveStack = board.moveStack();
+  chessground.setAutoShapes([]);
+  clearMovesList();
 
   if (moveStack.length === 0) {
     chessground.set({
