@@ -25,10 +25,14 @@ npm run watch-build
 Start server
 
 ```bash
+#Static website
 npm run serve
+
+#Enable binary engine loading feature
+node server.js
 ```
 
-Then, browse to http://localhost:5000
+Then, browse to http://localhost:5000 (Static website) or http://localhost:5015 (Enable binary engine loading feature)
 
 Enjoy!
 

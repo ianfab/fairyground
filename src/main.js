@@ -961,18 +961,25 @@ new Module().then((loadedModule) => {
     const fen = textFen.value;
     console.log(ffish.validateFen(fen, board.variant()));
 
-    if (!fen || ffish.validateFen(fen, board.variant())) {
+    if (!fen || ffish.validateFen(fen, board.variant()) >= 0) {
       if (fen) board.setFen(fen);
       else board.reset();
       const moves = textMoves.value.trim().split(" ").reverse();
+      let move = "";
 
       while (moves.length > 0) {
-        board.push(moves.pop());
+        move = moves.pop();
+        if (move == "") {
+          continue;
+        }
+        if (!board.push(move)) {
+          window.alert(`Invalid move: ${move}`);
+        }
       }
 
       updateChessground();
     } else {
-      alert("Invalid FEN");
+      window.alert("Invalid FEN");
     }
     recordedmultipv = 1;
   };
@@ -1251,6 +1258,7 @@ new Module().then((loadedModule) => {
     let text = engineOutput.value;
     let multipvid = 0;
     let bestpv = 0;
+    let index = 0;
     if (/( upperbound )|( lowerbound )/.test(text)) {
       return;
     }
@@ -1308,12 +1316,18 @@ new Module().then((loadedModule) => {
       multipvrecord[multipvid][4] = board.variationSan(
         textparselist.slice(textparselist.indexOf("pv") + 1).join(" "),
       );
-      multipvrecord[multipvid][5] = parseInt(
-        textparselist[textparselist.indexOf("depth") + 1],
-      );
-      multipvrecord[multipvid][6] = parseInt(
-        textparselist[textparselist.indexOf("seldepth") + 1],
-      );
+      index = textparselist.indexOf("depth");
+      if (index > 0) {
+        multipvrecord[multipvid][5] = parseInt(textparselist[index + 1]);
+      } else {
+        multipvrecord[multipvid][5] = -1;
+      }
+      index = textparselist.indexOf("seldepth");
+      if (index > 0) {
+        multipvrecord[multipvid][6] = parseInt(textparselist[index + 1]);
+      } else {
+        multipvrecord[multipvid][6] = -1;
+      }
       //Update Evaluation Section
       let k = 0;
       let pvinfostr = "";
@@ -1334,12 +1348,29 @@ new Module().then((loadedModule) => {
             showevalnum = multipvrecord[k][1].toFixed(2).toString();
           }
         }
-        pvinfostr += `Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5]} Max ${multipvrecord[k][6]}) ${showevalnum} → ${multipvrecord[k][4]}\n`;
+        pvinfostr += `Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5] > -1 ? multipvrecord[k][5] : "❓"} Max ${multipvrecord[k][6] > -1 ? multipvrecord[k][6] : "❓"}) ${showevalnum} → ${multipvrecord[k][4]}\n`;
         depthlist.push(multipvrecord[k][5]);
         seldepthlist.push(multipvrecord[k][6]);
       }
       pvinfo.innerText = pvinfostr;
-      evalinfo.innerText = `Depth (Average): ${Math.min(...depthlist)}\nDepth (Max): ${Math.max(...seldepthlist)}\nNodes: ${textparselist[textparselist.indexOf("nodes") + 1]}\nNodes Per Second: ${textparselist[textparselist.indexOf("nps") + 1]}`;
+      let nodeinfo = "❓";
+      index = textparselist.indexOf("nodes");
+      if (index > 0) {
+        nodeinfo = textparselist[index + 1];
+      }
+      let npsinfo = "❓";
+      index = textparselist.indexOf("nps");
+      if (index > 0) {
+        npsinfo = textparselist[index + 1];
+      }
+      let timeinfo = "❓";
+      index = textparselist.indexOf("time");
+      if (index > 0) {
+        timeinfo = textparselist[index + 1];
+      }
+      let maxdepth = Math.max(...depthlist);
+      let maxseldepth = Math.max(...seldepthlist);
+      evalinfo.innerText = `Depth (Average): ${maxdepth > 0 ? maxdepth : "❓"}\nDepth (Max): ${maxseldepth > 0 ? maxseldepth : "❓"}\nNodes: ${nodeinfo}\nNodes Per Second: ${npsinfo}\nTime: ${timeinfo}`;
     } else if (text.includes("bestmove")) {
       let textparselist = text.split(" ");
       if (board.turn()) {
@@ -1824,20 +1855,28 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
   while (displayReady.value.length < 1 || displayReady.value != 1) {
     continue;
   }
-  console.log(ffish.validateFen(fen, board.variant()));
+  //console.log(Error());
+  //console.log(ffish.validateFen(fen, board.variant()));
 
-  if (!fen || ffish.validateFen(fen, board.variant())) {
+  if (!fen || ffish.validateFen(fen, board.variant()) >= 0) {
     if (fen) board.setFen(fen);
     else board.reset();
     const moves = movelist.trim().split(" ").reverse();
+    let move = "";
 
     while (moves.length > 0) {
-      board.push(moves.pop());
+      move = moves.pop();
+      if (move == "") {
+        continue;
+      }
+      if (!board.push(move)) {
+        window.alert(`Invalid move: ${move}`);
+      }
     }
 
     updateChessground();
   } else {
-    alert("Invalid FEN");
+    window.alert("Invalid FEN");
   }
   if (enablemove) {
     enableBoardMove();
