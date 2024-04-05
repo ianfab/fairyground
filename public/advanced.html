@@ -1743,7 +1743,10 @@
                 );
                 fge.ws.close();
                 fge.WebSocketStatus = "ERROR";
-                document.getElementById("binengineinput").hidden = true;
+                const binenginediv = document.getElementById("binengineinput");
+                if (binenginediv) {
+                  binenginediv.hidden = true;
+                }
                 fge.first_engine = null;
                 fge.second_engine = null;
                 fge.analysis_engine = null;
@@ -1760,7 +1763,11 @@
                   );
                   fge.WebSocketStatus = "CONNECTED";
                   fge.ws.send("READYOK");
-                  document.getElementById("binengineinput").hidden = false;
+                  const binenginediv =
+                    document.getElementById("binengineinput");
+                  if (binenginediv) {
+                    binenginediv.hidden = false;
+                  }
                 } else {
                   console.error(
                     `%c WebSocket %c ERROR %c WebSocket Server conncetion failed: Server returns bad verification code.`,
@@ -1770,7 +1777,11 @@
                   );
                   fge.ws.close();
                   fge.WebSocketStatus = "ERROR";
-                  document.getElementById("binengineinput").hidden = true;
+                  const binenginediv =
+                    document.getElementById("binengineinput");
+                  if (binenginediv) {
+                    binenginediv.hidden = true;
+                  }
                   fge.first_engine = null;
                   fge.second_engine = null;
                   fge.analysis_engine = null;
@@ -1798,7 +1809,10 @@
               );
               console.error(event);
               fge.WebSocketStatus = "CLOSED";
-              document.getElementById("binengineinput").hidden = true;
+              const binenginediv = document.getElementById("binengineinput");
+              if (binenginediv) {
+                binenginediv.hidden = true;
+              }
               fge.first_engine = null;
               fge.second_engine = null;
               fge.analysis_engine = null;
@@ -1816,7 +1830,10 @@
                 "",
               );
               console.error(event);
-              document.getElementById("binengineinput").hidden = true;
+              const binenginediv = document.getElementById("binengineinput");
+              if (binenginediv) {
+                binenginediv.hidden = true;
+              }
               fge.first_engine = null;
               fge.second_engine = null;
               fge.analysis_engine = null;
@@ -1845,7 +1862,10 @@
           window.alert(
             "Cannot initiate WebSocket connection. Binary engine loading feature will be disabled.",
           );
-          document.getElementById("binengineinput").hidden = true;
+          const binenginediv = document.getElementById("binengineinput");
+          if (binenginediv) {
+            binenginediv.hidden = true;
+          }
           fge.first_engine = null;
           fge.second_engine = null;
           fge.analysis_engine = null;
@@ -1859,7 +1879,10 @@
         );
         fge.ws = null;
         fge.WebSocketStatus = "ERROR";
-        document.getElementById("binengineinput").hidden = true;
+        const binenginediv = document.getElementById("binengineinput");
+        if (binenginediv) {
+          binenginediv.hidden = true;
+        }
         fge.first_engine = null;
         fge.second_engine = null;
         fge.analysis_engine = null;
