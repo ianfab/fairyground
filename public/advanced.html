@@ -1894,7 +1894,7 @@
 
       const setVariant = () => {
         play_move = false;
-        force_stop();
+        stop(true);
         const variant = $("#dropdown-variant").value;
         stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
         stockfish.postMessage(`position startpos`);
@@ -2403,7 +2403,7 @@
       const displayCurrentPosition = () => {
         $("#gotomovenum").value = totalMoveNumber();
         console.log(`Current: ${!during_play}`);
-        displayMove(-1, !during_play);
+        displayMove(-1, false);
       };
 
       const displaySpecifiedPosition = () => {
@@ -4302,6 +4302,7 @@
                     return;
                   }
                   play_move = false;
+                  //console.log(Error());
                   window.setTimeout(() => {
                     setFen(false, true);
                   }, 10);

@@ -11,6 +11,8 @@ const checkboxDests = document.getElementById("check-dests");
 const checkboxAdjudicate = document.getElementById("check-adjudicate");
 const textFen = document.getElementById("fen");
 const textMoves = document.getElementById("move");
+const buttonSetFen = document.getElementById("setpos");
+const buttonStop = document.getElementById("stop");
 const pSetFen = document.getElementById("set");
 const labelPgn = document.getElementById("label-pgn");
 const labelStm = document.getElementById("label-stm");
@@ -909,12 +911,6 @@ new Module().then((loadedModule) => {
     let play_white = playWhite.checked;
     let play_black = playBlack.checked;
     buttonCurrentPosition.click();
-    if (play_white) {
-      playWhite.click();
-    }
-    if (play_black) {
-      playBlack.click();
-    }
 
     updateChessground();
     initializeThemes.click();
@@ -973,6 +969,12 @@ new Module().then((loadedModule) => {
           continue;
         }
         if (!board.push(move)) {
+          buttonStop.click();
+          textMoves.value = textMoves.value
+            .trim()
+            .split(/[ ]+/)
+            .slice(0, -1)
+            .join(" ");
           window.alert(`Invalid move: ${move}`);
         }
       }
@@ -1119,7 +1121,7 @@ new Module().then((loadedModule) => {
     if (dropdownPositionVariantType.value == "(default)") {
       textFen.value = "";
       textMoves.value = "";
-      pSetFen.click();
+      buttonSetFen.click();
     }
     UpdateVariantsPositionNameDropdown();
     positionInformation.innerHTML = "";
@@ -1870,6 +1872,12 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
         continue;
       }
       if (!board.push(move)) {
+        buttonStop.click();
+        textMoves.value = textMoves.value
+          .trim()
+          .split(/[ ]+/)
+          .slice(0, -1)
+          .join(" ");
         window.alert(`Invalid move: ${move}`);
       }
     }
