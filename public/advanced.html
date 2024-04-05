@@ -1745,7 +1745,7 @@
                 fge.WebSocketStatus = "ERROR";
                 const binenginediv = document.getElementById("binengineinput");
                 if (binenginediv) {
-                  binenginediv.hidden = true;
+                  binenginediv.style.display = "none";
                 }
                 fge.first_engine = null;
                 fge.second_engine = null;
@@ -1780,7 +1780,7 @@
                   const binenginediv =
                     document.getElementById("binengineinput");
                   if (binenginediv) {
-                    binenginediv.hidden = true;
+                    binenginediv.style.display = "none";
                   }
                   fge.first_engine = null;
                   fge.second_engine = null;
@@ -1811,7 +1811,7 @@
               fge.WebSocketStatus = "CLOSED";
               const binenginediv = document.getElementById("binengineinput");
               if (binenginediv) {
-                binenginediv.hidden = true;
+                binenginediv.style.display = "none";
               }
               fge.first_engine = null;
               fge.second_engine = null;
@@ -1832,7 +1832,7 @@
               console.error(event);
               const binenginediv = document.getElementById("binengineinput");
               if (binenginediv) {
-                binenginediv.hidden = true;
+                binenginediv.style.display = "none";
               }
               fge.first_engine = null;
               fge.second_engine = null;
@@ -1864,7 +1864,7 @@
           );
           const binenginediv = document.getElementById("binengineinput");
           if (binenginediv) {
-            binenginediv.hidden = true;
+            binenginediv.style.display = "none";
           }
           fge.first_engine = null;
           fge.second_engine = null;
@@ -1881,7 +1881,7 @@
         fge.WebSocketStatus = "ERROR";
         const binenginediv = document.getElementById("binengineinput");
         if (binenginediv) {
-          binenginediv.hidden = true;
+          binenginediv.style.display = "none";
         }
         fge.first_engine = null;
         fge.second_engine = null;
@@ -4058,88 +4058,92 @@
               "◀️Undo",
             ),
           ]),
-          m("div#binengineinput", { hidden: during_play }, [
-            m(
-              "button",
-              {
-                onclick: () => {
-                  fge.ShowEngineManagementUI(engine_list, fge.ws);
+          m(
+            "div#binengineinput",
+            { hidden: during_play || fge.WebSocketStatus != "CONNECTED" },
+            [
+              m(
+                "button",
+                {
+                  onclick: () => {
+                    fge.ShowEngineManagementUI(engine_list, fge.ws);
+                  },
                 },
-              },
-              "Engine Management",
-            ),
-            m("div#whiteenginesettings", [
-              m("p", "1st binary engine settings:"),
-              m("input[type=number]#whitedepth", {
-                placeholder: "Depth",
-                disabled:
-                  !is_ready ||
-                  fge.WebSocketStatus != "CONNECTED" ||
-                  analysis_mode,
-                min: 1,
-              }),
-              m("input[type=number]#whitemovetime", {
-                placeholder: "Movetime",
-                disabled:
-                  !is_ready ||
-                  fge.WebSocketStatus != "CONNECTED" ||
-                  analysis_mode,
-                min: 0,
-              }),
-              m("input[type=number]#whitenodes", {
-                placeholder: "Nodes",
-                disabled:
-                  !is_ready ||
-                  fge.WebSocketStatus != "CONNECTED" ||
-                  analysis_mode,
-                min: 1,
-              }),
-              m(
-                "p#whiteunsupportedvariant",
-                { hidden: true },
-                "1st engine does not support this variant. In browser Fairy-Stockfish will be used instead.",
+                "Engine Management",
               ),
-            ]),
-            m("div#blackenginesettings", [
-              m("p", "2nd binary engine settings:"),
-              m("input[type=number]#blackdepth", {
-                placeholder: "Depth",
-                disabled:
-                  !is_ready ||
-                  fge.WebSocketStatus != "CONNECTED" ||
-                  analysis_mode,
-                min: 1,
-              }),
-              m("input[type=number]#blackmovetime", {
-                placeholder: "Movetime",
-                disabled:
-                  !is_ready ||
-                  fge.WebSocketStatus != "CONNECTED" ||
-                  analysis_mode,
-                min: 0,
-              }),
-              m("input[type=number]#blacknodes", {
-                placeholder: "Nodes",
-                disabled:
-                  !is_ready ||
-                  fge.WebSocketStatus != "CONNECTED" ||
-                  analysis_mode,
-                min: 1,
-              }),
-              m(
-                "p#blackunsupportedvariant",
-                { hidden: true },
-                "2nd engine does not support this variant. In browser Fairy-Stockfish will be used instead.",
-              ),
-            ]),
-            m("div#analysisenginesettings", [
-              m(
-                "p#analysisunsupportedvariant",
-                { hidden: true },
-                "Analysis engine does not support this variant. In browser Fairy-Stockfish will be used instead.",
-              ),
-            ]),
-          ]),
+              m("div#whiteenginesettings", [
+                m("p", "1st binary engine settings:"),
+                m("input[type=number]#whitedepth", {
+                  placeholder: "Depth",
+                  disabled:
+                    !is_ready ||
+                    fge.WebSocketStatus != "CONNECTED" ||
+                    analysis_mode,
+                  min: 1,
+                }),
+                m("input[type=number]#whitemovetime", {
+                  placeholder: "Movetime",
+                  disabled:
+                    !is_ready ||
+                    fge.WebSocketStatus != "CONNECTED" ||
+                    analysis_mode,
+                  min: 0,
+                }),
+                m("input[type=number]#whitenodes", {
+                  placeholder: "Nodes",
+                  disabled:
+                    !is_ready ||
+                    fge.WebSocketStatus != "CONNECTED" ||
+                    analysis_mode,
+                  min: 1,
+                }),
+                m(
+                  "p#whiteunsupportedvariant",
+                  { hidden: true },
+                  "1st engine does not support this variant. In browser Fairy-Stockfish will be used instead.",
+                ),
+              ]),
+              m("div#blackenginesettings", [
+                m("p", "2nd binary engine settings:"),
+                m("input[type=number]#blackdepth", {
+                  placeholder: "Depth",
+                  disabled:
+                    !is_ready ||
+                    fge.WebSocketStatus != "CONNECTED" ||
+                    analysis_mode,
+                  min: 1,
+                }),
+                m("input[type=number]#blackmovetime", {
+                  placeholder: "Movetime",
+                  disabled:
+                    !is_ready ||
+                    fge.WebSocketStatus != "CONNECTED" ||
+                    analysis_mode,
+                  min: 0,
+                }),
+                m("input[type=number]#blacknodes", {
+                  placeholder: "Nodes",
+                  disabled:
+                    !is_ready ||
+                    fge.WebSocketStatus != "CONNECTED" ||
+                    analysis_mode,
+                  min: 1,
+                }),
+                m(
+                  "p#blackunsupportedvariant",
+                  { hidden: true },
+                  "2nd engine does not support this variant. In browser Fairy-Stockfish will be used instead.",
+                ),
+              ]),
+              m("div#analysisenginesettings", [
+                m(
+                  "p#analysisunsupportedvariant",
+                  { hidden: true },
+                  "Analysis engine does not support this variant. In browser Fairy-Stockfish will be used instead.",
+                ),
+              ]),
+            ],
+          ),
           m("div#input2", { hidden: during_play }, [
             m("p", "Settings:"),
             m("input[type=number]#depth", {
