@@ -1190,7 +1190,8 @@ class Engine {
         if (typeof this.IsReadyCallBack == "function") {
           this.IsReadyCallBack();
         }
-      } else if (typeof this.EvaluationUpdateCallBack == "function") {
+      }
+      if (typeof this.EvaluationUpdateCallBack == "function") {
         if (/( upperbound )|( lowerbound )/.test(Message)) {
           return;
         }
@@ -1292,6 +1293,55 @@ class Engine {
             );
           }
           this.EvaluationUpdateCallBack(msglist.join(" ") + " pv " + moves);
+        } else if (Message.includes("bestmove")) {
+          let msglist = Message.split(" ");
+          let bestmove = msglist[1];
+          let ponder = "0000";
+          if (msglist[2] == "draw") {
+            ponder = msglist[4];
+          } else {
+            ponder = msglist[3];
+          }
+          if (this.Protocol == "USI") {
+            bestmove = convertUSImovestoUCImoves(
+              bestmove,
+              GetBoardWidth(),
+              GetBoardHeight(),
+            );
+          } else if (
+            this.Protocol == "UCCI" ||
+            this.Protocol == "UCI_CYCLONE"
+          ) {
+            bestmove = convertUCCImovestoUCImoves(
+              bestmove,
+              GetBoardWidth(),
+              GetBoardHeight(),
+            );
+          }
+          if (ponder) {
+            if (this.Protocol == "USI") {
+              ponder = convertUSImovestoUCImoves(
+                ponder,
+                GetBoardWidth(),
+                GetBoardHeight(),
+              );
+            } else if (
+              this.Protocol == "UCCI" ||
+              this.Protocol == "UCI_CYCLONE"
+            ) {
+              ponder = convertUCCImovestoUCImoves(
+                ponder,
+                GetBoardWidth(),
+                GetBoardHeight(),
+              );
+            }
+          } else {
+            ponder = "0000";
+          }
+          //console.log(`bestmove ${bestmove} ponder ${ponder}`);
+          this.EvaluationUpdateCallBack(
+            `bestmove ${bestmove} ponder ${ponder}`,
+          );
         }
       }
     } else if (this.IsLoading) {

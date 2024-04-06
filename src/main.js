@@ -464,6 +464,9 @@ function parseUCIMove(ucimove) {
   if (typeof ucimove != "string") {
     throw TypeError;
   }
+  if (ucimove == "0000") {
+    return ["", "", "", ""];
+  }
   let move = ucimove;
   let gatingmove = "";
   if (move.includes(",")) {
@@ -1384,8 +1387,11 @@ new Module().then((loadedModule) => {
           Math.min(...evaluationindex.slice(0, recordedmultipv)),
         );
       }
+      if (bestpv < 0) {
+        bestpv = 0;
+      }
       bestmove = parseUCIMove(textparselist[1]);
-      if (textparselist[3] != undefined) {
+      if (textparselist[3] != undefined && textparselist[3] != "0000") {
         ponder = parseUCIMove(textparselist[3]);
       }
       multipvrecord[bestpv][2] = bestmove;
@@ -1423,10 +1429,16 @@ new Module().then((loadedModule) => {
         Math.min(...evaluationindex.slice(0, recordedmultipv)),
       );
     }
+    if (bestpv < 0) {
+      bestpv = 0;
+    }
     console.log("Best PV:", bestpv + 1);
     if (multipvrecord[bestpv][0]) {
       let matemoves = multipvrecord[bestpv][1];
-      if (matemoves > 0) {
+      if (isNaN(matemoves) || matemoves == null) {
+        evaluationBar.style.width = "50%";
+        evalscore.innerText = "Mate in ❓";
+      } else if (matemoves > 0) {
         evaluationBar.style.width = "100%";
         evalscore.innerText = "Mate in " + matemoves.toString();
       } else if (matemoves < 0) {
@@ -1443,18 +1455,23 @@ new Module().then((loadedModule) => {
       }
     } else {
       evaluation = multipvrecord[bestpv][1];
-      if (evaluation > 0) {
-        evalscore.innerText = "+" + evaluation.toFixed(2).toString();
+      if (isNaN(evaluation) || evaluation == null) {
+        evalscore.innerText = "❓";
+        evaluationBar.style.width = "50%";
       } else {
-        evalscore.innerText = evaluation.toFixed(2);
-      }
-      if (evaluation < -9.8) {
-        evaluationBar.style.width = "1%";
-      } else if (evaluation > 9.8) {
-        evaluationBar.style.width = "99%";
-      } else {
-        evaluationBar.style.width =
-          parseInt((evaluation * 100 + 1000) / 20).toString() + "%";
+        if (evaluation > 0) {
+          evalscore.innerText = "+" + evaluation.toFixed(2).toString();
+        } else {
+          evalscore.innerText = evaluation.toFixed(2);
+        }
+        if (evaluation < -9.8) {
+          evaluationBar.style.width = "1%";
+        } else if (evaluation > 9.8) {
+          evaluationBar.style.width = "99%";
+        } else {
+          evaluationBar.style.width =
+            parseInt((evaluation * 100 + 1000) / 20).toString() + "%";
+        }
       }
     }
     let autoshapes = [];
