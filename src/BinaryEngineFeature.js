@@ -702,7 +702,7 @@ function ParseSavedEngineListMessage(msg) {
     throw TypeError();
   }
   let list = [];
-  let entries = msg.split("/");
+  let entries = msg.split("\x01");
   entries.forEach((val) => {
     let enginesettings = val.split(";");
     if (enginesettings.length != 5) {
@@ -753,7 +753,7 @@ function ConvertEngineListToText(list) {
     let optiontxt = optionlist.join(",");
     strlist.push(`${id};${path};${wd};${protocol};${optiontxt}`);
   });
-  return strlist.join("/");
+  return strlist.join("\x01");
 }
 
 window.fairyground.BinaryEngineFeature.ConvertEngineListToText =
@@ -1125,7 +1125,7 @@ class Engine {
       if (AllBlankTestRegExp.test(msg[3])) {
         return;
       }
-      console.error("Engine " + msg[2] + " Error: " + msg[3]);
+      console.error("Engine " + msg[2] + " STDERR: " + msg[3]);
     } else if (
       msg[0] == "ID_CHANGED" &&
       msg[1] == this.ID &&
@@ -1611,7 +1611,7 @@ class Engine {
       if (IsNullValue(val.current)) {
         return;
       }
-      if (/protocol|variant/i.test(val.name)) {
+      if (/^protocol$|^(UCI_|USI_|UCCI_)variant$|^variant$/i.test(val.name)) {
         return;
       }
       this.SetOption(val.name, val.current);
@@ -1784,6 +1784,41 @@ class Engine {
       }
     } else {
       this.PonderMove = undefined;
+    }
+  }
+
+  RedetectOptions(LoadFinishCallBack, LoadFailureCallBack) {
+    if (
+      typeof LoadFinishCallBack != "function" &&
+      LoadFinishCallBack !== undefined
+    ) {
+      throw TypeError();
+    }
+    if (
+      typeof LoadFailureCallBack != "function" &&
+      LoadFailureCallBack !== undefined
+    ) {
+      throw TypeError();
+    }
+    if (this.WebSocketConnection.readyState != this.WebSocketConnection.OPEN) {
+      return false;
+    }
+    this.DataStream = "";
+    this.Variants = [];
+    this.Ponder = false;
+    this.PonderMiss = false;
+    this.PonderMove = "0000";
+    this.Move = "0000";
+    this.IsLoaded = false;
+    this.IsLoading = true;
+    this.LoadFinishCallBack = LoadFinishCallBack;
+    this.LoadFailureCallBack = LoadFailureCallBack;
+    if (this.Protocol == "UCI" || this.Protocol == "UCI_CYCLONE") {
+      this.PostMessage("uci");
+    } else if (this.Protocol == "USI") {
+      this.PostMessage("usi");
+    } else if (this.Protocol == "UCCI") {
+      this.PostMessage("ucci");
     }
   }
 
@@ -2075,6 +2110,8 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
     subdiv.style.marginTop = "10px";
     popup.appendChild(subdiv);
   });
+  let actiondiv = document.createElement("div");
+  actiondiv.style.display = "flex";
   let cancel = document.createElement("button");
   let canceltext = document.createTextNode("Close");
   cancel.appendChild(canceltext);
@@ -2124,7 +2161,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
     cancel.click();
   };
   save.appendChild(savetext);
-  popup.appendChild(save);
+  actiondiv.appendChild(save);
   let showcurrent = document.createElement("button");
   let showcurrenttext = document.createTextNode("Show Current Value");
   showcurrent.onclick = function () {
@@ -2158,7 +2195,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
     //console.log(EngineClass.Options);
   };
   showcurrent.appendChild(showcurrenttext);
-  popup.appendChild(showcurrent);
+  actiondiv.appendChild(showcurrent);
   let showdefault = document.createElement("button");
   let showdefaulttext = document.createTextNode("Show Default Value");
   showdefault.onclick = function () {
@@ -2192,25 +2229,68 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
     //console.log(EngineClass.Options);
   };
   showdefault.appendChild(showdefaulttext);
-  popup.appendChild(showdefault);
-  /*
-    let postmsg = document.createElement("button");
-    let postmsgtext = document.createTextNode("Post Message To Engine");
-    postmsg.appendChild(postmsgtext);
-    postmsg.onclick = function () {
-        let str = prompt("Enter the command that you want to send to the engine.\nBe aware that do not enter any setoption or other commands that changes the settings of the engine, as it will make the values in the GUI differ from engine's settings and can cause problems.");
-        if (str == null || str == "") {
+  actiondiv.appendChild(showdefault);
+  let redetectoptions = document.createElement("button");
+  let redetectoptionstext = document.createTextNode("Re-detect");
+  redetectoptions.appendChild(redetectoptionstext);
+  redetectoptions.onclick = function () {
+    EngineClass.RedetectOptions(
+      () => {
+        let Elem = null;
+        EngineClass.Options.forEach((value, index) => {
+          if (value.type == "button") {
             return;
+          }
+          Elem = document.getElementById(
+            value.name.replace(/[ ]/g, "") + "-input",
+          );
+          if (Elem == null) {
+            return;
+          }
+          if (value.type == "check") {
+            EngineClass.Options[index].current = Elem.checked.toString();
+            if (
+              value.name == "Ponder" ||
+              value.name == "USI_Ponder" ||
+              value.name == "UCCI_Ponder"
+            ) {
+              if (Elem.checked) {
+                EngineClass.Ponder = true;
+              } else {
+                EngineClass.Ponder = false;
+              }
+            }
+          } else {
+            EngineClass.Options[index].current = Elem.value.toString();
+          }
+        });
+        //console.log(EngineClass.Options);
+        EngineClass.SetOptions(EngineClass.Options);
+        while (document.getElementById("enginesettingspopup") != null) {
+          document.getElementById("enginesettingspopup").remove();
         }
-        if (GetEngineSettingsUIEngineColor() == "WHITE") {
-            PostMessageToEngine("WHITE", str, true);
-        }
-        else if (GetEngineSettingsUIEngineColor() == "BLACK") {
-            PostMessageToEngine("BLACK", str, true);
-        }
-    }
-    popup.appendChild(postmsg);*/
-  popup.appendChild(cancel);
+        window.fairyground.BinaryEngineFeature.changing_engine_settings = false;
+        setTimeout(() => {
+          ShowEditEngineOptionsUI(EngineClass, false);
+        }, 10);
+      },
+      (err) => {
+        window.alert(`Failed to redetect options: ${err}`);
+      },
+    );
+  };
+  actiondiv.appendChild(cancel);
+  actiondiv.appendChild(redetectoptions);
+  let redetectoptionshelp = document.createElement("pre");
+  redetectoptionshelp.innerText = "[?]";
+  redetectoptionshelp.onclick = function () {
+    window.alert(
+      "On some engines, the options might change after you set some of these values. (e.g. Fairy-Stockfish, when you set VariantPath the UCI_Variant option will change.)\nThis function allows you to re-detect the option values so that the GUI can get the options properly.\nNote that you might need to click <Re-detect> for twice to make this work as the engine probably takes time to parse files while the GUI has no way to detect that.",
+    );
+  };
+  redetectoptionshelp.style.cursor = "pointer";
+  actiondiv.appendChild(redetectoptionshelp);
+  popup.appendChild(actiondiv);
   popup.style.display = "block";
   popup.style.zIndex = "1003";
   document.body.appendChild(popup);
@@ -2988,6 +3068,162 @@ function ShowEngineManagementUI(EngineList, ws) {
     }
   };
   popup.appendChild(cancel);
+  let supportedvariants = document.createElement("button");
+  let supportedvariantstext = document.createTextNode("Supported Variants");
+  supportedvariants.appendChild(supportedvariantstext);
+  supportedvariants.onclick = function () {
+    window.alert(`Supported variants for engines:\n
+        First Engine: ${window.fairyground.BinaryEngineFeature.first_engine ? window.fairyground.BinaryEngineFeature.first_engine.Variants.toString().replace(/,/g, ", ") : "(Not loaded)"}
+        Second Engine: ${window.fairyground.BinaryEngineFeature.second_engine ? window.fairyground.BinaryEngineFeature.second_engine.Variants.toString().replace(/,/g, ", ") : "(Not loaded)"}
+        Analysis Engine: ${window.fairyground.BinaryEngineFeature.analysis_engine ? window.fairyground.BinaryEngineFeature.analysis_engine.Variants.toString().replace(/,/g, ", ") : "(Not loaded)"}
+        `);
+  };
+  popup.appendChild(supportedvariants);
+  let redetectsupportedvariants = document.createElement("button");
+  let redetectsupportedvariantstext = document.createTextNode(
+    "Re-detect Supported Variants",
+  );
+  redetectsupportedvariants.appendChild(redetectsupportedvariantstext);
+  redetectsupportedvariants.onclick = function () {
+    if (window.fairyground.BinaryEngineFeature.first_engine) {
+      if (window.fairyground.BinaryEngineFeature.first_engine.IsLoading) {
+        window.alert(
+          "First engine is loading. Please wait for all engines to be loaded before performing this action.",
+        );
+        return;
+      }
+      window.fairyground.BinaryEngineFeature.first_engine.RedetectOptions(
+        () => {
+          let Elem = null;
+          let EngineClass = window.fairyground.BinaryEngineFeature.first_engine;
+          EngineClass.Options.forEach((value, index) => {
+            if (value.type == "button") {
+              return;
+            }
+            Elem = document.getElementById(
+              value.name.replace(/[ ]/g, "") + "-input",
+            );
+            if (Elem == null) {
+              return;
+            }
+            if (value.type == "check") {
+              EngineClass.Options[index].current = Elem.checked.toString();
+              if (
+                value.name == "Ponder" ||
+                value.name == "USI_Ponder" ||
+                value.name == "UCCI_Ponder"
+              ) {
+                if (Elem.checked) {
+                  EngineClass.Ponder = true;
+                } else {
+                  EngineClass.Ponder = false;
+                }
+              }
+            } else {
+              EngineClass.Options[index].current = Elem.value.toString();
+            }
+          });
+          EngineClass.SetOptions(EngineClass.Options);
+        },
+        (err) => {
+          window.alert(`Failed to redetect options: ${err}`);
+        },
+      );
+    }
+    if (window.fairyground.BinaryEngineFeature.second_engine) {
+      if (window.fairyground.BinaryEngineFeature.second_engine.IsLoading) {
+        window.alert(
+          "Second engine is loading. Please wait for all engines to be loaded before performing this action.",
+        );
+        return;
+      }
+      window.fairyground.BinaryEngineFeature.second_engine.RedetectOptions(
+        () => {
+          let Elem = null;
+          let EngineClass =
+            window.fairyground.BinaryEngineFeature.second_engine;
+          EngineClass.Options.forEach((value, index) => {
+            if (value.type == "button") {
+              return;
+            }
+            Elem = document.getElementById(
+              value.name.replace(/[ ]/g, "") + "-input",
+            );
+            if (Elem == null) {
+              return;
+            }
+            if (value.type == "check") {
+              EngineClass.Options[index].current = Elem.checked.toString();
+              if (
+                value.name == "Ponder" ||
+                value.name == "USI_Ponder" ||
+                value.name == "UCCI_Ponder"
+              ) {
+                if (Elem.checked) {
+                  EngineClass.Ponder = true;
+                } else {
+                  EngineClass.Ponder = false;
+                }
+              }
+            } else {
+              EngineClass.Options[index].current = Elem.value.toString();
+            }
+          });
+          EngineClass.SetOptions(EngineClass.Options);
+        },
+        (err) => {
+          window.alert(`Failed to redetect options: ${err}`);
+        },
+      );
+    }
+    if (window.fairyground.BinaryEngineFeature.analysis_engine) {
+      if (window.fairyground.BinaryEngineFeature.analysis_engine.IsLoading) {
+        window.alert(
+          "Analysis engine is loading. Please wait for all engines to be loaded before performing this action.",
+        );
+        return;
+      }
+      window.fairyground.BinaryEngineFeature.analysis_engine.RedetectOptions(
+        () => {
+          let Elem = null;
+          let EngineClass =
+            window.fairyground.BinaryEngineFeature.analysis_engine;
+          EngineClass.Options.forEach((value, index) => {
+            if (value.type == "button") {
+              return;
+            }
+            Elem = document.getElementById(
+              value.name.replace(/[ ]/g, "") + "-input",
+            );
+            if (Elem == null) {
+              return;
+            }
+            if (value.type == "check") {
+              EngineClass.Options[index].current = Elem.checked.toString();
+              if (
+                value.name == "Ponder" ||
+                value.name == "USI_Ponder" ||
+                value.name == "UCCI_Ponder"
+              ) {
+                if (Elem.checked) {
+                  EngineClass.Ponder = true;
+                } else {
+                  EngineClass.Ponder = false;
+                }
+              }
+            } else {
+              EngineClass.Options[index].current = Elem.value.toString();
+            }
+          });
+          EngineClass.SetOptions(EngineClass.Options);
+        },
+        (err) => {
+          window.alert(`Failed to redetect options: ${err}`);
+        },
+      );
+    }
+  };
+  popup.appendChild(redetectsupportedvariants);
   popup.style.display = "block";
   popup.style.zIndex = "1001";
   document.body.appendChild(popup);
