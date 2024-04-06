@@ -489,7 +489,7 @@ const PonderOptionSearchRegExp = new RegExp(
   "(Ponder)|(UCI_Ponder)|(USI_Ponder)|(UCCI_Ponder)",
   "i",
 );
-const MessageSplitter = new RegExp("(?<!\\\\)\\|", "");
+const MessageSplitter = new RegExp("\x10", "");
 const AllBlankTestRegExp = new RegExp("^[ ]*$", "");
 
 function GetCurrentVariantID() {
@@ -770,7 +770,7 @@ function GetEngineList(GetFinishCallBack, ws) {
     throw Error("WebSocket connetion error");
   }
   function OnGetEngineListMessageReceived(event) {
-    let msg = event.data.split("|");
+    let msg = event.data.split("\x10");
     if (msg[0] == "ENGINE_LIST") {
       let list = ParseSavedEngineListMessage(msg[1]);
       ws.removeEventListener("message", OnGetEngineListMessageReceived);
@@ -791,7 +791,7 @@ function SaveEngineList(EngineList, ws) {
     throw Error("WebSocket connetion error");
   }
   let text = ConvertEngineListToText(EngineList);
-  ws.send(`SAVE_ENGINE_LIST|${text}`);
+  ws.send(`SAVE_ENGINE_LIST\x10${text}`);
 }
 
 window.fairyground.BinaryEngineFeature.SaveEngineList = SaveEngineList;
@@ -1031,7 +1031,9 @@ class Engine {
       this.WebSocketOnSocketInvalidHandlerBinded,
     );
     if (this.WebSocketConnection.readyState == this.WebSocketConnection.OPEN) {
-      this.WebSocketConnection.send(`EXIT_ENGINE|${this.ID}|${this.Color}`);
+      this.WebSocketConnection.send(
+        `EXIT_ENGINE\x10${this.ID}\x10${this.Color}`,
+      );
     }
     this.IsUsing = false;
     this.IsLoaded = false;
@@ -1066,7 +1068,7 @@ class Engine {
     this.LoadFinishCallBack = LoadFinishCallBack;
     this.LoadFailureCallBack = LoadFailureCallBack;
     this.WebSocketConnection.send(
-      `LOAD_ENGINE|${this.ID}|${this.Color}|${this.Protocol}|${this.Command}|${this.WorkingDirectory}|${this.LoadTimeOut}`,
+      `LOAD_ENGINE\x10${this.ID}\x10${this.Color}\x10${this.Protocol}\x10${this.Command}\x10${this.WorkingDirectory}\x10${this.LoadTimeOut}`,
     );
     return true;
   }
@@ -1359,7 +1361,9 @@ class Engine {
         this.SetOptions(this.Options);
         this.MessageBuffer = [];
       } else if (Message.includes("readyok")) {
-        this.WebSocketConnection.send(`ENGINE_READY|${this.ID}|${this.Color}`);
+        this.WebSocketConnection.send(
+          `ENGINE_READY\x10${this.ID}\x10${this.Color}`,
+        );
         this.IsLoaded = true;
         this.IsLoading = false;
         if (this.Variants.includes(GetCurrentVariantID())) {
@@ -1617,7 +1621,7 @@ class Engine {
     //console.log(`Send ${this.Color}: ${Message}`);
     //console.log(Error());
     this.WebSocketConnection.send(
-      `POST_MSG|${this.ID}|${this.Color}|${Message}`,
+      `POST_MSG\x10${this.ID}\x10${this.Color}\x10${Message}`,
     );
   }
 
@@ -2021,7 +2025,9 @@ class Engine {
     let OldID = this.ID;
     this.SetIDCallBack = SetIDCallBack;
     this.ID = ID;
-    this.WebSocketConnection.send(`CHANGE_ID|${OldID}|${this.Color}|${ID}`);
+    this.WebSocketConnection.send(
+      `CHANGE_ID\x10${OldID}\x10${this.Color}\x10${ID}`,
+    );
   }
 
   SetPonderMiss() {

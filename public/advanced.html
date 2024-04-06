@@ -1746,7 +1746,7 @@
             );
 
             fge.ws.addEventListener("open", function (event) {
-              fge.ws.send(`CONNECT|${checkconnectionnumber}`);
+              fge.ws.send(`CONNECT\x10${checkconnectionnumber}`);
             });
 
             fge.ws.addEventListener("message", function (event) {
