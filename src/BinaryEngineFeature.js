@@ -975,6 +975,7 @@ class Engine {
     this.RecordedMultiplePrincipalVariation = 0;
     this.MultiplePrincipalVariationRecord = [];
     this.EvaluationIndex = [];
+    this.IsThinking = false;
     this.LoadTimeOut = LoadTimeOut;
     this.LoadFinishCallBack = undefined;
     this.LoadFailureCallBack = undefined;
@@ -1147,6 +1148,7 @@ class Engine {
       }
       if (Message.startsWith("bestmove")) {
         //console.log(`${this.Color} Receive: ${Message}`);
+        this.IsThinking = false;
         if (EnginePlaysColor(this.Color)) {
           if (this.Ponder && this.PonderMiss) {
             this.PonderMiss = false;
@@ -1646,7 +1648,7 @@ class Engine {
   }
 
   NewGame() {
-    this.PostMessage("stop");
+    this.StopThinking(true, false);
     this.RecordedMultiplePrincipalVariation = 0;
     if (this.Protocol == "UCI" || this.Protocol == "UCI_CYCLONE") {
       this.PostMessage("ucinewgame");
@@ -1716,6 +1718,7 @@ class Engine {
           this.PostMessage(`setoption UCCI_Variant ${VariantID}`);
         }
       }
+      this.NewGame();
       this.PostMessage("position startpos");
       this.IsUsing = true;
       return true;
@@ -1829,6 +1832,10 @@ class Engine {
     ) {
       throw TypeError();
     }
+    if (!this.IsThinking) {
+      return;
+    }
+    this.IsThinking = false;
     if (InterruptPondering || !IsAdvancedTimeControl) {
       this.PonderMove = "0000";
       this.PonderMiss = false;
@@ -1876,6 +1883,7 @@ class Engine {
     if (!this.IsUsing) {
       return;
     }
+    this.IsThinking = true;
     this.RecordedMultiplePrincipalVariation = 0;
     let CurrentPlayerColor = CurrentPlayer.toUpperCase();
     if (this.IsAnalysisEngine) {
@@ -1959,7 +1967,7 @@ class Engine {
 
   SetPonderMiss() {
     this.PonderMiss = true;
-    this.PostMessage("stop");
+    this.StopThinking(true, true);
     let position = GetBoardPosition();
     this.SetPosition(
       position.fen,
@@ -3072,11 +3080,15 @@ function ShowEngineManagementUI(EngineList, ws) {
   let supportedvariantstext = document.createTextNode("Supported Variants");
   supportedvariants.appendChild(supportedvariantstext);
   supportedvariants.onclick = function () {
-    window.alert(`Supported variants for engines:\n
-        First Engine: ${window.fairyground.BinaryEngineFeature.first_engine ? window.fairyground.BinaryEngineFeature.first_engine.Variants.toString().replace(/,/g, ", ") : "(Not loaded)"}
-        Second Engine: ${window.fairyground.BinaryEngineFeature.second_engine ? window.fairyground.BinaryEngineFeature.second_engine.Variants.toString().replace(/,/g, ", ") : "(Not loaded)"}
-        Analysis Engine: ${window.fairyground.BinaryEngineFeature.analysis_engine ? window.fairyground.BinaryEngineFeature.analysis_engine.Variants.toString().replace(/,/g, ", ") : "(Not loaded)"}
-        `);
+    window.alert(
+      `First Engine:\n${window.fairyground.BinaryEngineFeature.first_engine ? window.fairyground.BinaryEngineFeature.first_engine.Variants.toString().replace(/,/g, ", ") : "(Not loaded)"}`,
+    );
+    window.alert(
+      `Second Engine:\n${window.fairyground.BinaryEngineFeature.second_engine ? window.fairyground.BinaryEngineFeature.second_engine.Variants.toString().replace(/,/g, ", ") : "(Not loaded)"}`,
+    );
+    window.alert(
+      `Analysis Engine:\n${window.fairyground.BinaryEngineFeature.analysis_engine ? window.fairyground.BinaryEngineFeature.analysis_engine.Variants.toString().replace(/,/g, ", ") : "(Not loaded)"}`,
+    );
   };
   popup.appendChild(supportedvariants);
   let redetectsupportedvariants = document.createElement("button");
