@@ -61,7 +61,7 @@ var ClientEngines = new Map();
 var ConnectingClients = new Set();
 var ConnectedClients = new Set();
 const PathLevelSeperatorMatcher = new RegExp("\\\\|/", "");
-const MessageSplitter = new RegExp("(?<!\\\\)\\|", "");
+const MessageSplitter = new RegExp("\x10", "");
 
 function GetWorkingDirectoryFromExcutablePath(path) {
   if (typeof path != "string") {
@@ -145,15 +145,15 @@ class Engine {
     if (WebSocketConnection.readyState != WebSocketConnection.OPEN) {
       throw Error("WebSocket connection error");
     }
-    this.ID = ID.replace("|", "\\|");
-    this.Command = Command.replace("|", "\\|");
-    this.WorkingDirectory = WorkingDirectory.replace("|", "\\|");
+    this.ID = ID;
+    this.Command = Command;
+    this.WorkingDirectory = WorkingDirectory;
     if (WorkingDirectory == "") {
       this.WorkingDirectory = GetWorkingDirectoryFromExcutablePath(Command);
     }
-    this.Protocol = Protocol.replace("|", "\\|");
+    this.Protocol = Protocol;
     this.Options = Options;
-    this.Color = Color.replace("|", "\\|");
+    this.Color = Color;
     this.IsLoading = false;
     this.IsLoaded = false;
     this.Process = null;
@@ -258,7 +258,7 @@ class Engine {
         err,
       );
       this.WebSocketConnection.send(
-        `ERROR|LOAD_ENGINE|${this.ID}|${this.Color}`,
+          `ERROR\x10LOAD_ENGINE\x10${this.ID}\x10${this.Color}`,
       );
       if (typeof this.LoadFailureCallBack == "function") {
         this.LoadFailureCallBack();
@@ -275,7 +275,7 @@ class Engine {
             `[WebSocket Server] Engine ${this.Color} (ID: ${this.ID}) load timed out.`,
           );
           this.WebSocketConnection.send(
-            `ERROR|ENGINE_TIMEOUT|${this.ID}|${this.Color}`,
+              `ERROR\x10ENGINE_TIMEOUT\x10${this.ID}\x10${this.Color}`,
           );
         } else {
           console.error(
@@ -283,7 +283,7 @@ class Engine {
             code,
           );
           this.WebSocketConnection.send(
-            `ERROR|LOAD_ENGINE|${this.ID}|${this.Color}`,
+              `ERROR\x10LOAD_ENGINE\x10${this.ID}\x10${this.Color}`,
           );
         }
         this.Status = "";
@@ -295,12 +295,12 @@ class Engine {
     });
     this.Process.stdout.on("data", (data) => {
       this.WebSocketConnection.send(
-        `ENGINE_STDOUT|${this.ID}|${this.Color}|${data}`,
+          `ENGINE_STDOUT\x10${this.ID}\x10${this.Color}\x10${data}`,
       );
     });
     this.Process.stderr.on("data", (data) => {
       this.WebSocketConnection.send(
-        `ENGINE_STDERR|${this.ID}|${this.Color}|${data}`,
+          `ENGINE_STDERR\x10${this.ID}\x10${this.Color}\x10${data}`,
       );
     });
     console.log(
@@ -355,7 +355,7 @@ class Engine {
     if (msg[0] == "POST_MSG") {
       if (msg.length != 4) {
         console.warn(
-          "[WebSocket Server] Received bad data from client. Syntax: POST_MSG|<ID>|<Color>|<info...>.",
+          "[WebSocket Server] Received bad data from client. Syntax: POST_MSG\x10<ID>\x10<Color>\x10<info...>.",
         );
         return;
       }
@@ -365,7 +365,7 @@ class Engine {
     } else if (msg[0] == "ENGINE_READY") {
       if (msg.length != 3) {
         console.warn(
-          "[WebSocket Server] Received bad data from client. Syntax: ENGINE_READY|<ID>|<Color>.",
+          "[WebSocket Server] Received bad data from client. Syntax: ENGINE_READY\x10<ID>\x10<Color>.",
         );
         return;
       }
@@ -379,7 +379,7 @@ class Engine {
     ) {
       if (typeof msg[3] == "string") {
         this.ID = msg[3];
-        this.WebSocketConnection.send(`ID_CHANGED|${this.ID}|${this.Color}`);
+        this.WebSocketConnection.send(`ID_CHANGED\x10${this.ID}\x10${this.Color}`);
       }
     }
   }
@@ -390,7 +390,7 @@ wss.on("connection", (ws, req) => {
   ws.isAlive = true;
   ws.on("pong", heartbeat);
   ws.on("message", (message) => {
-    let msg = message.toString().split("|");
+      let msg = message.toString().split(MessageSplitter);
     if (msg[0] == "CONNECT") {
       if (ConnectingClients.has(ws) || ConnectedClients.has(ws)) {
         console.warn(
@@ -429,7 +429,7 @@ wss.on("connection", (ws, req) => {
     if (msg[0] == "LOAD_ENGINE") {
       if (msg.length != 7) {
         console.warn(
-          "[WebSocket Server] Received bad data from client. Syntax: LOAD_ENGINE|<ID>|<Color>|<Protocol>|<Command>|<WorkingDirectory>|<LoadTimeOut>.",
+          "[WebSocket Server] Received bad data from client. Syntax: LOAD_ENGINE\x10<ID>\x10<Color>\x10<Protocol>\x10<Command>\x10<WorkingDirectory>\x10<LoadTimeOut>.",
         );
         return;
       }
@@ -474,7 +474,7 @@ wss.on("connection", (ws, req) => {
     } else if (msg[0] == "EXIT_ENGINE") {
       if (msg.length != 3) {
         console.warn(
-          "[WebSocket Server] Received bad data from client. Syntax: EXIT_ENGINE|<ID>|<Color>.",
+          "[WebSocket Server] Received bad data from client. Syntax: EXIT_ENGINE\x10<ID>\x10<Color>.",
         );
         return;
       }
@@ -496,11 +496,11 @@ wss.on("connection", (ws, req) => {
       }
     } else if (msg[0] == "GET_ENGINE_LIST") {
       let content = ReadFile("./EngineList.txt");
-      ws.send(`ENGINE_LIST|${content}`);
+      ws.send(`ENGINE_LIST\x10${content}`);
     } else if (msg[0] == "SAVE_ENGINE_LIST") {
       if (msg.length != 2) {
         console.warn(
-          "[WebSocket Server] Received bad data from client. Syntax: SAVE_ENGINE_LIST|<EngineListText>.",
+          "[WebSocket Server] Received bad data from client. Syntax: SAVE_ENGINE_LIST\x10<EngineListText>.",
         );
         return;
       }
@@ -509,7 +509,7 @@ wss.on("connection", (ws, req) => {
     } else if (msg[0] == "CHANGE_ID") {
       if (msg.length != 4) {
         console.warn(
-          "[WebSocket Server] Received bad data from client. Syntax: CHANGE_ID|<OldID>|<Color>|<NewID>.",
+          "[WebSocket Server] Received bad data from client. Syntax: CHANGE_ID\x10<OldID>\x10<Color>\x10<NewID>.",
         );
         return;
       }
