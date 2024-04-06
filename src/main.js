@@ -464,8 +464,8 @@ function parseUCIMove(ucimove) {
   if (typeof ucimove != "string") {
     throw TypeError;
   }
-  if (ucimove == "0000") {
-    return ["", "", "", ""];
+  if (ucimove == "0000" || ucimove == "") {
+    return [undefined, undefined, undefined, undefined];
   }
   let move = ucimove;
   let gatingmove = "";
@@ -1268,7 +1268,7 @@ new Module().then((loadedModule) => {
       return;
     }
     if (text.includes(" multipv ")) {
-      let textparselist = text.split(" ");
+      let textparselist = text.split(/[ ]+/);
       multipvid =
         parseInt(textparselist[textparselist.indexOf("multipv") + 1]) - 1;
       if (multipvid + 1 > recordedmultipv) {
@@ -1278,7 +1278,7 @@ new Module().then((loadedModule) => {
     let bestmove = [];
     let ponder = [];
     if (text.includes(" score ") && text.includes(" pv ")) {
-      let textparselist = text.split(" ");
+      let textparselist = text.split(/[ ]+/);
       let evaltext = textparselist.at(textparselist.indexOf("score") + 1);
       if (evaltext == "mate") {
         let matenum = parseInt(
