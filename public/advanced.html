@@ -3643,13 +3643,11 @@
                 }
               } else if (line.startsWith(" ")) {
               } else {
-                if (
-                  !review_mode &&
-                  line.startsWith("bestmove") &&
-                  ((play_white && stm == "white") ||
-                    (play_black && stm == "black"))
-                ) {
+                if (!review_mode && line.startsWith("bestmove") && play_move) {
                   play_move = false;
+                  if (analysis_mode) {
+                    return;
+                  }
                   $("#move").value += " " + line.split(" ")[1];
                   $("#set").click();
                 }
