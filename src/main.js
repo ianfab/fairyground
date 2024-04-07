@@ -1319,6 +1319,7 @@ new Module().then((loadedModule) => {
     }
     if (validateFEN(FEN, false)) {
       textFen.value = FEN;
+      textMoves.value = "";
       copySetFEN.click();
     } else {
       window.alert("Failed to apply the position. There are errors in it.");
