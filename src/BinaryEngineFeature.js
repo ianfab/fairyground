@@ -976,7 +976,7 @@ class Engine {
     this.MultiplePrincipalVariationRecord = [];
     this.EvaluationIndex = [];
     this.IsThinking = false;
-    this.HasMoveRight = false;
+    this.MoveRightCount = 0;
     this.LoadTimeOut = LoadTimeOut;
     this.LoadFinishCallBack = undefined;
     this.LoadFailureCallBack = undefined;
@@ -1151,18 +1151,18 @@ class Engine {
       }
       if (Message.startsWith("bestmove")) {
         //console.log(`${this.Color} Receive: ${Message}`);
-        this.IsThinking = false;
+        //this.IsThinking = false;
+        if (this.MoveRightCount <= 0) {
+          console.warn(
+            `Engine ${this.Color} ID ${this.ID} claims too many moves.`,
+          );
+          return;
+        }
+        this.MoveRightCount--;
         if (EnginePlaysColor(this.Color)) {
           if (this.Ponder && this.PonderMiss) {
             this.PonderMiss = false;
           } else {
-            if (!this.HasMoveRight) {
-              console.warn(
-                `Engine ${this.Color} ID ${this.ID} claims multiple moves.`,
-              );
-              return;
-            }
-            this.HasMoveRight = false;
             let bestmoveline = Message.split(" ");
             if (bestmoveline[1] == "resign" || bestmoveline[2] == "resign") {
               if (this.IsAnalysisEngine) {
@@ -1910,6 +1910,11 @@ class Engine {
     }
   }
 
+  ForceStop() {
+    this.PostMessage("stop");
+    this.IsThinking = false;
+  }
+
   StartThinking(
     CurrentPlayer,
     IsAdvancedTimeControl,
@@ -1945,7 +1950,9 @@ class Engine {
     if (!this.IsUsing) {
       return;
     }
-    this.HasMoveRight = true;
+    if (!IsPonderHit) {
+      this.MoveRightCount++;
+    }
     this.IsThinking = true;
     this.RecordedMultiplePrincipalVariation = 0;
     let CurrentPlayerColor = CurrentPlayer.toUpperCase();

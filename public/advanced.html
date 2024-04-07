@@ -435,6 +435,10 @@
     height: 600px;
   }
 
+  #info #sannotation {
+    background: #eee;
+  }
+
   #info #timecontrolduringplay {
     padding: 10px;
     margin-left: 20px;
@@ -2636,7 +2640,9 @@
 
         const stm = $("#label-stm").innerText;
         play_move =
-          (play_white && stm == "white") || (play_black && stm == "black");
+          (play_white && stm == "white") ||
+          (play_black && stm == "black") ||
+          analysis_mode;
         if (fge.WebSocketStatus == "CONNECTED") {
           if (analysis_mode) {
             if (fge.analysis_engine) {
@@ -4216,7 +4222,21 @@
             ),
             m(
               "button#stop",
-              { disabled: !is_ready, onclick: force_stop },
+              {
+                disabled: !is_ready,
+                onclick: () => {
+                  force_stop();
+                  if (fge.first_engine) {
+                    fge.first_engine.ForceStop();
+                  }
+                  if (fge.second_engine) {
+                    fge.second_engine.ForceStop();
+                  }
+                  if (fge.analysis_engine) {
+                    fge.analysis_engine.ForceStop();
+                  }
+                },
+              },
               "⏹Stop",
             ),
             m(
@@ -4875,6 +4895,82 @@
               ]),
             ]),
             m("div#info", [
+              m("select#sannotation", [
+                m("option", { value: "" }, "--Select Notation System--"),
+                m(
+                  "option",
+                  { value: "DEFAULT" },
+                  "Standard/Short Algebraic Notation Without Piece Type Omission (DEFAULT)",
+                ),
+                m(
+                  "option",
+                  { value: "SAN" },
+                  "Standard/Short Algebraic Notation (SAN)",
+                ),
+                m("option", { value: "LAN" }, "Long Algebraic Notation (LAN)"),
+                m(
+                  "option",
+                  { value: "SHOGI_HOSKING" },
+                  "Shogi Hosking Notation (SHOGI_HOSKING)",
+                ),
+                m(
+                  "option",
+                  { value: "SHOGI_HODGES" },
+                  "Shogi George Hodges Notation (SHOGI_HODGES)",
+                ),
+                m(
+                  "option",
+                  { value: "SHOGI_HODGES_NUMBER" },
+                  "Shogi George Hodges Number-only Notation (SHOGI_HODGES_NUMBER)",
+                ),
+                m("option", { value: "JANGGI" }, "Janggi Notation (JANGGI)"),
+                m(
+                  "option",
+                  { value: "XIANGQI_WXF" },
+                  "World Xiangqi Federation Notation (XIANGQI_WXF)",
+                ),
+                m(
+                  "option",
+                  { value: "THAI_SAN" },
+                  "Thai Standard/Short Algebraic Notation (THAI_SAN)",
+                ),
+                m(
+                  "option",
+                  { value: "THAI_LAN" },
+                  "Thai Long Algebraic Notation (THAI_LAN)",
+                ),
+                m(
+                  "option",
+                  { value: "FEN" },
+                  "Forsyth–Edwards Notation (Fairy-Stockfish) (FEN)",
+                ),
+                m("option", { value: "PGN" }, "Portable Game Notation (PGN)"),
+                m(
+                  "option",
+                  { value: "EPD" },
+                  "Extended Position Description (EPD)",
+                ),
+                m(
+                  "option",
+                  { value: "FEN+UCIMOVE" },
+                  "Forsyth–Edwards Notation (Fairy-Stockfish) and UCI Moves (FEN+UCIMOVE)",
+                ),
+                m(
+                  "option",
+                  { value: "FEN+USIMOVE" },
+                  "Forsyth–Edwards Notation (Fairy-Stockfish) and USI Moves (FEN+USIMOVE)",
+                ),
+                m(
+                  "option",
+                  { value: "FEN+UCCIMOVE" },
+                  "Forsyth–Edwards Notation (Fairy-Stockfish) and UCCI (CECP) Moves (FEN+UCCIMOVE)",
+                ),
+                m(
+                  "option",
+                  { value: "SFEN+USIMOVE" },
+                  "Shogi Forsyth–Edwards Notation and USI Moves (SFEN+USIMOVE)",
+                ),
+              ]),
               m("p#positioninfo", ""),
               m("div#timers", { hidden: !advanced_time_control }, [
                 m("div#whitetimer", [

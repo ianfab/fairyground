@@ -92,6 +92,7 @@ const haspiecechange = document.getElementById("haspiecechange");
 const buttonmakemove = document.getElementById("makemove");
 const buttonhighlightmove = document.getElementById("highlightmove");
 const searchresultinfo = document.getElementById("searchresultinfo");
+const dropdownNotationSystem = document.getElementById("sannotation");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
@@ -848,6 +849,228 @@ function highlightMoveOnBoard(move) {
   chessground.setAutoShapes(autoshapes);
 }
 
+function getNotation(notation, variant, startfen, is960, ucimoves) {
+  if (
+    typeof notation != "string" ||
+    typeof variant != "string" ||
+    typeof startfen != "string" ||
+    typeof is960 != "boolean" ||
+    typeof ucimoves != "string"
+  ) {
+    throw TypeError();
+  }
+  if (ffish) {
+    if (window.fairyground) {
+      if (window.fairyground.BinaryEngineFeature) {
+        const fge = window.fairyground.BinaryEngineFeature;
+        const variants = ffish.variants().split(" ");
+        if (variants.includes(variant)) {
+          if (ffish.validateFen(startfen, variant, is960) >= 0) {
+            let tmpboard = new ffish.Board(variant, startfen, is960);
+            let moveslist = ucimoves.trim().split(/[ ]+/).reverse();
+            let result = "";
+            if (moveslist.length == 1 && moveslist[0] == "") {
+            } else {
+              while (moveslist.length > 0) {
+                if (!tmpboard.push(moveslist.pop())) {
+                  return null;
+                }
+              }
+            }
+            if (notation == "DEFAULT") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(ucimoves, ffish.Notation.DEFAULT);
+            } else if (notation == "SAN") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(ucimoves, ffish.Notation.SAN);
+            } else if (notation == "LAN") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(ucimoves, ffish.Notation.LAN);
+            } else if (notation == "SHOGI_HOSKING") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(
+                ucimoves,
+                ffish.Notation.SHOGI_HOSKING,
+              );
+            } else if (notation == "SHOGI_HODGES") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(
+                ucimoves,
+                ffish.Notation.SHOGI_HODGES,
+              );
+            } else if (notation == "SHOGI_HODGES_NUMBER") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(
+                ucimoves,
+                ffish.Notation.SHOGI_HODGES_NUMBER,
+              );
+            } else if (notation == "JANGGI") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(ucimoves, ffish.Notation.JANGGI);
+            } else if (notation == "XIANGQI_WXF") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(
+                ucimoves,
+                ffish.Notation.XIANGQI_WXF,
+              );
+            } else if (notation == "THAI_SAN") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(ucimoves, ffish.Notation.THAI_SAN);
+            } else if (notation == "THAI_LAN") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(ucimoves, ffish.Notation.THAI_LAN);
+            } else if (notation == "FEN") {
+              return tmpboard.fen();
+            } else if (notation == "PGN") {
+              tmpboard.setFen(startfen);
+              const today = new Date();
+              const year = today.getFullYear();
+              const month = today.getMonth() + 1;
+              const day = today.getDate();
+              const hours = today.getHours();
+              const minutes = today.getMinutes();
+              const seconds = today.getSeconds();
+              let whitename = "";
+              let blackname = "";
+              if (playWhite.checked) {
+                if (fge.first_engine) {
+                  whitename = fge.first_engine.Name;
+                } else {
+                  whitename = "In browser Fairy-Stockfish";
+                }
+              } else {
+                whitename = "Human Player";
+              }
+              if (playBlack.checked) {
+                if (fge.second_engine) {
+                  blackname = fge.second_engine.Name;
+                } else {
+                  blackname = "In browser Fairy-Stockfish";
+                }
+              } else {
+                blackname = "Human Player";
+              }
+              result = `[Event "Fairy-Stockfish Playground match"]\n[Site "${window.location.host}"]\n[Date "${year.toString() + "." + month.toString() + "." + day.toString()}"]\n`;
+              result += `[Round "1"]\n[White "${whitename}"]\n[Black "${blackname}"]\n`;
+              result += `[FEN "${startfen}"]\n[Result "${tmpboard.result()}"]\n[Variant "${tmpboard.variant()}"]\n\n`;
+              result += tmpboard.variationSan(ucimoves, ffish.Notation.SAN);
+              return result;
+            } else if (notation == "EPD") {
+              const gamefen = tmpboard.fen().split(/[ ]+/);
+              result = `${gamefen[0]} ${gamefen[1]} ${gamefen[2]} ${gamefen[3]}`;
+              result += ` acd 0;`;
+              result += ` acn 0;`;
+              result += ` acs 0;`;
+              result += ` am 0000;`;
+              result += ` bm 0000;`;
+              result += ` ce 0.0;`;
+              result += ` dm 0;`;
+              result += ` draw_accept "null";`;
+              result += ` draw_claim "null";`;
+              result += ` draw_reject "null";`;
+              result += ` eco "null";`;
+              if (gamefen.length == 6) {
+                result += ` fmvn ${gamefen[5]};`;
+                result += ` hmvc ${gamefen[4]};`;
+              } else if (gamefen.length == 7) {
+                result += ` fmvn ${gamefen[6]};`;
+                result += ` hmvc ${gamefen[5]};`;
+              } else {
+                result += ` fmvn 0;`;
+                result += ` hmvc 0;`;
+              }
+              result += ` id "Fairy-Stockfish Playground match";`;
+              result += ` nic "null";`;
+              result += ` pm 0000;`;
+              result += ` pv 0;`;
+              result += ` rc 0;`;
+              result += ` resign "null";`;
+              result += ` sm 0000;`;
+              result += ` tcgs "null";`;
+              result += ` tcri "null";`;
+              result += ` tcsi "null";`;
+              result += ` v0 "null";`;
+              result += ` variant "${tmpboard.variant()}";`;
+              return result;
+            } else if (notation == "FEN+UCIMOVE") {
+              tmpboard.setFen(startfen);
+              return tmpboard.fen() + "|" + ucimoves;
+            } else if (notation == "FEN+USIMOVE") {
+              tmpboard.setFen(startfen);
+              let dimensions = getDimensions();
+              const convertedmoves = fge.convertUCImovestoUSImoves(
+                ucimoves,
+                dimensions.width,
+                dimensions.height,
+              );
+              if (convertedmoves != null) {
+                return tmpboard.fen() + "|" + convertedmoves;
+              } else {
+                return (
+                  tmpboard.fen() +
+                  "|(There are moves that cannot be displayed in USI moves, such as pawn promotion or seirawan gating)"
+                );
+              }
+            } else if (notation == "FEN+UCCIMOVE") {
+              tmpboard.setFen(startfen);
+              let dimensions = getDimensions();
+              const convertedmoves = fge.convertUCImovestoUCCImoves(
+                ucimoves,
+                dimensions.width,
+                dimensions.height,
+              );
+              if (convertedmoves != null) {
+                return tmpboard.fen() + "|" + convertedmoves;
+              } else {
+                return (
+                  tmpboard.fen() +
+                  "|(There are moves that cannot be displayed in UCCI moves, such as pawn promotion or seirawan gating)"
+                );
+              }
+            } else if (notation == "SFEN+USIMOVE") {
+              tmpboard.setFen(startfen);
+              let dimensions = getDimensions();
+              const convertedmoves = fge.convertUCImovestoUSImoves(
+                ucimoves,
+                dimensions.width,
+                dimensions.height,
+              );
+              if (convertedmoves != null) {
+                return (
+                  fge.ConvertFENtoSFEN(tmpboard.fen()) +
+                  "|" +
+                  fge.convertUCImovestoUSImoves(
+                    ucimoves,
+                    dimensions.width,
+                    dimensions.height,
+                  )
+                );
+              } else {
+                return (
+                  fge.ConvertFENtoSFEN(tmpboard.fen()) +
+                  "|(There are moves that cannot be displayed in USI moves, such as pawn promotion or seirawan gating)"
+                );
+              }
+            }
+          } else {
+            return "Illegal FEN";
+          }
+        } else {
+          return null;
+        }
+      } else {
+        throw Error(
+          "Namespace window.fairyground.BinaryEngineFeature does not exist",
+        );
+      }
+    } else {
+      throw Error("Namespace window.fairyground does not exist");
+    }
+  } else {
+    throw Error("ffish.js is not initialized!!!");
+  }
+}
+
 function getDimensions() {
   const fenBoard = board.fen().split(" ")[0];
   const ranks = fenBoard.split("/").length;
@@ -1318,7 +1541,11 @@ new Module().then((loadedModule) => {
       }
       multipvrecord[multipvid][2] = bestmove;
       multipvrecord[multipvid][3] = ponder;
-      multipvrecord[multipvid][4] = board.variationSan(
+      multipvrecord[multipvid][4] = getNotation(
+        dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,
+        board.variant(),
+        board.fen(),
+        false,
         textparselist.slice(textparselist.indexOf("pv") + 1).join(" "),
       );
       index = textparselist.indexOf("depth");
@@ -1865,6 +2092,12 @@ new Module().then((loadedModule) => {
       return;
     }
     highlightMoveOnBoard(move);
+  };
+
+  dropdownNotationSystem.onchange = function () {
+    if (labelPgn) {
+      labelPgn.innerText = getPgn(board);
+    }
   };
 
   updateChessground();
@@ -2662,35 +2895,47 @@ function afterMove(capture) {
 }
 
 function getPgn(board) {
-  let pgn = "";
-  const reversedMoves = [];
-  let moveStack = board.moveStack();
+  if (
+    dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value == ""
+  ) {
+    let pgn = "";
+    const reversedMoves = [];
+    let moveStack = board.moveStack();
 
-  while (moveStack.length > 0) {
-    // TODO: improve this :/
-    reversedMoves.push(moveStack.split(" ").pop());
-    board.pop();
-    moveStack = board.moveStack();
-  }
-
-  if (!board.turn() && reversedMoves.length > 0) {
-    pgn += board.fullmoveNumber() + "... ";
-  }
-
-  while (reversedMoves.length > 0) {
-    const move = reversedMoves.pop();
-
-    if (board.turn()) {
-      pgn += board.fullmoveNumber() + ". ";
+    while (moveStack.length > 0) {
+      // TODO: improve this :/
+      reversedMoves.push(moveStack.split(" ").pop());
+      board.pop();
+      moveStack = board.moveStack();
     }
 
-    pgn += board.sanMove(move) + " ";
-    board.push(move);
-  }
+    if (!board.turn() && reversedMoves.length > 0) {
+      pgn += board.fullmoveNumber() + "... ";
+    }
 
-  const result = board.result(checkboxAdjudicate.checked);
-  if (result !== "*") pgn += result;
-  return pgn.trim();
+    while (reversedMoves.length > 0) {
+      const move = reversedMoves.pop();
+
+      if (board.turn()) {
+        pgn += board.fullmoveNumber() + ". ";
+      }
+
+      pgn += board.sanMove(move) + " ";
+      board.push(move);
+    }
+
+    const result = board.result(checkboxAdjudicate.checked);
+    if (result !== "*") pgn += result;
+    return pgn.trim();
+  } else {
+    return getNotation(
+      dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,
+      board.variant(),
+      textFen.value == "" ? ffish.startingFen(board.variant()) : textFen.value,
+      false,
+      textMoves.value,
+    );
+  }
 }
 
 function disableBoardMove() {
