@@ -849,13 +849,13 @@ function highlightMoveOnBoard(move) {
   chessground.setAutoShapes(autoshapes);
 }
 
-function getNotation(notation, variant, startfen, is960, ucimoves) {
+function getNotation(notation, variant, startfen, is960, ucimovestr) {
   if (
     typeof notation != "string" ||
     typeof variant != "string" ||
     typeof startfen != "string" ||
     typeof is960 != "boolean" ||
-    typeof ucimoves != "string"
+    typeof ucimovestr != "string"
   ) {
     throw TypeError();
   }
@@ -864,10 +864,11 @@ function getNotation(notation, variant, startfen, is960, ucimoves) {
       if (window.fairyground.BinaryEngineFeature) {
         const fge = window.fairyground.BinaryEngineFeature;
         const variants = ffish.variants().split(" ");
+        let ucimoves = ucimovestr.trim();
         if (variants.includes(variant)) {
           if (ffish.validateFen(startfen, variant, is960) >= 0) {
             let tmpboard = new ffish.Board(variant, startfen, is960);
-            let moveslist = ucimoves.trim().split(/[ ]+/).reverse();
+            let moveslist = ucimoves.split(/[ ]+/).reverse();
             let result = "";
             if (moveslist.length == 1 && moveslist[0] == "") {
             } else {
@@ -922,6 +923,7 @@ function getNotation(notation, variant, startfen, is960, ucimoves) {
             } else if (notation == "FEN") {
               return tmpboard.fen();
             } else if (notation == "PGN") {
+              const gameresult = tmpboard.result();
               tmpboard.setFen(startfen);
               const today = new Date();
               const year = today.getFullYear();
@@ -952,7 +954,7 @@ function getNotation(notation, variant, startfen, is960, ucimoves) {
               }
               result = `[Event "Fairy-Stockfish Playground match"]\n[Site "${window.location.host}"]\n[Date "${year.toString() + "." + month.toString() + "." + day.toString()}"]\n`;
               result += `[Round "1"]\n[White "${whitename}"]\n[Black "${blackname}"]\n`;
-              result += `[FEN "${startfen}"]\n[Result "${tmpboard.result()}"]\n[Variant "${tmpboard.variant()}"]\n\n`;
+              result += `[FEN "${startfen}"]\n[Result "${gameresult}"]\n[Variant "${tmpboard.variant()}"]\n\n`;
               result += tmpboard.variationSan(ucimoves, ffish.Notation.SAN);
               return result;
             } else if (notation == "EPD") {
