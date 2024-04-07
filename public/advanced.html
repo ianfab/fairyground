@@ -437,6 +437,7 @@
 
   #info #sannotation {
     background: #eee;
+    margin-bottom: 10px;
   }
 
   #info #timecontrolduringplay {
@@ -3642,7 +3643,12 @@
                 }
               } else if (line.startsWith(" ")) {
               } else {
-                if (!review_mode && line.startsWith("bestmove") && play_move) {
+                if (
+                  !review_mode &&
+                  line.startsWith("bestmove") &&
+                  ((play_white && stm == "white") ||
+                    (play_black && stm == "black"))
+                ) {
                   play_move = false;
                   $("#move").value += " " + line.split(" ")[1];
                   $("#set").click();
