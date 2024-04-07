@@ -491,6 +491,8 @@ const PonderOptionSearchRegExp = new RegExp(
 );
 const MessageSplitter = new RegExp("\x10", "");
 const AllBlankTestRegExp = new RegExp("^[ ]*$", "");
+const WhiteSpaceMatcher = new RegExp("[ ]+", "");
+const LineFeedCarriageReturnMatcher = new RegExp("(\r\n)|(\r)", "g");
 
 function GetCurrentVariantID() {
   return document.getElementById("dropdown-variant").value;
@@ -1086,7 +1088,7 @@ class Engine {
       msg[1] == this.ID &&
       msg[2] == this.Color
     ) {
-      this.DataStream += msg[3].replace(/(\r\n)|(\r)/g, "\n");
+      this.DataStream += msg[3].replace(LineFeedCarriageReturnMatcher, "\n");
       let index = this.DataStream.indexOf("\n");
       if (index >= 0) {
         do {
@@ -1149,7 +1151,7 @@ class Engine {
       if (typeof this.OutputUpdateCallBack == "function") {
         this.OutputUpdateCallBack(this.Color, Message);
       }
-      if (Message.startsWith("bestmove")) {
+      if (Message.includes("bestmove")) {
         //console.log(`${this.Color} Receive: ${Message}`);
         //this.IsThinking = false;
         if (this.MoveRightCount <= 0) {
@@ -1163,7 +1165,7 @@ class Engine {
           if (this.Ponder && this.PonderMiss) {
             this.PonderMiss = false;
           } else {
-            let bestmoveline = Message.split(" ");
+            let bestmoveline = Message.trim().split(WhiteSpaceMatcher);
             if (bestmoveline[1] == "resign" || bestmoveline[2] == "resign") {
               if (this.IsAnalysisEngine) {
                 window.alert(
@@ -1282,7 +1284,7 @@ class Engine {
                     this.EvaluationUpdateCallBack(this.RecordedMultiplePrincipalVariation, this.MultiplePrincipalVariationRecord, this.EvaluationIndex, NaN, NaN);
                 }*/
         if (Message.includes(" score ") && Message.includes(" pv ")) {
-          let msglist = Message.split(" ");
+          let msglist = Message.trim().split(WhiteSpaceMatcher);
           let pv = msglist.slice(msglist.indexOf("pv") + 1);
           msglist = msglist.slice(0, msglist.indexOf("pv"));
           let moves = pv.join(" ");
@@ -1304,7 +1306,7 @@ class Engine {
           }
           this.EvaluationUpdateCallBack(msglist.join(" ") + " pv " + moves);
         } else if (Message.includes("bestmove")) {
-          let msglist = Message.split(" ");
+          let msglist = Message.trim().split(WhiteSpaceMatcher);
           let bestmove = msglist[1];
           let ponder = "0000";
           if (msglist[2] == "draw") {
