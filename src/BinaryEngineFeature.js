@@ -1028,6 +1028,7 @@ class Engine {
     this.EvaluationUpdateCallBack = undefined;
     this.OutputUpdateCallBack = undefined;
     this.SendMessageCallBack = undefined;
+    this.OnErrorMessageCallBack = undefined;
     if (Color == "ANALYSIS") {
       this.IsAnalysisEngine = true;
     }
@@ -1197,7 +1198,7 @@ class Engine {
         //console.log(`${this.Color} Receive: ${Message}`);
         //this.IsThinking = false;
         if (this.MoveRightCount <= 0) {
-          console.warn(
+          console.error(
             `Engine ${this.Color} ID ${this.ID} claims too many moves.`,
           );
           return;
@@ -1206,6 +1207,7 @@ class Engine {
         if (EnginePlaysColor(this.Color)) {
           if (this.Ponder && this.PonderMiss) {
             this.PonderMiss = false;
+            return;
           } else {
             let bestmoveline = Message.trim().split(WhiteSpaceMatcher);
             if (bestmoveline[1] == "resign" || bestmoveline[2] == "resign") {
@@ -1221,10 +1223,6 @@ class Engine {
               this.SetMoveInUCIFormat(bestmoveline[1]);
               if (this.Move == undefined) {
                 this.Move = "0000";
-              } else {
-                if (!this.IsAnalysisEngine && !this.PonderMiss) {
-                  this.CommitMove();
-                }
               }
             }
             if (bestmoveline[2] == "draw") {
@@ -1237,6 +1235,22 @@ class Engine {
             }
             console.log(
               `${this.Color}: Move: ${this.Move} Ponder: ${this.PonderMove}`,
+            );
+            if (
+              this.Move != "0000" &&
+              !this.IsAnalysisEngine &&
+              !this.PonderMiss
+            ) {
+              this.CommitMove();
+            }
+          }
+        } else {
+          console.error(
+            `Engine ID ${this.ID} Color ${this.Color} makes a move when not in it's turn. If you are not during play in advanced time control mode, you can ignore this message as this can be caused by clicking <stop> or the game finishes. Otherwise this usually can be making a move before "ponderhit" when Ponder=true.`,
+          );
+          if (typeof this.OnErrorMessageCallBack == "function") {
+            this.OnErrorMessageCallBack(
+              `Error: Engine ${this.Color} makes a move when not in it's turn. This usually can be making a move before "ponderhit" when Ponder=true.`,
             );
           }
         }
@@ -1954,12 +1968,16 @@ class Engine {
     this.IsThinking = false;
     if (InterruptPondering || !IsAdvancedTimeControl) {
       this.PonderMove = "0000";
-      this.PonderMiss = false;
       this.PostMessage("stop");
+      this.PonderMiss = false;
     } else {
-      if (this.Ponder) {
-        //this.PonderMiss = false;
+      if (!this.Ponder) {
+        this.PonderMiss = false;
         this.PostMessage("stop");
+      } else if (this.Ponder && this.PonderMiss) {
+        this.PostMessage("stop");
+      } else {
+        this.IsThinking = true;
       }
     }
   }
@@ -1967,10 +1985,12 @@ class Engine {
   ForceStop() {
     this.PostMessage("stop");
     this.IsThinking = false;
+    this.PonderMiss = false;
   }
 
   StartThinking(
     CurrentPlayer,
+    IsInfinite,
     IsAdvancedTimeControl,
     IsPonder,
     IsPonderHit,
@@ -1986,6 +2006,7 @@ class Engine {
   ) {
     if (
       typeof CurrentPlayer != "string" ||
+      typeof IsInfinite != "boolean" ||
       typeof IsAdvancedTimeControl != "boolean" ||
       typeof IsPonder != "boolean" ||
       typeof IsPonderHit != "boolean" ||
@@ -2010,12 +2031,14 @@ class Engine {
     this.IsThinking = true;
     this.RecordedMultiplePrincipalVariation = 0;
     let CurrentPlayerColor = CurrentPlayer.toUpperCase();
-    if (this.IsAnalysisEngine) {
+    if (this.IsAnalysisEngine || IsInfinite) {
       this.PostMessage("go infinite");
     } else if (IsAdvancedTimeControl) {
       let cmd = "";
       if (IsPonderHit) {
-        cmd = "ponderhit";
+        //cmd = "ponderhit";
+        this.PostMessage("ponderhit");
+        return;
       } else {
         cmd = "go";
       }
@@ -2093,14 +2116,7 @@ class Engine {
 
   SetPonderMiss() {
     this.PonderMiss = true;
-    this.StopThinking(true, true);
-    let position = GetBoardPosition();
-    this.SetPosition(
-      position.fen,
-      position.moves,
-      GetBoardWidth(),
-      GetBoardHeight(),
-    );
+    this.StopThinking(false, true);
   }
 
   IsReady(IsReadyCallBack) {

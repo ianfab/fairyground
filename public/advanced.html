@@ -1999,7 +1999,7 @@
           } else {
             if (stm == "white") {
               if (fge.first_engine) {
-                if (fge.first_engine.Ponder) {
+                if (fge.first_engine.Ponder && advanced_time_control) {
                   if (
                     fge.first_engine.PonderMove != "0000" &&
                     fge.first_engine.PonderMove !=
@@ -2036,7 +2036,11 @@
                 }
               }
               if (fge.second_engine) {
-                if (fge.second_engine.Ponder) {
+                if (
+                  fge.second_engine.Ponder &&
+                  fge.second_engine.PonderMove != "0000" &&
+                  advanced_time_control
+                ) {
                   fge.second_engine.SetPosition(
                     fen,
                     moves + ` ${fge.second_engine.PonderMove}`,
@@ -2044,6 +2048,14 @@
                     fge.GetBoardHeight(),
                   );
                 } else {
+                  if (fge.second_engine.Ponder && fge.second_engine.IsUsing) {
+                    console.log(
+                      `%c Ponder %c WARNING %c BLACK makes no ponder move but Ponder=true`,
+                      "color: #fff; background: #5f5f5f",
+                      "color: #fff; background: #ffc83d",
+                      "",
+                    );
+                  }
                   fge.second_engine.SetPosition(
                     fen,
                     moves,
@@ -2054,7 +2066,7 @@
               }
             } else if (stm == "black") {
               if (fge.second_engine) {
-                if (fge.second_engine.Ponder) {
+                if (fge.second_engine.Ponder && advanced_time_control) {
                   if (
                     fge.second_engine.PonderMove != "0000" &&
                     fge.second_engine.PonderMove !=
@@ -2091,7 +2103,11 @@
                 }
               }
               if (fge.first_engine) {
-                if (fge.first_engine.Ponder) {
+                if (
+                  fge.first_engine.Ponder &&
+                  fge.first_engine.PonderMove != "0000" &&
+                  advanced_time_control
+                ) {
                   fge.first_engine.SetPosition(
                     fen,
                     moves + ` ${fge.first_engine.PonderMove}`,
@@ -2099,6 +2115,14 @@
                     fge.GetBoardHeight(),
                   );
                 } else {
+                  if (fge.first_engine.Ponder && fge.first_engine.IsUsing) {
+                    console.log(
+                      `%c Ponder %c WARNING %c WHITE makes no ponder move but Ponder=true`,
+                      "color: #fff; background: #5f5f5f",
+                      "color: #fff; background: #ffc83d",
+                      "",
+                    );
+                  }
                   fge.first_engine.SetPosition(
                     fen,
                     moves,
@@ -2119,7 +2143,28 @@
             (play_black && stm == "black") ||
             analysis_mode)
         ) {
-          setTimeout(go(), 10);
+          setTimeout(go(false, false), 10);
+        } else if (automatically_start_engine_thinking) {
+          if (fge.first_engine) {
+            if (
+              fge.first_engine.IsUsing &&
+              fge.first_engine.Ponder &&
+              stm != "undefined" &&
+              play_white
+            ) {
+              setTimeout(go(true, false), 10);
+            }
+          }
+          if (fge.second_engine) {
+            if (
+              fge.second_engine.IsUsing &&
+              fge.second_engine.Ponder &&
+              stm != "undefined" &&
+              play_black
+            ) {
+              setTimeout(go(false, true), 10);
+            }
+          }
         }
       };
 
@@ -2294,7 +2339,7 @@
         return listlength;
       };
 
-      const displayMove = (movenum, is_force_stop) => {
+      const displayMove = (movenum, is_force_stop, interrupt_pondering) => {
         if (
           $("#displayready").value.length > 0 &&
           $("#displayready").value > 0
@@ -2310,7 +2355,7 @@
           if (is_force_stop) {
             force_stop();
           } else {
-            stop(true);
+            stop(interrupt_pondering);
           }
           $("#displaymoves").value = $("#move").value;
           review_mode = false;
@@ -2322,7 +2367,7 @@
           if (is_force_stop) {
             force_stop();
           } else {
-            stop(true);
+            stop(interrupt_pondering);
           }
           if ($("#showmovediv").checked) {
             $("#showmovediv").click();
@@ -2393,7 +2438,7 @@
         if ($("#advtimectrl").checked == true) {
           $("#advtimectrl").click();
         }
-        displayMove($("#gotomovenum").value, true);
+        displayMove($("#gotomovenum").value, true, true);
       };
 
       const displayPreviousMove = () => {
@@ -2411,7 +2456,7 @@
         if ($("#advtimectrl").checked == true) {
           $("#advtimectrl").click();
         }
-        displayMove($("#gotomovenum").value, true);
+        displayMove($("#gotomovenum").value, true, true);
       };
 
       const displayInitialPosition = () => {
@@ -2419,13 +2464,13 @@
         if ($("#advtimectrl").checked == true) {
           $("#advtimectrl").click();
         }
-        displayMove(0, true);
+        displayMove(0, true, true);
       };
 
       const displayCurrentPosition = () => {
         $("#gotomovenum").value = totalMoveNumber();
         console.log(`Current: ${!during_play}`);
-        displayMove(-1, false);
+        displayMove(-1, false, false);
       };
 
       const displaySpecifiedPosition = () => {
@@ -2440,7 +2485,7 @@
         if ($("#advtimectrl").checked == true) {
           $("#advtimectrl").click();
         }
-        displayMove($("#gotomovenum").value, true);
+        displayMove($("#gotomovenum").value, true, true);
       };
 
       const reset = () => {
@@ -2481,7 +2526,10 @@
         setFen(true, false);
       };
 
-      const go = () => {
+      const go = (
+        white_engine_ponder_and_human_black,
+        black_engine_ponder_and_human_white,
+      ) => {
         if (board_setup_mode) {
           return;
         }
@@ -2503,6 +2551,8 @@
         let blackdepthv = parseInt($("#blackdepth").value);
         let blackmovetimev = parseInt($("#blackmovetime").value);
         let blacknodesv = parseInt($("#blacknodes").value);
+        let winf = false;
+        let binf = false;
         let wtime = 0;
         let btime = 0;
         let winc = 0;
@@ -2516,6 +2566,7 @@
           ) {
             args += "infinite";
             wargs += "infinite";
+            winf = true;
             console.log("wtime infinite");
           } else if (
             black_timer_type == "infinite" &&
@@ -2523,64 +2574,60 @@
           ) {
             args += "infinite";
             bargs += "infinite";
+            binf = true;
             console.log("btime infinite");
-          } else {
-            if (white_timer_type == "time per move") {
-              wtime += +white_moving_time_list[0].remaining_time;
-              winc += +white_moving_time_list[0].remaining_time;
-            } else if (white_timer_type == "tournament") {
-              wtime += +(+white_remaining_time);
-              winc += +white_time_gain;
-            } else if (white_timer_type == "hourglass") {
-              //How to tell that it's hourglass to engine?
-              wtime += +white_remaining_time;
-            } else if (white_timer_type == "byoyomi") {
-              wtime += +white_remaining_time;
-              if (
-                white_remaining_time < white_byoyomi_time_per_period &&
-                white_remaining_byoyomi_periods > 0
-              ) {
-                winc += +white_byoyomi_time_per_period;
-              }
-              if (
-                white_remaining_byoyomi_periods == white_byoyomi_period_count
-              ) {
-                wtime += +white_byoyomi_time_per_period;
-                winc = 0;
-              }
-            }
-            if (black_timer_type == "time per move") {
-              btime += +black_moving_time_list[0].remaining_time;
-              binc += +black_moving_time_list[0].remaining_time;
-            } else if (black_timer_type == "tournament") {
-              btime += +(+black_remaining_time);
-              binc = +black_time_gain;
-            } else if (black_timer_type == "hourglass") {
-              //How to tell that it's hourglass to engine?
-              btime += +black_remaining_time;
-            } else if (black_timer_type == "byoyomi") {
-              btime += +black_remaining_time;
-              if (
-                black_remaining_time < black_byoyomi_time_per_period &&
-                black_remaining_byoyomi_periods > 0
-              ) {
-                binc += +black_byoyomi_time_per_period;
-              }
-              if (
-                black_remaining_byoyomi_periods == black_byoyomi_period_count
-              ) {
-                btime += +black_byoyomi_time_per_period;
-                binc = 0;
-              }
-            }
-            console.log(
-              `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`,
-            );
-            args += `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`;
-            stockfish.postMessage(
-              `setoption name Move Overhead value ${timer_interval}`,
-            );
           }
+          if (white_timer_type == "time per move") {
+            wtime += +white_moving_time_list[0].remaining_time;
+            winc += +white_moving_time_list[0].remaining_time;
+          } else if (white_timer_type == "tournament") {
+            wtime += +(+white_remaining_time);
+            winc += +white_time_gain;
+          } else if (white_timer_type == "hourglass") {
+            //How to tell that it's hourglass to engine?
+            wtime += +white_remaining_time;
+          } else if (white_timer_type == "byoyomi") {
+            wtime += +white_remaining_time;
+            if (
+              white_remaining_time < white_byoyomi_time_per_period &&
+              white_remaining_byoyomi_periods > 0
+            ) {
+              winc += +white_byoyomi_time_per_period;
+            }
+            if (white_remaining_byoyomi_periods == white_byoyomi_period_count) {
+              wtime += +white_byoyomi_time_per_period;
+              winc = 0;
+            }
+          }
+          if (black_timer_type == "time per move") {
+            btime += +black_moving_time_list[0].remaining_time;
+            binc += +black_moving_time_list[0].remaining_time;
+          } else if (black_timer_type == "tournament") {
+            btime += +(+black_remaining_time);
+            binc = +black_time_gain;
+          } else if (black_timer_type == "hourglass") {
+            //How to tell that it's hourglass to engine?
+            btime += +black_remaining_time;
+          } else if (black_timer_type == "byoyomi") {
+            btime += +black_remaining_time;
+            if (
+              black_remaining_time < black_byoyomi_time_per_period &&
+              black_remaining_byoyomi_periods > 0
+            ) {
+              binc += +black_byoyomi_time_per_period;
+            }
+            if (black_remaining_byoyomi_periods == black_byoyomi_period_count) {
+              btime += +black_byoyomi_time_per_period;
+              binc = 0;
+            }
+          }
+          console.log(
+            `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`,
+          );
+          args += `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`;
+          stockfish.postMessage(
+            `setoption name Move Overhead value ${timer_interval}`,
+          );
         } else {
           if (!analysis_mode && $("#depth").validity.valid && depth > 0) {
             args += ` depth ${depth}`;
@@ -2658,6 +2705,7 @@
                 fge.analysis_engine.IsAnalysisEngine = true;
                 fge.analysis_engine.StartThinking(
                   stm,
+                  true,
                   false,
                   false,
                   false,
@@ -2688,6 +2736,7 @@
                 ) {
                   fge.first_engine.StartThinking(
                     stm,
+                    false,
                     true,
                     false,
                     true,
@@ -2713,6 +2762,7 @@
                   }
                   fge.first_engine.StartThinking(
                     stm,
+                    winf,
                     advanced_time_control,
                     false,
                     false,
@@ -2728,11 +2778,11 @@
                   );
                   //console.log("WHITE: go " + wargs);
                 }
-              } else {
+              } else if (!black_engine_ponder_and_human_white) {
                 output2 = "";
                 stockfish.postMessage(`go ${args}`);
               }
-            } else {
+            } else if (!black_engine_ponder_and_human_white) {
               output2 = "";
               stockfish.postMessage(`go ${args}`);
             }
@@ -2740,7 +2790,6 @@
               if (fge.second_engine.IsUsing) {
                 if (
                   advanced_time_control &&
-                  white_timer_type != "infinite" &&
                   fge.second_engine.Ponder &&
                   fge.second_engine.PonderMove != "0000"
                 ) {
@@ -2749,6 +2798,7 @@
                   }
                   fge.second_engine.StartThinking(
                     stm,
+                    false,
                     true,
                     true,
                     false,
@@ -2776,6 +2826,7 @@
                 ) {
                   fge.second_engine.StartThinking(
                     stm,
+                    false,
                     true,
                     false,
                     true,
@@ -2801,6 +2852,7 @@
                   }
                   fge.second_engine.StartThinking(
                     stm,
+                    binf,
                     advanced_time_control,
                     false,
                     false,
@@ -2816,11 +2868,11 @@
                   );
                   //console.log("BLACK: go " + bargs);
                 }
-              } else {
+              } else if (!white_engine_ponder_and_human_black) {
                 output2 = "";
                 stockfish.postMessage(`go ${args}`);
               }
-            } else {
+            } else if (!white_engine_ponder_and_human_black) {
               output2 = "";
               stockfish.postMessage(`go ${args}`);
             }
@@ -2828,7 +2880,6 @@
               if (fge.first_engine.IsUsing) {
                 if (
                   advanced_time_control &&
-                  black_timer_type != "infinite" &&
                   fge.first_engine.Ponder &&
                   fge.first_engine.PonderMove != "0000"
                 ) {
@@ -2837,6 +2888,7 @@
                   }
                   fge.first_engine.StartThinking(
                     stm,
+                    false,
                     true,
                     true,
                     false,
@@ -3285,7 +3337,7 @@
         );
         if ((play_white && stm == "white") || (play_black && stm == "black")) {
           console.log("Go!");
-          go();
+          go(false, false);
         }
       };
 
@@ -4232,7 +4284,7 @@
                     if (!review_mode) {
                       setFen(true, false);
                     }
-                    go();
+                    go(false, false);
                   }, 10);
                 },
               },
@@ -4410,29 +4462,39 @@
                   if (fge.first_engine) {
                     fge.first_engine.OutputUpdateCallBack = (color, msg) => {
                       first_engine_output += "◀◀ " + msg + "\n";
-                      document.getElementById("whiteengineoutput").innerText =
+                      document.getElementById("whiteengineoutput").textContent =
                         first_engine_output;
                       scrollOutput();
                     };
                     fge.first_engine.SendMessageCallBack = (msg) => {
                       first_engine_output += "\n▶▶ " + msg + "\n\n";
-                      document.getElementById("whiteengineoutput").innerText =
+                      document.getElementById("whiteengineoutput").textContent =
                         first_engine_output;
                       scrollOutput();
+                    };
+                    fge.first_engine.OnErrorMessageCallBack = (msg) => {
+                      if (during_play) {
+                        window.alert(msg);
+                      }
                     };
                   }
                   if (fge.second_engine) {
                     fge.second_engine.OutputUpdateCallBack = (color, msg) => {
                       second_engine_output += "◀◀ " + msg + "\n";
-                      document.getElementById("blackengineoutput").innerText =
+                      document.getElementById("blackengineoutput").textContent =
                         second_engine_output;
                       scrollOutput();
                     };
                     fge.second_engine.SendMessageCallBack = (msg) => {
                       second_engine_output += "\n▶▶ " + msg + "\n\n";
-                      document.getElementById("blackengineoutput").innerText =
+                      document.getElementById("blackengineoutput").textContent =
                         second_engine_output;
                       scrollOutput();
+                    };
+                    fge.second_engine.OnErrorMessageCallBack = (msg) => {
+                      if (during_play) {
+                        window.alert(msg);
+                      }
                     };
                   }
                   if (fge.analysis_engine) {
@@ -4440,7 +4502,7 @@
                       analysis_engine_output += "◀◀ " + msg + "\n";
                       document.getElementById(
                         "analysisengineoutput",
-                      ).innerText = analysis_engine_output;
+                      ).textContent = analysis_engine_output;
                       scrollOutput();
                     };
                     fge.analysis_engine.EvaluationUpdateCallBack = (msg) => {
@@ -4451,7 +4513,7 @@
                       analysis_engine_output += "\n▶▶ " + msg + "\n\n";
                       document.getElementById(
                         "analysisengineoutput",
-                      ).innerText = analysis_engine_output;
+                      ).textContent = analysis_engine_output;
                       scrollOutput();
                     };
                   }
