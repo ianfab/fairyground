@@ -665,19 +665,60 @@ function EnginePlaysColor(color) {
 
 window.fairyground.BinaryEngineFeature.EnginePlaysColor = EnginePlaysColor;
 
-function IsNullMove(ucimove) {
+function IsUCIMoveSyntaxCorrect(ucimove) {
   if (typeof ucimove != "string") {
-    throw TypeError();
+    return false;
   }
-  return (
-    ucimove == "0000" ||
-    ucimove == "(none)" ||
-    ucimove == "none" ||
-    ucimove == "null"
-  );
+  let move = ucimove;
+  if (ucimove.includes(",")) {
+    let index = ucimove.indexOf(",");
+    let gatingmove = move.slice(index + 1);
+    move = ucimove.slice(0, index);
+    if (!/^([a-z]{1}[0-9]+){2}$/.test(gatingmove)) {
+      return false;
+    }
+  }
+  if (ucimove.includes("@")) {
+    let parts = move.split("@");
+    if (parts.length > 2) {
+      return false;
+    }
+    let piecetype = parts[0];
+    let dest = parts[1];
+    if (/^\+?[A-Z]{1}$/.test(piecetype) && /^[a-z]{1}[0-9]+$/.test(dest)) {
+      if (piecetype.length == 2 && /[a-z+-]/.test(piecetype.charAt(0))) {
+        return true;
+      } else if (piecetype.length == 1) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+  let numbers = move.split(/[a-z]{1}/).filter((val) => {
+    return val != "";
+  });
+  let characters = move.split(/[0-9]+/).filter((val) => {
+    return val != "";
+  });
+  if (numbers.length != 2) {
+    return false;
+  }
+  if (characters.length < 2 || characters.length > 3) {
+    return false;
+  }
+  if (characters.length == 3 && /^([a-z]{1}[0-9]+){2}[a-z+-]{1}$/.test(move)) {
+    return true;
+  } else if (characters.length == 2 && /^([a-z]{1}[0-9]+){2}$/.test(move)) {
+    return true;
+  }
+  return false;
 }
 
-window.fairyground.BinaryEngineFeature.IsNullMove = IsNullMove;
+window.fairyground.BinaryEngineFeature.IsUCIMoveSyntaxCorrect =
+  IsUCIMoveSyntaxCorrect;
 
 function GetEngineID(color) {
   if (typeof color != "string") {
@@ -986,6 +1027,7 @@ class Engine {
     this.SetIDCallBack = undefined;
     this.EvaluationUpdateCallBack = undefined;
     this.OutputUpdateCallBack = undefined;
+    this.SendMessageCallBack = undefined;
     if (Color == "ANALYSIS") {
       this.IsAnalysisEngine = true;
     }
@@ -1176,10 +1218,10 @@ class Engine {
               }
             } else if (bestmoveline[1] == "win" || bestmoveline[1] == "lose") {
             } else {
-              if (IsNullMove(bestmoveline[1])) {
+              this.SetMoveInUCIFormat(bestmoveline[1]);
+              if (this.Move == undefined) {
                 this.Move = "0000";
               } else {
-                this.SetMoveInUCIFormat(bestmoveline[1]);
                 if (!this.IsAnalysisEngine && !this.PonderMiss) {
                   this.CommitMove();
                 }
@@ -1622,6 +1664,9 @@ class Engine {
     }
     //console.log(`Send ${this.Color}: ${Message}`);
     //console.log(Error());
+    if (typeof this.SendMessageCallBack == "function") {
+      this.SendMessageCallBack(Message);
+    }
     this.WebSocketConnection.send(
       `POST_MSG\x10${this.ID}\x10${this.Color}\x10${Message}`,
     );
@@ -1796,6 +1841,9 @@ class Engine {
     if (!this.IsUsing) {
       return;
     }
+    if (this.Move == "0000" || this.Move == undefined) {
+      return;
+    }
     console.log(`${this.Color}: Commit move: ${this.Move}`);
     if (EnginePlaysColor(this.Color)) {
       MakeMoveOnBoard(this.Move);
@@ -1810,7 +1858,11 @@ class Engine {
       throw TypeError();
     }
     if (this.Protocol == "UCI") {
-      this.Move = move;
+      if (IsUCIMoveSyntaxCorrect(move)) {
+        this.Move = move;
+      } else {
+        this.Move = null;
+      }
     } else if (this.Protocol == "USI") {
       this.Move = convertUSImovestoUCImoves(
         move,

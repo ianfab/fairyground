@@ -430,9 +430,10 @@
 
   #info {
     padding: 10px;
-    margin-left: 20px;
+    margin-left: 10px;
     font-size: 16px;
     height: 600px;
+    width: 800px;
   }
 
   #info #sannotation {
@@ -558,7 +559,7 @@
     border: 1px solid #ddd;
   }
 
-  #info #enginecmddiv #sendenginecmd {
+  #info #enginecmddiv button {
     display: inline-block;
     padding: 3px 6px 3px 6px;
     background: #888;
@@ -568,21 +569,21 @@
     cursor: pointer;
   }
 
-  #info #enginecmddiv #sendenginecmd:hover {
+  #info #enginecmddiv button:hover {
     background: #aaa;
   }
 
-  #info #enginecmddiv #sendenginecmd:disabled {
+  #info #enginecmddiv button:disabled {
     background: #ccc;
     color: #000;
   }
 
-  #info #enginecmddiv #sendenginecmd:active {
+  #info #enginecmddiv button:active {
     background: #000;
   }
 
   #info #enginecmddiv #targetengine {
-    width: 200px;
+    width: 150px;
     background: #eee;
   }
 
@@ -2166,7 +2167,7 @@
         }
         if (cmd[0] == "ponderhit") {
           window.alert(
-            "Cannot send this command: Fairyground does not allow engine pondering.",
+            "Cannot send this command: Engine ponder hit is only allowed to be sent by the GUI.",
           );
           return;
         }
@@ -2640,6 +2641,9 @@
         stockfish.postMessage(`isready`);
 
         const stm = $("#label-stm").innerText;
+        const clear_log = document.getElementById(
+          "clearlogonstartthinking",
+        ).checked;
         play_move =
           (play_white && stm == "white") ||
           (play_black && stm == "black") ||
@@ -2648,7 +2652,9 @@
           if (analysis_mode) {
             if (fge.analysis_engine) {
               if (fge.analysis_engine.IsUsing) {
-                analysis_engine_output = "";
+                if (clear_log) {
+                  analysis_engine_output = "";
+                }
                 fge.analysis_engine.IsAnalysisEngine = true;
                 fge.analysis_engine.StartThinking(
                   stm,
@@ -2702,7 +2708,9 @@
                     "",
                   );
                 } else {
-                  first_engine_output = "";
+                  if (clear_log) {
+                    first_engine_output = "";
+                  }
                   fge.first_engine.StartThinking(
                     stm,
                     advanced_time_control,
@@ -2736,7 +2744,9 @@
                   fge.second_engine.Ponder &&
                   fge.second_engine.PonderMove != "0000"
                 ) {
-                  second_engine_output = "";
+                  if (clear_log) {
+                    second_engine_output = "";
+                  }
                   fge.second_engine.StartThinking(
                     stm,
                     true,
@@ -2786,7 +2796,9 @@
                     "",
                   );
                 } else {
-                  second_engine_output = "";
+                  if (clear_log) {
+                    second_engine_output = "";
+                  }
                   fge.second_engine.StartThinking(
                     stm,
                     advanced_time_control,
@@ -2820,7 +2832,9 @@
                   fge.first_engine.Ponder &&
                   fge.first_engine.PonderMove != "0000"
                 ) {
-                  first_engine_output = "";
+                  if (clear_log) {
+                    first_engine_output = "";
+                  }
                   fge.first_engine.StartThinking(
                     stm,
                     true,
@@ -4395,7 +4409,13 @@
                 onclick: () => {
                   if (fge.first_engine) {
                     fge.first_engine.OutputUpdateCallBack = (color, msg) => {
-                      first_engine_output += msg + "\n";
+                      first_engine_output += "◀◀ " + msg + "\n";
+                      document.getElementById("whiteengineoutput").innerText =
+                        first_engine_output;
+                      scrollOutput();
+                    };
+                    fge.first_engine.SendMessageCallBack = (msg) => {
+                      first_engine_output += "\n▶▶ " + msg + "\n\n";
                       document.getElementById("whiteengineoutput").innerText =
                         first_engine_output;
                       scrollOutput();
@@ -4403,7 +4423,13 @@
                   }
                   if (fge.second_engine) {
                     fge.second_engine.OutputUpdateCallBack = (color, msg) => {
-                      second_engine_output += msg + "\n";
+                      second_engine_output += "◀◀ " + msg + "\n";
+                      document.getElementById("blackengineoutput").innerText =
+                        second_engine_output;
+                      scrollOutput();
+                    };
+                    fge.second_engine.SendMessageCallBack = (msg) => {
+                      second_engine_output += "\n▶▶ " + msg + "\n\n";
                       document.getElementById("blackengineoutput").innerText =
                         second_engine_output;
                       scrollOutput();
@@ -4411,7 +4437,7 @@
                   }
                   if (fge.analysis_engine) {
                     fge.analysis_engine.OutputUpdateCallBack = (color, msg) => {
-                      analysis_engine_output += msg + "\n";
+                      analysis_engine_output += "◀◀ " + msg + "\n";
                       document.getElementById(
                         "analysisengineoutput",
                       ).innerText = analysis_engine_output;
@@ -4420,6 +4446,13 @@
                     fge.analysis_engine.EvaluationUpdateCallBack = (msg) => {
                       document.getElementById("engineoutputline").value = msg;
                       document.getElementById("engineoutputline").click();
+                    };
+                    fge.analysis_engine.SendMessageCallBack = (msg) => {
+                      analysis_engine_output += "\n▶▶ " + msg + "\n\n";
+                      document.getElementById(
+                        "analysisengineoutput",
+                      ).innerText = analysis_engine_output;
+                      scrollOutput();
                     };
                   }
                   scrollOutput();
@@ -5032,9 +5065,21 @@
               m("p#label-pgn"),
               m("div#output2", { onupdate: scrollOutput }, [
                 m("pre#fsfoutput", output2),
-                m("pre#whiteengineoutput", { hidden: true }, ""),
-                m("pre#blackengineoutput", { hidden: true }, ""),
-                m("pre#analysisengineoutput", { hidden: true }, ""),
+                m(
+                  "pre#whiteengineoutput",
+                  { hidden: true },
+                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.",
+                ),
+                m(
+                  "pre#blackengineoutput",
+                  { hidden: true },
+                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.",
+                ),
+                m(
+                  "pre#analysisengineoutput",
+                  { hidden: true },
+                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.",
+                ),
               ]),
               m("div#enginecmddiv", [
                 m("input#enginecmd", {
@@ -5118,6 +5163,32 @@
                     },
                   },
                   "SEND",
+                ),
+                m(
+                  "label#label-clearlogonstartthinking",
+                  m("input[type=checkbox]#clearlogonstartthinking", {
+                    disabled: !is_ready,
+                  }),
+                  "Clear Log On Start Thinking",
+                ),
+                m(
+                  "button",
+                  {
+                    onclick: () => {
+                      first_engine_output = "";
+                      second_engine_output = "";
+                      analysis_engine_output = "";
+                      document.getElementById("whiteengineoutput").innerText =
+                        "";
+                      document.getElementById("blackengineoutput").innerText =
+                        "";
+                      document.getElementById(
+                        "analysisengineoutput",
+                      ).innerText = "";
+                      scrollOutput();
+                    },
+                  },
+                  "Clear Logs",
                 ),
               ]),
             ]),
