@@ -36,8 +36,12 @@ shoshogi|Shogi Variants|Sho Shogi|A new piece called Drunk Elephant is introduce
 
 xiangqi|Xiangqi Variants|Xiangqi|Chinese Chess, one of the oldest and most played board games in the world.
 manchu|Xiangqi Variants|Manchu Xiangqi|Xiangqi variant where one side has a chariot that can also move as a cannon or horse.
-janggi|Xiangqi Variants|Janggi|Korean Chess, similar to Xiangqi but plays much differently. Tournament rules are used.
 minixiangqi|Xiangqi Variants|Mini Xiangqi|Compact version of Xiangqi played on a 7x7 board without a river.
+
+janggi|Janggi Variants|Janggi|Korean Chess, similar to Xiangqi but plays much differently. Tournament rules are used.
+janggicasual|Janggi Variants|Janggi Casual|Korean Chess, similar to Xiangqi but plays much differently. Casual rules are used.
+janggimodern|Janggi Variants|Janggi Modern|Korean Chess, similar to Xiangqi but plays much differently. Modern rules are used.
+janggitraditional|Janggi Variants|Janggi Traditional|Korean Chess, similar to Xiangqi but plays much differently. Traditional rules are used.
 
 capablanca|Fairy Variants|Capablanca Chess|Play with the hybrid pieces, archbishop (B+N) and chancellor (R+N), on a 10x8 board.
 capahouse|Fairy Variants|Capablanca House|Capablanca with Crazyhouse drop rules.
