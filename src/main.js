@@ -1586,7 +1586,7 @@ new Module().then((loadedModule) => {
             showevalnum = multipvrecord[k][1].toFixed(2).toString();
           }
         }
-        pvinfostr += `Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5] > -1 ? multipvrecord[k][5] : "❓"} Max ${multipvrecord[k][6] > -1 ? multipvrecord[k][6] : "❓"}) ${showevalnum} → ${multipvrecord[k][4]}\n████████████████████\n`;
+        pvinfostr += `Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5] > -1 ? multipvrecord[k][5] : "❓"} Max ${multipvrecord[k][6] > -1 ? multipvrecord[k][6] : "❓"}) ${showevalnum} → ${multipvrecord[k][4]}\n\n`;
         depthlist.push(multipvrecord[k][5]);
         seldepthlist.push(multipvrecord[k][6]);
       }
