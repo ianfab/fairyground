@@ -73,11 +73,14 @@ This requires the computer that runs the server to install a SSH server and allo
 
 You will need to use SSH port forwarding to forward one of the open port on the computer that opens the browser to the port that the server listens on the computer that runs the server.
 
-For example, the server is running at http://192.168.1.10:5015 (which means IP: 192.168.1.10, Port: 5015), and an open port on the computer which runs the browser is 9999, then the command would be:
+For example, the server is running at http://192.168.1.10:5015 (which means IP: 192.168.1.10, Port: 5015), and the WebSocket Server will be launched at ws://192.168.1.10:5016 (which means IP: 192.168.1.10, Port: 5016, the port of WebSocket server will be port of HTTP +1), while 2 of the open ports on the computer which runs the browser are 9999 and 10000, then the command would be:
 
 ```
 ssh -g -f -N -L 9999:192.168.1.10:5015 192.168.1.10
+ssh -g -f -N -L 10000:192.168.1.10:5016 192.168.1.10
 ```
+
+You need to build two connections, 9999 for HTTP and 9999 + 1 = 10000 for WebSocket in order to make it work.
 
 Then browse to http://localhost:9999 and if you see \<Engine Management\> button it works.
 
