@@ -5022,82 +5022,124 @@
               ]),
             ]),
             m("div#info", [
-              m("select#sannotation", [
-                m("option", { value: "" }, "--Select Notation System--"),
-                m(
-                  "option",
-                  { value: "DEFAULT" },
-                  "Standard/Short Algebraic Notation Without Piece Type Omission (DEFAULT)",
-                ),
-                m(
-                  "option",
-                  { value: "SAN" },
-                  "Standard/Short Algebraic Notation (SAN)",
-                ),
-                m("option", { value: "LAN" }, "Long Algebraic Notation (LAN)"),
-                m(
-                  "option",
-                  { value: "SHOGI_HOSKING" },
-                  "Shogi Hosking Notation (SHOGI_HOSKING)",
-                ),
-                m(
-                  "option",
-                  { value: "SHOGI_HODGES" },
-                  "Shogi George Hodges Notation (SHOGI_HODGES)",
-                ),
-                m(
-                  "option",
-                  { value: "SHOGI_HODGES_NUMBER" },
-                  "Shogi George Hodges Number-only Notation (SHOGI_HODGES_NUMBER)",
-                ),
-                m("option", { value: "JANGGI" }, "Janggi Notation (JANGGI)"),
-                m(
-                  "option",
-                  { value: "XIANGQI_WXF" },
-                  "World Xiangqi Federation Notation (XIANGQI_WXF)",
-                ),
-                m(
-                  "option",
-                  { value: "THAI_SAN" },
-                  "Thai Standard/Short Algebraic Notation (THAI_SAN)",
-                ),
-                m(
-                  "option",
-                  { value: "THAI_LAN" },
-                  "Thai Long Algebraic Notation (THAI_LAN)",
-                ),
-                m(
-                  "option",
-                  { value: "FEN" },
-                  "Forsyth–Edwards Notation (Fairy-Stockfish) (FEN)",
-                ),
-                m("option", { value: "PGN" }, "Portable Game Notation (PGN)"),
-                m(
-                  "option",
-                  { value: "EPD" },
-                  "Extended Position Description (EPD)",
-                ),
-                m(
-                  "option",
-                  { value: "FEN+UCIMOVE" },
-                  "Forsyth–Edwards Notation (Fairy-Stockfish) and UCI Moves (FEN+UCIMOVE)",
-                ),
-                m(
-                  "option",
-                  { value: "FEN+USIMOVE" },
-                  "Forsyth–Edwards Notation (Fairy-Stockfish) and USI Moves (FEN+USIMOVE)",
-                ),
-                m(
-                  "option",
-                  { value: "FEN+UCCIMOVE" },
-                  "Forsyth–Edwards Notation (Fairy-Stockfish) and UCCI (CECP) Moves (FEN+UCCIMOVE)",
-                ),
-                m(
-                  "option",
-                  { value: "SFEN+USIMOVE" },
-                  "Shogi Forsyth–Edwards Notation and USI Moves (SFEN+USIMOVE)",
-                ),
-              ]),
+              m(
+                "select#sannotation",
+                {
+                  onchange: () => {
+                    const dropdownnotation =
+                      document.getElementById("sannotation");
+                    const evalbar = document.getElementById("evalbar");
+                    const evalbarprogress =
+                      document.getElementById("evalbarprogress");
+                    const cp = document.getElementById("cp");
+                    if (dropdownnotation.selectedIndex < 0) {
+                      evalbar.style.backgroundColor = "#111111";
+                      evalbarprogress.style.backgroundColor = "#eeeeee";
+                      cp.style.color = "orange";
+                      return;
+                    }
+                    const value =
+                      dropdownnotation[dropdownnotation.selectedIndex].value;
+                    if (/xiangqi|ucci/i.test(value)) {
+                      evalbar.style.backgroundColor = "black";
+                      evalbarprogress.style.backgroundColor = "red";
+                      cp.style.color = "white";
+                    } else if (/shogi|usi/i.test(value)) {
+                      evalbar.style.backgroundColor = "#eeeeee";
+                      evalbarprogress.style.backgroundColor = "#111111";
+                      cp.style.color = "orange";
+                    } else if (/janggi/i.test(value)) {
+                      evalbar.style.backgroundColor = "red";
+                      evalbarprogress.style.backgroundColor = "blue";
+                      cp.style.color = "white";
+                    } else {
+                      evalbar.style.backgroundColor = "#111111";
+                      evalbarprogress.style.backgroundColor = "#eeeeee";
+                      cp.style.color = "orange";
+                    }
+                  },
+                },
+                [
+                  m("option", { value: "" }, "--Select Notation System--"),
+                  m(
+                    "option",
+                    { value: "DEFAULT" },
+                    "Standard/Short Algebraic Notation Without Piece Type Omission (DEFAULT)",
+                  ),
+                  m(
+                    "option",
+                    { value: "SAN" },
+                    "Standard/Short Algebraic Notation (SAN)",
+                  ),
+                  m(
+                    "option",
+                    { value: "LAN" },
+                    "Long Algebraic Notation (LAN)",
+                  ),
+                  m(
+                    "option",
+                    { value: "SHOGI_HOSKING" },
+                    "Shogi Hosking Notation (SHOGI_HOSKING)",
+                  ),
+                  m(
+                    "option",
+                    { value: "SHOGI_HODGES" },
+                    "Shogi George Hodges Notation (SHOGI_HODGES)",
+                  ),
+                  m(
+                    "option",
+                    { value: "SHOGI_HODGES_NUMBER" },
+                    "Shogi George Hodges Number-only Notation (SHOGI_HODGES_NUMBER)",
+                  ),
+                  m("option", { value: "JANGGI" }, "Janggi Notation (JANGGI)"),
+                  m(
+                    "option",
+                    { value: "XIANGQI_WXF" },
+                    "World Xiangqi Federation Notation (XIANGQI_WXF)",
+                  ),
+                  m(
+                    "option",
+                    { value: "THAI_SAN" },
+                    "Thai Standard/Short Algebraic Notation (THAI_SAN)",
+                  ),
+                  m(
+                    "option",
+                    { value: "THAI_LAN" },
+                    "Thai Long Algebraic Notation (THAI_LAN)",
+                  ),
+                  m(
+                    "option",
+                    { value: "FEN" },
+                    "Forsyth–Edwards Notation (Fairy-Stockfish) (FEN)",
+                  ),
+                  m("option", { value: "PGN" }, "Portable Game Notation (PGN)"),
+                  m(
+                    "option",
+                    { value: "EPD" },
+                    "Extended Position Description (EPD)",
+                  ),
+                  m(
+                    "option",
+                    { value: "FEN+UCIMOVE" },
+                    "Forsyth–Edwards Notation (Fairy-Stockfish) and UCI Moves (FEN+UCIMOVE)",
+                  ),
+                  m(
+                    "option",
+                    { value: "FEN+USIMOVE" },
+                    "Forsyth–Edwards Notation (Fairy-Stockfish) and USI Moves (FEN+USIMOVE)",
+                  ),
+                  m(
+                    "option",
+                    { value: "FEN+UCCIMOVE" },
+                    "Forsyth–Edwards Notation (Fairy-Stockfish) and UCCI (CECP) Moves (FEN+UCCIMOVE)",
+                  ),
+                  m(
+                    "option",
+                    { value: "SFEN+USIMOVE" },
+                    "Shogi Forsyth–Edwards Notation and USI Moves (SFEN+USIMOVE)",
+                  ),
+                ],
+              ),
               m("p#positioninfo", ""),
               m("div#timers", { hidden: !advanced_time_control }, [
                 m("div#whitetimer", [
