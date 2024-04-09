@@ -82,7 +82,7 @@ ssh -g -f -N -L 10000:192.168.1.10:5016 192.168.1.10
 
 You need to build two connections, 9999 for HTTP and 9999 + 1 = 10000 for WebSocket in order to make it work.
 
-Then browse to http://localhost:9999 and if you see \<Engine Management\> button it works. Note that all the paths are paths <u><strong>on the server</strong></u>, <u><strong>NOT</strong></u> the path on the computer that runs the browser. The binary executables of the engines need to be placed at respective paths <u><strong>on the server</strong></u>.
+Then browse to http://localhost:9999 and if you see \<Engine Management\> button it works. Note that all the paths are paths <i><strong>on the server</strong></i>, <i><strong>NOT</strong></i> the path on the computer that runs the browser. The binary executables of the engines need to be placed at respective paths <i><strong>on the server</strong></i>.
 
 ## Make A Release
 
