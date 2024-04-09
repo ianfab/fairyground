@@ -1288,6 +1288,9 @@
       if (typeof FileReader === "undefined") {
         return false;
       }
+      if (typeof WebSocket === "undefined") {
+        return false;
+      }
       return true;
     };
 
