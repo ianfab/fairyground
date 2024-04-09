@@ -1246,11 +1246,11 @@ class Engine {
           }
         } else {
           console.error(
-            `Engine ID ${this.ID} Color ${this.Color} makes a move when not in it's turn. If you are not during play in advanced time control mode, you can ignore this message as this can be caused by clicking <stop> or the game finishes. Otherwise this usually can be making a move before "ponderhit" when Ponder=true.`,
+            `Engine ID ${this.ID} Color ${this.Color} makes a move when not in it's turn. If you are not during play in advanced time control mode, you can ignore this message as this can be caused by clicking <stop> or the game finishes/aborts. Otherwise this usually can be making a move before "ponderhit" when Ponder=true.`,
           );
           if (typeof this.OnErrorMessageCallBack == "function") {
             this.OnErrorMessageCallBack(
-              `Error: Engine ${this.Color} makes a move when not in it's turn. This usually can be making a move before "ponderhit" when Ponder=true.`,
+              `Error: Engine ID ${this.ID} Color ${this.Color} makes a move when not in it's turn. This usually can be making a move before "ponderhit" when Ponder=true.`,
             );
           }
         }

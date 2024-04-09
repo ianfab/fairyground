@@ -433,7 +433,6 @@
     margin-left: 10px;
     font-size: 16px;
     height: 600px;
-    width: 800px;
   }
 
   #info #sannotation {
@@ -1214,6 +1213,19 @@
       return Array.from(newArr);
     }
 
+    //Throttle function, used to prevent lag when operating DOM objects.
+    function Throttle(func, wait) {
+      let timer = null;
+      return function () {
+        if (!timer) {
+          timer = setTimeout(() => {
+            func.apply(this, arguments);
+            timer = null;
+          }, wait);
+        }
+      };
+    }
+
     function getFileFromServer(url, doneCallback, errorCallback) {
       var xhr;
       function handleStateChange() {
@@ -1728,6 +1740,8 @@
       let previous_mover = "";
       let move_finish_timer_updating = false;
       let changing_variant_type = false;
+      let clear_log = true;
+      let throttle_threshold = 400; //in milliseconds, increase this if the GUI lags
       let timer;
 
       let variants = [];
@@ -2545,6 +2559,11 @@
         const threadnum = $("#threads").value;
         const hashsize = $("#hash").value;
         const multipleprincipalvariation = $("#multipv").value;
+        const whiteengineoutput = document.getElementById("whiteengineoutput");
+        const blackengineoutput = document.getElementById("blackengineoutput");
+        const analysisengineoutput = document.getElementById(
+          "analysisengineoutput",
+        );
         let whitedepthv = parseInt($("#whitedepth").value);
         let whitemovetimev = parseInt($("#whitemovetime").value);
         let whitenodesv = parseInt($("#whitenodes").value);
@@ -2688,9 +2707,6 @@
         stockfish.postMessage(`isready`);
 
         const stm = $("#label-stm").innerText;
-        const clear_log = document.getElementById(
-          "clearlogonstartthinking",
-        ).checked;
         play_move =
           (play_white && stm == "white") ||
           (play_black && stm == "black") ||
@@ -2700,6 +2716,7 @@
             if (fge.analysis_engine) {
               if (fge.analysis_engine.IsUsing) {
                 if (clear_log) {
+                  analysisengineoutput.textContent = "";
                   analysis_engine_output = "";
                 }
                 fge.analysis_engine.IsAnalysisEngine = true;
@@ -2758,6 +2775,7 @@
                   );
                 } else {
                   if (clear_log) {
+                    whiteengineoutput.textContent = "";
                     first_engine_output = "";
                   }
                   fge.first_engine.StartThinking(
@@ -2794,6 +2812,7 @@
                   fge.second_engine.PonderMove != "0000"
                 ) {
                   if (clear_log) {
+                    blackengineoutput.textContent = "";
                     second_engine_output = "";
                   }
                   fge.second_engine.StartThinking(
@@ -2848,6 +2867,7 @@
                   );
                 } else {
                   if (clear_log) {
+                    blackengineoutput.textContent = "";
                     second_engine_output = "";
                   }
                   fge.second_engine.StartThinking(
@@ -2884,6 +2904,7 @@
                   fge.first_engine.PonderMove != "0000"
                 ) {
                   if (clear_log) {
+                    whiteengineoutput.textContent = "";
                     first_engine_output = "";
                   }
                   fge.first_engine.StartThinking(
@@ -4460,17 +4481,20 @@
                 hidden: true,
                 onclick: () => {
                   if (fge.first_engine) {
+                    const OutputUpdateThrottleFunction = Throttle(() => {
+                      document.getElementById(
+                        "whiteengineoutput",
+                      ).textContent += first_engine_output;
+                      first_engine_output = "";
+                      scrollOutput();
+                    }, throttle_threshold);
                     fge.first_engine.OutputUpdateCallBack = (color, msg) => {
                       first_engine_output += "◀◀ " + msg + "\n";
-                      document.getElementById("whiteengineoutput").textContent =
-                        first_engine_output;
-                      scrollOutput();
+                      OutputUpdateThrottleFunction();
                     };
                     fge.first_engine.SendMessageCallBack = (msg) => {
                       first_engine_output += "\n▶▶ " + msg + "\n\n";
-                      document.getElementById("whiteengineoutput").textContent =
-                        first_engine_output;
-                      scrollOutput();
+                      OutputUpdateThrottleFunction();
                     };
                     fge.first_engine.OnErrorMessageCallBack = (msg) => {
                       if (during_play) {
@@ -4479,17 +4503,20 @@
                     };
                   }
                   if (fge.second_engine) {
+                    const OutputUpdateThrottleFunction = Throttle(() => {
+                      document.getElementById(
+                        "blackengineoutput",
+                      ).textContent += second_engine_output;
+                      second_engine_output = "";
+                      scrollOutput();
+                    }, throttle_threshold);
                     fge.second_engine.OutputUpdateCallBack = (color, msg) => {
                       second_engine_output += "◀◀ " + msg + "\n";
-                      document.getElementById("blackengineoutput").textContent =
-                        second_engine_output;
-                      scrollOutput();
+                      OutputUpdateThrottleFunction();
                     };
                     fge.second_engine.SendMessageCallBack = (msg) => {
                       second_engine_output += "\n▶▶ " + msg + "\n\n";
-                      document.getElementById("blackengineoutput").textContent =
-                        second_engine_output;
-                      scrollOutput();
+                      OutputUpdateThrottleFunction();
                     };
                     fge.second_engine.OnErrorMessageCallBack = (msg) => {
                       if (during_play) {
@@ -4498,12 +4525,16 @@
                     };
                   }
                   if (fge.analysis_engine) {
-                    fge.analysis_engine.OutputUpdateCallBack = (color, msg) => {
-                      analysis_engine_output += "◀◀ " + msg + "\n";
+                    const OutputUpdateThrottleFunction = Throttle(() => {
                       document.getElementById(
                         "analysisengineoutput",
-                      ).textContent = analysis_engine_output;
+                      ).textContent += analysis_engine_output;
+                      analysis_engine_output = "";
                       scrollOutput();
+                    }, throttle_threshold);
+                    fge.analysis_engine.OutputUpdateCallBack = (color, msg) => {
+                      analysis_engine_output += "◀◀ " + msg + "\n";
+                      OutputUpdateThrottleFunction();
                     };
                     fge.analysis_engine.EvaluationUpdateCallBack = (msg) => {
                       document.getElementById("engineoutputline").value = msg;
@@ -4511,10 +4542,7 @@
                     };
                     fge.analysis_engine.SendMessageCallBack = (msg) => {
                       analysis_engine_output += "\n▶▶ " + msg + "\n\n";
-                      document.getElementById(
-                        "analysisengineoutput",
-                      ).textContent = analysis_engine_output;
-                      scrollOutput();
+                      OutputUpdateThrottleFunction();
                     };
                   }
                   scrollOutput();
@@ -5130,17 +5158,17 @@
                 m(
                   "pre#whiteengineoutput",
                   { hidden: true },
-                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.",
+                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.\n\n",
                 ),
                 m(
                   "pre#blackengineoutput",
                   { hidden: true },
-                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.",
+                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.\n\n",
                 ),
                 m(
                   "pre#analysisengineoutput",
                   { hidden: true },
-                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.",
+                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.\n\n",
                 ),
               ]),
               m("div#enginecmddiv", [
@@ -5230,6 +5258,10 @@
                   "label#label-clearlogonstartthinking",
                   m("input[type=checkbox]#clearlogonstartthinking", {
                     disabled: !is_ready,
+                    checked: clear_log,
+                    onclick: () => {
+                      clear_log = !clear_log;
+                    },
                   }),
                   "Clear Log On Start Thinking",
                 ),
@@ -5240,13 +5272,13 @@
                       first_engine_output = "";
                       second_engine_output = "";
                       analysis_engine_output = "";
-                      document.getElementById("whiteengineoutput").innerText =
+                      document.getElementById("whiteengineoutput").textContent =
                         "";
-                      document.getElementById("blackengineoutput").innerText =
+                      document.getElementById("blackengineoutput").textContent =
                         "";
                       document.getElementById(
                         "analysisengineoutput",
-                      ).innerText = "";
+                      ).textContent = "";
                       scrollOutput();
                     },
                   },
