@@ -69,11 +69,15 @@ Older browsers like Internet Explorer of any version are not supported.
 
 ## Run Engines Remotely
 
-This requires the computer that runs the server to install a SSH server and allows port forwarding.
+The definition of the terms used in this section:
+*__Server__*: The computer that runs the fairyground server (a console application) and the binary engines.
+*__Client__*: The computer that runs the browser and the UI (a graphical user interface, GUI).
 
-You will need to use SSH port forwarding to forward one of the open port on the computer that opens the browser to the port that the server listens on the computer that runs the server.
+You will need to use port forwarding (local forwarding) to forward one of the open port on the client to the port that the server listens. Any software that provides port forwarding is OK. In this guide we use SSH as the tool for instance.
 
-For example, the server is running at http://192.168.1.10:5015 (which means IP: 192.168.1.10, Port: 5015), and the WebSocket Server will be launched at ws://192.168.1.10:5016 (which means IP: 192.168.1.10, Port: 5016, the port of WebSocket server will be port of HTTP +1), while 2 of the open ports on the computer which runs the browser are 9999 and 10000, then the command would be:
+This requires the server to install a SSH server and allows port forwarding. If the server runs Windows, You can install [OpenSSH For Windows](https://github.com/PowerShell/Win32-OpenSSH/releases).
+
+For example, the server is running at http://192.168.1.10:5015 (which means IP: 192.168.1.10, Port: 5015), and then the WebSocket Server will be launched at ws://192.168.1.10:5016 (which means IP: 192.168.1.10, Port: 5016, the port of WebSocket server will be port of HTTP +1), while 2 of the open ports on the client are 9999 and 10000, then the command would be:
 
 ```
 ssh -g -f -N -L 9999:192.168.1.10:5015 192.168.1.10
@@ -82,7 +86,7 @@ ssh -g -f -N -L 10000:192.168.1.10:5016 192.168.1.10
 
 You need to build two connections, 9999 for HTTP and 9999 + 1 = 10000 for WebSocket in order to make it work.
 
-Then browse to http://localhost:9999 and if you see \<Engine Management\> button it works. Note that all the paths are paths <i><strong>on the server</strong></i>, <i><strong>NOT</strong></i> the path on the computer that runs the browser. The binary executables of the engines need to be placed at respective paths <i><strong>on the server</strong></i>.
+Then browse to http://localhost:9999 on the client and if you see \<Engine Management\> button it works. Note that all the paths are paths *__on the server__*, *__NOT__* the path on the computer that runs the browser. The binary executables of the engines need to be placed at respective paths *__on the server__*.
 
 ## Make A Release
 
