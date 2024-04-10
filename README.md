@@ -70,7 +70,9 @@ Older browsers like Internet Explorer of any version are not supported.
 ## Run Engines Remotely
 
 The definition of the terms used in this section:
+
 *__Server__*: The computer that runs the fairyground server (a console application) and the binary engines.
+
 *__Client__*: The computer that runs the browser and the UI (a graphical user interface, GUI).
 
 You will need to use port forwarding (local forwarding) to forward one of the open port on the client to the port that the server listens. Any software that provides port forwarding is OK. In this guide we use SSH as the tool for instance.
