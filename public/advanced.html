@@ -1935,7 +1935,11 @@
         play_move = false;
         stop(true);
         const variant = $("#dropdown-variant").value;
-        stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
+        if (variant == "") {
+          stockfish.postMessage(`setoption name UCI_Variant value chess`);
+        } else {
+          stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
+        }
         stockfish.postMessage(`position startpos`);
         if (fge.WebSocketStatus == "CONNECTED") {
           if (fge.first_engine) {
