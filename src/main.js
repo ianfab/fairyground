@@ -11,6 +11,8 @@ const checkboxDests = document.getElementById("check-dests");
 const checkboxAdjudicate = document.getElementById("check-adjudicate");
 const textFen = document.getElementById("fen");
 const textMoves = document.getElementById("move");
+const buttonSetFen = document.getElementById("setpos");
+const buttonStop = document.getElementById("stop");
 const pSetFen = document.getElementById("set");
 const labelPgn = document.getElementById("label-pgn");
 const labelStm = document.getElementById("label-stm");
@@ -90,6 +92,7 @@ const haspiecechange = document.getElementById("haspiecechange");
 const buttonmakemove = document.getElementById("makemove");
 const buttonhighlightmove = document.getElementById("highlightmove");
 const searchresultinfo = document.getElementById("searchresultinfo");
+const dropdownNotationSystem = document.getElementById("sannotation");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
@@ -461,6 +464,9 @@ function getWallSquarePosition() {
 function parseUCIMove(ucimove) {
   if (typeof ucimove != "string") {
     throw TypeError;
+  }
+  if (ucimove == "0000" || ucimove == "") {
+    return [undefined, undefined, undefined, undefined];
   }
   let move = ucimove;
   let gatingmove = "";
@@ -843,6 +849,233 @@ function highlightMoveOnBoard(move) {
   chessground.setAutoShapes(autoshapes);
 }
 
+function getNotation(notation, variant, startfen, is960, ucimovestr) {
+  if (
+    typeof notation != "string" ||
+    typeof variant != "string" ||
+    typeof startfen != "string" ||
+    typeof is960 != "boolean" ||
+    typeof ucimovestr != "string"
+  ) {
+    throw TypeError();
+  }
+  if (notation == "") {
+    return "(Missing notaion system, please select one in the dropdown...)";
+  }
+  if (ffish) {
+    if (window.fairyground) {
+      if (window.fairyground.BinaryEngineFeature) {
+        const fge = window.fairyground.BinaryEngineFeature;
+        const variants = ffish.variants().split(" ");
+        let ucimoves = ucimovestr.trim();
+        if (variants.includes(variant)) {
+          if (ffish.validateFen(startfen, variant, is960) >= 0) {
+            let tmpboard = new ffish.Board(variant, startfen, is960);
+            let moveslist = ucimoves.split(/[ ]+/).reverse();
+            let result = "";
+            if (moveslist.length == 1 && moveslist[0] == "") {
+            } else {
+              while (moveslist.length > 0) {
+                if (!tmpboard.push(moveslist.pop())) {
+                  return null;
+                }
+              }
+            }
+            if (notation == "DEFAULT") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(ucimoves, ffish.Notation.DEFAULT);
+            } else if (notation == "SAN") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(ucimoves, ffish.Notation.SAN);
+            } else if (notation == "LAN") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(ucimoves, ffish.Notation.LAN);
+            } else if (notation == "SHOGI_HOSKING") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(
+                ucimoves,
+                ffish.Notation.SHOGI_HOSKING,
+              );
+            } else if (notation == "SHOGI_HODGES") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(
+                ucimoves,
+                ffish.Notation.SHOGI_HODGES,
+              );
+            } else if (notation == "SHOGI_HODGES_NUMBER") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(
+                ucimoves,
+                ffish.Notation.SHOGI_HODGES_NUMBER,
+              );
+            } else if (notation == "JANGGI") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(ucimoves, ffish.Notation.JANGGI);
+            } else if (notation == "XIANGQI_WXF") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(
+                ucimoves,
+                ffish.Notation.XIANGQI_WXF,
+              );
+            } else if (notation == "THAI_SAN") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(ucimoves, ffish.Notation.THAI_SAN);
+            } else if (notation == "THAI_LAN") {
+              tmpboard.setFen(startfen);
+              return tmpboard.variationSan(ucimoves, ffish.Notation.THAI_LAN);
+            } else if (notation == "FEN") {
+              return tmpboard.fen();
+            } else if (notation == "PGN") {
+              const gameresult = tmpboard.result();
+              tmpboard.setFen(startfen);
+              const today = new Date();
+              const year = today.getFullYear();
+              const month = today.getMonth() + 1;
+              const day = today.getDate();
+              const hours = today.getHours();
+              const minutes = today.getMinutes();
+              const seconds = today.getSeconds();
+              let whitename = "";
+              let blackname = "";
+              if (playWhite.checked) {
+                if (fge.first_engine) {
+                  whitename = fge.first_engine.Name;
+                } else {
+                  whitename = "In browser Fairy-Stockfish";
+                }
+              } else {
+                whitename = "Human Player";
+              }
+              if (playBlack.checked) {
+                if (fge.second_engine) {
+                  blackname = fge.second_engine.Name;
+                } else {
+                  blackname = "In browser Fairy-Stockfish";
+                }
+              } else {
+                blackname = "Human Player";
+              }
+              result = `[Event "Fairy-Stockfish Playground match"]\n[Site "${window.location.host}"]\n[Date "${year.toString() + "." + month.toString() + "." + day.toString()}"]\n`;
+              result += `[Round "1"]\n[White "${whitename}"]\n[Black "${blackname}"]\n`;
+              result += `[FEN "${startfen}"]\n[Result "${gameresult}"]\n[Variant "${tmpboard.variant()}"]\n\n`;
+              result += tmpboard.variationSan(ucimoves, ffish.Notation.SAN);
+              return result;
+            } else if (notation == "EPD") {
+              const gamefen = tmpboard.fen().split(/[ ]+/);
+              result = `${gamefen[0]} ${gamefen[1]} ${gamefen[2]} ${gamefen[3]}`;
+              result += ` acd 0;`;
+              result += ` acn 0;`;
+              result += ` acs 0;`;
+              result += ` am 0000;`;
+              result += ` bm 0000;`;
+              result += ` ce 0.0;`;
+              result += ` dm 0;`;
+              result += ` draw_accept "null";`;
+              result += ` draw_claim "null";`;
+              result += ` draw_reject "null";`;
+              result += ` eco "null";`;
+              if (gamefen.length == 6) {
+                result += ` fmvn ${gamefen[5]};`;
+                result += ` hmvc ${gamefen[4]};`;
+              } else if (gamefen.length == 7) {
+                result += ` fmvn ${gamefen[6]};`;
+                result += ` hmvc ${gamefen[5]};`;
+              } else {
+                result += ` fmvn 0;`;
+                result += ` hmvc 0;`;
+              }
+              result += ` id "Fairy-Stockfish Playground match";`;
+              result += ` nic "null";`;
+              result += ` pm 0000;`;
+              result += ` pv 0;`;
+              result += ` rc 0;`;
+              result += ` resign "null";`;
+              result += ` sm 0000;`;
+              result += ` tcgs "null";`;
+              result += ` tcri "null";`;
+              result += ` tcsi "null";`;
+              result += ` v0 "null";`;
+              result += ` variant "${tmpboard.variant()}";`;
+              return result;
+            } else if (notation == "FEN+UCIMOVE") {
+              tmpboard.setFen(startfen);
+              return tmpboard.fen() + "|" + ucimoves;
+            } else if (notation == "FEN+USIMOVE") {
+              tmpboard.setFen(startfen);
+              let dimensions = getDimensions();
+              const convertedmoves = fge.convertUCImovestoUSImoves(
+                ucimoves,
+                dimensions.width,
+                dimensions.height,
+              );
+              if (convertedmoves != null) {
+                return tmpboard.fen() + "|" + convertedmoves;
+              } else {
+                return (
+                  tmpboard.fen() +
+                  "|(There are moves that cannot be displayed in USI moves, such as pawn promotion or seirawan gating)"
+                );
+              }
+            } else if (notation == "FEN+UCCIMOVE") {
+              tmpboard.setFen(startfen);
+              let dimensions = getDimensions();
+              const convertedmoves = fge.convertUCImovestoUCCImoves(
+                ucimoves,
+                dimensions.width,
+                dimensions.height,
+              );
+              if (convertedmoves != null) {
+                return tmpboard.fen() + "|" + convertedmoves;
+              } else {
+                return (
+                  tmpboard.fen() +
+                  "|(There are moves that cannot be displayed in UCCI moves, such as pawn promotion or seirawan gating)"
+                );
+              }
+            } else if (notation == "SFEN+USIMOVE") {
+              tmpboard.setFen(startfen);
+              let dimensions = getDimensions();
+              const convertedmoves = fge.convertUCImovestoUSImoves(
+                ucimoves,
+                dimensions.width,
+                dimensions.height,
+              );
+              if (convertedmoves != null) {
+                return (
+                  fge.ConvertFENtoSFEN(tmpboard.fen()) +
+                  "|" +
+                  fge.convertUCImovestoUSImoves(
+                    ucimoves,
+                    dimensions.width,
+                    dimensions.height,
+                  )
+                );
+              } else {
+                return (
+                  fge.ConvertFENtoSFEN(tmpboard.fen()) +
+                  "|(There are moves that cannot be displayed in USI moves, such as pawn promotion or seirawan gating)"
+                );
+              }
+            }
+          } else {
+            return "Illegal FEN";
+          }
+        } else {
+          return null;
+        }
+      } else {
+        throw Error(
+          "Namespace window.fairyground.BinaryEngineFeature does not exist",
+        );
+      }
+    } else {
+      throw Error("Namespace window.fairyground does not exist");
+    }
+  } else {
+    throw Error("ffish.js is not initialized!!!");
+  }
+}
+
 function getDimensions() {
   const fenBoard = board.fen().split(" ")[0];
   const ranks = fenBoard.split("/").length;
@@ -909,12 +1142,6 @@ new Module().then((loadedModule) => {
     let play_white = playWhite.checked;
     let play_black = playBlack.checked;
     buttonCurrentPosition.click();
-    if (play_white) {
-      playWhite.click();
-    }
-    if (play_black) {
-      playBlack.click();
-    }
 
     updateChessground();
     initializeThemes.click();
@@ -961,18 +1188,31 @@ new Module().then((loadedModule) => {
     const fen = textFen.value;
     console.log(ffish.validateFen(fen, board.variant()));
 
-    if (!fen || ffish.validateFen(fen, board.variant())) {
+    if (!fen || ffish.validateFen(fen, board.variant()) >= 0) {
       if (fen) board.setFen(fen);
       else board.reset();
       const moves = textMoves.value.trim().split(" ").reverse();
+      let move = "";
 
       while (moves.length > 0) {
-        board.push(moves.pop());
+        move = moves.pop();
+        if (move == "") {
+          continue;
+        }
+        if (!board.push(move)) {
+          buttonStop.click();
+          textMoves.value = textMoves.value
+            .trim()
+            .split(/[ ]+/)
+            .slice(0, -1)
+            .join(" ");
+          window.alert(`Invalid move: ${move}`);
+        }
       }
 
       updateChessground();
     } else {
-      alert("Invalid FEN");
+      window.alert("Invalid FEN");
     }
     recordedmultipv = 1;
   };
@@ -1082,6 +1322,7 @@ new Module().then((loadedModule) => {
     }
     if (validateFEN(FEN, false)) {
       textFen.value = FEN;
+      textMoves.value = "";
       copySetFEN.click();
     } else {
       window.alert("Failed to apply the position. There are errors in it.");
@@ -1112,7 +1353,7 @@ new Module().then((loadedModule) => {
     if (dropdownPositionVariantType.value == "(default)") {
       textFen.value = "";
       textMoves.value = "";
-      pSetFen.click();
+      buttonSetFen.click();
     }
     UpdateVariantsPositionNameDropdown();
     positionInformation.innerHTML = "";
@@ -1251,11 +1492,12 @@ new Module().then((loadedModule) => {
     let text = engineOutput.value;
     let multipvid = 0;
     let bestpv = 0;
+    let index = 0;
     if (/( upperbound )|( lowerbound )/.test(text)) {
       return;
     }
     if (text.includes(" multipv ")) {
-      let textparselist = text.split(" ");
+      let textparselist = text.split(/[ ]+/);
       multipvid =
         parseInt(textparselist[textparselist.indexOf("multipv") + 1]) - 1;
       if (multipvid + 1 > recordedmultipv) {
@@ -1265,7 +1507,7 @@ new Module().then((loadedModule) => {
     let bestmove = [];
     let ponder = [];
     if (text.includes(" score ") && text.includes(" pv ")) {
-      let textparselist = text.split(" ");
+      let textparselist = text.split(/[ ]+/);
       let evaltext = textparselist.at(textparselist.indexOf("score") + 1);
       if (evaltext == "mate") {
         let matenum = parseInt(
@@ -1305,15 +1547,25 @@ new Module().then((loadedModule) => {
       }
       multipvrecord[multipvid][2] = bestmove;
       multipvrecord[multipvid][3] = ponder;
-      multipvrecord[multipvid][4] = board.variationSan(
+      multipvrecord[multipvid][4] = getNotation(
+        dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,
+        board.variant(),
+        board.fen(),
+        false,
         textparselist.slice(textparselist.indexOf("pv") + 1).join(" "),
       );
-      multipvrecord[multipvid][5] = parseInt(
-        textparselist[textparselist.indexOf("depth") + 1],
-      );
-      multipvrecord[multipvid][6] = parseInt(
-        textparselist[textparselist.indexOf("seldepth") + 1],
-      );
+      index = textparselist.indexOf("depth");
+      if (index > 0) {
+        multipvrecord[multipvid][5] = parseInt(textparselist[index + 1]);
+      } else {
+        multipvrecord[multipvid][5] = -1;
+      }
+      index = textparselist.indexOf("seldepth");
+      if (index > 0) {
+        multipvrecord[multipvid][6] = parseInt(textparselist[index + 1]);
+      } else {
+        multipvrecord[multipvid][6] = -1;
+      }
       //Update Evaluation Section
       let k = 0;
       let pvinfostr = "";
@@ -1334,12 +1586,29 @@ new Module().then((loadedModule) => {
             showevalnum = multipvrecord[k][1].toFixed(2).toString();
           }
         }
-        pvinfostr += `Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5]} Max ${multipvrecord[k][6]}) ${showevalnum} → ${multipvrecord[k][4]}\n`;
+        pvinfostr += `Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5] > -1 ? multipvrecord[k][5] : "❓"} Max ${multipvrecord[k][6] > -1 ? multipvrecord[k][6] : "❓"}) ${showevalnum} → ${multipvrecord[k][4]}\n\n`;
         depthlist.push(multipvrecord[k][5]);
         seldepthlist.push(multipvrecord[k][6]);
       }
       pvinfo.innerText = pvinfostr;
-      evalinfo.innerText = `Depth (Average): ${Math.min(...depthlist)}\nDepth (Max): ${Math.max(...seldepthlist)}\nNodes: ${textparselist[textparselist.indexOf("nodes") + 1]}\nNodes Per Second: ${textparselist[textparselist.indexOf("nps") + 1]}`;
+      let nodeinfo = "❓";
+      index = textparselist.indexOf("nodes");
+      if (index > 0) {
+        nodeinfo = textparselist[index + 1];
+      }
+      let npsinfo = "❓";
+      index = textparselist.indexOf("nps");
+      if (index > 0) {
+        npsinfo = textparselist[index + 1];
+      }
+      let timeinfo = "❓";
+      index = textparselist.indexOf("time");
+      if (index > 0) {
+        timeinfo = textparselist[index + 1];
+      }
+      let maxdepth = Math.max(...depthlist);
+      let maxseldepth = Math.max(...seldepthlist);
+      evalinfo.innerText = `Depth (Average): ${maxdepth > 0 ? maxdepth : "❓"}\nDepth (Max): ${maxseldepth > 0 ? maxseldepth : "❓"}\nNodes: ${nodeinfo}\nNodes Per Second: ${npsinfo}\nTime: ${timeinfo}`;
     } else if (text.includes("bestmove")) {
       let textparselist = text.split(" ");
       if (board.turn()) {
@@ -1351,8 +1620,11 @@ new Module().then((loadedModule) => {
           Math.min(...evaluationindex.slice(0, recordedmultipv)),
         );
       }
+      if (bestpv < 0) {
+        bestpv = 0;
+      }
       bestmove = parseUCIMove(textparselist[1]);
-      if (textparselist[3] != undefined) {
+      if (textparselist[3] != undefined && textparselist[3] != "0000") {
         ponder = parseUCIMove(textparselist[3]);
       }
       multipvrecord[bestpv][2] = bestmove;
@@ -1390,10 +1662,16 @@ new Module().then((loadedModule) => {
         Math.min(...evaluationindex.slice(0, recordedmultipv)),
       );
     }
+    if (bestpv < 0) {
+      bestpv = 0;
+    }
     console.log("Best PV:", bestpv + 1);
     if (multipvrecord[bestpv][0]) {
       let matemoves = multipvrecord[bestpv][1];
-      if (matemoves > 0) {
+      if (isNaN(matemoves) || matemoves == null) {
+        evaluationBar.style.width = "50%";
+        evalscore.innerText = "Mate in ❓";
+      } else if (matemoves > 0) {
         evaluationBar.style.width = "100%";
         evalscore.innerText = "Mate in " + matemoves.toString();
       } else if (matemoves < 0) {
@@ -1410,18 +1688,23 @@ new Module().then((loadedModule) => {
       }
     } else {
       evaluation = multipvrecord[bestpv][1];
-      if (evaluation > 0) {
-        evalscore.innerText = "+" + evaluation.toFixed(2).toString();
+      if (isNaN(evaluation) || evaluation == null) {
+        evalscore.innerText = "❓";
+        evaluationBar.style.width = "50%";
       } else {
-        evalscore.innerText = evaluation.toFixed(2);
-      }
-      if (evaluation < -9.8) {
-        evaluationBar.style.width = "1%";
-      } else if (evaluation > 9.8) {
-        evaluationBar.style.width = "99%";
-      } else {
-        evaluationBar.style.width =
-          parseInt((evaluation * 100 + 1000) / 20).toString() + "%";
+        if (evaluation > 0) {
+          evalscore.innerText = "+" + evaluation.toFixed(2).toString();
+        } else {
+          evalscore.innerText = evaluation.toFixed(2);
+        }
+        if (evaluation < -9.8) {
+          evaluationBar.style.width = "1%";
+        } else if (evaluation > 9.8) {
+          evaluationBar.style.width = "99%";
+        } else {
+          evaluationBar.style.width =
+            parseInt((evaluation * 100 + 1000) / 20).toString() + "%";
+        }
       }
     }
     let autoshapes = [];
@@ -1817,6 +2100,12 @@ new Module().then((loadedModule) => {
     highlightMoveOnBoard(move);
   };
 
+  dropdownNotationSystem.onchange = function () {
+    if (labelPgn) {
+      labelPgn.innerText = getPgn(board);
+    }
+  };
+
   updateChessground();
 }); // Chessground helper functions
 
@@ -1824,20 +2113,34 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
   while (displayReady.value.length < 1 || displayReady.value != 1) {
     continue;
   }
-  console.log(ffish.validateFen(fen, board.variant()));
+  //console.log(Error());
+  //console.log(ffish.validateFen(fen, board.variant()));
 
-  if (!fen || ffish.validateFen(fen, board.variant())) {
+  if (!fen || ffish.validateFen(fen, board.variant()) >= 0) {
     if (fen) board.setFen(fen);
     else board.reset();
     const moves = movelist.trim().split(" ").reverse();
+    let move = "";
 
     while (moves.length > 0) {
-      board.push(moves.pop());
+      move = moves.pop();
+      if (move == "") {
+        continue;
+      }
+      if (!board.push(move)) {
+        buttonStop.click();
+        textMoves.value = textMoves.value
+          .trim()
+          .split(/[ ]+/)
+          .slice(0, -1)
+          .join(" ");
+        window.alert(`Invalid move: ${move}`);
+      }
     }
 
     updateChessground();
   } else {
-    alert("Invalid FEN");
+    window.alert("Invalid FEN");
   }
   if (enablemove) {
     enableBoardMove();
@@ -2598,35 +2901,47 @@ function afterMove(capture) {
 }
 
 function getPgn(board) {
-  let pgn = "";
-  const reversedMoves = [];
-  let moveStack = board.moveStack();
+  if (
+    dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value == ""
+  ) {
+    let pgn = "";
+    const reversedMoves = [];
+    let moveStack = board.moveStack();
 
-  while (moveStack.length > 0) {
-    // TODO: improve this :/
-    reversedMoves.push(moveStack.split(" ").pop());
-    board.pop();
-    moveStack = board.moveStack();
-  }
-
-  if (!board.turn() && reversedMoves.length > 0) {
-    pgn += board.fullmoveNumber() + "... ";
-  }
-
-  while (reversedMoves.length > 0) {
-    const move = reversedMoves.pop();
-
-    if (board.turn()) {
-      pgn += board.fullmoveNumber() + ". ";
+    while (moveStack.length > 0) {
+      // TODO: improve this :/
+      reversedMoves.push(moveStack.split(" ").pop());
+      board.pop();
+      moveStack = board.moveStack();
     }
 
-    pgn += board.sanMove(move) + " ";
-    board.push(move);
-  }
+    if (!board.turn() && reversedMoves.length > 0) {
+      pgn += board.fullmoveNumber() + "... ";
+    }
 
-  const result = board.result(checkboxAdjudicate.checked);
-  if (result !== "*") pgn += result;
-  return pgn.trim();
+    while (reversedMoves.length > 0) {
+      const move = reversedMoves.pop();
+
+      if (board.turn()) {
+        pgn += board.fullmoveNumber() + ". ";
+      }
+
+      pgn += board.sanMove(move) + " ";
+      board.push(move);
+    }
+
+    const result = board.result(checkboxAdjudicate.checked);
+    if (result !== "*") pgn += result;
+    return pgn.trim();
+  } else {
+    return getNotation(
+      dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,
+      board.variant(),
+      textFen.value == "" ? ffish.startingFen(board.variant()) : textFen.value,
+      false,
+      textMoves.value,
+    );
+  }
 }
 
 function disableBoardMove() {

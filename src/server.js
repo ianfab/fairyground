@@ -258,7 +258,7 @@ class Engine {
         err,
       );
       this.WebSocketConnection.send(
-          `ERROR\x10LOAD_ENGINE\x10${this.ID}\x10${this.Color}`,
+        `ERROR\x10LOAD_ENGINE\x10${this.ID}\x10${this.Color}`,
       );
       if (typeof this.LoadFailureCallBack == "function") {
         this.LoadFailureCallBack();
@@ -275,7 +275,7 @@ class Engine {
             `[WebSocket Server] Engine ${this.Color} (ID: ${this.ID}) load timed out.`,
           );
           this.WebSocketConnection.send(
-              `ERROR\x10ENGINE_TIMEOUT\x10${this.ID}\x10${this.Color}`,
+            `ERROR\x10ENGINE_TIMEOUT\x10${this.ID}\x10${this.Color}`,
           );
         } else {
           console.error(
@@ -283,7 +283,7 @@ class Engine {
             code,
           );
           this.WebSocketConnection.send(
-              `ERROR\x10LOAD_ENGINE\x10${this.ID}\x10${this.Color}`,
+            `ERROR\x10LOAD_ENGINE\x10${this.ID}\x10${this.Color}`,
           );
         }
         this.Status = "";
@@ -295,12 +295,12 @@ class Engine {
     });
     this.Process.stdout.on("data", (data) => {
       this.WebSocketConnection.send(
-          `ENGINE_STDOUT\x10${this.ID}\x10${this.Color}\x10${data}`,
+        `ENGINE_STDOUT\x10${this.ID}\x10${this.Color}\x10${data}`,
       );
     });
     this.Process.stderr.on("data", (data) => {
       this.WebSocketConnection.send(
-          `ENGINE_STDERR\x10${this.ID}\x10${this.Color}\x10${data}`,
+        `ENGINE_STDERR\x10${this.ID}\x10${this.Color}\x10${data}`,
       );
     });
     console.log(
@@ -379,7 +379,9 @@ class Engine {
     ) {
       if (typeof msg[3] == "string") {
         this.ID = msg[3];
-        this.WebSocketConnection.send(`ID_CHANGED\x10${this.ID}\x10${this.Color}`);
+        this.WebSocketConnection.send(
+          `ID_CHANGED\x10${this.ID}\x10${this.Color}`,
+        );
       }
     }
   }
@@ -390,7 +392,7 @@ wss.on("connection", (ws, req) => {
   ws.isAlive = true;
   ws.on("pong", heartbeat);
   ws.on("message", (message) => {
-      let msg = message.toString().split(MessageSplitter);
+    let msg = message.toString().split(MessageSplitter);
     if (msg[0] == "CONNECT") {
       if (ConnectingClients.has(ws) || ConnectedClients.has(ws)) {
         console.warn(
@@ -554,19 +556,3 @@ const interval = setInterval(function ping() {
     ws.ping(noop);
   });
 }, 30000);
-
-function openDefaultBrowser(url) {
-  var exec = require('child_process').exec;
-  switch (process.platform) {
-    case "darwin":
-      exec('open ' + url);
-      break;
-    case "win32":
-      exec('start ' + url);
-      break;
-    default:
-      exec('xdg-open ' + url);
-  }
-}
-
-openDefaultBrowser(`http://localhost:${port}`);

@@ -21,22 +21,27 @@ knightmate|Chess Variants|Knight Mate|The king moves like a knight while the kni
 
 makruk|Makruk Variants|Makruk|Thai Chess. A game closely resembling the original Chaturanga. Similar to Chess but with a different queen and bishop.
 makpong|Makruk Variants|Makpong|Makruk variant where kings cannot move to escape out of check.
-cambodian|Makruk Variants|Cambodian Chess|Makruk with a few additional opening abilities.
+cambodian|Makruk Variants|Ouk Chatrang|Cambodian Chess. Makruk with a few additional opening abilities.
 sittuyin|Makruk Variants|Sittuyin|Burmese Chess. Similar to Makruk, but pieces are placed at the start of the match.
 asean|Makruk Variants|Asean|Makruk using the board/pieces from International Chess as well as pawn promotion rules.
 
 shogi|Shogi Variants|Shogi|Japanese Chess, the standard 9x9 version played today with drops and promotions.
 minishogi|Shogi Variants|Mini Shogi|5x5 Shogi for more compact and faster games. There are no knights or lances.
 kyotoshogi|Shogi Variants|Kyoto Shogi|A wild Shogi variant on a 5x5 board where pieces flip into a different piece after each move.
-dobutsu|Shogi Variants|Dobutsu|3x4 game with cute animals, designed to teach children how to play Shogi.
-gorogoroplus|Shogi Variants|Gorogoro+|5x6 Shogi designed to introduce tactics with the generals.
+dobutsu|Shogi Variants|Dobutsu Shogi|3x4 game with cute animals, designed to teach children how to play Shogi.
+gorogoro|Shogi Variants|Gorogoro Shogi|5x6 Shogi designed to introduce tactics with the generals.
+gorogoroplus|Shogi Variants|Gorogoro+ Shogi|5x6 Shogi designed to introduce tactics with the generals.
 torishogi|Shogi Variants|Tori Shogi|A confrontational 7x7 variant with unique pieces each named after different birds.
 shoshogi|Shogi Variants|Sho Shogi|A new piece called Drunk Elephant is introduced, which can promote to a new king. You can lose one of the 2 kings after the promotion.
 
 xiangqi|Xiangqi Variants|Xiangqi|Chinese Chess, one of the oldest and most played board games in the world.
 manchu|Xiangqi Variants|Manchu Xiangqi|Xiangqi variant where one side has a chariot that can also move as a cannon or horse.
-janggi|Xiangqi Variants|Janggi|Korean Chess, similar to Xiangqi but plays much differently. Tournament rules are used.
 minixiangqi|Xiangqi Variants|Mini Xiangqi|Compact version of Xiangqi played on a 7x7 board without a river.
+
+janggi|Janggi Variants|Janggi|Korean Chess, similar to Xiangqi but plays much differently. Tournament rules are used.
+janggicasual|Janggi Variants|Janggi Casual|Korean Chess, similar to Xiangqi but plays much differently. Casual rules are used.
+janggimodern|Janggi Variants|Janggi Modern|Korean Chess, similar to Xiangqi but plays much differently. Modern rules are used.
+janggitraditional|Janggi Variants|Janggi Traditional|Korean Chess, similar to Xiangqi but plays much differently. Traditional rules are used.
 
 capablanca|Fairy Variants|Capablanca Chess|Play with the hybrid pieces, archbishop (B+N) and chancellor (R+N), on a 10x8 board.
 capahouse|Fairy Variants|Capablanca House|Capablanca with Crazyhouse drop rules.

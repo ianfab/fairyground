@@ -319,6 +319,56 @@
     margin-bottom: 10px;
   }
 
+  #binengineinput {
+    margin-bottom: 5px;
+  }
+
+  #binengineinput button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 5px;
+    cursor: pointer;
+    margin-bottom: 5px;
+  }
+
+  #binengineinput button:hover {
+    background: #aaa;
+  }
+
+  #binengineinput button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #binengineinput button:active {
+    background: #000;
+  }
+
+  #binengineinput input {
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+  }
+
+  #binengineinput input:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
+  #binengineinput #whiteenginesettings {
+    display: flex;
+  }
+
+  #binengineinput #blackenginesettings {
+    display: flex;
+  }
+
+  #binengineinput #analysisenginesettings {
+    display: flex;
+  }
+
   #posvariantdiv {
     display: flex;
     margin-bottom: 10px;
@@ -380,9 +430,14 @@
 
   #info {
     padding: 10px;
-    margin-left: 20px;
+    margin-left: 10px;
     font-size: 16px;
     height: 600px;
+  }
+
+  #info #sannotation {
+    background: #eee;
+    margin-bottom: 10px;
   }
 
   #info #timecontrolduringplay {
@@ -498,12 +553,12 @@
   }
 
   #info #enginecmddiv #enginecmd {
-    width: 600px;
+    width: 500px;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
   }
 
-  #info #enginecmddiv #sendenginecmd {
+  #info #enginecmddiv button {
     display: inline-block;
     padding: 3px 6px 3px 6px;
     background: #888;
@@ -513,17 +568,22 @@
     cursor: pointer;
   }
 
-  #info #enginecmddiv #sendenginecmd:hover {
+  #info #enginecmddiv button:hover {
     background: #aaa;
   }
 
-  #info #enginecmddiv #sendenginecmd:disabled {
+  #info #enginecmddiv button:disabled {
     background: #ccc;
     color: #000;
   }
 
-  #info #enginecmddiv #sendenginecmd:active {
+  #info #enginecmddiv button:active {
     background: #000;
+  }
+
+  #info #enginecmddiv #targetengine {
+    width: 150px;
+    background: #eee;
   }
 
   #blacktime {
@@ -633,7 +693,6 @@
     width: 25%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
-    border-right: 0;
   }
 
   #boardsetupsettings2 #currentmovenum:invalid {
@@ -657,10 +716,9 @@
     width: 35%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
-    border-right: 0;
   }
 
-  #boardsetupsettings2 #enpassantfile:invalid {
+  #boardsetupsettings2 #enpassantrank:invalid {
     background: #ff9e9e;
     border: 3px solid #f00;
   }
@@ -669,7 +727,6 @@
     width: 60%;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
-    border-right: 0;
   }
 
   #advancedtimesettings {
@@ -951,10 +1008,184 @@
   #separatorsearchresult {
     border: double #ffffff;
   }
+
+  #fsfoutput {
+    font-family: Consolas;
+  }
+
+  #whiteengineoutput {
+    font-family: Consolas;
+  }
+
+  #blackengineoutput {
+    font-family: Consolas;
+  }
+
+  #analysisengineoutput {
+    font-family: Consolas;
+  }
+
+  #enginesettingspopup {
+    display: none;
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    background-color: white;
+    border-radius: 5px;
+    overflow: scroll;
+  }
+
+  #enginesettingspopup button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-left: 6px;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  #enginesettingspopup button:hover {
+    background: #aaa;
+  }
+
+  #enginesettingspopup button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #enginesettingspopup button:active {
+    background: #000;
+  }
+
+  #enginesettingspopup input {
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    margin-left: 6px;
+    margin-right: 6px;
+  }
+
+  #enginesettingspopup select {
+    min-width: 120px;
+    background: #eee;
+    margin-left: 6px;
+    margin-right: 6px;
+  }
+
+  #enginemanagementpopup {
+    display: none;
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    background-color: white;
+    border-radius: 5px;
+    overflow: scroll;
+  }
+
+  #enginemanagementpopup button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-left: 6px;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  #enginemanagementpopup button:hover {
+    background: #aaa;
+  }
+
+  #enginemanagementpopup button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #enginemanagementpopup button:active {
+    background: #000;
+  }
+
+  #enginemanagementpopup input {
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    margin-left: 6px;
+    margin-right: 6px;
+  }
+
+  #enginemanagementpopup select {
+    min-width: 120px;
+    background: #eee;
+    margin-left: 6px;
+    margin-right: 6px;
+  }
+
+  #enginesetuppopup {
+    display: none;
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    background-color: white;
+    border-radius: 5px;
+    overflow: scroll;
+  }
+
+  #enginesetuppopup button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-left: 6px;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  #enginesetuppopup button:hover {
+    background: #aaa;
+  }
+
+  #enginesetuppopup button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #enginesetuppopup button:active {
+    background: #000;
+  }
+
+  #enginesetuppopup input {
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    margin-left: 6px;
+    margin-right: 6px;
+    min-width: 300px;
+  }
+
+  #enginesetuppopup select {
+    min-width: 120px;
+    background: #eee;
+    margin-left: 6px;
+    margin-right: 6px;
+  }
 </style>
 
 <body>
   <div id="root"></div>
+  <script>
+    //Fairyground namespace for variable/function definition transfer
+    window.fairyground = { super: window };
+  </script>
   <script src="bundle.js" defer></script>
 
   <!--iframe src="./themes.html" onload="this.before((this.contentDocument.body || this.contentDocument).children[0]); this.remove();"--><!--/iframe-->
@@ -963,7 +1194,10 @@
 
   <script src="./lib/stockfish.js"></script>
   <script src="./lib/mithril.min.js"></script>
+  <script src="./lib/BinaryEngineFeature.js"></script>
   <script>
+    //For quick access (Shortening the name)
+    var fge = window.fairyground.BinaryEngineFeature;
     let themes = [[], [], []];
     let themenames = [[], []];
     let variantsettings = [[], [], [], []];
@@ -974,6 +1208,19 @@
     function uniqArr(arr) {
       var newArr = new Set(arr);
       return Array.from(newArr);
+    }
+
+    //Throttle function, used to prevent lag when operating DOM objects.
+    function Throttle(func, wait) {
+      let timer = null;
+      return function () {
+        if (!timer) {
+          timer = setTimeout(() => {
+            func.apply(this, arguments);
+            timer = null;
+          }, wait);
+        }
+      };
     }
 
     function getFileFromServer(url, doneCallback, errorCallback) {
@@ -1036,6 +1283,9 @@
         return false;
       }
       if (typeof FileReader === "undefined") {
+        return false;
+      }
+      if (typeof WebSocket === "undefined") {
         return false;
       }
       return true;
@@ -1152,7 +1402,7 @@
             variantsettings[2].push(variantdescriptionitem[2]);
             variantsettings[3].push(variantdescriptionitem[3]);
           }
-          console.log(variantsettings);
+          //console.log(variantsettings);
         } else {
           console.error(
             `Bad data type from variantsettings.txt: ${typeof data}`,
@@ -1453,6 +1703,9 @@
       let stockfish = null;
       let stockfish_state = "INIT"; // 'READY', 'FAILED'
       let output2 = "";
+      let first_engine_output = "";
+      let second_engine_output = "";
+      let analysis_engine_output = "";
       let show_dests = true;
       let adjudicate = true;
       let analysis_mode = false;
@@ -1464,6 +1717,8 @@
       let advanced_time_control = false;
       let during_play = false;
       let select_move_dialog = false;
+      let white_start_time = 0;
+      let black_start_time = 0;
       let white_remaining_time = 0;
       let black_remaining_time = 0;
       let white_moving_time_list = [];
@@ -1483,10 +1738,191 @@
       let black_time_margin = 0;
       let timeout_margin = 500;
       let previous_mover = "";
+      let move_finish_timer_updating = false;
+      let changing_variant_type = false;
+      let clear_log = true;
+      let throttle_threshold = 400; //in milliseconds, increase this if the GUI lags
       let timer;
 
       let variants = [];
       let varianttypes = [];
+
+      let engine_list = [];
+
+      const checkconnectionnumber = parseInt(Math.random() * 100000);
+      let wsport = window.location.port;
+      if (wsport == "") {
+        wsport = 5001;
+      } else {
+        wsport = +wsport + 1;
+      }
+
+      let i = 0;
+      if (window.location.hostname == "localhost") {
+        for (i = 0; i < fge.WebSocketReconnectionTime; i++) {
+          try {
+            fge.ws = new WebSocket(
+              "ws://" + window.location.hostname + ":" + wsport.toString(),
+            );
+
+            fge.ws.addEventListener("open", function (event) {
+              fge.ws.send(`CONNECT\x10${checkconnectionnumber}`);
+            });
+
+            fge.ws.addEventListener("message", function (event) {
+              if (typeof event.data != "string") {
+                console.error(
+                  `%c WebSocket %c ERROR %c Received bad data type from server: ${typeof event.data}`,
+                  "color: #fff; background: #5f5f5f",
+                  "color: #fff; background: #f03a17",
+                  "",
+                );
+                fge.ws.close();
+                fge.WebSocketStatus = "ERROR";
+                const binenginediv = document.getElementById("binengineinput");
+                if (binenginediv) {
+                  binenginediv.style.display = "none";
+                }
+                fge.first_engine = null;
+                fge.second_engine = null;
+                fge.analysis_engine = null;
+                return;
+              }
+              let msg = event.data.split("|");
+              if (fge.WebSocketStatus == "Unestablished") {
+                if (event.data == `${checkconnectionnumber}`) {
+                  console.log(
+                    `%c WebSocket %c CONNECTED %c WebSocket connection established.`,
+                    "color: #fff; background: #5f5f5f",
+                    "color: #fff; background: #4bc729",
+                    "",
+                  );
+                  fge.WebSocketStatus = "CONNECTED";
+                  fge.ws.send("READYOK");
+                  const binenginediv =
+                    document.getElementById("binengineinput");
+                  if (binenginediv) {
+                    binenginediv.hidden = false;
+                  }
+                } else {
+                  console.error(
+                    `%c WebSocket %c ERROR %c WebSocket Server conncetion failed: Server returns bad verification code.`,
+                    "color: #fff; background: #5f5f5f",
+                    "color: #fff; background: #f03a17",
+                    "",
+                  );
+                  fge.ws.close();
+                  fge.WebSocketStatus = "ERROR";
+                  const binenginediv =
+                    document.getElementById("binengineinput");
+                  if (binenginediv) {
+                    binenginediv.style.display = "none";
+                  }
+                  fge.first_engine = null;
+                  fge.second_engine = null;
+                  fge.analysis_engine = null;
+                }
+              } else if (fge.WebSocketStatus == "CONNECTED") {
+                if (msg[0] == "UPDATE_DATA") {
+                  fge.GetEngineList((data) => {
+                    engine_list = data;
+                  }, fge.ws);
+                  console.log(engine_list);
+                }
+              }
+            });
+
+            fge.ws.addEventListener("close", function (event) {
+              let { code, reason, wasClen } = event;
+              if (fge.WebSocketStatus == "ERROR") {
+                return;
+              }
+              console.error(
+                `%c WebSocket %c CLOSED %c WebSocket Connection Closed.`,
+                "color: #fff; background: #5f5f5f",
+                "color: #fff; background: #f03a17",
+                "",
+              );
+              console.error(event);
+              fge.WebSocketStatus = "CLOSED";
+              const binenginediv = document.getElementById("binengineinput");
+              if (binenginediv) {
+                binenginediv.style.display = "none";
+              }
+              fge.first_engine = null;
+              fge.second_engine = null;
+              fge.analysis_engine = null;
+              window.alert(
+                "WebSocket connection has closed. You will be unable to use binary engines. Try reloading this page to fix this.",
+              );
+            });
+
+            fge.ws.addEventListener("error", function (event) {
+              fge.WebSocketStatus = "ERROR";
+              console.error(
+                `%c WebSocket %c ERROR %c Errors occurred during establishing WebSocket connection.`,
+                "color: #fff; background: #5f5f5f",
+                "color: #fff; background: #f03a17",
+                "",
+              );
+              console.error(event);
+              const binenginediv = document.getElementById("binengineinput");
+              if (binenginediv) {
+                binenginediv.style.display = "none";
+              }
+              fge.first_engine = null;
+              fge.second_engine = null;
+              fge.analysis_engine = null;
+            });
+
+            break;
+          } catch {
+            console.warn(
+              `%c WebSocket %c WARNING %c Cannot initiate WebSocket connection. Retrying... (${i + 1}/${fge.WebSocketReconnectionTime})`,
+              "color: #fff; background: #5f5f5f",
+              "color: #fff; background: #ffc83d",
+              "",
+            );
+            continue;
+          }
+        }
+        if (i == fge.WebSocketReconnectionTime) {
+          console.error(
+            `%c WebSocket %c ERROR %c Cannot initiate WebSocket connection. Binary engine loading feature will be disabled.`,
+            "color: #fff; background: #5f5f5f",
+            "color: #fff; background: #f03a17",
+            "",
+          );
+          fge.ws = null;
+          fge.WebSocketStatus = "ERROR";
+          window.alert(
+            "Cannot initiate WebSocket connection. Binary engine loading feature will be disabled.",
+          );
+          const binenginediv = document.getElementById("binengineinput");
+          if (binenginediv) {
+            binenginediv.style.display = "none";
+          }
+          fge.first_engine = null;
+          fge.second_engine = null;
+          fge.analysis_engine = null;
+        }
+      } else {
+        console.error(
+          `%c WebSocket %c ERROR %c Cannot initiate WebSocket connection in online versions.`,
+          "color: #fff; background: #5f5f5f",
+          "color: #fff; background: #f03a17",
+          "",
+        );
+        fge.ws = null;
+        fge.WebSocketStatus = "ERROR";
+        const binenginediv = document.getElementById("binengineinput");
+        if (binenginediv) {
+          binenginediv.style.display = "none";
+        }
+        fge.first_engine = null;
+        fge.second_engine = null;
+        fge.analysis_engine = null;
+      }
 
       const getVariants = () => {
         stockfish.postMessage(`uci`);
@@ -1494,10 +1930,39 @@
 
       const setVariant = () => {
         play_move = false;
-        stop();
+        stop(true);
         const variant = $("#dropdown-variant").value;
-        stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
+        if (variant == "") {
+          stockfish.postMessage(`setoption name UCI_Variant value chess`);
+        } else {
+          stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
+        }
         stockfish.postMessage(`position startpos`);
+        if (fge.WebSocketStatus == "CONNECTED") {
+          if (fge.first_engine) {
+            if (fge.first_engine.SetVariant(variant)) {
+              document.getElementById("whiteunsupportedvariant").hidden = true;
+            } else {
+              document.getElementById("whiteunsupportedvariant").hidden = false;
+            }
+          }
+          if (fge.second_engine) {
+            if (fge.second_engine.SetVariant(variant)) {
+              document.getElementById("blackunsupportedvariant").hidden = true;
+            } else {
+              document.getElementById("blackunsupportedvariant").hidden = false;
+            }
+          }
+          if (fge.analysis_engine) {
+            if (fge.analysis_engine.SetVariant(variant)) {
+              document.getElementById("analysisunsupportedvariant").hidden =
+                true;
+            } else {
+              document.getElementById("analysisunsupportedvariant").hidden =
+                false;
+            }
+          }
+        }
         $("#fen").value = "";
         $("#move").value = "";
         resetTimer();
@@ -1505,10 +1970,13 @@
         setVariantStylesheet(variant);
       };
 
-      const setFen = () => {
-        stop();
-        const fen = $("#fen").value;
-        const moves = $("#move").value;
+      const setFen = (
+        interrupt_ponder,
+        automatically_start_engine_thinking,
+      ) => {
+        stop(interrupt_ponder);
+        const fen = $("#fen").value.trim();
+        const moves = $("#move").value.trim();
 
         if (fen.length > 0) {
           stockfish.postMessage(`position fen ${fen} moves ${moves}`);
@@ -1516,13 +1984,206 @@
           stockfish.postMessage(`position startpos moves ${moves}`);
         }
         const stm = $("#label-stm").innerText;
+        if (fge.WebSocketStatus == "CONNECTED") {
+          if (fge.analysis_engine) {
+            fge.analysis_engine.SetPosition(
+              fen,
+              moves,
+              fge.GetBoardWidth(),
+              fge.GetBoardHeight(),
+            );
+          }
+          if (
+            interrupt_ponder ||
+            !advanced_time_control ||
+            (advanced_time_control && !during_play)
+          ) {
+            if (fge.first_engine) {
+              fge.first_engine.SetPosition(
+                fen,
+                moves,
+                fge.GetBoardWidth(),
+                fge.GetBoardHeight(),
+              );
+            }
+            if (fge.second_engine) {
+              fge.second_engine.SetPosition(
+                fen,
+                moves,
+                fge.GetBoardWidth(),
+                fge.GetBoardHeight(),
+              );
+            }
+          } else {
+            if (stm == "white") {
+              if (fge.first_engine) {
+                if (fge.first_engine.Ponder && advanced_time_control) {
+                  if (
+                    fge.first_engine.PonderMove != "0000" &&
+                    fge.first_engine.PonderMove !=
+                      $("#move").value.trim().split(" ").at(-1)
+                  ) {
+                    fge.first_engine.SetPonderMiss();
+                    fge.first_engine.SetPosition(
+                      fen,
+                      moves,
+                      fge.GetBoardWidth(),
+                      fge.GetBoardHeight(),
+                    );
+                    console.log(
+                      `%c Ponder %c MISS %c WHITE Ponder misses`,
+                      "color: #fff; background: #5f5f5f",
+                      "color: #fff; background: #f03a17",
+                      "",
+                    );
+                  } else if (fge.first_engine.PonderMove == "0000") {
+                    fge.first_engine.SetPosition(
+                      fen,
+                      moves,
+                      fge.GetBoardWidth(),
+                      fge.GetBoardHeight(),
+                    );
+                  }
+                } else {
+                  fge.first_engine.SetPosition(
+                    fen,
+                    moves,
+                    fge.GetBoardWidth(),
+                    fge.GetBoardHeight(),
+                  );
+                }
+              }
+              if (fge.second_engine) {
+                if (
+                  fge.second_engine.Ponder &&
+                  fge.second_engine.PonderMove != "0000" &&
+                  advanced_time_control
+                ) {
+                  fge.second_engine.SetPosition(
+                    fen,
+                    moves + ` ${fge.second_engine.PonderMove}`,
+                    fge.GetBoardWidth(),
+                    fge.GetBoardHeight(),
+                  );
+                } else {
+                  if (fge.second_engine.Ponder && fge.second_engine.IsUsing) {
+                    console.log(
+                      `%c Ponder %c WARNING %c BLACK makes no ponder move but Ponder=true`,
+                      "color: #fff; background: #5f5f5f",
+                      "color: #fff; background: #ffc83d",
+                      "",
+                    );
+                  }
+                  fge.second_engine.SetPosition(
+                    fen,
+                    moves,
+                    fge.GetBoardWidth(),
+                    fge.GetBoardHeight(),
+                  );
+                }
+              }
+            } else if (stm == "black") {
+              if (fge.second_engine) {
+                if (fge.second_engine.Ponder && advanced_time_control) {
+                  if (
+                    fge.second_engine.PonderMove != "0000" &&
+                    fge.second_engine.PonderMove !=
+                      $("#move").value.trim().split(" ").at(-1)
+                  ) {
+                    fge.second_engine.SetPonderMiss();
+                    fge.second_engine.SetPosition(
+                      fen,
+                      moves,
+                      fge.GetBoardWidth(),
+                      fge.GetBoardHeight(),
+                    );
+                    console.log(
+                      `%c Ponder %c MISS %c BLACK Ponder misses`,
+                      "color: #fff; background: #5f5f5f",
+                      "color: #fff; background: #f03a17",
+                      "",
+                    );
+                  } else if (fge.second_engine.PonderMove == "0000") {
+                    fge.second_engine.SetPosition(
+                      fen,
+                      moves,
+                      fge.GetBoardWidth(),
+                      fge.GetBoardHeight(),
+                    );
+                  }
+                } else {
+                  fge.second_engine.SetPosition(
+                    fen,
+                    moves,
+                    fge.GetBoardWidth(),
+                    fge.GetBoardHeight(),
+                  );
+                }
+              }
+              if (fge.first_engine) {
+                if (
+                  fge.first_engine.Ponder &&
+                  fge.first_engine.PonderMove != "0000" &&
+                  advanced_time_control
+                ) {
+                  fge.first_engine.SetPosition(
+                    fen,
+                    moves + ` ${fge.first_engine.PonderMove}`,
+                    fge.GetBoardWidth(),
+                    fge.GetBoardHeight(),
+                  );
+                } else {
+                  if (fge.first_engine.Ponder && fge.first_engine.IsUsing) {
+                    console.log(
+                      `%c Ponder %c WARNING %c WHITE makes no ponder move but Ponder=true`,
+                      "color: #fff; background: #5f5f5f",
+                      "color: #fff; background: #ffc83d",
+                      "",
+                    );
+                  }
+                  fge.first_engine.SetPosition(
+                    fen,
+                    moves,
+                    fge.GetBoardWidth(),
+                    fge.GetBoardHeight(),
+                  );
+                }
+              }
+            }
+          }
+        }
+        updateTimerOnMove();
+
         if (
+          automatically_start_engine_thinking &&
           stm != "undefined" &&
-          (analysis_mode ||
-            (play_white && stm == "white") ||
-            (play_black && stm == "black"))
-        )
-          setTimeout(go(), 10);
+          ((play_white && stm == "white") ||
+            (play_black && stm == "black") ||
+            analysis_mode)
+        ) {
+          setTimeout(go(false, false), 10);
+        } else if (automatically_start_engine_thinking) {
+          if (fge.first_engine) {
+            if (
+              fge.first_engine.IsUsing &&
+              fge.first_engine.Ponder &&
+              stm != "undefined" &&
+              play_white
+            ) {
+              setTimeout(go(true, false), 10);
+            }
+          }
+          if (fge.second_engine) {
+            if (
+              fge.second_engine.IsUsing &&
+              fge.second_engine.Ponder &&
+              stm != "undefined" &&
+              play_black
+            ) {
+              setTimeout(go(false, true), 10);
+            }
+          }
+        }
       };
 
       const sendCommandToEngine = () => {
@@ -1569,7 +2230,7 @@
         }
         if (cmd[0] == "ponderhit") {
           window.alert(
-            "Cannot send this command: Fairyground does not allow engine pondering.",
+            "Cannot send this command: Engine ponder hit is only allowed to be sent by the GUI.",
           );
           return;
         }
@@ -1586,17 +2247,9 @@
         if (
           cmd[0] == "setoption" &&
           cmd[1] == "name" &&
-          cmd[2] == "SyzygyPath"
-        ) {
-          window.alert(
-            "Cannot send this command: Syzygy tablebase files cannot be accessed by setting value here, as the engine is running in WASM binary in the browser and web browsers do not allow accessing client's files without consent.",
-          );
-          return;
-        }
-        if (
-          cmd[0] == "setoption" &&
-          cmd[1] == "name" &&
-          cmd[2] == "UCI_Variant"
+          (cmd[2] == "UCI_Variant" ||
+            cmd[2] == "USI_Variant" ||
+            cmd[2] == "UCCI_Variant")
         ) {
           window.alert(
             "Cannot send this command: To change the variant, select the items in the variants dropdown.",
@@ -1611,35 +2264,84 @@
         }
         if (cmd[0] == "usi") {
           window.alert(
-            "Cannot send this command: Fairyground only accepts UCI protocol.",
+            "Cannot send this command: Change engine protocol in engine management UI. In browser Fairy-Stockfish only accepts UCI protocol.",
           );
           return;
         }
         if (cmd[0] == "ucci") {
           window.alert(
-            "Cannot send this command: Fairyground only accepts UCI protocol.",
+            "Cannot send this command: Change engine protocol in engine management UI. In browser Fairy-Stockfish only accepts UCI protocol.",
           );
           return;
         }
         if (cmd[0] == "xboard") {
           window.alert(
-            "Cannot send this command: Fairyground only accepts UCI protocol.",
+            "Cannot send this command: Change engine protocol in engine management UI. In browser Fairy-Stockfish only accepts UCI protocol.",
           );
           return;
         }
         if (cmd[0] == "ucicyclone") {
           window.alert(
-            "Cannot send this command: Fairyground only accepts UCI protocol.",
+            "Cannot send this command: Change engine protocol in engine management UI. In browser Fairy-Stockfish only accepts UCI protocol.",
           );
           return;
         }
         if (cmd[0] == "uci") {
           window.alert(
-            "Cannot send this command: This will reset engine status leaving UI status unchanged.",
+            "Cannot send this command: Change engine protocol in engine management UI. In browser Fairy-Stockfish only accepts UCI protocol.",
           );
           return;
         }
-        stockfish.postMessage($("#enginecmd").value);
+        const targetengine = document.getElementById("targetengine");
+        if (targetengine[targetengine.selectedIndex].value == "WHITE") {
+          if (fge.WebSocketStatus == "CONNECTED") {
+            if (fge.first_engine) {
+              fge.first_engine.PostMessage($("#enginecmd").value.trim());
+            } else {
+              window.alert("1st engine is not loaded.");
+            }
+          } else if (window.location.hostname != "localhost") {
+            window.alert("This feature is only available in offline versions.");
+          } else {
+            window.alert(
+              "Connection lost with the server. Try reloading the page.",
+            );
+          }
+        } else if (targetengine[targetengine.selectedIndex].value == "BLACK") {
+          if (fge.WebSocketStatus == "CONNECTED") {
+            if (fge.second_engine) {
+              fge.second_engine.PostMessage($("#enginecmd").value.trim());
+            } else {
+              window.alert("2nd engine is not loaded.");
+            }
+          } else if (window.location.hostname != "localhost") {
+            window.alert("This feature is only available in offline versions.");
+          } else {
+            window.alert(
+              "Connection lost with the server. Try reloading the page.",
+            );
+          }
+        } else if (
+          targetengine[targetengine.selectedIndex].value == "ANALYSIS"
+        ) {
+          if (fge.WebSocketStatus == "CONNECTED") {
+            if (fge.analysis_engine) {
+              fge.analysis_engine.PostMessage($("#enginecmd").value.trim());
+            } else {
+              window.alert("Analysis engine is not loaded.");
+            }
+          } else if (window.location.hostname != "localhost") {
+            window.alert("This feature is only available in offline versions.");
+          } else {
+            window.alert(
+              "Connection lost with the server. Try reloading the page.",
+            );
+          }
+        } else if (
+          targetengine[targetengine.selectedIndex].value == "DEFAULT"
+        ) {
+          stockfish.postMessage($("#enginecmd").value.trim());
+        }
       };
 
       const totalMoveNumber = () => {
@@ -1655,7 +2357,7 @@
         return listlength;
       };
 
-      const displayMove = (movenum, is_force_stop) => {
+      const displayMove = (movenum, is_force_stop, interrupt_pondering) => {
         if (
           $("#displayready").value.length > 0 &&
           $("#displayready").value > 0
@@ -1671,7 +2373,7 @@
           if (is_force_stop) {
             force_stop();
           } else {
-            stop();
+            stop(interrupt_pondering);
           }
           $("#displaymoves").value = $("#move").value;
           review_mode = false;
@@ -1683,7 +2385,7 @@
           if (is_force_stop) {
             force_stop();
           } else {
-            stop();
+            stop(interrupt_pondering);
           }
           if ($("#showmovediv").checked) {
             $("#showmovediv").click();
@@ -1704,14 +2406,38 @@
             }
           }
         }
-        const fen = $("#fen").value;
-        const display_moves = $("#displaymoves").value;
+        const fen = $("#fen").value.trim();
+        const display_moves = $("#displaymoves").value.trim();
         if (fen.length > 0) {
           stockfish.postMessage(`position fen ${fen} moves ${display_moves}`);
         } else {
           stockfish.postMessage(`position startpos moves ${display_moves}`);
         }
-        console.log(`${display_moves}`);
+        if (fge.first_engine) {
+          fge.first_engine.SetPosition(
+            fen,
+            display_moves,
+            fge.GetBoardWidth(),
+            fge.GetBoardHeight(),
+          );
+        }
+        if (fge.second_engine) {
+          fge.second_engine.SetPosition(
+            fen,
+            display_moves,
+            fge.GetBoardWidth(),
+            fge.GetBoardHeight(),
+          );
+        }
+        if (fge.analysis_engine) {
+          fge.analysis_engine.SetPosition(
+            fen,
+            display_moves,
+            fge.GetBoardWidth(),
+            fge.GetBoardHeight(),
+          );
+        }
+        //console.log(`${display_moves}`);
         $("#displayready").value = 1; //1 = updateChessBoardToPosition() working
       };
 
@@ -1730,7 +2456,7 @@
         if ($("#advtimectrl").checked == true) {
           $("#advtimectrl").click();
         }
-        displayMove($("#gotomovenum").value, true);
+        displayMove($("#gotomovenum").value, true, true);
       };
 
       const displayPreviousMove = () => {
@@ -1748,7 +2474,7 @@
         if ($("#advtimectrl").checked == true) {
           $("#advtimectrl").click();
         }
-        displayMove($("#gotomovenum").value, true);
+        displayMove($("#gotomovenum").value, true, true);
       };
 
       const displayInitialPosition = () => {
@@ -1756,13 +2482,13 @@
         if ($("#advtimectrl").checked == true) {
           $("#advtimectrl").click();
         }
-        displayMove(0, true);
+        displayMove(0, true, true);
       };
 
       const displayCurrentPosition = () => {
         $("#gotomovenum").value = totalMoveNumber();
         console.log(`Current: ${!during_play}`);
-        displayMove(-1, !during_play);
+        displayMove(-1, false, false);
       };
 
       const displaySpecifiedPosition = () => {
@@ -1777,7 +2503,7 @@
         if ($("#advtimectrl").checked == true) {
           $("#advtimectrl").click();
         }
-        displayMove($("#gotomovenum").value, true);
+        displayMove($("#gotomovenum").value, true, true);
       };
 
       const reset = () => {
@@ -1786,7 +2512,16 @@
         $("#fen").value = "";
         $("#move").value = "";
         resetTimer();
-        setFen();
+        if (fge.first_engine) {
+          fge.first_engine.NewGame();
+        }
+        if (fge.second_engine) {
+          fge.second_engine.NewGame();
+        }
+        if (fge.analysis_engine) {
+          fge.analysis_engine.NewGame();
+        }
+        setFen(true, false);
         $("#currentposition").click();
       };
 
@@ -1796,25 +2531,51 @@
         }
         const moves = $("#move").value;
         $("#move").value = moves.substring(0, moves.lastIndexOf(" "));
+        if (fge.first_engine) {
+          fge.first_engine.NewGame();
+        }
+        if (fge.second_engine) {
+          fge.second_engine.NewGame();
+        }
+        if (fge.analysis_engine) {
+          fge.analysis_engine.NewGame();
+        }
         resetTimer();
-        setFen();
+        setFen(true, false);
       };
 
-      const go = () => {
+      const go = (
+        white_engine_ponder_and_human_black,
+        black_engine_ponder_and_human_white,
+      ) => {
         if (board_setup_mode) {
           return;
         }
         return_early = play_move;
-        stop();
         console.log(`return early: ${return_early}`);
         if (return_early) return; // avoid race condition
         let args = "";
+        let wargs = "";
+        let bargs = "";
         const movetime = $("#movetime").value;
         const depth = $("#depth").value;
         const nodes = $("#nodes").value;
         const threadnum = $("#threads").value;
         const hashsize = $("#hash").value;
         const multipleprincipalvariation = $("#multipv").value;
+        const whiteengineoutput = document.getElementById("whiteengineoutput");
+        const blackengineoutput = document.getElementById("blackengineoutput");
+        const analysisengineoutput = document.getElementById(
+          "analysisengineoutput",
+        );
+        let whitedepthv = parseInt($("#whitedepth").value);
+        let whitemovetimev = parseInt($("#whitemovetime").value);
+        let whitenodesv = parseInt($("#whitenodes").value);
+        let blackdepthv = parseInt($("#blackdepth").value);
+        let blackmovetimev = parseInt($("#blackmovetime").value);
+        let blacknodesv = parseInt($("#blacknodes").value);
+        let winf = false;
+        let binf = false;
         let wtime = 0;
         let btime = 0;
         let winc = 0;
@@ -1827,70 +2588,69 @@
             $("#label-stm").innerHTML == "white"
           ) {
             args += "infinite";
+            wargs += "infinite";
+            winf = true;
             console.log("wtime infinite");
           } else if (
             black_timer_type == "infinite" &&
             $("#label-stm").innerHTML == "black"
           ) {
             args += "infinite";
+            bargs += "infinite";
+            binf = true;
             console.log("btime infinite");
-          } else {
-            if (white_timer_type == "time per move") {
-              wtime += +white_moving_time_list[0];
-              winc += +white_moving_time_list[0];
-            } else if (white_timer_type == "tournament") {
-              wtime += +(+white_remaining_time + +white_time_gain);
-              winc += +white_time_gain;
-            } else if (white_timer_type == "hourglass") {
-              //How to tell that it's hourglass to engine?
-              wtime += +white_remaining_time;
-            } else if (white_timer_type == "byoyomi") {
-              wtime += +white_remaining_time;
-              if (
-                white_remaining_time < white_byoyomi_time_per_period &&
-                white_remaining_byoyomi_periods > 0
-              ) {
-                winc += +white_byoyomi_time_per_period;
-              }
-              if (
-                white_remaining_byoyomi_periods == white_byoyomi_period_count
-              ) {
-                wtime += +white_byoyomi_time_per_period;
-                winc = 0;
-              }
-            }
-            if (black_timer_type == "time per move") {
-              btime += +black_moving_time_list[0];
-              binc += +black_moving_time_list[0];
-            } else if (black_timer_type == "tournament") {
-              btime += +(+black_remaining_time + +black_time_gain);
-              binc = +black_time_gain;
-            } else if (black_timer_type == "hourglass") {
-              //How to tell that it's hourglass to engine?
-              btime += +black_remaining_time;
-            } else if (black_timer_type == "byoyomi") {
-              btime += +black_remaining_time;
-              if (
-                black_remaining_time < black_byoyomi_time_per_period &&
-                black_remaining_byoyomi_periods > 0
-              ) {
-                binc += +black_byoyomi_time_per_period;
-              }
-              if (
-                black_remaining_byoyomi_periods == black_byoyomi_period_count
-              ) {
-                btime += +black_byoyomi_time_per_period;
-                binc = 0;
-              }
-            }
-            console.log(
-              `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`,
-            );
-            args += `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`;
-            stockfish.postMessage(
-              `setoption name Move Overhead value ${timer_interval}`,
-            );
           }
+          if (white_timer_type == "time per move") {
+            wtime += +white_moving_time_list[0].remaining_time;
+            winc += +white_moving_time_list[0].remaining_time;
+          } else if (white_timer_type == "tournament") {
+            wtime += +(+white_remaining_time);
+            winc += +white_time_gain;
+          } else if (white_timer_type == "hourglass") {
+            //How to tell that it's hourglass to engine?
+            wtime += +white_remaining_time;
+          } else if (white_timer_type == "byoyomi") {
+            wtime += +white_remaining_time;
+            if (
+              white_remaining_time < white_byoyomi_time_per_period &&
+              white_remaining_byoyomi_periods > 0
+            ) {
+              winc += +white_byoyomi_time_per_period;
+            }
+            if (white_remaining_byoyomi_periods == white_byoyomi_period_count) {
+              wtime += +white_byoyomi_time_per_period;
+              winc = 0;
+            }
+          }
+          if (black_timer_type == "time per move") {
+            btime += +black_moving_time_list[0].remaining_time;
+            binc += +black_moving_time_list[0].remaining_time;
+          } else if (black_timer_type == "tournament") {
+            btime += +(+black_remaining_time);
+            binc = +black_time_gain;
+          } else if (black_timer_type == "hourglass") {
+            //How to tell that it's hourglass to engine?
+            btime += +black_remaining_time;
+          } else if (black_timer_type == "byoyomi") {
+            btime += +black_remaining_time;
+            if (
+              black_remaining_time < black_byoyomi_time_per_period &&
+              black_remaining_byoyomi_periods > 0
+            ) {
+              binc += +black_byoyomi_time_per_period;
+            }
+            if (black_remaining_byoyomi_periods == black_byoyomi_period_count) {
+              btime += +black_byoyomi_time_per_period;
+              binc = 0;
+            }
+          }
+          console.log(
+            `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`,
+          );
+          args += `wtime ${wtime} winc ${winc} btime ${btime} binc ${binc}`;
+          stockfish.postMessage(
+            `setoption name Move Overhead value ${timer_interval}`,
+          );
         } else {
           if (!analysis_mode && $("#depth").validity.valid && depth > 0) {
             args += ` depth ${depth}`;
@@ -1900,6 +2660,24 @@
           }
           if (!analysis_mode && $("#nodes").validity.valid && nodes > 0) {
             args += ` nodes ${nodes}`;
+          }
+          if (!($("#whitedepth").validity.valid && whitedepthv > 0)) {
+            whitedepth = -1;
+          }
+          if (!($("#whitemovetime").validity.valid && whitemovetimev > 0)) {
+            whitemovetime = -1;
+          }
+          if (!($("#whitenodes").validity.valid && whitenodesv > 0)) {
+            whitenodes = -1;
+          }
+          if (!($("#blackdepth").validity.valid && blackdepthv > 0)) {
+            blackdepth = -1;
+          }
+          if (!($("#blackmovetime").validity.valid && blackmovetimev > 0)) {
+            blackmovetime = -1;
+          }
+          if (!($("#blacknodes").validity.valid && blacknodesv > 0)) {
+            blacknodes = -1;
           }
         }
 
@@ -1934,9 +2712,229 @@
 
         const stm = $("#label-stm").innerText;
         play_move =
-          (play_white && stm == "white") || (play_black && stm == "black");
-        stockfish.postMessage(`go ${args}`);
-        output2 = "";
+          (play_white && stm == "white") ||
+          (play_black && stm == "black") ||
+          analysis_mode;
+        if (fge.WebSocketStatus == "CONNECTED") {
+          if (analysis_mode) {
+            if (fge.analysis_engine) {
+              if (fge.analysis_engine.IsUsing) {
+                if (clear_log) {
+                  analysisengineoutput.textContent = "";
+                  analysis_engine_output = "";
+                }
+                fge.analysis_engine.IsAnalysisEngine = true;
+                fge.analysis_engine.StartThinking(
+                  stm,
+                  true,
+                  false,
+                  false,
+                  false,
+                  false,
+                  -1,
+                  -1,
+                  -1,
+                  wtime,
+                  winc,
+                  btime,
+                  binc,
+                  white_byoyomi_time_per_period,
+                );
+              } else {
+                stockfish.postMessage(`go ${args}`);
+              }
+            } else {
+              stockfish.postMessage(`go ${args}`);
+            }
+          } else if (stm == "white") {
+            if (fge.first_engine) {
+              if (fge.first_engine.IsUsing) {
+                if (
+                  advanced_time_control &&
+                  fge.first_engine.Ponder &&
+                  fge.first_engine.PonderMove ==
+                    $("#move").value.trim().split(" ").at(-1)
+                ) {
+                  fge.first_engine.StartThinking(
+                    stm,
+                    false,
+                    true,
+                    false,
+                    true,
+                    white_timer_type == "byoyomi",
+                    whitedepthv,
+                    whitemovetimev,
+                    whitenodesv,
+                    wtime,
+                    winc,
+                    btime,
+                    binc,
+                    white_byoyomi_time_per_period,
+                  );
+                  console.log(
+                    `%c Ponder %c HIT %c WHITE Ponder Hits`,
+                    "color: #fff; background: #5f5f5f",
+                    "color: #fff; background: #4bc729",
+                    "",
+                  );
+                } else {
+                  if (clear_log) {
+                    whiteengineoutput.textContent = "";
+                    first_engine_output = "";
+                  }
+                  fge.first_engine.StartThinking(
+                    stm,
+                    winf,
+                    advanced_time_control,
+                    false,
+                    false,
+                    white_timer_type == "byoyomi",
+                    whitedepthv,
+                    whitemovetimev,
+                    whitenodesv,
+                    wtime,
+                    winc,
+                    btime,
+                    binc,
+                    white_byoyomi_time_per_period,
+                  );
+                  //console.log("WHITE: go " + wargs);
+                }
+              } else if (!black_engine_ponder_and_human_white) {
+                output2 = "";
+                stockfish.postMessage(`go ${args}`);
+              }
+            } else if (!black_engine_ponder_and_human_white) {
+              output2 = "";
+              stockfish.postMessage(`go ${args}`);
+            }
+            if (fge.second_engine) {
+              if (fge.second_engine.IsUsing) {
+                if (
+                  advanced_time_control &&
+                  fge.second_engine.Ponder &&
+                  fge.second_engine.PonderMove != "0000"
+                ) {
+                  if (clear_log) {
+                    blackengineoutput.textContent = "";
+                    second_engine_output = "";
+                  }
+                  fge.second_engine.StartThinking(
+                    stm,
+                    false,
+                    true,
+                    true,
+                    false,
+                    black_timer_type == "byoyomi",
+                    blackdepthv,
+                    blackmovetimev,
+                    blacknodesv,
+                    wtime,
+                    winc,
+                    btime,
+                    binc,
+                    black_byoyomi_time_per_period,
+                  );
+                }
+              }
+            }
+          } else if (stm == "black") {
+            if (fge.second_engine) {
+              if (fge.second_engine.IsUsing) {
+                if (
+                  advanced_time_control &&
+                  fge.second_engine.Ponder &&
+                  fge.second_engine.PonderMove ==
+                    $("#move").value.trim().split(" ").at(-1)
+                ) {
+                  fge.second_engine.StartThinking(
+                    stm,
+                    false,
+                    true,
+                    false,
+                    true,
+                    black_timer_type == "byoyomi",
+                    blackdepthv,
+                    blackmovetimev,
+                    blacknodesv,
+                    wtime,
+                    winc,
+                    btime,
+                    binc,
+                    black_byoyomi_time_per_period,
+                  );
+                  console.log(
+                    `%c Ponder %c HIT %c BLACK Ponder Hits`,
+                    "color: #fff; background: #5f5f5f",
+                    "color: #fff; background: #4bc729",
+                    "",
+                  );
+                } else {
+                  if (clear_log) {
+                    blackengineoutput.textContent = "";
+                    second_engine_output = "";
+                  }
+                  fge.second_engine.StartThinking(
+                    stm,
+                    binf,
+                    advanced_time_control,
+                    false,
+                    false,
+                    black_timer_type == "byoyomi",
+                    blackdepthv,
+                    blackmovetimev,
+                    blacknodesv,
+                    wtime,
+                    winc,
+                    btime,
+                    binc,
+                    white_byoyomi_time_per_period,
+                  );
+                  //console.log("BLACK: go " + bargs);
+                }
+              } else if (!white_engine_ponder_and_human_black) {
+                output2 = "";
+                stockfish.postMessage(`go ${args}`);
+              }
+            } else if (!white_engine_ponder_and_human_black) {
+              output2 = "";
+              stockfish.postMessage(`go ${args}`);
+            }
+            if (fge.first_engine) {
+              if (fge.first_engine.IsUsing) {
+                if (
+                  advanced_time_control &&
+                  fge.first_engine.Ponder &&
+                  fge.first_engine.PonderMove != "0000"
+                ) {
+                  if (clear_log) {
+                    whiteengineoutput.textContent = "";
+                    first_engine_output = "";
+                  }
+                  fge.first_engine.StartThinking(
+                    stm,
+                    false,
+                    true,
+                    true,
+                    false,
+                    white_timer_type == "byoyomi",
+                    whitedepthv,
+                    whitemovetimev,
+                    whitenodesv,
+                    wtime,
+                    winc,
+                    btime,
+                    binc,
+                    white_byoyomi_time_per_period,
+                  );
+                }
+              }
+            }
+          }
+        } else {
+          output2 = "";
+          stockfish.postMessage(`go ${args}`);
+        }
       };
 
       const setupTimer = () => {
@@ -2031,8 +3029,15 @@
         }
         white_moving_time_list = [];
         black_moving_time_list = [];
-        white_moving_time_list.push(white_remaining_time); //Start time white
-        black_moving_time_list.push(black_remaining_time); //Start time black
+        const now = Date.now();
+        white_moving_time_list.push({
+          remaining_time: white_remaining_time,
+          time_stamp: now,
+        }); //Start time white
+        black_moving_time_list.push({
+          remaining_time: black_remaining_time,
+          time_stamp: now,
+        }); //Start time black
         $("#whitetime").innerHTML = `${parseInt(white_remaining_time / 1000)}`;
         $("#blacktime").innerHTML = `${parseInt(black_remaining_time / 1000)}`;
         if (white_timer_type == "infinite") {
@@ -2051,32 +3056,41 @@
         $("#timeoutside").value = 0;
       };
 
-      function updateTimer() {
-        if ($("#gamestatus").innerHTML == "END") {
-          deleteTimer();
-          gameEnd();
+      function updateTimerOnMove() {
+        if (!during_play) {
           return;
         }
-        $("#gamestatus").click();
+        move_finish_timer_updating = true;
+        const stm = document.getElementById("label-stm").innerText;
         console.log(`${$("#gamestatus").innerHTML}`);
-        if ($("#gamestatus").innerHTML == "PLAYING_WHITE") {
+        //console.log(white_moving_time_list);
+        //console.log(white_moving_time_list);
+        const now = Date.now();
+        if (stm == "white") {
           if (previous_mover == "") {
             if (white_timer_type == "tournament") {
               white_remaining_time =
                 +white_remaining_time + +white_time_gain + +timer_interval;
             }
-            white_moving_time_list.push(white_remaining_time); //Time stamp for white's turn begin
-          } else if (previous_mover == "BLACK") {
-            black_moving_time_list.push(black_remaining_time); //Time stamp for black's turn end
+            white_moving_time_list.push({
+              remaining_time: white_remaining_time,
+              time_stamp: now,
+            }); //Time stamp for white's turn begin
+          } else {
+            black_moving_time_list.push({
+              remaining_time: black_remaining_time,
+              time_stamp: now,
+            }); //Time stamp for black's turn end
             if (black_remaining_time < 0) {
               black_remaining_time = 0;
             }
+            //white_remaining_time = (+white_moving_time_list.at(-1).remaining_time) + ((+white_moving_time_list.at(-1).time_stamp) - (+now));
             if (white_timer_type == "tournament") {
               white_remaining_time =
                 +white_remaining_time + +white_time_gain + +timer_interval;
             } else if (white_timer_type == "time per move") {
               white_remaining_time =
-                +white_moving_time_list[0] + +timer_interval;
+                +white_moving_time_list[0].remaining_time + +timer_interval;
             } else if (white_timer_type == "byoyomi") {
               if (
                 white_remaining_byoyomi_periods < white_byoyomi_period_count
@@ -2090,12 +3104,79 @@
             if (black_timer_type == "hourglass") {
               white_remaining_time =
                 +white_remaining_time +
-                +black_moving_time_list.at(-2) -
-                +black_moving_time_list.at(-1) +
-                +timer_interval;
+                +black_moving_time_list.at(-2).remaining_time -
+                +black_moving_time_list.at(-1).remaining_time;
             }
-            white_moving_time_list.push(white_remaining_time); //Time stamp for white's turn begin
+            white_moving_time_list.push({
+              remaining_time: white_remaining_time,
+              time_stamp: now,
+            }); //Time stamp for white's turn begin
           }
+          previous_mover = "WHITE";
+        } else if (stm == "black") {
+          if (previous_mover == "") {
+            if (black_timer_type == "tournament") {
+              black_remaining_time =
+                +black_remaining_time + +black_time_gain + +timer_interval;
+            }
+            black_moving_time_list.push({
+              remaining_time: black_remaining_time,
+              time_stamp: now,
+            }); //Time stamp for black's turn begin
+          } else {
+            white_moving_time_list.push({
+              remaining_time: white_remaining_time,
+              time_stamp: now,
+            }); //Time stamp for white's turn end
+            if (white_remaining_time < 0) {
+              white_remaining_time = 0;
+            }
+            //black_remaining_time = (+black_moving_time_list.at(-1).remaining_time) + ((+black_moving_time_list.at(-1).time_stamp) - (+now));
+            if (black_timer_type == "tournament") {
+              black_remaining_time =
+                +black_remaining_time + +black_time_gain + +timer_interval;
+            } else if (black_timer_type == "time per move") {
+              black_remaining_time =
+                +black_moving_time_list[0].remaining_time + +timer_interval;
+            } else if (black_timer_type == "byoyomi") {
+              if (
+                black_remaining_byoyomi_periods < black_byoyomi_period_count
+              ) {
+                black_remaining_time =
+                  +black_byoyomi_time_per_period + +timer_interval;
+              } else {
+                black_remaining_time = +black_remaining_time + +timer_interval;
+              }
+            }
+            if (white_timer_type == "hourglass") {
+              black_remaining_time =
+                +black_remaining_time +
+                +white_moving_time_list.at(-2).remaining_time -
+                +white_moving_time_list.at(-1).remaining_time;
+            }
+            black_moving_time_list.push({
+              remaining_time: black_remaining_time,
+              time_stamp: now,
+            }); //Time stamp for black's turn begin
+          }
+          previous_mover = "BLACK";
+        }
+        move_finish_timer_updating = false;
+      }
+
+      function updateTimer() {
+        if ($("#gamestatus").innerHTML == "END") {
+          deleteTimer();
+          gameEnd();
+          return;
+        }
+        if (move_finish_timer_updating) {
+          //avoid race condition
+          return;
+        }
+        $("#gamestatus").click();
+        console.log(`${$("#gamestatus").innerHTML}`);
+        if ($("#gamestatus").innerHTML == "PLAYING_WHITE") {
           if (white_timer_type == "infinite") {
             previous_mover = "WHITE";
             return;
@@ -2150,42 +3231,6 @@
           }
           previous_mover = "WHITE";
         } else if ($("#gamestatus").innerHTML == "PLAYING_BLACK") {
-          if (previous_mover == "") {
-            if (black_timer_type == "tournament") {
-              black_remaining_time =
-                +black_remaining_time + +black_time_gain + +timer_interval;
-            }
-            black_moving_time_list.push(black_remaining_time); //Time stamp for black's turn begin
-          } else if (previous_mover == "WHITE") {
-            white_moving_time_list.push(white_remaining_time); //Time stamp for white's turn end
-            if (white_remaining_time < 0) {
-              white_remaining_time = 0;
-            }
-            if (black_timer_type == "tournament") {
-              black_remaining_time =
-                +black_remaining_time + +black_time_gain + +timer_interval;
-            } else if (black_timer_type == "time per move") {
-              black_remaining_time =
-                +black_moving_time_list[0] + +timer_interval;
-            } else if (black_timer_type == "byoyomi") {
-              if (
-                black_remaining_byoyomi_periods < black_byoyomi_period_count
-              ) {
-                black_remaining_time =
-                  +black_byoyomi_time_per_period + +timer_interval;
-              } else {
-                black_remaining_time = +black_remaining_time + +timer_interval;
-              }
-            }
-            if (white_timer_type == "hourglass") {
-              black_remaining_time =
-                +black_remaining_time +
-                +white_moving_time_list.at(-2) -
-                +white_moving_time_list.at(-1) +
-                +timer_interval;
-            }
-            black_moving_time_list.push(black_remaining_time); //Time stamp for black's turn begin
-          }
           if (black_timer_type == "infinite") {
             previous_mover = "BLACK";
             return;
@@ -2299,6 +3344,15 @@
         $("#gamestatus").click();
         during_play = true;
         $("#currentposition").click();
+        if (fge.first_engine) {
+          fge.first_engine.PonderMove = "0000";
+          fge.first_engine.PonderMiss = false;
+        }
+        if (fge.second_engine) {
+          fge.second_engine.PonderMove = "0000";
+          fge.second_engine.PonderMiss = false;
+        }
+        updateTimerOnMove();
         createTimer();
         const stm = $("#label-stm").innerText;
         console.log(
@@ -2308,17 +3362,33 @@
         );
         if ((play_white && stm == "white") || (play_black && stm == "black")) {
           console.log("Go!");
-          go();
+          go(false, false);
         }
       };
 
-      const stop = () => {
+      const stop = (interrupt_pondering) => {
         stockfish.postMessage(`stop`);
+        if (fge.first_engine) {
+          fge.first_engine.StopThinking(
+            interrupt_pondering,
+            advanced_time_control,
+          );
+        }
+        if (fge.second_engine) {
+          fge.second_engine.StopThinking(
+            interrupt_pondering,
+            advanced_time_control,
+          );
+        }
+        if (fge.analysis_engine) {
+          fge.analysis_engine.StopThinking(true, false);
+        }
       };
 
       const force_stop = () => {
         play_white = play_black = false;
-        stop();
+        play_move = false;
+        stop(true);
       };
 
       const changePieces = (onlyChangeWhenInvalid) => {
@@ -2443,7 +3513,7 @@
             newOption.text = getThemeName(val);
             newOption.value = val;
             piecethemedropdown.add(newOption);
-            console.log(val);
+            //console.log(val);
           });
         } else {
           let newOption = document.createElement("option");
@@ -2461,7 +3531,7 @@
             newOption.text = getThemeName(val);
             newOption.value = val;
             boardthemedropdown.add(newOption);
-            console.log(val);
+            //console.log(val);
           });
         } else {
           let newOption = document.createElement("option");
@@ -2555,7 +3625,6 @@
         });
         variantdropdown.selectedIndex = 0;
         //updateVariantDropdownTitles();
-        variantdropdown.dispatchEvent(new Event("change"));
       };
 
       const updateVariantTypeDropdown = () => {
@@ -2598,7 +3667,8 @@
           varianttypedropdown.appendChild(option);
         });
         varianttypedropdown.selectedIndex = 0;
-        updateVariantDropdown();
+        changing_variant_type = true;
+        $("#dropdown-variant").dispatchEvent(new Event("change"));
       };
 
       const scrollOutput = () => {
@@ -2666,12 +3736,22 @@
               } else {
                 if (!review_mode && line.startsWith("bestmove") && play_move) {
                   play_move = false;
+                  if (analysis_mode) {
+                    return;
+                  }
                   $("#move").value += " " + line.split(" ")[1];
                   $("#set").click();
                 }
                 output2 += line + "\n";
-                $("#engineoutputline").value = line;
-                $("#engineoutputline").click();
+                if (fge.analysis_engine) {
+                  if (!fge.analysis_engine.IsUsing) {
+                    $("#engineoutputline").value = line;
+                    $("#engineoutputline").click();
+                  }
+                } else {
+                  $("#engineoutputline").value = line;
+                  $("#engineoutputline").click();
+                }
               }
               m.redraw();
             });
@@ -2952,7 +4032,8 @@
               {
                 disabled: !is_ready || review_mode || board_setup_mode,
                 onchange: (e) => {
-                  updateVariantDropdown();
+                  changing_variant_type = true;
+                  $("#dropdown-variant").dispatchEvent(new Event("change"));
                 },
               },
               [
@@ -2966,6 +4047,10 @@
               {
                 disabled: !is_ready || review_mode || board_setup_mode,
                 onchange: (e) => {
+                  if (changing_variant_type) {
+                    updateVariantDropdown();
+                    changing_variant_type = false;
+                  }
                   window.setTimeout(setVariant, 10);
                 },
               },
@@ -3035,7 +4120,7 @@
                   e.redraw = false;
                   return;
                 }
-                setFen();
+                setFen(true, false);
               },
             }),
             m("input#move", {
@@ -3046,7 +4131,7 @@
                   e.redraw = false;
                   return;
                 }
-                setFen();
+                setFen(true, false);
               },
             }),
             m(
@@ -3058,7 +4143,18 @@
                     return;
                   }
                   resetTimer();
-                  window.setTimeout(setFen, 10);
+                  if (fge.first_engine) {
+                    fge.first_engine.NewGame();
+                  }
+                  if (fge.second_engine) {
+                    fge.second_engine.NewGame();
+                  }
+                  if (fge.analysis_engine) {
+                    fge.analysis_engine.NewGame();
+                  }
+                  window.setTimeout(() => {
+                    setFen(true, false);
+                  }, 10);
                   $("#currentposition").click();
                 },
               },
@@ -3079,6 +4175,92 @@
               "◀️Undo",
             ),
           ]),
+          m(
+            "div#binengineinput",
+            { hidden: during_play || fge.WebSocketStatus != "CONNECTED" },
+            [
+              m(
+                "button",
+                {
+                  onclick: () => {
+                    fge.ShowEngineManagementUI(engine_list, fge.ws);
+                  },
+                },
+                "Engine Management",
+              ),
+              m("div#whiteenginesettings", [
+                m("p", "1st binary engine settings:"),
+                m("input[type=number]#whitedepth", {
+                  placeholder: "Depth",
+                  disabled:
+                    !is_ready ||
+                    fge.WebSocketStatus != "CONNECTED" ||
+                    analysis_mode,
+                  min: 1,
+                }),
+                m("input[type=number]#whitemovetime", {
+                  placeholder: "Movetime",
+                  disabled:
+                    !is_ready ||
+                    fge.WebSocketStatus != "CONNECTED" ||
+                    analysis_mode,
+                  min: 0,
+                }),
+                m("input[type=number]#whitenodes", {
+                  placeholder: "Nodes",
+                  disabled:
+                    !is_ready ||
+                    fge.WebSocketStatus != "CONNECTED" ||
+                    analysis_mode,
+                  min: 1,
+                }),
+                m(
+                  "p#whiteunsupportedvariant",
+                  { hidden: true },
+                  "1st engine does not support this variant. In browser Fairy-Stockfish will be used instead.",
+                ),
+              ]),
+              m("div#blackenginesettings", [
+                m("p", "2nd binary engine settings:"),
+                m("input[type=number]#blackdepth", {
+                  placeholder: "Depth",
+                  disabled:
+                    !is_ready ||
+                    fge.WebSocketStatus != "CONNECTED" ||
+                    analysis_mode,
+                  min: 1,
+                }),
+                m("input[type=number]#blackmovetime", {
+                  placeholder: "Movetime",
+                  disabled:
+                    !is_ready ||
+                    fge.WebSocketStatus != "CONNECTED" ||
+                    analysis_mode,
+                  min: 0,
+                }),
+                m("input[type=number]#blacknodes", {
+                  placeholder: "Nodes",
+                  disabled:
+                    !is_ready ||
+                    fge.WebSocketStatus != "CONNECTED" ||
+                    analysis_mode,
+                  min: 1,
+                }),
+                m(
+                  "p#blackunsupportedvariant",
+                  { hidden: true },
+                  "2nd engine does not support this variant. In browser Fairy-Stockfish will be used instead.",
+                ),
+              ]),
+              m("div#analysisenginesettings", [
+                m(
+                  "p#analysisunsupportedvariant",
+                  { hidden: true },
+                  "Analysis engine does not support this variant. In browser Fairy-Stockfish will be used instead.",
+                ),
+              ]),
+            ],
+          ),
           m("div#input2", { hidden: during_play }, [
             m("p", "Settings:"),
             m("input[type=number]#depth", {
@@ -3123,14 +4305,33 @@
                   if ($("#advtimectrl").checked == true) {
                     $("#advtimectrl").click();
                   }
-                  go();
+                  setTimeout(() => {
+                    if (!review_mode) {
+                      setFen(true, false);
+                    }
+                    go(false, false);
+                  }, 10);
                 },
               },
               "▶️Go",
             ),
             m(
               "button#stop",
-              { disabled: !is_ready, onclick: force_stop },
+              {
+                disabled: !is_ready,
+                onclick: () => {
+                  force_stop();
+                  if (fge.first_engine) {
+                    fge.first_engine.ForceStop();
+                  }
+                  if (fge.second_engine) {
+                    fge.second_engine.ForceStop();
+                  }
+                  if (fge.analysis_engine) {
+                    fge.analysis_engine.ForceStop();
+                  }
+                },
+              },
               "⏹Stop",
             ),
             m(
@@ -3235,7 +4436,11 @@
                   if (review_mode) {
                     return;
                   }
-                  window.setTimeout(setFen, 10);
+                  play_move = false;
+                  //console.log(Error());
+                  window.setTimeout(() => {
+                    setFen(false, true);
+                  }, 10);
                 },
                 hidden: true,
               },
@@ -3273,6 +4478,81 @@
                 },
               },
               "Copy Set FEN (internal)",
+            ),
+            m(
+              "p#binengineoutputinit",
+              {
+                hidden: true,
+                onclick: () => {
+                  if (fge.first_engine) {
+                    const OutputUpdateThrottleFunction = Throttle(() => {
+                      document.getElementById(
+                        "whiteengineoutput",
+                      ).textContent += first_engine_output;
+                      first_engine_output = "";
+                      scrollOutput();
+                    }, throttle_threshold);
+                    fge.first_engine.OutputUpdateCallBack = (color, msg) => {
+                      first_engine_output += "◀◀ " + msg + "\n";
+                      OutputUpdateThrottleFunction();
+                    };
+                    fge.first_engine.SendMessageCallBack = (msg) => {
+                      first_engine_output += "\n▶▶ " + msg + "\n\n";
+                      OutputUpdateThrottleFunction();
+                    };
+                    fge.first_engine.OnErrorMessageCallBack = (msg) => {
+                      if (during_play) {
+                        window.alert(msg);
+                      }
+                    };
+                  }
+                  if (fge.second_engine) {
+                    const OutputUpdateThrottleFunction = Throttle(() => {
+                      document.getElementById(
+                        "blackengineoutput",
+                      ).textContent += second_engine_output;
+                      second_engine_output = "";
+                      scrollOutput();
+                    }, throttle_threshold);
+                    fge.second_engine.OutputUpdateCallBack = (color, msg) => {
+                      second_engine_output += "◀◀ " + msg + "\n";
+                      OutputUpdateThrottleFunction();
+                    };
+                    fge.second_engine.SendMessageCallBack = (msg) => {
+                      second_engine_output += "\n▶▶ " + msg + "\n\n";
+                      OutputUpdateThrottleFunction();
+                    };
+                    fge.second_engine.OnErrorMessageCallBack = (msg) => {
+                      if (during_play) {
+                        window.alert(msg);
+                      }
+                    };
+                  }
+                  if (fge.analysis_engine) {
+                    const OutputUpdateThrottleFunction = Throttle(() => {
+                      document.getElementById(
+                        "analysisengineoutput",
+                      ).textContent += analysis_engine_output;
+                      analysis_engine_output = "";
+                      scrollOutput();
+                    }, throttle_threshold);
+                    fge.analysis_engine.OutputUpdateCallBack = (color, msg) => {
+                      analysis_engine_output += "◀◀ " + msg + "\n";
+                      OutputUpdateThrottleFunction();
+                    };
+                    fge.analysis_engine.EvaluationUpdateCallBack = (msg) => {
+                      document.getElementById("engineoutputline").value = msg;
+                      document.getElementById("engineoutputline").click();
+                    };
+                    fge.analysis_engine.SendMessageCallBack = (msg) => {
+                      analysis_engine_output += "\n▶▶ " + msg + "\n\n";
+                      OutputUpdateThrottleFunction();
+                    };
+                  }
+                  scrollOutput();
+                },
+              },
+              "Binary Engine Output Event Handler Initialization (internal)",
             ),
           ]),
           m(
@@ -3746,6 +5026,124 @@
               ]),
             ]),
             m("div#info", [
+              m(
+                "select#sannotation",
+                {
+                  onchange: () => {
+                    const dropdownnotation =
+                      document.getElementById("sannotation");
+                    const evalbar = document.getElementById("evalbar");
+                    const evalbarprogress =
+                      document.getElementById("evalbarprogress");
+                    const cp = document.getElementById("cp");
+                    if (dropdownnotation.selectedIndex < 0) {
+                      evalbar.style.backgroundColor = "#111111";
+                      evalbarprogress.style.backgroundColor = "#eeeeee";
+                      cp.style.color = "orange";
+                      return;
+                    }
+                    const value =
+                      dropdownnotation[dropdownnotation.selectedIndex].value;
+                    if (/xiangqi|ucci/i.test(value)) {
+                      evalbar.style.backgroundColor = "black";
+                      evalbarprogress.style.backgroundColor = "red";
+                      cp.style.color = "white";
+                    } else if (/shogi|usi/i.test(value)) {
+                      evalbar.style.backgroundColor = "#eeeeee";
+                      evalbarprogress.style.backgroundColor = "#111111";
+                      cp.style.color = "orange";
+                    } else if (/janggi/i.test(value)) {
+                      evalbar.style.backgroundColor = "red";
+                      evalbarprogress.style.backgroundColor = "blue";
+                      cp.style.color = "white";
+                    } else {
+                      evalbar.style.backgroundColor = "#111111";
+                      evalbarprogress.style.backgroundColor = "#eeeeee";
+                      cp.style.color = "orange";
+                    }
+                  },
+                },
+                [
+                  m("option", { value: "" }, "--Select Notation System--"),
+                  m(
+                    "option",
+                    { value: "DEFAULT" },
+                    "Standard/Short Algebraic Notation Without Piece Type Omission (DEFAULT)",
+                  ),
+                  m(
+                    "option",
+                    { value: "SAN" },
+                    "Standard/Short Algebraic Notation (SAN)",
+                  ),
+                  m(
+                    "option",
+                    { value: "LAN" },
+                    "Long Algebraic Notation (LAN)",
+                  ),
+                  m(
+                    "option",
+                    { value: "SHOGI_HOSKING" },
+                    "Shogi Hosking Notation (SHOGI_HOSKING)",
+                  ),
+                  m(
+                    "option",
+                    { value: "SHOGI_HODGES" },
+                    "Shogi George Hodges Notation (SHOGI_HODGES)",
+                  ),
+                  m(
+                    "option",
+                    { value: "SHOGI_HODGES_NUMBER" },
+                    "Shogi George Hodges Number-only Notation (SHOGI_HODGES_NUMBER)",
+                  ),
+                  m("option", { value: "JANGGI" }, "Janggi Notation (JANGGI)"),
+                  m(
+                    "option",
+                    { value: "XIANGQI_WXF" },
+                    "World Xiangqi Federation Notation (XIANGQI_WXF)",
+                  ),
+                  m(
+                    "option",
+                    { value: "THAI_SAN" },
+                    "Thai Standard/Short Algebraic Notation (THAI_SAN)",
+                  ),
+                  m(
+                    "option",
+                    { value: "THAI_LAN" },
+                    "Thai Long Algebraic Notation (THAI_LAN)",
+                  ),
+                  m(
+                    "option",
+                    { value: "FEN" },
+                    "Forsyth–Edwards Notation (Fairy-Stockfish) (FEN)",
+                  ),
+                  m("option", { value: "PGN" }, "Portable Game Notation (PGN)"),
+                  m(
+                    "option",
+                    { value: "EPD" },
+                    "Extended Position Description (EPD)",
+                  ),
+                  m(
+                    "option",
+                    { value: "FEN+UCIMOVE" },
+                    "Forsyth–Edwards Notation (Fairy-Stockfish) and UCI Moves (FEN+UCIMOVE)",
+                  ),
+                  m(
+                    "option",
+                    { value: "FEN+USIMOVE" },
+                    "Forsyth–Edwards Notation (Fairy-Stockfish) and USI Moves (FEN+USIMOVE)",
+                  ),
+                  m(
+                    "option",
+                    { value: "FEN+UCCIMOVE" },
+                    "Forsyth–Edwards Notation (Fairy-Stockfish) and UCCI (CECP) Moves (FEN+UCCIMOVE)",
+                  ),
+                  m(
+                    "option",
+                    { value: "SFEN+USIMOVE" },
+                    "Shogi Forsyth–Edwards Notation and USI Moves (SFEN+USIMOVE)",
+                  ),
+                ],
+              ),
               m("p#positioninfo", ""),
               m("div#timers", { hidden: !advanced_time_control }, [
                 m("div#whitetimer", [
@@ -3801,7 +5199,24 @@
               ]),
               m("p#currentboardfen"),
               m("p#label-pgn"),
-              m("div#output2", { onupdate: scrollOutput }, m("pre", output2)),
+              m("div#output2", { onupdate: scrollOutput }, [
+                m("pre#fsfoutput", output2),
+                m(
+                  "pre#whiteengineoutput",
+                  { hidden: true },
+                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.\n\n",
+                ),
+                m(
+                  "pre#blackengineoutput",
+                  { hidden: true },
+                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.\n\n",
+                ),
+                m(
+                  "pre#analysisengineoutput",
+                  { hidden: true },
+                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.\n\n",
+                ),
+              ]),
               m("div#enginecmddiv", [
                 m("input#enginecmd", {
                   placeholder: "Send command to engine...",
@@ -3818,6 +5233,61 @@
                   },
                 }),
                 m(
+                  "select#targetengine",
+                  {
+                    onchange: () => {
+                      let index = $("#targetengine").selectedIndex;
+                      if (index == 0) {
+                        document.getElementById("fsfoutput").hidden = false;
+                        document.getElementById("whiteengineoutput").hidden =
+                          true;
+                        document.getElementById("blackengineoutput").hidden =
+                          true;
+                        document.getElementById("analysisengineoutput").hidden =
+                          true;
+                      } else if (index == 1) {
+                        document.getElementById("fsfoutput").hidden = true;
+                        document.getElementById("whiteengineoutput").hidden =
+                          false;
+                        document.getElementById("blackengineoutput").hidden =
+                          true;
+                        document.getElementById("analysisengineoutput").hidden =
+                          true;
+                      } else if (index == 2) {
+                        document.getElementById("fsfoutput").hidden = true;
+                        document.getElementById("whiteengineoutput").hidden =
+                          true;
+                        document.getElementById("blackengineoutput").hidden =
+                          false;
+                        document.getElementById("analysisengineoutput").hidden =
+                          true;
+                      } else if (index == 3) {
+                        document.getElementById("fsfoutput").hidden = true;
+                        document.getElementById("whiteengineoutput").hidden =
+                          true;
+                        document.getElementById("blackengineoutput").hidden =
+                          true;
+                        document.getElementById("analysisengineoutput").hidden =
+                          false;
+                      }
+                    },
+                  },
+                  [
+                    m(
+                      "option",
+                      { value: "DEFAULT" },
+                      "In browser Fairy-Stockfish",
+                    ),
+                    m("option", { value: "WHITE" }, "1st binary engine"),
+                    m("option", { value: "BLACK" }, "2nd binary engine"),
+                    m(
+                      "option",
+                      { value: "ANALYSIS" },
+                      "Analysis binary engine",
+                    ),
+                  ],
+                ),
+                m(
                   "button#sendenginecmd",
                   {
                     disabled: during_play,
@@ -3829,6 +5299,36 @@
                     },
                   },
                   "SEND",
+                ),
+                m(
+                  "label#label-clearlogonstartthinking",
+                  m("input[type=checkbox]#clearlogonstartthinking", {
+                    disabled: !is_ready,
+                    checked: clear_log,
+                    onclick: () => {
+                      clear_log = !clear_log;
+                    },
+                  }),
+                  "Clear Log On Start Thinking",
+                ),
+                m(
+                  "button",
+                  {
+                    onclick: () => {
+                      first_engine_output = "";
+                      second_engine_output = "";
+                      analysis_engine_output = "";
+                      document.getElementById("whiteengineoutput").textContent =
+                        "";
+                      document.getElementById("blackengineoutput").textContent =
+                        "";
+                      document.getElementById(
+                        "analysisengineoutput",
+                      ).textContent = "";
+                      scrollOutput();
+                    },
+                  },
+                  "Clear Logs",
                 ),
               ]),
             ]),
