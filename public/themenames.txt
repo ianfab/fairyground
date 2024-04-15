@@ -7,6 +7,8 @@ merida|Merida
 cburnett|Cburnett
 lettertiles|Letter Tiles
 letters|FEN Style Letters
+meridaletters|Merida Letters
+cburnettletters|Cubernett Letters
 userdefined|User Defined Graphics
 
 blueboard|Blue

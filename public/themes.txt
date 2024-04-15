@@ -72,7 +72,7 @@
 #https://github.com/ianfab/fairyground/issues
 
 
-*|lettertiles,letters,userdefined|
+*|lettertiles,letters,meridaletters,cburnettletters,userdefined|
 |merida,cburnett|blueboard,greenboard,brownboard,purpleboard,cobaltboard
 
 seirawan|seirawan|
