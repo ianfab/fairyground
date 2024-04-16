@@ -1717,6 +1717,7 @@
       let advanced_time_control = false;
       let during_play = false;
       let select_move_dialog = false;
+      let in_browser_fsf_hash = 16;
       let white_start_time = 0;
       let black_start_time = 0;
       let white_remaining_time = 0;
@@ -1932,6 +1933,7 @@
         play_move = false;
         stop(true);
         const variant = $("#dropdown-variant").value;
+        stockfish.postMessage(`ucinewgame`);
         if (variant == "") {
           stockfish.postMessage(`setoption name UCI_Variant value chess`);
         } else {
@@ -2512,6 +2514,7 @@
         $("#fen").value = "";
         $("#move").value = "";
         resetTimer();
+        stockfish.postMessage(`ucinewgame`);
         if (fge.first_engine) {
           fge.first_engine.NewGame();
         }
@@ -2531,6 +2534,7 @@
         }
         const moves = $("#move").value;
         $("#move").value = moves.substring(0, moves.lastIndexOf(" "));
+        stockfish.postMessage(`ucinewgame`);
         if (fge.first_engine) {
           fge.first_engine.NewGame();
         }
@@ -2688,13 +2692,22 @@
         } else {
           stockfish.postMessage(`setoption name Threads value ${threadnum}`);
         }
-        stockfish.postMessage(`setoption name clear hash`);
         if (hashsize.length <= 0 || hashsize < 1) {
-          stockfish.postMessage(`setoption name Hash value 16`);
+          if (in_browser_fsf_hash != 16) {
+            stockfish.postMessage(`setoption name Hash value 16`);
+            in_browser_fsf_hash = 16;
+            console.log(`sethash: 16`);
+          }
         } else if (hashsize > 33554432) {
-          stockfish.postMessage(`setoption name Hash value 33554432`);
-        } else {
+          if (in_browser_fsf_hash != 33554432) {
+            stockfish.postMessage(`setoption name Hash value 33554432`);
+            in_browser_fsf_hash = 33554432;
+            console.log(`sethash: 33554432`);
+          }
+        } else if (in_browser_fsf_hash != hashsize) {
           stockfish.postMessage(`setoption name Hash value ${hashsize}`);
+          in_browser_fsf_hash = hashsize;
+          console.log(`sethash: ${hashsize}`);
         }
         if (
           multipleprincipalvariation.length <= 0 ||
@@ -4143,6 +4156,7 @@
                     return;
                   }
                   resetTimer();
+                  stockfish.postMessage(`ucinewgame`);
                   if (fge.first_engine) {
                     fge.first_engine.NewGame();
                   }
