@@ -67,6 +67,7 @@ empire|Army Variants|Empire Chess|Asymmetric variant where one army has pieces t
 ordamirror|Army Variants|Orda Mirror|Orda Chess variant with two Horde armies. The Falcon replaces the Yurt.
 spartan|Army Variants|Spartan|Asymmetric Spartans vs. Persians variant.
 horde|Army Variants|Horde|Lots of pawns VS chess army. White wins when checkmating black while black wins when capturing all white pieces.
+khans|Army Variants|Khans Chess|Orda Chess variant. The scout and khatun replaces the pawn and yurt.
 
 ataxx|Rule Variants|ATAXX|Infection game. Pieces can turn the enemy pieces in the 8 squares around the destination square into friendly pieces after move.
 snailtrail|Rule Variants|Snail Trail|The squares that pieces have moved from will be blocked. The one who gets stuck loses.
