@@ -33,6 +33,7 @@ gorogoro|Shogi Variants|Gorogoro Shogi|5x6 Shogi designed to introduce tactics w
 gorogoroplus|Shogi Variants|Gorogoro+ Shogi|5x6 Shogi designed to introduce tactics with the generals.
 torishogi|Shogi Variants|Tori Shogi|A confrontational 7x7 variant with unique pieces each named after different birds.
 shoshogi|Shogi Variants|Sho Shogi|A new piece called Drunk Elephant is introduced, which can promote to a new king. You can lose one of the 2 kings after the promotion.
+cannonshogi|Shogi Variants|Cannon Shogi|Shogi with Chinese and Korean cannons.
 
 xiangqi|Xiangqi Variants|Xiangqi|Chinese Chess, one of the oldest and most played board games in the world.
 manchu|Xiangqi Variants|Manchu Xiangqi|Xiangqi variant where one side has a chariot that can also move as a cannon or horse.
@@ -57,6 +58,7 @@ gothic|Fairy Variants|Gothic Chess|Gothic chess. Capablanca chess with better st
 chaturanga|Fairy Variants|Chaturanga|Ancient form of chess. Pawns, bishops(elephants), and queen(ferz) are different from the ones in modern chess.
 chak|Fairy Variants|Chak|Mayan chess. Inspired by cultural elements of Mesoamerica.
 chennis|Fairy Variants|Chennis|Pieces alternate between two forms with each move.
+mansindam|Fairy Variants|Mansindam|A variant that combines the Shogi's drop rule with strong pieces.
 
 orda|Army Variants|Orda Chess|Asymmetric variant where one army has pieces that move like knights but capture differently.
 synochess|Army Variants|Syno Chess|Asymmetric East vs. West variant which pits the western Chess army against a Xiangqi and Janggi-styled army.
@@ -65,6 +67,7 @@ empire|Army Variants|Empire Chess|Asymmetric variant where one army has pieces t
 ordamirror|Army Variants|Orda Mirror|Orda Chess variant with two Horde armies. The Falcon replaces the Yurt.
 spartan|Army Variants|Spartan|Asymmetric Spartans vs. Persians variant.
 horde|Army Variants|Horde|Lots of pawns VS chess army. White wins when checkmating black while black wins when capturing all white pieces.
+khans|Army Variants|Khans Chess|Orda Chess variant. The scout and khatun replaces the pawn and yurt.
 
 ataxx|Rule Variants|ATAXX|Infection game. Pieces can turn the enemy pieces in the 8 squares around the destination square into friendly pieces after move.
 snailtrail|Rule Variants|Snail Trail|The squares that pieces have moved from will be blocked. The one who gets stuck loses.
