@@ -1,0 +1,17 @@
+.gorogoroboard.board5x6 cg-board {
+  background-image: url('images/board/gorogoro/gorogoro.svg');
+  width: 100%;
+  height: 100%;
+}
+
+.gorogoroboard.board5x6 .cg-wrap.manipulable.orientation-white, .gorogoroboard.board5x6 .cg-wrap.manipulable.orientation-black {
+  width: 520px;
+  height: 720px;
+  position: relative;
+  display: block;
+}
+
+.gorogoroboard.board5x6 .cg-wrap piece {
+  position: absolute;
+  margin-left: -6px;
+}
