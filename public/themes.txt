@@ -96,6 +96,7 @@ cannonshogi|cannonshogi|cannonshogiboard
 torishogi|torishogi|torishogiboard
 gorogoro|@shogi|gorogoroboard
 gorogoroplus|@shogi|@gorogoro
+dobutsu|dobutsu|dobutsuboard
 
 xiangqi|x2dhanzi,wikim|xiangqiboard
 xiangqihouse|@xiangqi|@xiangqi
@@ -121,3 +122,4 @@ flipersi|@flipello|
 chennis|chennis|chennisboard
 ataxx|ataxx|ataxxboard
 mansindam|mansindam|
+
