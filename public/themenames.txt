@@ -9,6 +9,7 @@ lettertiles|Letter Tiles
 letters|FEN Style Letters
 meridaletters|Merida Letters
 cburnettletters|Cburnett Letters
+blindfold|Invisible (Blindfold)
 userdefined|User Defined Graphics
 
 blueboard|Blue
