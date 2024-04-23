@@ -77,6 +77,7 @@
 
 seirawan|seirawan|
 shouse|@seirawan|
+duck|duck|
 
 spartan|spartan|
 empire|empire|
