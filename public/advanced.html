@@ -1843,6 +1843,7 @@
         let i = 0;
         for (i = 0; i < fge.WebSocketReconnectionTime; i++) {
           try {
+            fge.WebSocketStatus = "CONNECTING";
             fge.ws = new WebSocket("ws://localhost:" + port.toString());
 
             fge.ws.addEventListener("open", function (event) {
@@ -1869,7 +1870,7 @@
                 return;
               }
               let msg = event.data.split("|");
-              if (fge.WebSocketStatus == "Unestablished") {
+              if (fge.WebSocketStatus == "CONNECTING") {
                 if (event.data == `${checkconnectionnumber}`) {
                   console.log(
                     `%c WebSocket %c CONNECTED %c WebSocket connection established.`,
@@ -1892,7 +1893,6 @@
                     "",
                   );
                   fge.ws.close();
-                  fge.ws = null;
                   fge.WebSocketStatus = "ERROR";
                   const binenginediv =
                     document.getElementById("binengineinput");
@@ -1918,7 +1918,6 @@
               if (fge.WebSocketStatus == "ERROR") {
                 return;
               }
-              fge.ws = null;
               console.error(
                 `%c WebSocket %c CLOSED %c WebSocket Connection Closed.`,
                 "color: #fff; background: #5f5f5f",
@@ -1941,7 +1940,6 @@
 
             fge.ws.addEventListener("error", function (event) {
               fge.WebSocketStatus = "ERROR";
-              fge.ws = null;
               console.error(
                 `%c WebSocket %c ERROR %c Errors occurred during establishing WebSocket connection.`,
                 "color: #fff; background: #5f5f5f",
@@ -1979,7 +1977,6 @@
             "color: #fff; background: #f03a17",
             "",
           );
-          fge.ws = null;
           fge.WebSocketStatus = "ERROR";
           window.alert(
             `Cannot initiate WebSocket connection to ws://localhost:${port}. Binary engine loading feature will be disabled.`,
@@ -4136,8 +4133,13 @@
                     if (!is_ready) {
                       return;
                     }
-                    if (fge.ws) {
+                    if (fge.WebSocketStatus == "CONNECTED") {
                       window.alert("You are already connected.");
+                      return;
+                    } else if (fge.WebSocketStatus == "CONNECTING") {
+                      window.alert(
+                        "Connection is during establishment process.",
+                      );
                       return;
                     }
                     let port = window.prompt(
