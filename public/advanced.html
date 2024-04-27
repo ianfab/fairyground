@@ -306,6 +306,30 @@
     margin-bottom: 10px;
   }
 
+  #misc button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-left: 6px;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  #misc button:hover {
+    background: #aaa;
+  }
+
+  #misc button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #misc button:active {
+    background: #000;
+  }
+
   #outputs {
     display: flex;
     flex: 1 1 auto;
@@ -1274,6 +1298,7 @@
             func.apply(this, arguments);
             timer = null;
           }, wait);
+          func.apply(this, arguments);
         }
       };
     }
@@ -1814,13 +1839,11 @@
         wsport = +wsport + 1;
       }
 
-      let i = 0;
-      if (window.location.hostname == "localhost") {
+      const connectToWebSocketServer = (port, callbackfn) => {
+        let i = 0;
         for (i = 0; i < fge.WebSocketReconnectionTime; i++) {
           try {
-            fge.ws = new WebSocket(
-              "ws://" + window.location.hostname + ":" + wsport.toString(),
-            );
+            fge.ws = new WebSocket("ws://localhost:" + port.toString());
 
             fge.ws.addEventListener("open", function (event) {
               fge.ws.send(`CONNECT\x10${checkconnectionnumber}`);
@@ -1953,7 +1976,7 @@
           fge.ws = null;
           fge.WebSocketStatus = "ERROR";
           window.alert(
-            "Cannot initiate WebSocket connection. Binary engine loading feature will be disabled.",
+            `Cannot initiate WebSocket connection to ws://localhost:${port}. Binary engine loading feature will be disabled.`,
           );
           const binenginediv = document.getElementById("binengineinput");
           if (binenginediv) {
@@ -1963,15 +1986,19 @@
           fge.second_engine = null;
           fge.analysis_engine = null;
         }
+      };
+
+      if (window.location.hostname == "localhost") {
+        connectToWebSocketServer(wsport);
       } else {
-        console.error(
-          `%c WebSocket %c ERROR %c Cannot initiate WebSocket connection in online versions.`,
+        console.log(
+          `%c WebSocket %c PENDING %c Cannot automatically initiate WebSocket connection in online versions. Waiting user action...`,
           "color: #fff; background: #5f5f5f",
-          "color: #fff; background: #f03a17",
+          "color: #fff; background: #3f48cc",
           "",
         );
         fge.ws = null;
-        fge.WebSocketStatus = "ERROR";
+        fge.WebSocketStatus = "Unestablished";
         const binenginediv = document.getElementById("binengineinput");
         if (binenginediv) {
           binenginediv.style.display = "none";
@@ -4088,6 +4115,43 @@
                   onclick: () =>
                     window.alert(
                       "You can upload a Variant Settings file to load settings for the variants including classification, names and descriptions. Contents will be appended to the variant descriptions provided by the server.",
+                    ),
+                },
+                "[?]",
+              ),
+            ]),
+            m("div", { hidden: during_play }, [
+              "- External binary engine feature: ",
+              m(
+                "button",
+                {
+                  disabled: !is_ready,
+                  onclick: () => {
+                    if (!is_ready) {
+                      return;
+                    }
+                    if (fge.ws) {
+                      window.alert("You are already connected.");
+                      return;
+                    }
+                    let port = window.prompt(
+                      "Please enter the WebSocket port of local fairyground server:",
+                      "5016",
+                    );
+                    if (port) {
+                      connectToWebSocketServer(port);
+                    }
+                  },
+                },
+                "CONNECT",
+              ),
+              m(
+                "span",
+                {
+                  style: "cursor: pointer;",
+                  onclick: () =>
+                    window.alert(
+                      "If you are using online version of fairyground, external binary engine loading feature will not be enabled automatically. You need to provide the port of local (i.e. offline version) fairyground server in order to make it work.",
                     ),
                 },
                 "[?]",
