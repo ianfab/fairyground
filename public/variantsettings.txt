@@ -1,5 +1,5 @@
 #Fairyground Variant Settings File
-#Syntax: <variant ID (delcared in variants.ini)>|<variant type/classification>|<variant display name>|<variant description>
+#Syntax: <variant ID (declared in variants.ini)>|<variant type/classification>|<variant display name>|<variant description>
 #The type or classification is used in variant type dropdown which helps you classify the variants.
 #The display name will be displayed in the variant dropdown as the item name.
 #The description will be displayed in the dropdown as tooltips, you can hover your cursor on an item to view that.
@@ -54,7 +54,7 @@ shako|Fairy Variants|Shako|Introduces the cannon and elephant from Xiangqi into 
 shogun|Fairy Variants|Shogun|Pieces promote and can be dropped, similar to Shogi.
 hoppelpoppel|Fairy Variants|Hoppel-Poppel|Knights capture as bishops; bishops capture as knights.
 amazon|Fairy Variants|Amazon|Replace the Queen with Amazon (Q + N).
-gothic|Fairy Variants|Gothic Chess|Gothic chess. Capablanca chess with better starting positon.
+gothic|Fairy Variants|Gothic Chess|Gothic chess. Capablanca chess with better starting position.
 chaturanga|Fairy Variants|Chaturanga|Ancient form of chess. Pawns, bishops(elephants), and queen(ferz) are different from the ones in modern chess.
 chak|Fairy Variants|Chak|Mayan chess. Inspired by cultural elements of Mesoamerica.
 chennis|Fairy Variants|Chennis|Pieces alternate between two forms with each move.

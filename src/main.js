@@ -609,13 +609,13 @@ function generateRegExp(expstr) {
         return regexp;
       } catch {
         window.alert(
-          'There is a syntax error in the regular expression. The syntax is /<search items...>/<flags...>. You can google "regular expression" to get more informaion.',
+          'There is a syntax error in the regular expression. The syntax is /<search items...>/<flags...>. You can google "regular expression" to get more information.',
         );
         return null;
       }
     } else {
       window.alert(
-        'There is a syntax error in the regular expression. The syntax is /<search items...>/<flags...>. You can google "regular expression" to get more informaion.',
+        'There is a syntax error in the regular expression. The syntax is /<search items...>/<flags...>. You can google "regular expression" to get more information.',
       );
       return null;
     }
@@ -860,7 +860,7 @@ function getNotation(notation, variant, startfen, is960, ucimovestr) {
     throw TypeError();
   }
   if (notation == "") {
-    return "(Missing notaion system, please select one in the dropdown...)";
+    return "(Missing notation system, please select one in the dropdown...)";
   }
   if (ffish) {
     if (window.fairyground) {
@@ -2347,7 +2347,7 @@ function LoadPositionVariant(side, file) {
     //<Root dir: PositionVariantsDirectory>  //Items are classified by chess variant names
     //    <Sub dir1: VariantTypeDirectory>  //Items are classified by position variant types, e.g. Mate in X, Handicaps, etc.
     //        <Sub Sub dir1: VariantNameDirectory>  //Items are classified by the position variant name provided in the file.
-    //            <File: VariantPositionItem>  //This contains the FEN and the discription
+    //            <File: VariantPositionItem>  //This contains the FEN and the description
     //        <Sub Sub dir2: VariantNameDirectory>
     //            <File: VariantPositionItem>
     //            ...
