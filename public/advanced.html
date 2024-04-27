@@ -1892,6 +1892,7 @@
                     "",
                   );
                   fge.ws.close();
+                  fge.ws = null;
                   fge.WebSocketStatus = "ERROR";
                   const binenginediv =
                     document.getElementById("binengineinput");
@@ -1917,6 +1918,7 @@
               if (fge.WebSocketStatus == "ERROR") {
                 return;
               }
+              fge.ws = null;
               console.error(
                 `%c WebSocket %c CLOSED %c WebSocket Connection Closed.`,
                 "color: #fff; background: #5f5f5f",
@@ -1939,6 +1941,7 @@
 
             fge.ws.addEventListener("error", function (event) {
               fge.WebSocketStatus = "ERROR";
+              fge.ws = null;
               console.error(
                 `%c WebSocket %c ERROR %c Errors occurred during establishing WebSocket connection.`,
                 "color: #fff; background: #5f5f5f",
