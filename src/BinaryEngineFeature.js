@@ -810,7 +810,7 @@ function GetEngineList(GetFinishCallBack, ws) {
     throw TypeError();
   }
   if (ws.readyState != ws.OPEN) {
-    throw Error("WebSocket connetion error");
+    throw Error("WebSocket connection error");
   }
   function OnGetEngineListMessageReceived(event) {
     let msg = event.data.split("\x10");
@@ -831,7 +831,7 @@ function SaveEngineList(EngineList, ws) {
     throw TypeError();
   }
   if (ws.readyState != ws.OPEN) {
-    throw Error("WebSocket connetion error");
+    throw Error("WebSocket connection error");
   }
   let text = ConvertEngineListToText(EngineList);
   ws.send(`SAVE_ENGINE_LIST\x10${text}`);
@@ -2461,7 +2461,7 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
     throw TypeError();
   }
   if (ws.readyState != ws.OPEN) {
-    throw Error("WebSocket connetion error");
+    throw Error("WebSocket connection error");
   }
   while (document.getElementById("enginesetuppopup") != null) {
     document.getElementById("enginesetuppopup").remove();
@@ -2501,7 +2501,7 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let pathdiv = document.createElement("div");
   pathdiv.style.display = "flex";
   let enginepathtext = document.createElement("p");
-  enginepathtext.innerText = "Engine Excutable Path (Absolute Path):";
+  enginepathtext.innerText = "Engine Executable Path (Absolute Path):";
   let enginepath = document.createElement("input");
   enginepath.style.border = "1px solid #ddd";
   enginepath.style.width = "500px";
@@ -2517,7 +2517,7 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   enginewd.style.border = "1px solid #ddd";
   enginewd.style.width = "500px";
   enginewd.placeholder =
-    "Leave blank to be the same with Excutable Path directory";
+    "Leave blank to be the same with Executable Path directory";
   wddiv.appendChild(enginewdtext);
   wddiv.appendChild(enginewd);
   wddiv.style.marginBottom = "5px";
@@ -2603,7 +2603,7 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
       }
     } else {
       if (engineid.value == "" || enginepath.value == "") {
-        window.alert("Engine ID and excutable path must not be null");
+        window.alert("Engine ID and executable path must not be null");
         return;
       }
       if (newengineobj) {
@@ -2690,7 +2690,7 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   }
   confirm.onclick = function () {
     if (engineid.value == "" || enginepath.value == "") {
-      window.alert("Engine ID and excutable path must not be null");
+      window.alert("Engine ID and executable path must not be null");
       return;
     }
     if (isloadingengine) {
@@ -2803,7 +2803,7 @@ function ShowEngineManagementUI(EngineList, ws) {
     throw TypeError();
   }
   if (ws.readyState != ws.OPEN) {
-    throw Error("WebSocket connetion error");
+    throw Error("WebSocket connection error");
   }
   while (document.getElementById("enginemanagementpopup") != null) {
     document.getElementById("enginemanagementpopup").remove();
