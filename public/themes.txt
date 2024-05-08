@@ -72,11 +72,12 @@
 #https://github.com/ianfab/fairyground/issues
 
 
-*|meridaletters,cburnettletters,lettertiles,letters,userdefined|
+*|meridaletters,cburnettletters,lettertiles,letters,blindfold,userdefined|
 |merida,cburnett|blueboard,greenboard,brownboard,purpleboard,cobaltboard
 
 seirawan|seirawan|
 shouse|@seirawan|
+duck|duck|
 
 spartan|spartan|
 empire|empire|
@@ -86,10 +87,17 @@ ordavsempire|ordavsempire|
 synochess|synochess|
 shinobi|shinobi|
 chak|chak|chakboard
+khans|khans|
+shinobiplus|shinobiplus|
 
 kyotoshogi|kyoto|
 shogi|portella2kanji|shogiboard
 minishogi|@shogi|minishogiboard
+cannonshogi|cannonshogi|cannonshogiboard
+torishogi|torishogi|torishogiboard
+gorogoro|@shogi|gorogoroboard
+gorogoroplus|@shogi|@gorogoro
+dobutsu|dobutsu|dobutsuboard
 
 xiangqi|x2dhanzi,wikim|xiangqiboard
 xiangqihouse|@xiangqi|@xiangqi
@@ -103,6 +111,7 @@ janggitraditional|@janggi|@janggi
 makruk|makruk|makrukboard
 makpong|@makruk|@makruk
 cambodian|@makruk|@makruk
+asean|asean|
 
 sittuyin|sittuyin|sittuyinboard
 
@@ -110,3 +119,8 @@ flipello|flipello|
 flipello10|@flipello|
 flipello6|@flipello|
 flipersi|@flipello|
+
+chennis|chennis|chennisboard
+ataxx|ataxx|ataxxboard
+mansindam|mansindam|
+
