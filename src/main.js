@@ -1,4 +1,4 @@
-// ffish.js test using chessgroundx
+﻿// ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
 const variantsIni = document.getElementById("variants-ini");
@@ -1093,6 +1093,7 @@ function getNotation(notation, variant, startfen, is960, ucimovestr) {
                 );
               }
             }
+            tmpboard.delete();
           } else {
             return "Illegal FEN";
           }

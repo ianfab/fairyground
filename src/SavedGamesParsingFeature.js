@@ -140,6 +140,8 @@ function GetCurrentGameInformation(FFishJSLibrary) {
     } else if (tmpboard.result() == "*") {
       Termination = "Unterminated";
     }
+    let gameresult = tmpboard.result();
+    tmpboard.delete();
     return {
       Event: GameEvent,
       Site: Site,
@@ -149,7 +151,7 @@ function GetCurrentGameInformation(FFishJSLibrary) {
       Variant: Variant,
       FirstPlayerName: whitename,
       SecondPlayerName: blackname,
-      Result: tmpboard.result(),
+      Result: gameresult,
       Termination: Termination,
     };
   } else {
@@ -291,6 +293,7 @@ class Game {
         FFishJSLibrary.Notation.SAN,
       );
       result += ` ${gameresult}\n\n`;
+      tmpboard.delete();
       return result;
     } else {
       return null;
@@ -367,6 +370,7 @@ class Game {
         result += ` sm ${this.SuppliedMove};`;
       }
       result += ` eval ${this.Evaluation.toFixed(2)};`;
+      tmpboard.delete();
       return result;
     } else {
       return null;
@@ -437,6 +441,7 @@ class PortableGameNotation {
       } else {
         while (moveslist.length > 0) {
           if (!tmpboard.pushSan(moveslist.pop(), Notation)) {
+            tmpboard.delete();
             return null;
           }
         }
@@ -445,9 +450,11 @@ class PortableGameNotation {
       if (typeof Result == "string") {
         if (tmpboard.result() != Result) {
           console.warn("Provided result mismatches with actual result.");
+          tmpboard.delete();
           return null;
         }
       }
+      tmpboard.delete();
       return result.trim();
     } else {
       console.warn("Invalid FEN or non-existent variant");
@@ -544,9 +551,11 @@ class PortableGameNotation {
       if (typeof Result == "string") {
         if (tmpboard.result() != Result) {
           console.warn("Provided result mismatches with actual result.");
+          tmpboard.delete();
           return null;
         }
       }
+      tmpboard.delete();
       return result.trim();
     } else {
       console.warn("Invalid FEN or non-existent variant");
@@ -1527,7 +1536,7 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
       if (size > 1048576) {
         if (
           !window.confirm(
-            `Warning: Provided file is very large (${(size / 1048576).toFixed(2)} MB). Fairyground is not designed to load large files (>1MB). Continuing loading can cause the page to hang for a long time and probably crash the page. Proceed?`,
+            `Warning: Provided file is very large (${(size / 1048576).toFixed(2)} MB). Fairyground is not designed to load large files (>1MB). Continuing loading can cause the page to hang for a long time. Proceed?`,
           )
         ) {
           return;
