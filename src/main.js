@@ -2960,7 +2960,7 @@ function getPgn(board) {
   if (
     dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value == ""
   ) {
-    let pgn = "";
+    /*let pgn = "";
     const reversedMoves = [];
     let moveStack = board.moveStack();
 
@@ -2988,7 +2988,8 @@ function getPgn(board) {
 
     const result = board.result(checkboxAdjudicate.checked);
     if (result !== "*") pgn += result;
-    return pgn.trim();
+    return pgn.trim();*/
+    return "Please select a notation system in the dropdown...";
   } else {
     return getNotation(
       dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,

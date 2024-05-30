@@ -2601,6 +2601,7 @@
         $("#fen").value = "";
         $("#move").value = "";
         resetTimer();
+        stockfish.postMessage(`stop`);
         stockfish.postMessage(`ucinewgame`);
         if (fge.first_engine) {
           fge.first_engine.NewGame();
@@ -2621,6 +2622,7 @@
         }
         const moves = $("#move").value;
         $("#move").value = moves.substring(0, moves.lastIndexOf(" "));
+        stockfish.postMessage(`stop`);
         stockfish.postMessage(`ucinewgame`);
         if (fge.first_engine) {
           fge.first_engine.NewGame();
@@ -4302,6 +4304,7 @@
                     return;
                   }
                   resetTimer();
+                  stockfish.postMessage(`stop`);
                   stockfish.postMessage(`ucinewgame`);
                   if (fge.first_engine) {
                     fge.first_engine.NewGame();
