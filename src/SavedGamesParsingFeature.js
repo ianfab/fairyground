@@ -391,7 +391,12 @@ class PortableGameNotation {
     this.GameList = [];
     this.FFishJSLibrary = FFishJSLibrary;
     if (typeof FileRawText == "string") {
-      this.ParseFromText(FileRawText);
+      let NotLoadedGameCount = this.ParseFromText(FileRawText);
+      if (NotLoadedGameCount) {
+        window.alert(
+          `${NotLoadedGameCount} game(s) is/are not loaded. Press Ctrl+Shift+I to see the reasons in errors.`,
+        );
+      }
     }
   }
 
@@ -586,6 +591,7 @@ class PortableGameNotation {
     let SANVariation = this.FFishJSLibrary.Notation.SAN;
     let ParserState = 0;
     let ParserStarts = false;
+    let NotLoadedGameCount = 0;
     let rawText = FileRawText.replace(
       LineFeedCarriageReturnMatcher2,
       "\n",
@@ -645,13 +651,15 @@ class PortableGameNotation {
             } else {
               let variantlist = this.FFishJSLibrary.variants().split(" ");
               if (variantlist.includes(Variant)) {
-                console.warn(
+                console.error(
                   `At game ${CurrentGame} (ends with line ${i}) in PGN file: Value Error: Bad FEN, move notation or game result.`,
                 );
+                NotLoadedGameCount++;
               } else {
-                console.warn(
+                console.error(
                   `At game ${CurrentGame} (ends with line ${i}) in PGN file: Reference Error: Variant "${Variant}" is not defined.`,
                 );
+                NotLoadedGameCount++;
                 if (!variantlist.includes("chess")) {
                   console.error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
                   window.alert(
@@ -801,9 +809,23 @@ class PortableGameNotation {
           ),
         );
       } else {
-        console.warn(
-          `At game ${CurrentGame} in PGN file: Value Error: Bad FEN, move notation or game result.`,
-        );
+        let variantlist = this.FFishJSLibrary.variants().split(" ");
+        if (variantlist.includes(Variant)) {
+          console.error(
+            `At game ${CurrentGame} (ends with line ${i}) in PGN file: Value Error: Bad FEN, move notation or game result.`,
+          );
+          NotLoadedGameCount++;
+        } else {
+          console.error(
+            `At game ${CurrentGame} (ends with line ${i}) in PGN file: Reference Error: Variant "${Variant}" is not defined.`,
+          );
+          NotLoadedGameCount++;
+          if (!variantlist.includes("chess")) {
+            console.error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
+            window.alert("ERROR: FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
+            throw Error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
+          }
+        }
       }
     } else if (ParserStarts) {
       console.warn(
@@ -814,6 +836,7 @@ class PortableGameNotation {
         `At line ${i + 1} of PGN file: Syntax Error: A PGN file must begin with configuration entries.`,
       );
     }
+    return NotLoadedGameCount;
   }
 
   AppendToGameList(GameList) {
@@ -840,7 +863,12 @@ class ExtendedPositionDescription {
     this.GameList = [];
     this.FFishJSLibrary = FFishJSLibrary;
     if (typeof FileRawText == "string") {
-      this.ParseFromText(FileRawText);
+      let NotLoadedGameCount = this.ParseFromText(FileRawText);
+      if (NotLoadedGameCount) {
+        window.alert(
+          `${NotLoadedGameCount} game(s) is/are not loaded. Press Ctrl+Shift+I to see the reasons in errors.`,
+        );
+      }
     }
   }
 
@@ -868,6 +896,7 @@ class ExtendedPositionDescription {
     let SuppliedMove = "0000";
     let Evaluation = 0.0;
     let Termination = "";
+    let NotLoadedGameCount = 0;
     let rawText = FileRawText.replace(
       LineFeedCarriageReturnMatcher2,
       "\n",
@@ -1029,12 +1058,13 @@ class ExtendedPositionDescription {
       } else {
         let variantlist = this.FFishJSLibrary.variants().split(" ");
         if (variantlist.includes(Variant)) {
-          console.warn(
+          console.error(
             `At line ${i + 1} of EPD file: Value Error: Invalid FEN.`,
           );
+          NotLoadedGameCount++;
           continue;
         } else {
-          console.warn(
+          console.error(
             `At line ${i + 1} of EPD file: Reference Error: Variant "${Variant}" is not defined.`,
           );
           if (!variantlist.includes("chess")) {
@@ -1042,10 +1072,12 @@ class ExtendedPositionDescription {
             window.alert("ERROR: FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
             throw Error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
           }
+          NotLoadedGameCount++;
           continue;
         }
       }
     }
+    return NotLoadedGameCount;
   }
 
   AppendToGameList(GameList) {
