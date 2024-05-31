@@ -429,7 +429,8 @@ class PortableGameNotation {
             val == "1-0" ||
             val == "0-1" ||
             val == "1/2-1/2" ||
-            val == "..."
+            val == "..." ||
+            val.startsWith("$")
           ) {
             return false;
           } else {

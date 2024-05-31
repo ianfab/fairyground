@@ -1737,9 +1737,9 @@ new Module().then((loadedModule) => {
         } else {
           evalscore.innerText = evaluation.toFixed(2);
         }
-        if (evaluation < -9.8) {
+        if (evaluation <= -9.8) {
           evaluationBar.style.width = "1%";
-        } else if (evaluation > 9.8) {
+        } else if (evaluation >= 9.8) {
           evaluationBar.style.width = "99%";
         } else {
           evaluationBar.style.width =
