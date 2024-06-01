@@ -1,4 +1,13 @@
-#FairyGround Position Variant Setting file
+#FairyGround Position Variant (Custom Position) Setting file
+#Syntax (Also applies to client uploaded position variants):
+#Type 1: <variant>|<position type>|<position name>|<FEN>|<description>
+#Type 2: <variant>|<position type>|<position name>|<FEN>|<uci moves>|<description>
+#<variant>: The variant that the position applies to.
+#<position type>: The type of the position. For instance, "Handicap", "Mate Games", "Development", "Defense".
+#<position name>: The unique name of this position.
+#<FEN>: The Forsyth-Edwards Notation of this position. This is considered as the starting position. For example: 8/8/8/8/3k4/1Q6/8/K7 w - - 0 1
+#<uci moves>: Moves in uci format. The moves are based on the FEN. For example: e2e4 e7e5 g1f3
+#<description>: The description of this position. It will be displayed at the top of the right panel and in <Position INFO> button.
 
 chess|Mate Endgame|Queen Mate|8/8/8/8/3k4/1Q6/8/K7 w - - 0 1|Mate black king with your queen! If you can win this, then it means that you can simply win with a promoted pawn! However, queen cannot mate by herself. King's support is needed.
 chess|Mate Endgame|Rook Mate|8/8/8/8/4k3/8/8/4K2R w K - 0 1|Mate black king with your rook! Remember a rook a control a whole file & rank, which can block the king from passing it.

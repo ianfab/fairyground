@@ -602,18 +602,31 @@ function generateRegExp(expstr) {
     return null;
   }
   if (expstr.trim().charAt(0) == "/") {
-    let params = expstr.trim().slice(1).split("/");
-    if (params.length == 2) {
-      try {
-        let regexp = new RegExp(params[0], params[1]);
-        return regexp;
-      } catch {
-        window.alert(
-          'There is a syntax error in the regular expression. The syntax is /<search items...>/<flags...>. You can google "regular expression" to get more information.',
-        );
-        return null;
+    let i = 0;
+    let str = expstr.trim().slice(1);
+    let index = 0;
+    for (i = 0; i < str.length; i++) {
+      if (str.charAt(i) == "\\") {
+        i++;
+        continue;
       }
-    } else {
+      if (str.charAt(i) == "/") {
+        if (i == 0) {
+          window.alert(
+            'There is a syntax error in the regular expression. The syntax is /<search items...>/<flags...>. You can google "regular expression" to get more informaion.',
+          );
+          return null;
+        } else {
+          index = i;
+          break;
+        }
+      }
+    }
+    let params = [str.slice(0, index), str.slice(index + 1)];
+    try {
+      let regexp = new RegExp(params[0], params[1]);
+      return regexp;
+    } catch {
       window.alert(
         'There is a syntax error in the regular expression. The syntax is /<search items...>/<flags...>. You can google "regular expression" to get more information.',
       );
@@ -961,8 +974,34 @@ function getNotation(notation, variant, startfen, is960, ucimovestr) {
               result += tmpboard.variationSan(ucimoves, ffish.Notation.SAN);
               return result;
             } else if (notation == "EPD") {
-              const gamefen = tmpboard.fen().split(/[ ]+/);
-              result = `${gamefen[0]} ${gamefen[1]} ${gamefen[2]} ${gamefen[3]}`;
+              const today = new Date();
+              const year = today.getFullYear();
+              const month = today.getMonth() + 1;
+              const day = today.getDate();
+              const hours = today.getHours();
+              const minutes = today.getMinutes();
+              const seconds = today.getSeconds();
+              let whitename = "";
+              let blackname = "";
+              if (playWhite.checked) {
+                if (fge.first_engine) {
+                  whitename = fge.first_engine.Name;
+                } else {
+                  whitename = "In browser Fairy-Stockfish";
+                }
+              } else {
+                whitename = "Human Player";
+              }
+              if (playBlack.checked) {
+                if (fge.second_engine) {
+                  blackname = fge.second_engine.Name;
+                } else {
+                  blackname = "In browser Fairy-Stockfish";
+                }
+              } else {
+                blackname = "Human Player";
+              }
+              result = `${tmpboard.fen()};`;
               result += ` acd 0;`;
               result += ` acn 0;`;
               result += ` acs 0;`;
@@ -974,16 +1013,8 @@ function getNotation(notation, variant, startfen, is960, ucimovestr) {
               result += ` draw_claim "null";`;
               result += ` draw_reject "null";`;
               result += ` eco "null";`;
-              if (gamefen.length == 6) {
-                result += ` fmvn ${gamefen[5]};`;
-                result += ` hmvc ${gamefen[4]};`;
-              } else if (gamefen.length == 7) {
-                result += ` fmvn ${gamefen[6]};`;
-                result += ` hmvc ${gamefen[5]};`;
-              } else {
-                result += ` fmvn 0;`;
-                result += ` hmvc 0;`;
-              }
+              result += ` fmvn 0;`;
+              result += ` hmvc 0;`;
               result += ` id "Fairy-Stockfish Playground match";`;
               result += ` nic "null";`;
               result += ` pm 0000;`;
@@ -996,6 +1027,11 @@ function getNotation(notation, variant, startfen, is960, ucimovestr) {
               result += ` tcsi "null";`;
               result += ` v0 "null";`;
               result += ` variant "${tmpboard.variant()}";`;
+              result += ` site "${window.location.host}";`;
+              result += ` date "${year.toString() + "." + month.toString() + "." + day.toString()}";`;
+              result += ` result "${tmpboard.result()}";`;
+              result += ` first_player "${whitename}";`;
+              result += ` second_player "${blackname}";`;
               return result;
             } else if (notation == "FEN+UCIMOVE") {
               tmpboard.setFen(startfen);
@@ -1057,6 +1093,7 @@ function getNotation(notation, variant, startfen, is960, ucimovestr) {
                 );
               }
             }
+            tmpboard.delete();
           } else {
             return "Illegal FEN";
           }
@@ -1096,6 +1133,7 @@ import Module from "ffish-es6";
 new Module().then((loadedModule) => {
   ffish = loadedModule;
   console.log("ffish.js initialized!");
+  window.ffishlib = loadedModule; //Used in dev tools for debugging purposes and transfer to <script>
   initBoard(dropdownVariant.value);
   soundMove.volume = rangeVolume.value;
   soundCapture.volume = rangeVolume.value;
@@ -1186,29 +1224,31 @@ new Module().then((loadedModule) => {
       return;
     }
     const fen = textFen.value;
+    const WhiteSpaceMatcher = new RegExp("[ ]+", "");
     console.log(ffish.validateFen(fen, board.variant()));
 
     if (!fen || ffish.validateFen(fen, board.variant()) >= 0) {
       if (fen) board.setFen(fen);
       else board.reset();
-      const moves = textMoves.value.trim().split(" ").reverse();
+      const moves = textMoves.value.trim().split(WhiteSpaceMatcher).reverse();
       let move = "";
+      let i = 0;
+      let movelist = textMoves.value.trim().split(WhiteSpaceMatcher);
 
       while (moves.length > 0) {
         move = moves.pop();
         if (move == "") {
           continue;
         }
-        if (!board.push(move)) {
+        if (board.push(move)) {
+          i++;
+        } else {
           buttonStop.click();
-          textMoves.value = textMoves.value
-            .trim()
-            .split(/[ ]+/)
-            .slice(0, -1)
-            .join(" ");
-          window.alert(`Invalid move: ${move}`);
+          movelist.splice(i, 1);
+          window.alert(`Illegal move: ${move}`);
         }
       }
+      textMoves.value = movelist.join(" ");
 
       updateChessground();
     } else {
@@ -1376,7 +1416,7 @@ new Module().then((loadedModule) => {
           );
           textFen.value = game.FEN;
           positionInformation.innerHTML = game.Description;
-          textMoves.value = "";
+          textMoves.value = game.Moves;
           pSetFen.click();
         } else {
           dropdownPositionVariantName.selectedIndex = -1;
@@ -1697,9 +1737,9 @@ new Module().then((loadedModule) => {
         } else {
           evalscore.innerText = evaluation.toFixed(2);
         }
-        if (evaluation < -9.8) {
+        if (evaluation <= -9.8) {
           evaluationBar.style.width = "1%";
-        } else if (evaluation > 9.8) {
+        } else if (evaluation >= 9.8) {
           evaluationBar.style.width = "99%";
         } else {
           evaluationBar.style.width =
@@ -2113,29 +2153,35 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
   while (displayReady.value.length < 1 || displayReady.value != 1) {
     continue;
   }
+  const WhiteSpaceMatcher = new RegExp("[ ]+", "");
   //console.log(Error());
   //console.log(ffish.validateFen(fen, board.variant()));
 
   if (!fen || ffish.validateFen(fen, board.variant()) >= 0) {
     if (fen) board.setFen(fen);
     else board.reset();
-    const moves = movelist.trim().split(" ").reverse();
+    const moves = movelist.trim().split(WhiteSpaceMatcher).reverse();
     let move = "";
+    let i = 0;
+    let movelistmem = textMoves.value.trim().split(WhiteSpaceMatcher);
+    let haserror = false;
 
     while (moves.length > 0) {
       move = moves.pop();
       if (move == "") {
         continue;
       }
-      if (!board.push(move)) {
+      if (board.push(move)) {
+        i++;
+      } else {
         buttonStop.click();
-        textMoves.value = textMoves.value
-          .trim()
-          .split(/[ ]+/)
-          .slice(0, -1)
-          .join(" ");
-        window.alert(`Invalid move: ${move}`);
+        haserror = true;
+        movelistmem.splice(i, 1);
+        window.alert(`Illegal move: ${move}`);
       }
+    }
+    if (haserror) {
+      textMoves.value = movelistmem.join(" ");
     }
 
     updateChessground();
@@ -2365,7 +2411,7 @@ function LoadPositionVariant(side, file) {
         continue;
       }
       variantsettings = rawText[i].trim().split("|");
-      if (variantsettings.length != 5) {
+      if (variantsettings.length != 5 && variantsettings.length != 6) {
         console.warn(
           `At line ${i} in paragraph of <position variant file>: Bad syntax\n`,
         );
@@ -2389,10 +2435,20 @@ function LoadPositionVariant(side, file) {
         );
         continue;
       }
-      VariantNameDirectory.set(variantsettings[2], {
-        FEN: variantsettings[3],
-        Description: variantsettings[4].replace("\\n", "\n"),
-      });
+      if (variantsettings.length == 5) {
+        VariantNameDirectory.set(variantsettings[2], {
+          FEN: variantsettings[3],
+          Moves: "",
+          Description: variantsettings[4].replace("\\n", "\n"),
+        });
+      } else if (variantsettings.length == 6) {
+        VariantNameDirectory.set(variantsettings[2], {
+          FEN: variantsettings[3],
+          Moves: variantsettings[4],
+          Description: variantsettings[5].replace("\\n", "\n"),
+        });
+      }
+
       VariantTypeDirectory.set(variantsettings[1], VariantNameDirectory);
       PositionVariantsDirectory.set(variantsettings[0], VariantTypeDirectory);
     }
@@ -2904,7 +2960,7 @@ function getPgn(board) {
   if (
     dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value == ""
   ) {
-    let pgn = "";
+    /*let pgn = "";
     const reversedMoves = [];
     let moveStack = board.moveStack();
 
@@ -2932,7 +2988,8 @@ function getPgn(board) {
 
     const result = board.result(checkboxAdjudicate.checked);
     if (result !== "*") pgn += result;
-    return pgn.trim();
+    return pgn.trim();*/
+    return "Please select a notation system in the dropdown...";
   } else {
     return getNotation(
       dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,
