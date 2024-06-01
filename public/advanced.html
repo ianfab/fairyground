@@ -2612,6 +2612,7 @@
         if (fge.analysis_engine) {
           fge.analysis_engine.NewGame();
         }
+        play_move = false;
         setFen(true, false);
         $("#currentposition").click();
       };
@@ -2634,7 +2635,8 @@
           fge.analysis_engine.NewGame();
         }
         resetTimer();
-        setFen(true, false);
+        play_move = false;
+        setFen(true, analysis_mode);
       };
 
       const go = (
