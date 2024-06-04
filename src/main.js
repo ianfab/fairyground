@@ -1,4 +1,4 @@
-﻿// ffish.js test using chessgroundx
+// ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
 const variantsIni = document.getElementById("variants-ini");
@@ -246,10 +246,52 @@ var evaluationindex = [];
 const mateevalfactor = 2147483647;
 const maxmultipvcount = 4096;
 var recordedmultipv = 1;
+var previousclicktime = Date.now();
+var previousclicksquare = "00";
 
 for (i = 0; i < maxmultipvcount; i++) {
   multipvrecord.push([null, null, null, null, null, null, null]);
   evaluationindex.push(0);
+}
+
+function convertChessgroundXKeyToSquare(key) {
+  const ranks = [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    ":",
+    ";",
+    "<",
+    "=",
+    ">",
+    "?",
+    "@",
+  ];
+  const files = [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+  ];
+  return key.charAt(0) + (ranks.indexOf(key.charAt(1)) + 1).toString();
 }
 
 function getPieceRoles(pieceLetters) {
@@ -392,42 +434,62 @@ function initBoard(variant) {
 function onSelectSquare(key) {
   console.log("key:", key);
   console.log(chessground.state);
-  if (!isBoardSetup.checked) {
-    return;
-  }
-  let piece = { role: "", color: "" };
-  let pieceid = "";
-  console.log("pieceid selected: ", dropdownSetPiece.value);
-  if (dropdownSetPiece.value == null || dropdownSetPiece.value == "<delete>") {
-    if (chessground.state.boardState.pieces.has(key)) {
-      chessground.state.boardState.pieces.delete(key);
-    }
-  } else if (dropdownSetPiece.value == "<move>") {
-  } else {
-    pieceid = dropdownSetPiece.value;
-    if (pieceid.charAt(0) == "+") {
-      piece.role = "p";
-      pieceid = pieceid.substring(1);
-    }
+  if (isBoardSetup.checked) {
+    let piece = { role: "", color: "" };
+    let pieceid = "";
+    console.log("pieceid selected: ", dropdownSetPiece.value);
     if (
-      ("a" <= pieceid.charAt(0) && pieceid.charAt(0) <= "z") ||
-      pieceid.charAt(0) == "*"
+      dropdownSetPiece.value == null ||
+      dropdownSetPiece.value == "<delete>"
     ) {
-      piece.color = "black";
+      if (chessground.state.boardState.pieces.has(key)) {
+        chessground.state.boardState.pieces.delete(key);
+      }
+    } else if (dropdownSetPiece.value == "<move>") {
     } else {
-      piece.color = "white";
+      pieceid = dropdownSetPiece.value;
+      if (pieceid.charAt(0) == "+") {
+        piece.role = "p";
+        pieceid = pieceid.substring(1);
+      }
+      if (
+        ("a" <= pieceid.charAt(0) && pieceid.charAt(0) <= "z") ||
+        pieceid.charAt(0) == "*"
+      ) {
+        piece.color = "black";
+      } else {
+        piece.color = "white";
+      }
+      if (pieceid.charAt(0) == "*") {
+        piece.role = "_-piece";
+      } else {
+        piece.role = piece.role + pieceid.charAt(0).toLowerCase() + "-piece";
+      }
+      console.log("final piece id:", piece.role);
+      chessground.state.boardState.pieces.set(key, piece);
     }
-    if (pieceid.charAt(0) == "*") {
-      piece.role = "_-piece";
-    } else {
-      piece.role = piece.role + pieceid.charAt(0).toLowerCase() + "-piece";
+    chessground.set({
+      lastMove: undefined,
+    });
+  } else {
+    if (Date.now() - previousclicktime < 1000 && key == previousclicksquare) {
+      let square = convertChessgroundXKeyToSquare(key);
+      afterChessgroundMove(square, square, {
+        premove: false,
+        ctrlKey: false,
+        holdTime: 0,
+        captured: {
+          role: null,
+          color: null,
+          promoted: false,
+        },
+        predrop: false,
+      });
+      chessground.cancelMove();
     }
-    console.log("final piece id:", piece.role);
-    chessground.state.boardState.pieces.set(key, piece);
+    previousclicktime = Date.now();
+    previousclicksquare = key;
   }
-  chessground.set({
-    lastMove: undefined,
-  });
 }
 
 function getWallSquarePosition() {
@@ -858,6 +920,23 @@ function highlightMoveOnBoard(move) {
         }
       }
     }
+  }
+  if (bestmove[3] != "") {
+    autoshapes.push({
+      brush: "yellow",
+      orig: bestmove[3].replace("10", ":"),
+    });
+    autoshapes.push({
+      brush: "yellow",
+      dest: "a0",
+      orig: bestmove[3].replace("10", ":"),
+      piece: {
+        color: "black",
+        role: "_-piece",
+        scale: 0.7,
+      },
+      modifiers: { hilite: true },
+    });
   }
   chessground.setAutoShapes(autoshapes);
 }
@@ -2666,7 +2745,8 @@ function afterChessgroundMove(orig, dest, metadata) {
 
   //console.log("move:", orig, dest, metadata);
 
-  const move = orig.replace(":", "10") + dest.replace(":", "10");
+  const move =
+    convertChessgroundXKeyToSquare(orig) + convertChessgroundXKeyToSquare(dest);
   console.log(`${move}`);
   const capture = isCapture(board, move);
 
@@ -2854,7 +2934,7 @@ function afterChessgroundDrop(piece, dest, metadata) {
   //The program logic is the same as moving.
 
   const role = piece.role;
-  const move = util.dropOrigOf(role) + dest.replace(":", "10");
+  const move = util.dropOrigOf(role) + convertChessgroundXKeyToSquare(dest);
   console.log(`${move}`);
 
   const legalmoves = board.legalMoves().trim().split(" ");
