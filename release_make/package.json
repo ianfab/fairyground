@@ -9,7 +9,8 @@
   "author": "",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "ws": "^8.16.0"
   },
   "bin": "./index.js"
 }

@@ -1,4 +1,4 @@
-﻿// ffish.js test using chessgroundx
+// ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
 const variantsIni = document.getElementById("variants-ini");
@@ -73,6 +73,7 @@ const clickClickMove = document.getElementById("clickclickmove");
 const positionVariantTxt = document.getElementById("posvariant-txt");
 const quickPromotionPiece = document.getElementById("dropdown-quickpromotion");
 const buttonPassMove = document.getElementById("passmove");
+const buttonPlaceWall = document.getElementById("placewall");
 const engineOutput = document.getElementById("engineoutputline");
 const isAnalysis = document.getElementById("analysis");
 const evaluationBar = document.getElementById("evalbarprogress");
@@ -246,10 +247,52 @@ var evaluationindex = [];
 const mateevalfactor = 2147483647;
 const maxmultipvcount = 4096;
 var recordedmultipv = 1;
+var previousclicktime = Date.now();
+var previousclicksquare = "00";
 
 for (i = 0; i < maxmultipvcount; i++) {
   multipvrecord.push([null, null, null, null, null, null, null]);
   evaluationindex.push(0);
+}
+
+function convertChessgroundXKeyToSquare(key) {
+  const ranks = [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    ":",
+    ";",
+    "<",
+    "=",
+    ">",
+    "?",
+    "@",
+  ];
+  const files = [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+  ];
+  return key.charAt(0) + (ranks.indexOf(key.charAt(1)) + 1).toString();
 }
 
 function getPieceRoles(pieceLetters) {
@@ -392,42 +435,62 @@ function initBoard(variant) {
 function onSelectSquare(key) {
   console.log("key:", key);
   console.log(chessground.state);
-  if (!isBoardSetup.checked) {
-    return;
-  }
-  let piece = { role: "", color: "" };
-  let pieceid = "";
-  console.log("pieceid selected: ", dropdownSetPiece.value);
-  if (dropdownSetPiece.value == null || dropdownSetPiece.value == "<delete>") {
-    if (chessground.state.boardState.pieces.has(key)) {
-      chessground.state.boardState.pieces.delete(key);
-    }
-  } else if (dropdownSetPiece.value == "<move>") {
-  } else {
-    pieceid = dropdownSetPiece.value;
-    if (pieceid.charAt(0) == "+") {
-      piece.role = "p";
-      pieceid = pieceid.substring(1);
-    }
+  if (isBoardSetup.checked) {
+    let piece = { role: "", color: "" };
+    let pieceid = "";
+    console.log("pieceid selected: ", dropdownSetPiece.value);
     if (
-      ("a" <= pieceid.charAt(0) && pieceid.charAt(0) <= "z") ||
-      pieceid.charAt(0) == "*"
+      dropdownSetPiece.value == null ||
+      dropdownSetPiece.value == "<delete>"
     ) {
-      piece.color = "black";
+      if (chessground.state.boardState.pieces.has(key)) {
+        chessground.state.boardState.pieces.delete(key);
+      }
+    } else if (dropdownSetPiece.value == "<move>") {
     } else {
-      piece.color = "white";
+      pieceid = dropdownSetPiece.value;
+      if (pieceid.charAt(0) == "+") {
+        piece.role = "p";
+        pieceid = pieceid.substring(1);
+      }
+      if (
+        ("a" <= pieceid.charAt(0) && pieceid.charAt(0) <= "z") ||
+        pieceid.charAt(0) == "*"
+      ) {
+        piece.color = "black";
+      } else {
+        piece.color = "white";
+      }
+      if (pieceid.charAt(0) == "*") {
+        piece.role = "_-piece";
+      } else {
+        piece.role = piece.role + pieceid.charAt(0).toLowerCase() + "-piece";
+      }
+      console.log("final piece id:", piece.role);
+      chessground.state.boardState.pieces.set(key, piece);
     }
-    if (pieceid.charAt(0) == "*") {
-      piece.role = "_-piece";
-    } else {
-      piece.role = piece.role + pieceid.charAt(0).toLowerCase() + "-piece";
+    chessground.set({
+      lastMove: undefined,
+    });
+  } else {
+    if (Date.now() - previousclicktime < 1000 && key == previousclicksquare) {
+      let square = convertChessgroundXKeyToSquare(key);
+      afterChessgroundMove(square, square, {
+        premove: false,
+        ctrlKey: false,
+        holdTime: 0,
+        captured: {
+          role: null,
+          color: null,
+          promoted: false,
+        },
+        predrop: false,
+      });
+      chessground.cancelMove();
     }
-    console.log("final piece id:", piece.role);
-    chessground.state.boardState.pieces.set(key, piece);
+    previousclicktime = Date.now();
+    previousclicksquare = key;
   }
-  chessground.set({
-    lastMove: undefined,
-  });
 }
 
 function getWallSquarePosition() {
@@ -858,6 +921,23 @@ function highlightMoveOnBoard(move) {
         }
       }
     }
+  }
+  if (bestmove[3] != "") {
+    autoshapes.push({
+      brush: "yellow",
+      orig: bestmove[3].replace("10", ":"),
+    });
+    autoshapes.push({
+      brush: "yellow",
+      dest: "a0",
+      orig: bestmove[3].replace("10", ":"),
+      piece: {
+        color: "black",
+        role: "_-piece",
+        scale: 0.7,
+      },
+      modifiers: { hilite: true },
+    });
   }
   chessground.setAutoShapes(autoshapes);
 }
@@ -1513,6 +1593,60 @@ new Module().then((loadedModule) => {
       return;
     }
     afterChessgroundMove(passmove.orig, passmove.dest, {
+      premove: false,
+      ctrlKey: false,
+      holdTime: 0,
+      captured: {
+        role: null,
+        color: null,
+        promoted: false,
+      },
+      predrop: false,
+    });
+  };
+
+  buttonPlaceWall.onclick = function () {
+    if (
+      chessground.state.movable.color == "both" ||
+      chessground.state.movable.color == undefined
+    ) {
+      return;
+    }
+    const moves = board
+      .legalMoves()
+      .trim()
+      .split(" ")
+      .filter((element) => {
+        if (
+          typeof element != "string" ||
+          element.length < 4 ||
+          !element.includes(",")
+        ) {
+          return false;
+        }
+        let elem = element.substring(0, element.indexOf(","));
+        const files = elem.split(/[0-9]+/).filter((elem1) => {
+          return elem1 != "";
+        });
+        const ranks = elem.split(/[a-z]+/).filter((elem1) => {
+          return elem1 != "";
+        });
+        return files[0] == files[1] && ranks[0] == ranks[1];
+      });
+    if (moves == null || moves.length == 0) {
+      alert(
+        "Cannot place a wall without moving currently. This variant does not allow walling or there are restrictions on walling without moving.",
+      );
+      return;
+    }
+    const wallmove = {
+      orig: moves[0].match(/[a-z]+[0-9]+/g)[0],
+      dest: moves[0].match(/[a-z]+[0-9]+/g)[1],
+    };
+    if (wallmove.orig == null || wallmove.dest == null) {
+      return;
+    }
+    afterChessgroundMove(wallmove.orig, wallmove.dest, {
       premove: false,
       ctrlKey: false,
       holdTime: 0,
@@ -2666,7 +2800,8 @@ function afterChessgroundMove(orig, dest, metadata) {
 
   //console.log("move:", orig, dest, metadata);
 
-  const move = orig.replace(":", "10") + dest.replace(":", "10");
+  const move =
+    convertChessgroundXKeyToSquare(orig) + convertChessgroundXKeyToSquare(dest);
   console.log(`${move}`);
   const capture = isCapture(board, move);
 
@@ -2784,24 +2919,30 @@ function afterChessgroundMove(orig, dest, metadata) {
 
   if (possiblegatings.length > 1) {
     //if there are more than one option
+    let i = 0;
+    let gatesquares = [];
+    for (i = 0; i < possiblegatings.length; i++) {
+      gatesquares.push(possiblegatings[i].match(/[a-z]+[0-9]+/g)[1]);
+    }
     while (true) {
       choice = prompt(
-        `There are multiple chioces that you can gate a wall square. They are\n${possiblegatings}\n, where = means do not gate, letters with numbers mean destination square (e.g. e4e5 means your piece has moved to e4 and you gate a wall square to e5). Now please enter your choice: `,
+        `There are multiple chioces that you can gate a wall square. They are\n${gatesquares}\n, where = means do not gate, letters with numbers mean destination square (e.g. e5 means you gate a wall square to e5). Now please enter your choice: `,
         "",
       );
       if (choice == null) {
         afterMove(false);
         return;
       }
-      if (possiblegatings.includes(choice)) {
+      if (gatesquares.includes(choice)) {
         break;
       } else {
         alert(
-          `Bad input: ${choice} . You should enter one option among ${possiblegatings}.`,
+          `Bad input: ${choice} . You should enter one option among ${gatesquares}.`,
         );
         continue;
       }
     }
+    choice = possiblegatings[gatesquares.indexOf(choice)];
   } else if (possiblegatings.length == 1) {
     //if there is only one option
     choice = possiblegatings[0];
@@ -2854,7 +2995,7 @@ function afterChessgroundDrop(piece, dest, metadata) {
   //The program logic is the same as moving.
 
   const role = piece.role;
-  const move = util.dropOrigOf(role) + dest.replace(":", "10");
+  const move = util.dropOrigOf(role) + convertChessgroundXKeyToSquare(dest);
   console.log(`${move}`);
 
   const legalmoves = board.legalMoves().trim().split(" ");
@@ -3058,6 +3199,11 @@ function updateChessground() {
     } else {
       lastMoveFrom = lastMove.match(/[a-z]+[0-9]+/g)[0].replace("10", ":");
       lastMoveTo = lastMove.match(/[a-z]+[0-9]+/g)[1].replace("10", ":");
+      if (lastMoveFrom == lastMoveTo && lastMove.includes(",")) {
+        lastMoveFrom = lastMoveTo = lastMove
+          .match(/[a-z]+[0-9]+/g)[3]
+          .replace("10", ":");
+      }
     }
     chessground.set({
       lastMove: [lastMoveFrom, lastMoveTo],
