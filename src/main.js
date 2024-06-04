@@ -2919,24 +2919,30 @@ function afterChessgroundMove(orig, dest, metadata) {
 
   if (possiblegatings.length > 1) {
     //if there are more than one option
+    let i = 0;
+    let gatesquares = [];
+    for (i = 0; i < possiblegatings.length; i++) {
+      gatesquares.push(possiblegatings[i].match(/[a-z]+[0-9]+/g)[1]);
+    }
     while (true) {
       choice = prompt(
-        `There are multiple chioces that you can gate a wall square. They are\n${possiblegatings}\n, where = means do not gate, letters with numbers mean destination square (e.g. e4e5 means your piece has moved to e4 and you gate a wall square to e5). Now please enter your choice: `,
+        `There are multiple chioces that you can gate a wall square. They are\n${gatesquares}\n, where = means do not gate, letters with numbers mean destination square (e.g. e5 means you gate a wall square to e5). Now please enter your choice: `,
         "",
       );
       if (choice == null) {
         afterMove(false);
         return;
       }
-      if (possiblegatings.includes(choice)) {
+      if (gatesquares.includes(choice)) {
         break;
       } else {
         alert(
-          `Bad input: ${choice} . You should enter one option among ${possiblegatings}.`,
+          `Bad input: ${choice} . You should enter one option among ${gatesquares}.`,
         );
         continue;
       }
     }
+    choice = possiblegatings[gatesquares.indexOf(choice)];
   } else if (possiblegatings.length == 1) {
     //if there is only one option
     choice = possiblegatings[0];
