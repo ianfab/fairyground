@@ -4963,6 +4963,17 @@
               },
               "[?]",
             ),
+            m(
+              "span",
+              {
+                style: "cursor: pointer; margin-left: 5px;",
+                onclick: () =>
+                  window.alert(
+                    "A null move is considered as a move that have the same original square and destination square. Double click a square (No matter whether it's empty or not) will make a null move on that square.\nNote:\n1. In most cases passing a turn is equivalent to making a null move on the king.\n2. In Atlantis variant, placing a wall without moving any piece requires to make a null move on the most bottom then the most left piece of your color.\n3. Click <show moves dialog> to see all legal moves if you are not sure how to make a move.",
+                  ),
+              },
+              "[How to make null moves?]",
+            ),
           ]),
           m("div#boardsetupsettings", { hidden: !board_setup_mode }, [
             m("p", "Board Setup:"),
