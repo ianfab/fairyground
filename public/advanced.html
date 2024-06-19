@@ -1294,7 +1294,7 @@
     var fgs = window.fairyground.SavedGamesParsingFeature;
     let themes = [[], [], []];
     let themenames = [[], []];
-    let variantsettings = [[], [], [], []];
+    let variantsettings = [[], [], [], [], []];
     let allvariants = [];
     const $ = (...args) => document.querySelector(...args);
 
@@ -1462,7 +1462,7 @@
               continue;
             }
             variantdescriptionitem = rawText[i].split("|");
-            if (variantdescriptionitem.length != 4) {
+            if (variantdescriptionitem.length != 5) {
               console.warn(
                 `At line ${i + 1} in variantsettings.txt: Syntax error.`,
               );
@@ -1496,6 +1496,7 @@
             variantsettings[1].push(variantdescriptionitem[1]);
             variantsettings[2].push(variantdescriptionitem[2]);
             variantsettings[3].push(variantdescriptionitem[3]);
+            variantsettings[4].push(variantdescriptionitem[4]);
           }
           //console.log(variantsettings);
         } else {
@@ -1791,6 +1792,22 @@
         }
       } else {
         return variantsettings[3][index];
+      }
+    }
+
+    function getVariantWikiPageURL(variant, useplaceholder) {
+      if (typeof variant != "string" || typeof useplaceholder != "boolean") {
+        return null;
+      }
+      let index = variantsettings[0].indexOf(variant);
+      if (index < 0) {
+        if (useplaceholder) {
+          return "";
+        } else {
+          return undefined;
+        }
+      } else {
+        return variantsettings[4][index];
       }
     }
 
@@ -4257,10 +4274,24 @@
                     $("#dropdown-variant").value,
                     false,
                   );
+                  let wiki = getVariantWikiPageURL(
+                    $("#dropdown-variant").value,
+                    false,
+                  );
                   if (description) {
-                    window.alert(
-                      `Variant ${name} (ID: ${$("#dropdown-variant").value}):\n${description}`,
-                    );
+                    if (wiki) {
+                      if (
+                        window.confirm(
+                          `Variant ${name} (ID: ${$("#dropdown-variant").value}):\n${description}\n\nWiki: ${wiki}\n\nDo you want to visit the wiki page?`,
+                        )
+                      ) {
+                        window.open(wiki, "_blank");
+                      }
+                    } else {
+                      window.alert(
+                        `Variant ${name} (ID: ${$("#dropdown-variant").value}):\n${description}`,
+                      );
+                    }
                   } else {
                     window.alert(
                       "This variant does not provide a description. You can upload a variantsettings.txt yourself to add a description for it.",
