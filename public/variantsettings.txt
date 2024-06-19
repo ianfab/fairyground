@@ -1,74 +1,150 @@
 #Fairyground Variant Settings File
-#Syntax: <variant ID (declared in variants.ini)>|<variant type/classification>|<variant display name>|<variant description>
+#Syntax: <variant ID (declared in variants.ini)>|<variant type/classification>|<variant display name>|<variant description>|<variant wiki page>
 #The type or classification is used in variant type dropdown which helps you classify the variants.
 #The display name will be displayed in the variant dropdown as the item name.
 #The description will be displayed in the dropdown as tooltips, you can hover your cursor on an item to view that.
-#This can also be accessed from <About This Variant> button.
+#The wiki page will be shown when users click <Variant INFO> button and click <Yes> or <OK>.
+#This can also be accessed from <Variant INFO> button.
 
-chess|Chess Variants|Chess|Chess, unmodified, as it's played by FIDE standards.
-crazyhouse|Chess Variants|Crazy House|Take captured pieces and drop them back on to the board as your own.
-atomic|Chess Variants|Atomic Chess|Pieces explode upon capture, destroying all pieces except pawns in the 8 square around the destination square and itself.
-kingofthehill|Chess Variants|King Of The Hill|Bring your King to the center to win the game.
-3check|Chess Variants|3 Check|Check your opponent 3 times to win the game.
-placement|Chess Variants|Placement Chess|Choose where your pieces start.
-duck|Chess Variants|Duck Chess|The duck (a wall square that blocks any piece from moving to it) must be moved to a new square after every turn.
-racingkings|Chess Variants|Racing Kings|Hinder the opponent's king and make your king reach the 8th rank first to win. Checks are not allowed.
-giveaway|Chess Variants|Giveaway Chess|Lose all your pieces or get stalemated to win. Capturing is compulsory.
-torpedo|Chess Variants|Torpedo|Pawns can always move forward one or two squares.
-nocastle|Chess Variants|No Castling|Castling is not allowed.
-pawnsideways|Chess Variants|Pawns Sideways|Pawns can also move sideways one square.
-knightmate|Chess Variants|Knight Mate|The king moves like a knight while the knights move like a king.
+chess|Chess Variants|Chess|Chess, unmodified, as it's played by FIDE standards.|https://en.wikipedia.org/wiki/Chess
+fischerandom|Chess Variants|Fischer Random|Chess960. Pieces at the 1st/8th rank can be placed randomly but the bishops must be on squares of different colors and the king must be between the rooks. Special castling rules are applied.|https://en.wikipedia.org/wiki/Fischer_random_chess
+crazyhouse|Chess Variants|Crazy House|Take captured pieces and drop them back on to the board as your own.|https://en.wikipedia.org/wiki/Crazyhouse
+atomic|Chess Variants|Atomic Chess|Pieces explode upon capture, destroying all pieces except pawns in the 8 square around the destination square and itself.|https://en.wikipedia.org/wiki/Atomic_chess
+kingofthehill|Chess Variants|King Of The Hill|Bring your King to the center to win the game.|https://en.wikipedia.org/wiki/King_of_the_Hill_(chess)
+3check|Chess Variants|3 Check|Check your opponent 3 times to win the game.|https://en.wikipedia.org/wiki/Three-check_chess
+placement|Chess Variants|Placement Chess|Choose where your pieces start.|https://www.chessvariants.com/link/placement-chess
+duck|Chess Variants|Duck Chess|The duck (a wall square that blocks any piece from moving to it) must be moved to a new square after every turn.|https://duckchess.com/
+racingkings|Chess Variants|Racing Kings|Hinder the opponent's king and make your king reach the 8th rank first to win. Checks are not allowed.|https://en.wikipedia.org/wiki/V._R._Parton#Racing_Kings
+giveaway|Chess Variants|Giveaway Chess|Lose all your pieces or get stalemated to win. Capturing is compulsory. Kings are no longer royal.|http://www.chessvariants.com/diffobjective.dir/giveaway.old.html
+antichess|Chess Variants|Anti Chess|Lose all your pieces or get stalemated to win. Capturing is compulsory. Kings are no longer royal and cannot castle.|https://lichess.org/variant/antichess
+suicide|Chess Variants|Suicide Chess|Lose all your pieces or have fewer pieces than the opponent's when getting stalemated to win. Capturing is compulsory. Kings are no longer royal and cannot castle.|https://www.freechess.org/Help/HelpFiles/suicide_chess.html
+losers|Chess Variants|Loser's Chess|Lose all your pieces except your king, get stalemated or get checkmated to win. Capturing is compulsory.|https://www.chessclub.com/help/Wild17
+torpedo|Chess Variants|Torpedo|Pawns can always move forward one or two squares.|https://arxiv.org/abs/2009.04374
+nocastle|Chess Variants|No Castling|Castling is not allowed.|
+pawnsideways|Chess Variants|Pawn Sideways|Pawns can also move sideways one square.|https://arxiv.org/abs/2009.04374
+pawnback|Chess Variants|Pawn Back|Pawns can also move back one square.|https://arxiv.org/abs/2009.04374
+knightmate|Chess Variants|Knight Mate|The king moves like a knight while the knights move like a king.|https://www.chessvariants.com/diffobjective.dir/knightmate.html
+armageddon|Chess Variants|Armageddon Chess|Chess but all draws are considered as win for black.|https://en.wikipedia.org/wiki/Fast_chess#Armageddon
+legan|Chess Variants|Legan Chess|Chess with pawn movements rotated by 45° counter-clockwise and different starting position.|https://en.wikipedia.org/wiki/Legan_chess
+extinction|Chess Variants|Extinction Chess|Capture all opponent pieces of a particular type to win. Promoted pieces are considered as their promoted form.|https://en.wikipedia.org/wiki/Extinction_chess
+codrus|Chess Variants|Codrus Chess|Lose your king to win the game. Capturing is compulsory.|http://www.binnewirtz.com/Schlagschach1.htm
+pocketknight|Chess Variants|Pocket Knight|Players take an extra knight at beginning and can drop it on the board.|https://www.chessvariants.com/other.dir/pocket.html
+kinglet|Chess Variants|Kinglet Chess|Capture all opponent's pawns to win. Kings are no longer royal.|https://en.wikipedia.org/wiki/V._R._Parton#Kinglet_chess
+loop|Chess Variants|Loop Chess|Crazy house where promoted pieces keep their rank when captured.|https://en.wikipedia.org/wiki/Crazyhouse#Variations
+chessgi|Chess Variants|Chessgi|Crazy house where promoted pieces keep their rank when captured and pawns may be dropped on its 1st rank.|https://en.wikipedia.org/wiki/Crazyhouse#Variations
+losalamos|Chess Variants|Los Alamos Chess|Chess with no bishops on a 6x6 board. No castling, no pawn double step and no en passant. Pawns cannot promote to bishops.|https://en.wikipedia.org/wiki/Los_Alamos_chess
+coregal|Chess Variants|Coregal Chess|Queens are also royal (i.e. can be checkmated) and can also castle. Pawns can promote to a queen and thus being royal.|https://www.chessvariants.com/winning.dir/coregal.html
+troitzky|Chess Variants|Troitzky Chess|Chess on a round board.|https://www.chessvariants.com/play/troitzky-chess
+jesonmor|Chess Variants|Jeson Mor|Player wins by being first to occupy the central square e5 with a knight, and then leave that square.|https://en.wikipedia.org/wiki/Jeson_Mor
+threekings|Chess Variants|Three Kings Chess|Rooks are replaced by kings. Any of the kings are checkmated is considered as a lose.|https://github.com/cutechess/cutechess/blob/master/projects/lib/src/board/threekingsboard.h
+petrified|Chess Variants|Petrified Chess|Pieces except pawns that capture a piece will turn into a wall square. Pawns can move sideways.|https://www.chess.com/variants/petrified
+nocheckatomic|Chess Variants|No Check Atomic Chess|Atomic chess without checks. (ICC rules)|https://www.chessclub.com/help/atomic
+atomar|Chess Variants|Atomar Chess|Atomic Chess but Kings does not self explode or get blown up.|https://web.archive.org/web/20230519082613/https://chronatog.com/wp-content/uploads/2021/09/atomar-chess-rules.pdf
+5check|Chess Variants|5 Check|Check your opponent 5 times to win the game.|
+gardner|Chess Variants|Gardner's Mini Chess|5x5 chess. No double step and castling.|https://en.wikipedia.org/wiki/Minichess#5%C3%975_chess
 
-makruk|Makruk Variants|Makruk|Thai Chess. A game closely resembling the original Chaturanga. Similar to Chess but with a different queen and bishop.
-makpong|Makruk Variants|Makpong|Makruk variant where kings cannot move to escape out of check.
-cambodian|Makruk Variants|Ouk Chatrang|Cambodian Chess. Makruk with a few additional opening abilities.
-sittuyin|Makruk Variants|Sittuyin|Burmese Chess. Similar to Makruk, but pieces are placed at the start of the match.
-asean|Makruk Variants|Asean|Makruk using the board/pieces from International Chess as well as pawn promotion rules.
+makruk|Makruk Variants|Makruk|Thai Chess. A game closely resembling the original Chaturanga. Similar to Chess but with a different queen and bishop.|https://en.wikipedia.org/wiki/Makruk
+makpong|Makruk Variants|Makpong|Makruk variant where kings cannot move to escape out of check.|
+cambodian|Makruk Variants|Ouk Chatrang|Cambodian Chess. Makruk with a few additional opening abilities.|https://en.wikipedia.org/wiki/Makruk#Cambodian_chess
+sittuyin|Makruk Variants|Sittuyin|Burmese Chess. Similar to Makruk, but pieces are placed at the start of the match.|https://en.wikipedia.org/wiki/Sittuyin
+asean|Makruk Variants|Asean|Makruk using the board/pieces from International Chess as well as pawn promotion rules.|http://hgm.nubati.net/rules/ASEAN.html
+karouk|Makruk Variants|Kar Ouk|A variant of Cambodian Chess (Ouk Chatrang) where the first check wins.|https://en.wikipedia.org/wiki/Makruk#Ka_Ouk
+ai-wok|Makruk Variants|Ai-wok|A makruk variant where the met is replaced by a super-piece moving as rook, knight, or met.|
 
-shogi|Shogi Variants|Shogi|Japanese Chess, the standard 9x9 version played today with drops and promotions.
-minishogi|Shogi Variants|Mini Shogi|5x5 Shogi for more compact and faster games. There are no knights or lances.
-kyotoshogi|Shogi Variants|Kyoto Shogi|A wild Shogi variant on a 5x5 board where pieces flip into a different piece after each move.
-dobutsu|Shogi Variants|Dobutsu Shogi|3x4 game with cute animals, designed to teach children how to play Shogi.
-gorogoro|Shogi Variants|Gorogoro Shogi|5x6 Shogi designed to introduce tactics with the generals.
-gorogoroplus|Shogi Variants|Gorogoro+ Shogi|5x6 Shogi designed to introduce tactics with the generals.
-torishogi|Shogi Variants|Tori Shogi|A confrontational 7x7 variant with unique pieces each named after different birds.
-shoshogi|Shogi Variants|Sho Shogi|A new piece called Drunk Elephant is introduced, which can promote to a new king. You can lose one of the 2 kings after the promotion.
-cannonshogi|Shogi Variants|Cannon Shogi|Shogi with Chinese and Korean cannons.
+shogi|Shogi Variants|Shogi|Japanese Chess, the standard 9x9 version played today with drops and promotions.|https://en.wikipedia.org/wiki/Shogi
+minishogi|Shogi Variants|Mini Shogi|5x5 Shogi for more compact and faster games. There are no knights or lances.|https://en.wikipedia.org/wiki/Minishogi
+kyotoshogi|Shogi Variants|Kyoto Shogi|A wild Shogi variant on a 5x5 board where pieces flip into a different piece after each move.|https://en.wikipedia.org/wiki/Kyoto_shogi
+dobutsu|Shogi Variants|Dobutsu Shogi|3x4 game with cute animals, designed to teach children how to play Shogi.|https://en.wikipedia.org/wiki/D%C5%8Dbutsu_sh%C5%8Dgi
+gorogoro|Shogi Variants|Gorogoro Shogi|5x6 Shogi designed to introduce tactics with the generals.|https://en.wikipedia.org/wiki/D%C5%8Dbutsu_sh%C5%8Dgi#Variation
+gorogoroplus|Shogi Variants|Gorogoro+ Shogi|Gorogoro Shogi with an addtional lance and an additional knight in the pocket.|
+torishogi|Shogi Variants|Tori Shogi|A confrontational 7x7 variant with unique pieces each named after different birds.|https://en.wikipedia.org/wiki/Tori_shogi
+shoshogi|Shogi Variants|Sho Shogi|A new piece called Drunk Elephant is introduced, which can promote to a new king. You can lose one of the 2 kings after the promotion.|https://en.wikipedia.org/wiki/Sho_shogi
+cannonshogi|Shogi Variants|Cannon Shogi|Shogi with Chinese and Korean cannons.|
+yarishogi|Shogi Variants|Yari Shogi|Shogi with movement of the pieces changed on a 7x9 board. See the wiki in <Variant INFO> for more details.|https://en.wikipedia.org/wiki/Yari_shogi
+okisakishogi|Shogi Variants|Okisaki Shogi|Shogi where Queens (Q) are added and the Shogi Knights (fN) are replaced with Chess Knights (N) on a 10x10 board.|https://en.wikipedia.org/wiki/Okisaki_shogi
+micro|Shogi Variants|Micro Shogi|Shogi on a 4x4 board where pieces promote on capture and can be dropped in their promoted form.|https://en.wikipedia.org/wiki/Micro_shogi
+euroshogi|Shogi Variants|Euro Shogi|Shogi on a 8x8 board where knights can also move sideways.|https://en.wikipedia.org/wiki/EuroShogi
+judkins|Shogi Variants|Judkins Shogi|6x6 Shogi with no lances.|https://en.wikipedia.org/wiki/Judkins_shogi
 
-xiangqi|Xiangqi Variants|Xiangqi|Chinese Chess, one of the oldest and most played board games in the world.
-manchu|Xiangqi Variants|Manchu Xiangqi|Xiangqi variant where one side has a chariot that can also move as a cannon or horse.
-minixiangqi|Xiangqi Variants|Mini Xiangqi|Compact version of Xiangqi played on a 7x7 board without a river.
+xiangqi|Xiangqi Variants|Xiangqi|Chinese Chess, one of the oldest and most played board games in the world.|https://en.wikipedia.org/wiki/Xiangqi
+manchu|Xiangqi Variants|Manchu Xiangqi|Xiangqi variant where one side has a chariot that can also move as a cannon or horse.|https://en.wikipedia.org/wiki/Manchu_chess
+minixiangqi|Xiangqi Variants|Mini Xiangqi|Compact version of Xiangqi played on a 7x7 board without a river.|http://mlwi.magix.net/bg/minixiangqi.htm
+supply|Xiangqi Variants|Supply Xiangqi|Xiangqi Bughouse.|https://en.wikipedia.org/wiki/Xiangqi#Variations
 
-janggi|Janggi Variants|Janggi|Korean Chess, similar to Xiangqi but plays much differently. Tournament rules are used.
-janggicasual|Janggi Variants|Janggi Casual|Korean Chess, similar to Xiangqi but plays much differently. Casual rules are used.
-janggimodern|Janggi Variants|Janggi Modern|Korean Chess, similar to Xiangqi but plays much differently. Modern rules are used.
-janggitraditional|Janggi Variants|Janggi Traditional|Korean Chess, similar to Xiangqi but plays much differently. Traditional rules are used.
+janggi|Janggi Variants|Janggi|Korean Chess, similar to Xiangqi but plays much differently. Tournament rules are used.|https://en.wikipedia.org/wiki/Janggi
+janggicasual|Janggi Variants|Janggi Casual|Korean Chess, similar to Xiangqi but plays much differently. Casual rules are used.|
+janggimodern|Janggi Variants|Janggi Modern|Korean Chess, similar to Xiangqi but plays much differently. Modern rules are used.|
+janggitraditional|Janggi Variants|Janggi Traditional|Korean Chess, similar to Xiangqi but plays much differently. Traditional rules are used.|
 
-capablanca|Fairy Variants|Capablanca Chess|Play with the hybrid pieces, archbishop (B+N) and chancellor (R+N), on a 10x8 board.
-capahouse|Fairy Variants|Capablanca House|Capablanca with Crazyhouse drop rules.
-seirawan|Fairy Variants|Seirawan Chess|S-Chess. Hybrid pieces, the hawk (B+N) and elephant (R+N), can enter the board after moving a back rank piece.
-shouse|Fairy Variants|Seirawan House|S-Chess with Crazyhouse drop rules.
-grand|Fairy Variants|Grand Chess|Play with the hybrid pieces, archbishop (B+N) and chancellor (R+N), on a grand 10x10 board.
-grandhouse|Fairy Variants|Grand House|Grand Chess with Crazyhouse drop rules.
-shako|Fairy Variants|Shako|Introduces the cannon and elephant from Xiangqi into a 10x10 chess board.
-shogun|Fairy Variants|Shogun|Pieces promote and can be dropped, similar to Shogi.
-hoppelpoppel|Fairy Variants|Hoppel-Poppel|Knights capture as bishops; bishops capture as knights.
-amazon|Fairy Variants|Amazon|Replace the Queen with Amazon (Q + N).
-gothic|Fairy Variants|Gothic Chess|Gothic chess. Capablanca chess with better starting position.
-chaturanga|Fairy Variants|Chaturanga|Ancient form of chess. Pawns, bishops(elephants), and queen(ferz) are different from the ones in modern chess.
-chak|Fairy Variants|Chak|Mayan chess. Inspired by cultural elements of Mesoamerica.
-chennis|Fairy Variants|Chennis|Pieces alternate between two forms with each move.
-mansindam|Fairy Variants|Mansindam|A variant that combines the Shogi's drop rule with strong pieces.
+capablanca|Fairy Variants|Capablanca Chess|Play with the hybrid pieces, archbishop (B+N) and chancellor (R+N), on a 10x8 board.|https://en.wikipedia.org/wiki/Capablanca_Chess
+capahouse|Fairy Variants|Capablanca House|Capablanca with Crazyhouse drop rules.|
+seirawan|Fairy Variants|Seirawan Chess|S-Chess. Hybrid pieces, the hawk (B+N) and elephant (R+N), can enter the board after moving a back rank piece.|https://en.wikipedia.org/wiki/Seirawan_chess
+shouse|Fairy Variants|Seirawan House|S-Chess with Crazyhouse drop rules.|
+grand|Fairy Variants|Grand Chess|Play with the hybrid pieces, archbishop (B+N) and chancellor (R+N), on a grand 10x10 board.|https://en.wikipedia.org/wiki/Grand_Chess
+grandhouse|Fairy Variants|Grand House|Grand Chess with Crazyhouse drop rules.|
+shako|Fairy Variants|Shako|Introduces the cannon and elephant from Xiangqi into a 10x10 chess board.|https://www.chessvariants.com/large.dir/shako.html
+shogun|Fairy Variants|Shogun|Pieces promote and can be dropped, similar to Shogi.|
+hoppelpoppel|Fairy Variants|Hoppel-Poppel|Knights capture as bishops; bishops capture as knights.|http://www.chessvariants.com/diffmove.dir/hoppel-poppel.html
+amazon|Fairy Variants|Amazon|Replace the Queen with Amazon (Q + N).|https://www.chessvariants.com/diffmove.dir/amazone.html
+gothic|Fairy Variants|Gothic Chess|Gothic chess. Capablanca chess with better starting position.|https://www.chessvariants.com/large.dir/gothicchess.html
+chaturanga|Fairy Variants|Chaturanga|Ancient form of chess. Pawns, bishops(elephants), and queen(ferz) are different from the ones in modern chess.|https://en.wikipedia.org/wiki/Chaturanga
+chak|Fairy Variants|Chak|Mayan chess. Inspired by cultural elements of Mesoamerica.|
+chennis|Fairy Variants|Chennis|Pieces alternate between two forms with each move.|
+mansindam|Fairy Variants|Mansindam|A variant that combines the Shogi's drop rule with strong pieces.|
+wolf|Fairy Variants|Wolf Chess|Play with the hybrid pieces, Fox (B+N) , Wolf (R+N), Nightrider (N0) and Sergeant (fKifmnD) on a 8x10 board.|https://en.wikipedia.org/wiki/Wolf_chess
+dragon|Fairy Variants|Dragon Chess|A Dragon (B+N) can be dropped at the 1st rank.|https://www.edami.com/dragonchess/
+almost|Fairy Variants|Almost Chess|Replace the Queen with Chancellor (R + N).|https://en.wikipedia.org/wiki/Almost_chess
+chigorin|Fairy Variants|Chigorin Chess|Chancellor (R + N) and Knights versus Queen and Bishops. Pawns can promote to anything except king that was in the player's army at the start of the game.|https://www.chessvariants.com/diffsetup.dir/chigorin.html
+nightrider|Fairy Variants|Nightrider Chess|A fairy chess piece called Nightrider (N0) that can move any number of steps as a knight in the same direction replaces the knights.|https://en.wikipedia.org/wiki/Nightrider_(chess)
+grasshopper|Fairy Variants|Grasshopper Chess|The grasshopper (gQ) must hop over other pieces to the square behind that piece in 8 directions in order to move or capture.|https://en.wikipedia.org/wiki/Grasshopper_chess
+omicron|Fairy Variants|Omicron Chess|Omega chess on 12x10 board. Champion (WAD) and Wizard (FC) are introduced.|http://www.eglebbk.dds.nl/program/chess-omicron.html
+gustav3|Fairy Variants|Gustav III's Chess|Four extra corners on a 10x8 board are initially positioned two General-Adjutants (Q + N).|https://www.chessvariants.com/play/gustav-iiis-chess
+berolina|Fairy Variants|Berolina Chess|Pawns capture a square orthogonally forward and move one square diagonally forward. They can also double step diagonally when not moved.|https://en.wikipedia.org/wiki/Berolina_pawn#Berolina_chess
+centaur|Fairy Variants|Royal Court|Crowned Knights (K + N) are added to the 10x8 board.|https://www.chessvariants.com/large.dir/contest/royalcourt.html
+tencubed|Fairy Variants|TenCubed Chess|Marshall (R + N), Archbishop (B + N), Champion (WAD) and Wizard (CZ) are added on a 10x10 board. No castling.|https://www.chessvariants.com/contests/10/tencubedchess.html
+shatranj|Fairy Variants|Shatranj|An old form of chess originating from chaturanga, as played in the Sasanian Empire.|https://en.wikipedia.org/wiki/Shatranj
+shatar|Fairy Variants|Shatar|Chess played in Mongolia with some special rules. See the wiki in <Variant INFO> for more details.|https://en.wikipedia.org/wiki/Shatar
+courier|Fairy Variants|Courier Chess|A chess variant that dates from the 12th century and was popular for at least 600 years. Schleich (W) and Courier (B) are added while bishop moves and queen moves are different from modern ones.|https://en.wikipedia.org/wiki/Courier_chess
+raazuvaa|Fairy Variants|Raazuvaa|Maldivian Chess. Classical Shatranj with modern Bishop and Queen moves and Kings crosswise.|https://www.researchgate.net/publication/374859315_Maldivian_Chess_Raazuvaa
+newzealand|Fairy Variants|New Zealand|Knights capture like rooks and vice versa.|
+embassy|Fairy Variants|Embassy Chess|Grand Chess on a 10x8 board and the rules are the same with Capablanca Chess.|https://en.wikipedia.org/wiki/Grand_Chess#Embassy_chess
+opulent|Fairy Variants|Opulent Chess|A decimal chess variant similar to Grand Chess, but with a stronger Knight (WN), and two new jumping pieces Lion (FC) and Wizard (HFD).|https://www.chessvariants.com/rules/opulent-chess
+caparandom|Fairy Variants|Capablance Chess 960|Capablance Chess with Fischer Random (Chess 960) rules applied.|
+paradigm|Fairy Variants|Paradigm Chess 30|8x8 variant with a bishop+horse hybrid piece replacing bishops.|https://www.chessvariants.com/rules/paradigm-chess30
+sortofalmost|Fairy Variants|Sort Of Almost Chess|One queen is replaced by a Chancellor.|https://en.wikipedia.org/wiki/Almost_chess#Sort_of_almost_chess
+chancellor|Fairy Variants|Chancellor Chess|9x9 variant with Chancellors.|https://en.wikipedia.org/wiki/Chancellor_chess
+janus|Fairy Variants|Janus Chess|10x8 variant with two archbishops per side.|https://en.wikipedia.org/wiki/Janus_Chess
+modern|Fairy Variants|Modern Chess|9x9 variant with archbishops.|https://en.wikipedia.org/wiki/Modern_chess
+perfect|Fairy Variants|Perfect Chess|General (Q + N), Chancellor (R + N) and Minister (B + N) are added to the game.|https://www.chessvariants.com/diffmove.dir/perfectchess.html
 
-orda|Army Variants|Orda Chess|Asymmetric variant where one army has pieces that move like knights but capture differently.
-synochess|Army Variants|Syno Chess|Asymmetric East vs. West variant which pits the western Chess army against a Xiangqi and Janggi-styled army.
-shinobiplus|Army Variants|Shinobi+|Asymmetric variant which pits the western Chess army against a drop-based, Shogi-styled army.
-empire|Army Variants|Empire Chess|Asymmetric variant where one army has pieces that move like queens but capture as usual.
-ordamirror|Army Variants|Orda Mirror|Orda Chess variant with two Horde armies. The Falcon replaces the Yurt.
-spartan|Army Variants|Spartan|Asymmetric Spartans vs. Persians variant.
-horde|Army Variants|Horde|Lots of pawns VS chess army. White wins when checkmating black while black wins when capturing all white pieces.
-khans|Army Variants|Khans Chess|Orda Chess variant. The scout and khatun replaces the pawn and yurt.
+orda|Army Variants|Orda Chess|Asymmetric variant where one army has pieces that move like knights but capture differently.|
+synochess|Army Variants|Syno Chess|Asymmetric East vs. West variant which pits the western Chess army against a Xiangqi and Janggi-styled army.|
+shinobiplus|Army Variants|Shinobi+|Asymmetric variant which pits the western Chess army against a drop-based, Shogi-styled army.|
+empire|Army Variants|Empire Chess|Asymmetric variant where one army has pieces that move like queens but capture as usual.|
+ordamirror|Army Variants|Orda Mirror|Orda Chess variant with two Horde armies. The Falcon replaces the Yurt.|
+spartan|Army Variants|Spartan|Asymmetric Spartans vs. Persians variant.|https://www.chessvariants.com/rules/spartan-chess
+horde|Army Variants|Horde|Lots of pawns VS chess army. White wins when checkmating black while black wins when capturing all white pieces.|https://en.wikipedia.org/wiki/Dunsany%27s_Chess#Horde_Chess
+khans|Army Variants|Khans Chess|Orda Chess variant. The scout and khatun replaces the pawn and yurt.|
 
-ataxx|Rule Variants|ATAXX|Infection game. Pieces can turn the enemy pieces in the 8 squares around the destination square into friendly pieces after move.
-snailtrail|Rule Variants|Snail Trail|The squares that pieces have moved from will be blocked. The one who gets stuck loses.
+ataxx|Rule Variants|ATAXX|Infection game. Pieces can turn the enemy pieces in the 8 squares around the destination square into friendly pieces after move.|https://en.wikipedia.org/wiki/Ataxx
+amazons|Rule Variants|Game of the Amazons|Move queens and place a wall on squares in the 8 directions from the destination square. The last player able to move is the winner.|https://en.wikipedia.org/wiki/Game_of_the_Amazons
+breakthrough|Rule Variants|Breakthrough|The first player to reach the farthest rank by moving the piece (mfWfF) is the winner.|https://en.wikipedia.org/wiki/Breakthrough_(board_game)
+clobber|Rule Variants|Clobber|Players take turns to capture an opponent piece which is orthogonally adjacent to their own pieces. The one who cannot move loses.|https://en.wikipedia.org/wiki/Clobber
+cfour|Rule Variants|Connect Four|Be the first to form a horizontal, vertical, or diagonal line of four of one's own tokens to win.|https://en.wikipedia.org/wiki/Connect_Four
+tictactoe|Rule Variants|Tic-tac-toe|Noughts and Crosses. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row is the winner.|https://en.wikipedia.org/wiki/Tic-tac-toe
+flipersi|Rule Variants|Reversi|Drop your disk on a square that can enclose opponent disks lie in a straight line to turn those opponent disks color into yours. The one having more disks of that one's color wins when no moves are available.|https://en.wikipedia.org/wiki/Reversi
+flipello|Rule Variants|Othello|Reversi but players can pass their turn when they have no legal moves and the board has empty squares left.|https://en.wikipedia.org/wiki/Reversi#Othello
+fox-and-hounds|Rule Variants|Fox and Hounds|Hounds (fF) hunting the fox (F). If fox has no moves available, hounds wins. If fox reaches the farthest rank, fox wins.|https://boardgamegeek.com/boardgame/148180/fox-and-hounds
+isolation|Rule Variants|Isolation|Players move their piece (K) and then place a wall square. The one who cannot move loses.|https://boardgamegeek.com/boardgame/1875/isolation
+joust|Rule Variants|Joust|The squares that pieces (N) have moved from will be blocked. The one who cannot move loses.|https://www.chessvariants.com/programs.dir/joust.html
+snailtrail|Rule Variants|Snail Trail|The squares that pieces (K) have moved from will be blocked. The one who cannot move loses.|https://boardgamegeek.com/boardgame/37135/snailtrail
+clobber10|Rule Variants|Clobber 10x10|Clobber on a 10x10 board, mainly played by computers|
+flipello10|Rule Variants|Reversi 10x10|Othello on a 10x10 board, mainly played by computers|
+isolation7x7|Rule Variants|Isolation 7x7|7x7 version of Isolation.|
 
+bughouse|(not supported)|Bughouse Chess|Team work chess where 4 players play on 2 boards in teams of 2. Captured pieces on one board are passed on to the teammate on the other board, who then has the option of dropping these pieces on their board.|https://en.wikipedia.org/wiki/Bughouse_chess
+koedem|(not supported)|Koedem|Bughouse Chess but kings can be captured and then immediately given to teammate whose next move has to play that king. The team has all four kings wins.|http://schachclub-oetigheim.de/wp-content/uploads/2016/04/Koedem-rules.pdf
+
+fairy|Pesudo Variants|♔♕♖♗♘♙♚♛♜♝♞♟|Pseudo-variant only used for endgame initialization.|
+mini|Pesudo Variants|♔♕♖♗♘♙♚♛♜♝♞♟|Pseudo-variant only used for internal purposes.|
+normal|Pesudo Variants|♔♕♖♗♘♙♚♛♜♝♞♟|Pseudo-variant only used for internal purposes.|
