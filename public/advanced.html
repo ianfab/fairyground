@@ -1318,6 +1318,16 @@
       };
     }
 
+    function OpenURL(url) {
+      let link = document.createElement("a");
+      link.href = url;
+      link.id = "tmplink";
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
     function getFileFromServer(url, doneCallback, errorCallback) {
       var xhr;
       function handleStateChange() {
@@ -4285,7 +4295,7 @@
                           `Variant ${name} (ID: ${$("#dropdown-variant").value}):\n${description}\n\nWiki: ${wiki}\n\nDo you want to visit the wiki page?`,
                         )
                       ) {
-                        window.open(wiki, "_blank");
+                        OpenURL(wiki);
                       }
                     } else {
                       window.alert(
