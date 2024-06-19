@@ -69,7 +69,6 @@ judkins|Shogi Variants|Judkins Shogi|6x6 Shogi with no lances.|https://en.wikipe
 xiangqi|Xiangqi Variants|Xiangqi|Chinese Chess, one of the oldest and most played board games in the world.|https://en.wikipedia.org/wiki/Xiangqi
 manchu|Xiangqi Variants|Manchu Xiangqi|Xiangqi variant where one side has a chariot that can also move as a cannon or horse.|https://en.wikipedia.org/wiki/Manchu_chess
 minixiangqi|Xiangqi Variants|Mini Xiangqi|Compact version of Xiangqi played on a 7x7 board without a river.|http://mlwi.magix.net/bg/minixiangqi.htm
-supply|Xiangqi Variants|Supply Xiangqi|Xiangqi Bughouse.|https://en.wikipedia.org/wiki/Xiangqi#Variations
 
 janggi|Janggi Variants|Janggi|Korean Chess, similar to Xiangqi but plays much differently. Tournament rules are used.|https://en.wikipedia.org/wiki/Janggi
 janggicasual|Janggi Variants|Janggi Casual|Korean Chess, similar to Xiangqi but plays much differently. Casual rules are used.|
@@ -144,6 +143,7 @@ isolation7x7|Rule Variants|Isolation 7x7|7x7 version of Isolation.|
 
 bughouse|(not supported)|Bughouse Chess|Team work chess where 4 players play on 2 boards in teams of 2. Captured pieces on one board are passed on to the teammate on the other board, who then has the option of dropping these pieces on their board.|https://en.wikipedia.org/wiki/Bughouse_chess
 koedem|(not supported)|Koedem|Bughouse Chess but kings can be captured and then immediately given to teammate whose next move has to play that king. The team has all four kings wins.|http://schachclub-oetigheim.de/wp-content/uploads/2016/04/Koedem-rules.pdf
+supply|(not supported)|Supply Xiangqi|Xiangqi Bughouse.|https://en.wikipedia.org/wiki/Xiangqi#Variations
 
 fairy|Pesudo Variants|♔♕♖♗♘♙♚♛♜♝♞♟|Pseudo-variant only used for endgame initialization.|
 mini|Pesudo Variants|♔♕♖♗♘♙♚♛♜♝♞♟|Pseudo-variant only used for internal purposes.|
