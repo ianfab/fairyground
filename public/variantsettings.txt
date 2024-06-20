@@ -91,7 +91,7 @@ rooksquare|Chess Variants|Rooksquare Chess|Move any of your pieces to the corner
 river|Chess Variants|River Chess|Get one of your pieces to the farthest rank to win. King is not royal.|https://www.zillions-of-games.com/cgi-bin/zilligames/submissions.cgi?do=show;id=732
 nuclear|Chess Variants|Nuclear Chess|Atomic Chess but the piece capturing another one turns into a wall square after self explosion. Pawns can be blown up and petrified.|https://www.chessvariants.com/difftaking.dir/deadsquare.html
 castle|Chess Variants|Castle Chess|Black wins if black castles queen side while loses when black can longer castle queen side (i.e. moves the king without castling queen side). Standard rules apply.|https://www.chessvariants.com/winning.dir/castle.html
-squatter|Chess Variants|Squatter Chess|Move any piece to the farthest rank without being captured immediately next turn to win.|https://github.com/yagu0/vchess/blob/master/client/src/translations/rules/Squatter1/en.pug
+squatter|Chess Variants|Squatter Chess|Move any piece to the farthest rank without being captured immediately next turn or checkmate opponent's king to win.|https://github.com/yagu0/vchess/blob/master/client/src/translations/rules/Squatter1/en.pug
 opposite-castling|Chess Variants|Opposite Castling Chess|Two players cannot castle the same side.|
 atlantis|Chess Variants|Atlantis Chess|Player may remove an empty square from the edge of the board instead of making a piece move. After a square is removed, more squares could be considered to belong to the edge of the board.|https://www.chessvariants.com/boardrules.dir/atlantis.html
 petty|Chess Variants|Petty Chess|5x6 variant with no castling and no double step.|https://www.chessvariants.com/small.dir/petty.html
