@@ -69,6 +69,9 @@ Older browsers like Internet Explorer of any version are not supported.
 
 ## Run Engines Remotely
 
+> [!WARNING]
+> All binary engine loading features are experimental
+
 The definition of the terms used in this section:
 
 *__Server__*: The computer that runs the fairyground server (a console application) and the binary engines.
@@ -91,6 +94,9 @@ You need to build two connections, 9999 for HTTP and 9999 + 1 = 10000 for WebSoc
 Then browse to http://localhost:9999 on the client and if you see \<Engine Management\> button it works. Note that all the paths are paths *__on the server__*, *__NOT__* the path on the client. The binary executables of the engines need to be placed at respective paths *__on the server__*.
 
 ## Run External Binary Engines In Online Versions
+
+> [!WARNING]
+> All binary engine loading features are experimental
 
 The definition of the terms used in this section:
 
