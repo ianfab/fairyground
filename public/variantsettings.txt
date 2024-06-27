@@ -1,4 +1,4 @@
-#Fairyground Variant Settings File
+﻿#Fairyground Variant Settings File
 #Syntax: <variant ID (declared in variants.ini)>|<variant type/classification>|<variant display name>|<variant description>|<variant wiki page>
 #The type or classification is used in variant type dropdown which helps you classify the variants.
 #The display name will be displayed in the variant dropdown as the item name.
@@ -67,7 +67,7 @@ active|Chess Variants|Active Chess|9x9 variant with 2 queens each side.|https://
 advancedpawn|Chess Variants|Advanced Pawn Chess|Pawns have advanced one square at the beginning.|https://greenchess.net/rules.php?v=advanced-pawn
 captureall|Chess Variants|Capture All Chess|Capture all of your opponent's pieces to win.|https://greenchess.net/rules.php?v=capture-all
 cornerrook|Chess Variants|Corner Rook Chess|All pieces except rooks have advanced one square at the beginning.|https://greenchess.net/rules.php?v=corner-rook
-diana|Chess Variants|Diana Chess|Chess with no queens on a 6x6 board. No pawn double step and no en passant. Pawns cannot promote to bishops.|https://greenchess.net/rules.php?v=diana
+diana|Chess Variants|Diana Chess|Chess with no queens on a 6x6 board. No pawn double step and no en passant. Pawns cannot promote to queens.|https://greenchess.net/rules.php?v=diana
 microchess|Chess Variants|Micro Chess|Chess variant on a 4x5 board. There is no queen, and only a single pawn. No double step and castling.|https://greenchess.net/rules.php?v=microchess
 crossderby|Chess Variants|Cross Derby|Pawns promote to a knight on the 8th rank. Checkmate or stalemate your opponent to win the game.|https://www.chess.com/variants/cross-derby
 elimination|Chess Variants|Elimination Chess|Eliminate all the opponents' pieces but one to win. No checkmates, capturing is compulsory.|https://www.chess.com/variants/elimination-chess
