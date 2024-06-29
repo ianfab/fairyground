@@ -62,6 +62,11 @@
     margin-bottom: 10px;
   }
 
+  #input3 {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
   #gamesettings {
     display: flex;
     margin-bottom: 10px;
@@ -1840,6 +1845,8 @@
       let during_play = false;
       let select_move_dialog = false;
       let in_browser_fsf_hash = 16;
+      let random_mover_white = false;
+      let random_mover_black = false;
       let white_start_time = 0;
       let black_start_time = 0;
       let white_remaining_time = 0;
@@ -2313,6 +2320,15 @@
             ) {
               setTimeout(go(false, true), 10);
             }
+          }
+          if (
+            (random_mover_white && !play_white && stm == "white") ||
+            (random_mover_black && !play_black && stm == "black")
+          ) {
+            setTimeout(() => {
+              if (random_mover_white || random_mover_black)
+                document.getElementById("randommovergo").click();
+            }, 200);
           }
         }
       };
@@ -3467,6 +3483,7 @@
         $("#currentposition").click();
         $("#input").style.display = "";
         $("#input2").style.display = "";
+        $("#input3").style.display = "";
         $("#posvariantdiv").style.display = "";
       };
 
@@ -3483,6 +3500,7 @@
         //We need to prevent user from doing unnecessary actions during countdown, so we'll hide these divs
         $("#input").style.display = "none"; //These divs are unable to be hidden by {hidden: during_play}
         $("#input2").style.display = "none";
+        $("#input3").style.display = "none";
         $("#posvariantdiv").style.display = "none";
         //$("#movecontrol").style.display = "none";
         resetTimer();
@@ -3506,10 +3524,8 @@
             (play_white && stm == "white") || (play_black && stm == "black")
           }`,
         );
-        if ((play_white && stm == "white") || (play_black && stm == "black")) {
-          console.log("Go!");
-          go(false, false);
-        }
+        console.log("Go!");
+        setFen(false, true);
       };
 
       const stop = (interrupt_pondering) => {
@@ -3532,7 +3548,11 @@
       };
 
       const force_stop = () => {
-        play_white = play_black = false;
+        play_white =
+          play_black =
+          random_mover_white =
+          random_mover_black =
+            false;
         play_move = false;
         stop(true);
       };
@@ -3861,50 +3881,63 @@
         }
 
         loadStockfish({ wasmBinary: data })
-          .then((_stockfish) => {
-            stockfish = _stockfish;
-            stockfish_state = "READY";
-            stockfish.addMessageListener((line) => {
-              if (line.startsWith("option")) {
-                if (line.startsWith("option name UCI_Variant")) {
-                  allvariants = line
-                    .replace(
-                      "option name UCI_Variant type combo default chess var ",
-                      "",
-                    )
-                    .replace(/ var /g, " ")
-                    .split(" ")
-                    .sort();
-                  //variants = allvariants;
-                  updateVariantTypeDropdown();
-                }
-              } else if (line.startsWith(" ")) {
-              } else {
-                if (!review_mode && line.startsWith("bestmove") && play_move) {
-                  play_move = false;
-                  if (analysis_mode) {
-                    return;
+          .then(
+            (_stockfish) => {
+              stockfish = _stockfish;
+              stockfish_state = "READY";
+              stockfish.addMessageListener((line) => {
+                if (line.startsWith("option")) {
+                  if (line.startsWith("option name UCI_Variant")) {
+                    allvariants = line
+                      .replace(
+                        "option name UCI_Variant type combo default chess var ",
+                        "",
+                      )
+                      .replace(/ var /g, " ")
+                      .split(" ")
+                      .sort();
+                    //variants = allvariants;
+                    updateVariantTypeDropdown();
                   }
-                  $("#move").value += " " + line.split(" ")[1];
-                  $("#set").click();
-                }
-                output2 += line + "\n";
-                if (fge.analysis_engine) {
-                  if (!fge.analysis_engine.IsUsing) {
+                } else if (line.startsWith(" ")) {
+                } else {
+                  if (
+                    !review_mode &&
+                    line.startsWith("bestmove") &&
+                    play_move
+                  ) {
+                    play_move = false;
+                    if (analysis_mode) {
+                      return;
+                    }
+                    $("#move").value += " " + line.split(" ")[1];
+                    $("#set").click();
+                  }
+                  output2 += line + "\n";
+                  if (fge.analysis_engine) {
+                    if (!fge.analysis_engine.IsUsing) {
+                      $("#engineoutputline").value = line;
+                      $("#engineoutputline").click();
+                    }
+                  } else {
                     $("#engineoutputline").value = line;
                     $("#engineoutputline").click();
                   }
-                } else {
-                  $("#engineoutputline").value = line;
-                  $("#engineoutputline").click();
                 }
-              }
-              m.redraw();
-            });
-            getVariants();
-          })
+                m.redraw();
+              });
+              getVariants();
+            },
+            (err) => {
+              console.error(err);
+              throw err;
+            },
+          )
           .catch((e) => {
             stockfish_state = "FAILED";
+            window.alert(
+              "There is something wrong with in browser Fairy-Stockfish. Press Ctrl+Shift+I to see more details.",
+            );
             throw e;
           })
           .finally(() => m.redraw());
@@ -4563,7 +4596,9 @@
                   play_white ||
                   play_black ||
                   advanced_time_control ||
-                  board_setup_mode,
+                  board_setup_mode ||
+                  random_mover_white ||
+                  random_mover_black,
                 onclick: () => {
                   analysis_mode = !analysis_mode;
                 },
@@ -4574,7 +4609,11 @@
               "label",
               m("input[type=checkbox]#playwhite", {
                 checked: play_white,
-                disabled: analysis_mode || review_mode || board_setup_mode,
+                disabled:
+                  analysis_mode ||
+                  review_mode ||
+                  board_setup_mode ||
+                  random_mover_white,
                 onclick: () => {
                   play_white = !play_white;
                 },
@@ -4585,7 +4624,11 @@
               "label",
               m("input[type=checkbox]#playblack", {
                 checked: play_black,
-                disabled: analysis_mode || review_mode || board_setup_mode,
+                disabled:
+                  analysis_mode ||
+                  review_mode ||
+                  board_setup_mode ||
+                  random_mover_black,
                 onclick: () => {
                   play_black = !play_black;
                 },
@@ -4593,30 +4636,34 @@
               "Engine black",
             ),
             m(
-              "label#label-advtimectrl",
-              m("input[type=checkbox]#advtimectrl", {
-                checked: advanced_time_control,
-                disabled: analysis_mode || review_mode || board_setup_mode,
-                onclick: () => {
-                  advanced_time_control = !advanced_time_control;
-                },
-              }),
-              "Advanced Time Control",
-            ),
-            m(
-              "label#label-boardsetup",
-              m("input[type=checkbox]#isboardsetup", {
-                checked: board_setup_mode,
+              "label",
+              m("input[type=checkbox]#randommoverwhite", {
+                checked: random_mover_white,
                 disabled:
                   analysis_mode ||
                   review_mode ||
-                  advanced_time_control ||
-                  select_move_dialog,
+                  board_setup_mode ||
+                  play_white,
                 onclick: () => {
-                  board_setup_mode = !board_setup_mode;
+                  random_mover_white = !random_mover_white;
                 },
               }),
-              "Board Setup",
+              "Random mover white",
+            ),
+            m(
+              "label",
+              m("input[type=checkbox]#randommoverblack", {
+                checked: random_mover_black,
+                disabled:
+                  analysis_mode ||
+                  review_mode ||
+                  board_setup_mode ||
+                  play_black,
+                onclick: () => {
+                  random_mover_black = !random_mover_black;
+                },
+              }),
+              "Random mover black",
             ),
             m("p#label-stm", { hidden: true }),
             m("input#displaymoves", {
@@ -4701,6 +4748,13 @@
               "Copy Set FEN (internal)",
             ),
             m(
+              "p#randommovergo",
+              {
+                hidden: true,
+              },
+              "Random Mover Go (internal)",
+            ),
+            m(
               "p#binengineoutputinit",
               {
                 hidden: true,
@@ -4774,6 +4828,35 @@
                 },
               },
               "Binary Engine Output Event Handler Initialization (internal)",
+            ),
+          ]),
+          m("div#input3", { hidden: during_play }, [
+            m("p", "Additional Features: "),
+            m(
+              "label#label-advtimectrl",
+              m("input[type=checkbox]#advtimectrl", {
+                checked: advanced_time_control,
+                disabled: analysis_mode || review_mode || board_setup_mode,
+                onclick: () => {
+                  advanced_time_control = !advanced_time_control;
+                },
+              }),
+              "Advanced Time Control",
+            ),
+            m(
+              "label#label-boardsetup",
+              m("input[type=checkbox]#isboardsetup", {
+                checked: board_setup_mode,
+                disabled:
+                  analysis_mode ||
+                  review_mode ||
+                  advanced_time_control ||
+                  select_move_dialog,
+                onclick: () => {
+                  board_setup_mode = !board_setup_mode;
+                },
+              }),
+              "Board Setup",
             ),
           ]),
           m(

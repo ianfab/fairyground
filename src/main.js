@@ -1,4 +1,4 @@
-// ffish.js test using chessgroundx
+﻿// ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
 const variantsIni = document.getElementById("variants-ini");
@@ -33,6 +33,8 @@ const buttonSpecifiedPosition = document.getElementById("specifiedposition");
 const buttonGameStart = document.getElementById("gamestart");
 const playWhite = document.getElementById("playwhite");
 const playBlack = document.getElementById("playblack");
+const randomMoverWhite = document.getElementById("randommoverwhite");
+const randomMoverBlack = document.getElementById("randommoverblack");
 const currentBoardFen = document.getElementById("currentboardfen");
 const gameResult = document.getElementById("gameresult");
 const gameStatus = document.getElementById("gamestatus");
@@ -94,6 +96,7 @@ const buttonmakemove = document.getElementById("makemove");
 const buttonhighlightmove = document.getElementById("highlightmove");
 const searchresultinfo = document.getElementById("searchresultinfo");
 const dropdownNotationSystem = document.getElementById("sannotation");
+const pRandomMoverGo = document.getElementById("randommovergo");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
@@ -1369,12 +1372,20 @@ new Module().then((loadedModule) => {
   };
 
   buttonGameStart.onclick = function () {
-    if (playWhite.checked == true && playBlack.checked == false) {
+    if (
+      (playWhite.checked == true || randomMoverWhite.checked == true) &&
+      playBlack.checked == false &&
+      randomMoverBlack.checked == false
+    ) {
       chessground.set({
         orientation: "black",
       });
     }
-    if (playWhite.checked == false && playBlack.checked == true) {
+    if (
+      playWhite.checked == false &&
+      randomMoverWhite.checked == false &&
+      (playBlack.checked == true || randomMoverBlack.checked == true)
+    ) {
       chessground.set({
         orientation: "white",
       });
@@ -2285,6 +2296,14 @@ new Module().then((loadedModule) => {
     if (labelPgn) {
       labelPgn.innerText = getPgn(board);
     }
+  };
+
+  pRandomMoverGo.onclick = function () {
+    let movelist = textMoves.value.trim().split(/[ ]+/);
+    let legalmoves = board.legalMoves().trim().split(/[ ]+/);
+    movelist.push(legalmoves[Math.floor(Math.random() * legalmoves.length)]);
+    textMoves.value = movelist.join(" ");
+    pSetFen.click();
   };
 
   updateChessground();
