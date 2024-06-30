@@ -1,4 +1,4 @@
-﻿#Fairyground Variant Settings File
+#Fairyground Variant Settings File
 #Syntax: <variant ID (declared in variants.ini)>|<variant type/classification>|<variant display name>|<variant description>|<variant wiki page>
 #The type or classification is used in variant type dropdown which helps you classify the variants.
 #The display name will be displayed in the variant dropdown as the item name.
@@ -236,7 +236,7 @@ clobber10|Rule Variants|Clobber 10x10|Clobber on a 10x10 board, mainly played by
 flipello10|Rule Variants|Othello 10x10|Othello on a 10x10 board, mainly played by computers.|
 isolation7x7|Rule Variants|Isolation 7x7|7x7 version of Isolation.|
 flipello6|Rule Variants|Othello 6x6|Othello on a 6x6 board.|
-buffalo|Rule Variants|Buffalo|Stalemating black all capture all black pieces to win as white. Reach the farthest rank to win as black.|https://boardgamegeek.com/boardgame/32/buffalo-chess
+buffalo|Rule Variants|Buffalo|Stalemate black or capture all black pieces to win as white. Reach the farthest rank to win as black.|https://boardgamegeek.com/boardgame/32/buffalo-chess
 knights-halma|Rule Variants|Knight's Halma|Move all your knights from their starting positions in your yard into the opponent's yard to win. Captures not allowed.|https://www.zillions-of-games.com/cgi-bin/zilligames/submissions.cgi?do=show;id=1596
 hexapawn|Rule Variants|Hexapawn|Move one pawn to the farthest rank to win. Stalemate is a loss.|https://en.wikipedia.org/wiki/Hexapawn
 tuktuk|Rule Variants|T'uk T'uk|Pieces can move forward or backward for infinite squares. The one who cannot move loses.|https://ludii.games/details.php?keyword=T%27uk%20T%27uk
