@@ -101,17 +101,20 @@ dobutsu|dobutsu|dobutsuboard
 
 xiangqi|x2dhanzi,wikim|xiangqiboard
 xiangqihouse|@xiangqi|@xiangqi
+supply|@xiangqi|@xiangqi
 minixiangqi|@xiangqi|minixiangqiboard
 
 janggi|janggi|janggiboard
 janggicasual|@janggi|@janggi
 janggimodern|@janggi|@janggi
 janggitraditional|@janggi|@janggi
+janggihouse|@janggi|@janggi
 
 makruk|makruk|makrukboard
 makpong|@makruk|@makruk
 cambodian|@makruk|@makruk
 asean|asean|
+makhouse|@makruk|@makruk
 
 sittuyin|sittuyin|sittuyinboard
 
