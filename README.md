@@ -6,6 +6,10 @@ You can see it deployed at: [https://fairyground.vercel.app/](https://fairygroun
 
 ## Usage
 
+The following steps (_**Installation**_ and _**Run Application**_) show the process to install a development environment.
+
+If you want a one-click-to-run version, you can download the executables in the [Latest Build Actions](https://github.com/ianfab/fairyground/actions/workflows/ci.yml) section. (requires logging in to github)
+
 ### ◎ Installation
 
 #### ⊙ Prerequisites
