@@ -13,3 +13,31 @@ jobs:
       - uses: actions/checkout@v4
       - run: chmod 744 ./release_make/CI.sh
       - run: ./release_make/CI.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Windows-x86_64
+          path: ./release_make/artifacts/Windows-x86_64.zip
+          compression-level: 0
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Windows-ARM64
+          path: ./release_make/artifacts/Windows-ARM64.zip
+          compression-level: 0
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Linux-x86_64
+          path: ./release_make/artifacts/Linux-x86_64.zip
+          compression-level: 0
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Linux-ARM64
+          path: ./release_make/artifacts/Linux-ARM64.zip
+          compression-level: 0
+          if-no-files-found: error
