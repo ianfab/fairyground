@@ -107,10 +107,10 @@ echo "[Info] Compressing & packing artifacts to prepare for uploading..."
 cd ./release_make
 mkdir artifacts
 
-zip -9 -r ./artifacts/Windows-x86_64.zip ./release-builds/win/x64 || Error
-zip -9 -r ./artifacts/Windows-ARM64.zip ./release-builds/win/arm64 || Error
-zip -9 -r ./artifacts/Linux-x86_64.zip ./release-builds/linux/x64 || Error
-zip -9 -r ./artifacts/Linux-ARM64.zip ./release-builds/linux/arm64 || Error
+zip -9 -q -r ./artifacts/Windows-x86_64.zip ./release-builds/win/x64 || Error
+zip -9 -q -r ./artifacts/Windows-ARM64.zip ./release-builds/win/arm64 || Error
+zip -9 -q -r ./artifacts/Linux-x86_64.zip ./release-builds/linux/x64 || Error
+zip -9 -q -r ./artifacts/Linux-ARM64.zip ./release-builds/linux/arm64 || Error
 
 echo "[Info] Artifacts packed. Pending for upload..."
 exit 0
