@@ -105,7 +105,7 @@ echo "[Info] CI build test OK."
 echo "[Info] Compressing & packing artifacts to prepare for uploading..."
 
 cd ./release_make
-md artifacts
+mkdir artifacts
 
 zip -9 -r ./artifacts/Windows-x86_64.zip ./release-builds/win/x64 || Error
 zip -9 -r ./artifacts/Windows-ARM64.zip ./release-builds/win/arm64 || Error
