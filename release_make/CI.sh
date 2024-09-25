@@ -102,15 +102,6 @@ echo "[Warning] The macOS executables are not suitably signed yet. If you want t
 echo "[Warning] Use codesign on macOS to sign your executable. If you don't have a Mac, you can use a virtual machine."
 echo "[Warning] If you want to build a macOS virtual machine, please visit https://www.sysnettechsolutions.com/en/install-macos-vmware/"
 echo "[Info] CI build test OK."
-echo "[Info] Compressing & packing artifacts to prepare for uploading..."
 
-cd ./release_make
-mkdir artifacts
-
-zip -9 -q -r ./artifacts/Windows-x86_64.zip ./release-builds/win/x64 || Error
-zip -9 -q -r ./artifacts/Windows-ARM64.zip ./release-builds/win/arm64 || Error
-zip -9 -q -r ./artifacts/Linux-x86_64.zip ./release-builds/linux/x64 || Error
-zip -9 -q -r ./artifacts/Linux-ARM64.zip ./release-builds/linux/arm64 || Error
-
-echo "[Info] Artifacts packed. Pending for upload..."
+echo "[Info] Artifacts are ready. Pending for compression and upload..."
 exit 0
