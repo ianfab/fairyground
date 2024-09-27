@@ -102,4 +102,6 @@ echo "[Warning] The macOS executables are not suitably signed yet. If you want t
 echo "[Warning] Use codesign on macOS to sign your executable. If you don't have a Mac, you can use a virtual machine."
 echo "[Warning] If you want to build a macOS virtual machine, please visit https://www.sysnettechsolutions.com/en/install-macos-vmware/"
 echo "[Info] CI build test OK."
+
+echo "[Info] Artifacts are ready. Pending for compression and upload..."
 exit 0

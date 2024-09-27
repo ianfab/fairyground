@@ -13,3 +13,31 @@ jobs:
       - uses: actions/checkout@v4
       - run: chmod 744 ./release_make/CI.sh
       - run: ./release_make/CI.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Fairyground-Windows-x86_64
+          path: ./release_make/release-builds/win/x64/*
+          compression-level: 9
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Fairyground-Windows-ARM64
+          path: ./release_make/release-builds/win/arm64/*
+          compression-level: 9
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Fairyground-Linux-x86_64
+          path: ./release_make/release-builds/linux/x64/*
+          compression-level: 9
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Fairyground-Linux-ARM64
+          path: ./release_make/release-builds/linux/arm64/*
+          compression-level: 9
+          if-no-files-found: error
