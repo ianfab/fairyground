@@ -74,6 +74,23 @@ chess|Handicap|No Castling|rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 
 chess|Minigame|No Center Chess|rnbqkbnr/pppppppp/8/3**3/3**3/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1|It's well-known that controlling the center of the board is important, but what if the center is blocked? Figure out what would happen in this position.
 
 
+janggi|Starting position|nbbnNBBN|rnba1abnr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RNBA1ABNR w - - 0 1|
+janggi|Starting position|bnbnNBBN|rbna1abnr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RNBA1ABNR w - - 0 1|
+janggi|Starting position|nbnbNBBN|rnba1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RNBA1ABNR w - - 0 1|
+janggi|Starting position|bnnbNBBN|rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RNBA1ABNR w - - 0 1|
+janggi|Starting position|nbbnBNBN|rnba1abnr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ABNR w - - 0 1|
+janggi|Starting position|bnbnBNBN|rbna1abnr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ABNR w - - 0 1|
+janggi|Starting position|nbnbBNBN|rnba1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ABNR w - - 0 1|
+janggi|Starting position|bnnbBNBN|rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ABNR w - - 0 1|
+janggi|Starting position|nbbnNBNB|rnba1abnr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RNBA1ANBR w - - 0 1|
+janggi|Starting position|bnbnNBNB|rbna1abnr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RNBA1ANBR w - - 0 1|
+janggi|Starting position|nbnbNBNB|rnba1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RNBA1ANBR w - - 0 1|
+janggi|Starting position|bnnbNBNB|rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RNBA1ANBR w - - 0 1|
+janggi|Starting position|nbbnBNNB|rnba1abnr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1|
+janggi|Starting position|bnbnBNNB|rbna1abnr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1|
+janggi|Starting position|nbnbBNNB|rnba1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1|
+janggi|Starting position|bnnbBNNB|rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1|
+
 
 shogi|Handicap|香落ち|lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL[] w - - 0 1|Removes left lance.
 shogi|Handicap|角落ち|lnsgkgsnl/1r7/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL[] w - - 0 1|Removes bishop.
