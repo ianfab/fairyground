@@ -75,3 +75,7 @@
 .orda .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/barrier.svg');
 }
+
+.orda .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknown.svg');
+}

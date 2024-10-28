@@ -51,3 +51,7 @@
 .chak .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/barrier.svg');
 }
+
+.chak .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknown.svg');
+}

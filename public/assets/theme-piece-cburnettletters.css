@@ -314,3 +314,8 @@
 .cburnettletters .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/cross.svg');
 }
+
+
+.cburnettletters .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknown.svg');
+}

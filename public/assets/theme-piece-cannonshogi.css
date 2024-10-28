@@ -53,3 +53,7 @@
 .cannonshogi .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/barrier.svg');
 }
+
+.cannonshogi .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknown.svg');
+}

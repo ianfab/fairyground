@@ -105,3 +105,7 @@
 .seirawan .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/barrier.svg');
 }
+
+.seirawan .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknown.svg');
+}

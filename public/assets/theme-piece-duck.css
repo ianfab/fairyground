@@ -105,3 +105,7 @@
 .duck .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/duck.svg');
 }
+
+.duck .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknown.svg');
+}

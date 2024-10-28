@@ -53,3 +53,7 @@
 .dobutsu .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/barrier.svg');
 }
+
+.dobutsu .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknown.svg');
+}

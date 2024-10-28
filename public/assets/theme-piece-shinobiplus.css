@@ -419,3 +419,7 @@
 .shinobiplus .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/barrier.svg');
 }
+
+.shinobiplus .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknown.svg');
+}
