@@ -8,7 +8,7 @@
    version="1.1"
    id="svg5"
    inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
-   sodipodi:docname="绘图.svg"
+   sodipodi:docname="unknowncarbonfiber.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -26,7 +26,7 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="4.12225"
-     inkscape:cx="95.821457"
+     inkscape:cx="81.266299"
      inkscape:cy="101.76481"
      inkscape:window-width="1920"
      inkscape:window-height="1001"
@@ -1059,16 +1059,14 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="图层 2">
-    <text
-       xml:space="preserve"
-       style="font-stretch:condensed;font-size:45.1553px;line-height:0;font-family:Arial;-inkscape-font-specification:'Arial Condensed';text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.05832;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
-       x="26.337095"
-       y="42.785225"
-       id="text24989"><tspan
-         sodipodi:role="line"
-         id="tspan24987"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:condensed;font-size:45.1553px;font-family:Arial;-inkscape-font-specification:'Arial Bold Condensed';fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.05832;stroke-dasharray:none;stroke-opacity:1"
-         x="26.337095"
-         y="42.785225">?</tspan></text>
+    <g
+       aria-label="?"
+       id="text24989"
+       style="font-stretch:condensed;font-size:45.1553px;line-height:0;font-family:Arial;-inkscape-font-specification:'Arial Condensed';text-align:center;text-anchor:middle;fill:#ffffff;stroke:#000000;stroke-width:1.05832;stroke-linecap:round">
+      <path
+         d="m 28.608089,34.450897 h -4.608133 l -0.02205,-1.411103 q 0,-2.844255 0.749649,-4.608134 0.749648,-1.763879 2.9104,-3.880533 2.403285,-2.381237 2.888352,-3.263176 0.485066,-0.88194 0.485066,-2.05051 0,-1.918218 -1.256763,-3.152933 -1.234716,-1.234715 -3.130885,-1.234715 -4.07897,0 -5.027055,5.445976 L 16.94444,19.590217 q 0.198436,-4.145115 2.844255,-6.790934 2.667867,-2.667866 6.680691,-2.667866 4.07897,0 6.790934,2.667866 2.711964,2.667867 2.711964,6.658643 0,2.028461 -0.948085,3.858485 -0.948085,1.807976 -4.07897,4.96091 -1.60954,1.631588 -2.006412,2.62377 -0.374825,0.992182 -0.330728,3.549806 z m -4.608133,8.334328 V 36.5896 h 5.0932 v 6.195625 z"
+         style="font-weight:bold;-inkscape-font-specification:'Arial Bold Condensed'"
+         id="path488" />
+    </g>
   </g>
 </svg>

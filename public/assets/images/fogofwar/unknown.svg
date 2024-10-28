@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    width="100"
    height="100"
@@ -60,7 +59,8 @@
        y2="25.007183"
        gradientUnits="userSpaceOnUse" />
   </defs>
-  <g id="layer1">
+  <g
+     id="layer1">
     <rect
        style="fill:url(#linearGradient1011);stroke:#000000;stroke-width:0.79375;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;image-rendering:auto;fill-opacity:1"
        id="rect234"
@@ -77,16 +77,13 @@
        x="1.2843852"
        y="1.2843852"
        ry="3.8929825" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:condensed;font-size:19.7556px;line-height:0;font-family:Arial;-inkscape-font-specification:'Arial Bold Condensed';text-align:center;text-anchor:middle;fill:#fffffb;stroke:#000000;stroke-width:0.79375;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
-       x="13.176071"
-       y="20.372238"
-       id="text1154"><tspan
-         sodipodi:role="line"
-         id="tspan1152"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:condensed;font-size:19.7556px;font-family:Arial;-inkscape-font-specification:'Arial Bold Condensed';stroke-width:0.79375;fill:#fffffb;fill-opacity:1"
-         x="13.176071"
-         y="20.372238">?</tspan></text>
+    <g
+       aria-label="?"
+       id="text1154"
+       style="font-weight:bold;font-stretch:condensed;font-size:19.7556px;line-height:0;font-family:Arial;-inkscape-font-specification:'Arial Bold Condensed';text-align:center;text-anchor:middle;fill:#fffffb;stroke:#000000;stroke-width:0.79375;stroke-linecap:round;stroke-linejoin:round">
+      <path
+         d="m 14.169639,16.725941 h -2.016074 l -0.0096,-0.617363 q 0,-1.244371 0.327974,-2.016074 0.327974,-0.771703 1.27331,-1.697747 1.051446,-1.041799 1.263664,-1.427651 0.212218,-0.385851 0.212218,-0.897105 0,-0.8392267 -0.549838,-1.3794189 -0.540192,-0.5401922 -1.369773,-0.5401922 -1.784564,0 -2.199354,2.3826331 L 9.066752,10.224342 q 0.086817,-1.8135023 1.244371,-2.9710569 1.167201,-1.167201 2.922826,-1.167201 1.784563,0 2.971057,1.167201 1.186493,1.1672009 1.186493,2.9131789 0,0.887459 -0.41479,1.688101 -0.41479,0.790996 -1.784563,2.170415 -0.70418,0.713825 -0.877813,1.147908 -0.163987,0.434083 -0.144694,1.553053 z m -2.016074,3.646297 v -2.710607 h 2.228292 v 2.710607 z"
+         id="path906" />
+    </g>
   </g>
 </svg>

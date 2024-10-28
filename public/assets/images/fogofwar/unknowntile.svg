@@ -110,17 +110,15 @@
        x="23.300074"
        y="-40.893684"
        transform="matrix(0,1,1,0,0,0)" />
-    <text
-       xml:space="preserve"
-       style="font-weight:bold;font-stretch:condensed;font-size:21.0721px;line-height:0;font-family:Arial;-inkscape-font-specification:'Arial Bold Condensed';text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
-       x="21.253611"
-       y="28.836578"
+    <g
+       aria-label="?"
+       transform="translate(-51.194527,12.999233)"
        id="text909"
-       transform="translate(-51.194527,12.999233)"><tspan
-         sodipodi:role="line"
-         id="tspan907"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-family:Arial;-inkscape-font-specification:'Arial Condensed';fill:#000000;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
-         x="21.253611"
-         y="28.836578">?</tspan></text>
+       style="font-weight:bold;font-stretch:condensed;font-size:21.0721px;line-height:0;font-family:Arial;-inkscape-font-specification:'Arial Bold Condensed';text-align:center;text-anchor:middle;stroke:#000000;stroke-width:0;stroke-linecap:round;stroke-linejoin:round">
+      <path
+         d="m 20.409903,25.122209 -0.02058,-0.555612 q 0,-1.491921 0.504167,-2.500254 0.349829,-0.699659 1.471343,-1.903485 0.761394,-0.81284 0.998043,-1.317007 0.23665,-0.514455 0.23665,-1.111224 0,-1.131802 -0.720238,-1.924063 -0.720238,-0.792262 -1.656547,-0.792262 -0.956887,0 -1.625679,0.730527 -0.658503,0.730527 -0.853997,2.325339 l -1.563944,-0.22636 q 0.22636,-2.181292 1.286138,-3.261649 1.070068,-1.090645 2.747193,-1.090645 1.687414,0 2.808928,1.162669 1.131802,1.152381 1.131802,2.952975 0,0.987755 -0.370408,1.810884 -0.370408,0.823129 -1.481632,2.037244 -0.946598,1.018622 -1.183248,1.61539 -0.22636,0.586479 -0.257228,2.047533 z m -0.102891,3.714369 v -2.109267 h 1.728571 v 2.109267 z"
+         style="font-weight:normal;-inkscape-font-specification:'Arial Condensed'"
+         id="path853" />
+    </g>
   </g>
 </svg>
