@@ -1,4 +1,4 @@
-﻿// ffish.js test using chessgroundx
+// ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
 const variantsIni = document.getElementById("variants-ini");
@@ -76,6 +76,9 @@ const positionVariantTxt = document.getElementById("posvariant-txt");
 const quickPromotionPiece = document.getElementById("dropdown-quickpromotion");
 const buttonPassMove = document.getElementById("passmove");
 const buttonPlaceWall = document.getElementById("placewall");
+const dropdownFogOfWarSettings = document.getElementById(
+  "dropdown-fogofwarsettings",
+);
 const engineOutput = document.getElementById("engineoutputline");
 const isAnalysis = document.getElementById("analysis");
 const evaluationBar = document.getElementById("evalbarprogress");
@@ -1394,6 +1397,7 @@ new Module().then((loadedModule) => {
 
   isBoardSetup.onchange = function () {
     if (isBoardSetup.checked) {
+      updateChessground();
       chessground.set({
         movable: {
           color: "both",
@@ -2306,6 +2310,10 @@ new Module().then((loadedModule) => {
     pSetFen.click();
   };
 
+  dropdownFogOfWarSettings.onchange = function () {
+    updateChessground();
+  };
+
   updateChessground();
 }); // Chessground helper functions
 
@@ -3191,6 +3199,52 @@ function enableBoardMove() {
   });
 }
 
+function getCurrentBoardSize() {
+  let boardsize = [];
+  let i = 0;
+  const ClassList = document.getElementById(
+    "chessground-container-div",
+  ).classList;
+  for (i = 0; i < ClassList.length; i++) {
+    if (/board[0-9]+x[0-9]+/.test(ClassList[i])) {
+      boardsize = ClassList[i].replace("board", "").split("x"); //[width, height]
+      break;
+    }
+  }
+  return { width: boardsize[0], height: boardsize[1] };
+}
+
+function getKnownAndUnknownSquares(board) {
+  let moves = board.legalMoves().split(" ");
+  let unknownsquares = new Set();
+  let knownsquares = new Set();
+  let i = 0;
+  let j = 0;
+  let boardsize = getCurrentBoardSize();
+  let square = "";
+  let parseresult = [];
+  let orig = "";
+  let dest = "";
+  for (i = 0; i < moves.length; i++) {
+    parseresult = parseUCIMove(moves[i]);
+    orig = parseresult[0];
+    dest = parseresult[1];
+    if (!orig.includes("@")) {
+      knownsquares.add(orig);
+    }
+    knownsquares.add(dest);
+  }
+  for (i = 0; i < boardsize.width; i++) {
+    for (j = 0; j < boardsize.height; j++) {
+      square = `${files[i]}${j + 1}`;
+      if (!knownsquares.has(square)) {
+        unknownsquares.add(square);
+      }
+    }
+  }
+  return { KnownSquares: knownsquares, UnknownSquares: unknownsquares };
+}
+
 function updateChessground() {
   const boardfenval = board.fen();
   currentboardfen.innerHTML = `Current Board FEN:  ${boardfenval}`;
@@ -3206,8 +3260,127 @@ function updateChessground() {
       dests: getDests(board),
     },
   });
+
+  if (
+    dropdownFogOfWarSettings.value == "<DISABLED>" ||
+    isBoardSetup.checked ||
+    isAnalysis.checked ||
+    labelStm.innerText == "undefined"
+  ) {
+  } else if (dropdownFogOfWarSettings.value == "whiteonly") {
+    if (board.turn()) {
+      const fogofwarsquarevisibility = getKnownAndUnknownSquares(board);
+      fogofwarsquarevisibility.UnknownSquares.forEach((val) => {
+        let val1 = val.replace("10", ":");
+        if (chessground.state.boardState.pieces.has(val1)) {
+          let piece = chessground.state.boardState.pieces.get(val1);
+          if (piece.role == "_-piece" || piece.color == "white") {
+            return;
+          }
+          piece.role = "unknown";
+        } else {
+          chessground.state.boardState.pieces.set(val1, {
+            color: "black",
+            role: "unknown",
+          });
+        }
+      });
+    } else {
+      let i = 0;
+      let j = 0;
+      let boardsize = getCurrentBoardSize();
+      let square = "";
+      chessground.set({
+        movable: {
+          color: undefined,
+          dests: EmptyMap,
+        },
+      });
+      for (i = 0; i < boardsize.width; i++) {
+        for (j = 0; j < boardsize.height; j++) {
+          square = `${files[i]}${j + 1}`.replace("10", ":");
+          if (
+            chessground.state.boardState.pieces.has(square) &&
+            (chessground.state.boardState.pieces.get(square).color == "white" ||
+              chessground.state.boardState.pieces.get(square).role == "_-piece")
+          ) {
+            continue;
+          } else {
+            chessground.state.boardState.pieces.set(square, {
+              color: "black",
+              role: "unknown",
+            });
+          }
+        }
+      }
+    }
+  } else if (dropdownFogOfWarSettings.value == "blackonly") {
+    if (board.turn()) {
+      let i = 0;
+      let j = 0;
+      let boardsize = getCurrentBoardSize();
+      let square = "";
+      chessground.set({
+        movable: {
+          color: undefined,
+          dests: EmptyMap,
+        },
+      });
+      for (i = 0; i < boardsize.width; i++) {
+        for (j = 0; j < boardsize.height; j++) {
+          square = `${files[i]}${j + 1}`.replace("10", ":");
+          if (
+            chessground.state.boardState.pieces.has(square) &&
+            (chessground.state.boardState.pieces.get(square).color == "black" ||
+              chessground.state.boardState.pieces.get(square).role == "_-piece")
+          ) {
+            continue;
+          } else {
+            chessground.state.boardState.pieces.set(square, {
+              color: "white",
+              role: "unknown",
+            });
+          }
+        }
+      }
+    } else {
+      const fogofwarsquarevisibility = getKnownAndUnknownSquares(board);
+      fogofwarsquarevisibility.UnknownSquares.forEach((val) => {
+        let val1 = val.replace("10", ":");
+        if (chessground.state.boardState.pieces.has(val1)) {
+          let piece = chessground.state.boardState.pieces.get(val1);
+          if (piece.role == "_-piece" || piece.color == "black") {
+            return;
+          }
+          piece.role = "unknown";
+        } else {
+          chessground.state.boardState.pieces.set(val1, {
+            color: "white",
+            role: "unknown",
+          });
+        }
+      });
+    }
+  } else if (dropdownFogOfWarSettings.value == "alternate") {
+    const fogofwarsquarevisibility = getKnownAndUnknownSquares(board);
+    fogofwarsquarevisibility.UnknownSquares.forEach((val) => {
+      let val1 = val.replace("10", ":");
+      if (chessground.state.boardState.pieces.has(val1)) {
+        let piece = chessground.state.boardState.pieces.get(val1);
+        if (piece.role == "_-piece" || piece.color == getColor(board)) {
+          return;
+        }
+        piece.role = "unknown";
+      } else {
+        chessground.state.boardState.pieces.set(val1, {
+          color: board.turn() ? "black" : "white",
+          role: "unknown",
+        });
+      }
+    });
+  }
+
   const moveStack = board.moveStack();
-  chessground.setAutoShapes([]);
   clearMovesList();
 
   if (moveStack.length === 0) {
@@ -3231,10 +3404,57 @@ function updateChessground() {
           .replace("10", ":");
       }
     }
-    chessground.set({
-      lastMove: [lastMoveFrom, lastMoveTo],
-    });
+    if (
+      dropdownFogOfWarSettings.value == "<DISABLED>" ||
+      isBoardSetup.checked ||
+      isAnalysis.checked ||
+      labelStm.innerText == "undefined"
+    ) {
+      chessground.set({
+        lastMove: [lastMoveFrom, lastMoveTo],
+      });
+    } else {
+      if (
+        chessground.state.boardState.pieces.has(lastMoveFrom) &&
+        chessground.state.boardState.pieces.get(lastMoveFrom).role == "unknown"
+      ) {
+        if (
+          chessground.state.boardState.pieces.get(lastMoveTo) == undefined ||
+          chessground.state.boardState.pieces.get(lastMoveTo).role != "unknown"
+        ) {
+          chessground.set({
+            lastMove: [lastMoveTo, lastMoveTo],
+          });
+        } else {
+          chessground.set({
+            lastMove: undefined,
+          });
+        }
+      } else if (
+        chessground.state.boardState.pieces.has(lastMoveTo) &&
+        chessground.state.boardState.pieces.get(lastMoveTo).role == "unknown"
+      ) {
+        if (
+          chessground.state.boardState.pieces.get(lastMoveFrom) == undefined ||
+          chessground.state.boardState.pieces.get(lastMoveFrom).role !=
+            "unknown"
+        ) {
+          chessground.set({
+            lastMove: [lastMoveFrom, lastMoveFrom],
+          });
+        } else {
+          chessground.set({
+            lastMove: undefined,
+          });
+        }
+      } else {
+        chessground.set({
+          lastMove: [lastMoveFrom, lastMoveTo],
+        });
+      }
+    }
     buttonUndo.disabled = false;
   }
+  chessground.setAutoShapes([]);
   getGameStatus(true);
 }
