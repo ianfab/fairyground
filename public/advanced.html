@@ -295,6 +295,13 @@
     margin-right: 10px;
   }
 
+  #gamesettings #dropdown-fogofwarsettings {
+    width: 120px;
+    background: #eee;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
   #dropdown-boardtheme {
     min-width: 100px;
     background: #eee;
@@ -4601,6 +4608,9 @@
                   random_mover_black,
                 onclick: () => {
                   analysis_mode = !analysis_mode;
+                  document
+                    .getElementById("dropdown-fogofwarsettings")
+                    .dispatchEvent(new Event("change"));
                 },
               }),
               "Analysis",
@@ -5066,6 +5076,17 @@
             ),
             m("button#passmove", { disabled: !is_ready }, "🔄Pass This Turn"),
             m("button#placewall", { disabled: !is_ready }, "🅿️Place A Wall"),
+            m("p", "Fog Of War:"),
+            m(
+              "select#dropdown-fogofwarsettings",
+              { disabled: !is_ready || review_mode || board_setup_mode },
+              [
+                m("option", { value: "<DISABLED>" }, "<DISABLED>"),
+                m("option", { value: "whiteonly" }, "White's View"),
+                m("option", { value: "blackonly" }, "Black's View"),
+                m("option", { value: "alternate" }, "View Alternately"),
+              ],
+            ),
             m(
               "label#label-showmovediv",
               m("input[type=checkbox]#showmovediv", {
