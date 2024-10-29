@@ -3862,7 +3862,7 @@
         for (i = 0; i < chi.length; i++) {
           document.body.removeChild(chi[i]);
         }
-        if (review_mode) {
+        if (review_mode || board_setup_mode) {
           return;
         }
         var span = document.createElement("spangameresult");
