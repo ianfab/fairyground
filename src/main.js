@@ -479,7 +479,11 @@ function onSelectSquare(key) {
       lastMove: undefined,
     });
   } else {
-    if (Date.now() - previousclicktime < 1000 && key == previousclicksquare) {
+    if (
+      isReviewMode.value == "0" &&
+      Date.now() - previousclicktime < 1000 &&
+      key == previousclicksquare
+    ) {
       let square = convertChessgroundXKeyToSquare(key);
       afterChessgroundMove(square, square, {
         premove: false,
