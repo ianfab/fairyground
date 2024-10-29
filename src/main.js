@@ -1782,11 +1782,11 @@ new Module().then((loadedModule) => {
             showevalnum = multipvrecord[k][1].toFixed(2).toString();
           }
         }
-        pvinfostr += `Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5] > -1 ? multipvrecord[k][5] : "❓"} Max ${multipvrecord[k][6] > -1 ? multipvrecord[k][6] : "❓"}) ${showevalnum} → ${multipvrecord[k][4]}\n\n`;
+        pvinfostr += `Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5] > -1 ? multipvrecord[k][5] : "❓"} Max ${multipvrecord[k][6] > -1 ? multipvrecord[k][6] : "❓"}) <evalnum>${showevalnum}</evalnum> → ${multipvrecord[k][4]}\n\n`;
         depthlist.push(multipvrecord[k][5]);
         seldepthlist.push(multipvrecord[k][6]);
       }
-      pvinfo.innerText = pvinfostr;
+      pvinfo.innerHTML = pvinfostr;
       let nodeinfo = "❓";
       index = textparselist.indexOf("nodes");
       if (index > 0) {
@@ -1804,7 +1804,7 @@ new Module().then((loadedModule) => {
       }
       let maxdepth = Math.max(...depthlist);
       let maxseldepth = Math.max(...seldepthlist);
-      evalinfo.innerText = `Depth (Average): ${maxdepth > 0 ? maxdepth : "❓"}\nDepth (Max): ${maxseldepth > 0 ? maxseldepth : "❓"}\nNodes: ${nodeinfo}\nNodes Per Second: ${npsinfo}\nTime: ${timeinfo}`;
+      evalinfo.innerText = `Depth (Average): ${maxdepth > 0 ? maxdepth : "❓"}\nSelective Depth (Max): ${maxseldepth > 0 ? maxseldepth : "❓"}\nNodes: ${nodeinfo}\nNodes Per Second: ${npsinfo}\nTime: ${timeinfo}`;
     } else if (text.includes("bestmove")) {
       let textparselist = text.split(" ");
       if (board.turn()) {
