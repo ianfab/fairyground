@@ -1,4 +1,4 @@
-// ffish.js test using chessgroundx
+﻿// ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
 const variantsIni = document.getElementById("variants-ini");
@@ -3251,6 +3251,20 @@ function updateChessground() {
 
   if (labelPgn) labelPgn.innerText = getPgn(board);
   if (labelStm) labelStm.innerText = getColorOrUndefined(board);
+
+  if (
+    dropdownFogOfWarSettings.value == "alternate" &&
+    !isBoardSetup.checked &&
+    !isAnalysis.checked &&
+    labelStm.innerText != "undefined"
+  ) {
+    chessground.set({
+      animation: {
+        enabled: false,
+      },
+    });
+  }
+
   chessground.set({
     fen: board.fen(),
     check: board.isCheck(),
@@ -3455,6 +3469,20 @@ function updateChessground() {
     }
     buttonUndo.disabled = false;
   }
+
+  if (
+    dropdownFogOfWarSettings.value == "alternate" &&
+    !isBoardSetup.checked &&
+    !isAnalysis.checked &&
+    labelStm.innerText != "undefined"
+  ) {
+    chessground.set({
+      animation: {
+        enabled: true,
+      },
+    });
+  }
+
   chessground.setAutoShapes([]);
   getGameStatus(true);
 }
