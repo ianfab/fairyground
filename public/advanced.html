@@ -1324,10 +1324,8 @@
     let themenames = [[], []];
     let variantsettings = [[], [], [], [], []];
     let allvariants = [];
-    let darkmodecss = document.createElement("link");
-    darkmodecss.setAttribute("rel", "stylesheet");
-    darkmodecss.setAttribute("href", "./assets/darkmode.css");
-    darkmodecss.setAttribute("id", "current-variant-stylesheet");
+    let darkmodecss = document.createElement("style");
+    darkmodecss.style = "text/css";
     const $ = (...args) => document.querySelector(...args);
 
     //Remove duplicated elements
@@ -1906,6 +1904,16 @@
       let varianttypes = [];
 
       let engine_list = [];
+
+      getFileFromServer(
+        "./assets/darkmode.css",
+        (res) => {
+          darkmodecss.appendChild(document.createTextNode(res));
+        },
+        () => {
+          console.error("Dark mode CSS fetch failed. Dark mode not available.");
+        },
+      );
 
       const checkconnectionnumber = parseInt(Math.random() * 100000);
       let wsport = window.location.port;
