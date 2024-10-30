@@ -31,6 +31,10 @@
   body,
   #root {
     height: 100%;
+    transition-property: background, color;
+    transition-duration: 0.5s, 0.2s;
+    transition-timing-function: linear, linear;
+    transition-delay: 0s;
   }
 
   #root {
@@ -42,6 +46,13 @@
     display: flex;
     flex-direction: column;
     padding: 10px;
+  }
+
+  div {
+    transition-property: background, color;
+    transition-duration: 0.5s, 0.2s;
+    transition-timing-function: linear, linear;
+    transition-delay: 0s;
   }
 
   #pagetitle {
@@ -1313,6 +1324,10 @@
     let themenames = [[], []];
     let variantsettings = [[], [], [], [], []];
     let allvariants = [];
+    let darkmodecss = document.createElement("link");
+    darkmodecss.setAttribute("rel", "stylesheet");
+    darkmodecss.setAttribute("href", "./assets/darkmode.css");
+    darkmodecss.setAttribute("id", "current-variant-stylesheet");
     const $ = (...args) => document.querySelector(...args);
 
     //Remove duplicated elements
@@ -4264,6 +4279,8 @@
               "select#dropdown-varianttype",
               {
                 disabled: !is_ready || review_mode || board_setup_mode,
+                title:
+                  "The available types or categories of variants are shown in this list. Select one to see available variants in next dropdown.",
                 onchange: (e) => {
                   changing_variant_type = true;
                   $("#dropdown-variant").dispatchEvent(new Event("change"));
@@ -4279,6 +4296,8 @@
               "select#dropdown-variant",
               {
                 disabled: !is_ready || review_mode || board_setup_mode,
+                title:
+                  "The available variants of the selected type are shown in this list. Select one to start a game of that variant.",
                 onchange: (e) => {
                   if (changing_variant_type) {
                     updateVariantDropdown();
@@ -4297,6 +4316,8 @@
               "select#dropdown-posvarianttype",
               {
                 disabled: !is_ready || review_mode,
+                title:
+                  "The available types or categories of custom positions of this variant are shown in this list. Select one to see available positions in next dropdown.",
               },
               [m("option", { value: "(default)" }, "(default)")],
             ),
@@ -4305,6 +4326,8 @@
               "select#dropdown-posvariantname",
               {
                 disabled: !is_ready || review_mode,
+                title:
+                  "The available custom positions of the selected type are shown in this list. Select one to set the position.",
               },
               [],
             ),
@@ -4312,6 +4335,8 @@
               "button#aboutposition",
               {
                 disabled: !is_ready || review_mode,
+                title:
+                  "Click to show the information of current selected custom position (position variant).",
               },
               "Position INFO",
             ),
@@ -4319,6 +4344,8 @@
               "button#aboutvariant",
               {
                 disabled: !is_ready || review_mode,
+                title:
+                  "Click to show the information and the wiki page (if it has, otherwise not shown) of current variant.",
                 onclick: () => {
                   let name = getVariantName(
                     $("#dropdown-variant").value,
@@ -4360,6 +4387,7 @@
               "button",
               {
                 disabled: !is_ready || review_mode,
+                title: "Click to open PGN file and EPD file parser.",
                 onclick: () => {
                   if (!is_ready || review_mode) {
                     return;
@@ -4378,6 +4406,8 @@
             m("p", "Position:"),
             m("input#fen", {
               placeholder: "Input FEN Here",
+              title:
+                "Input the Forsyth-Edwards Notation (FEN) of the position you want to load. Leave it blank to use default position.",
               disabled: !is_ready || review_mode,
               onkeyup: (e) => {
                 if (e.keyCode != 13) {
@@ -4389,6 +4419,8 @@
             }),
             m("input#move", {
               placeholder: "Input Move Here",
+              title:
+                "Input the moves in UCI format based on the FEN. Leave it blank to indicate no move.",
               disabled: !is_ready || review_mode,
               onkeyup: (e) => {
                 if (e.keyCode != 13) {
@@ -4402,6 +4434,7 @@
               "button#setpos",
               {
                 disabled: !is_ready || review_mode,
+                title: "Click to set the FEN and the moves to the board.",
                 onclick: () => {
                   if (review_mode) {
                     return;
@@ -4428,13 +4461,18 @@
             ),
             m(
               "button#reset",
-              { disabled: !is_ready, onclick: reset },
+              {
+                disabled: !is_ready,
+                title: "Click to reset the position to default position.",
+                onclick: reset,
+              },
               "⏏️Reset",
             ),
             m(
               "button#undo",
               {
                 disabled: !is_ready || review_mode || board_setup_mode,
+                title: "Click to undo last move.",
                 hidden: review_mode,
                 onclick: undo,
               },
@@ -4448,6 +4486,7 @@
               m(
                 "button",
                 {
+                  title: "Click to enter binary engine management UI.",
                   onclick: () => {
                     fge.ShowEngineManagementUI(engine_list, fge.ws);
                   },
@@ -4458,6 +4497,8 @@
                 m("p", "1st binary engine settings:"),
                 m("input[type=number]#whitedepth", {
                   placeholder: "Depth",
+                  title:
+                    "The maximum depth that the engine is allowed to search.",
                   disabled:
                     !is_ready ||
                     fge.WebSocketStatus != "CONNECTED" ||
@@ -4466,6 +4507,8 @@
                 }),
                 m("input[type=number]#whitemovetime", {
                   placeholder: "Movetime",
+                  title:
+                    "The time in milliseconds that the engine can think at most.",
                   disabled:
                     !is_ready ||
                     fge.WebSocketStatus != "CONNECTED" ||
@@ -4474,6 +4517,7 @@
                 }),
                 m("input[type=number]#whitenodes", {
                   placeholder: "Nodes",
+                  title: "The number of moves that the engine should search.",
                   disabled:
                     !is_ready ||
                     fge.WebSocketStatus != "CONNECTED" ||
@@ -4490,6 +4534,8 @@
                 m("p", "2nd binary engine settings:"),
                 m("input[type=number]#blackdepth", {
                   placeholder: "Depth",
+                  title:
+                    "The maximum depth that the engine is allowed to search.",
                   disabled:
                     !is_ready ||
                     fge.WebSocketStatus != "CONNECTED" ||
@@ -4498,6 +4544,8 @@
                 }),
                 m("input[type=number]#blackmovetime", {
                   placeholder: "Movetime",
+                  title:
+                    "The time in milliseconds that the engine can think at most.",
                   disabled:
                     !is_ready ||
                     fge.WebSocketStatus != "CONNECTED" ||
@@ -4506,6 +4554,7 @@
                 }),
                 m("input[type=number]#blacknodes", {
                   placeholder: "Nodes",
+                  title: "The number of moves that the engine should search.",
                   disabled:
                     !is_ready ||
                     fge.WebSocketStatus != "CONNECTED" ||
@@ -4531,34 +4580,46 @@
             m("p", "Settings:"),
             m("input[type=number]#depth", {
               placeholder: "Depth",
+              title:
+                "The maximum depth in browser Fairy-Stockfish is allowed to search.",
               disabled: !is_ready || analysis_mode,
               min: 1,
               max: 255,
             }),
             m("input[type=number]#movetime", {
               placeholder: "Movetime",
+              title:
+                "The time in milliseconds that in browser Fairy-Stockfish can think at most.",
               disabled: !is_ready || analysis_mode,
               min: 0,
             }),
             m("input[type=number]#nodes", {
               placeholder: "Nodes",
+              title:
+                "The number of moves that in browser Fairy-Stockfish should search.",
               disabled: !is_ready || analysis_mode,
               min: 1,
             }),
             m("input[type=number]#threads", {
               placeholder: "Threads",
+              title:
+                "The number of parallel searching threads of in browser Fairy-Stockfish.",
               disabled: !is_ready,
               min: 1,
               max: 512,
             }),
             m("input[type=number]#hash", {
               placeholder: "Hash",
+              title:
+                "The size of the hash table of in browser Fairy-Stockfish.",
               disabled: !is_ready,
               min: 1,
               max: 33554432,
             }),
             m("input[type=number]#multipv", {
               placeholder: "MultiPV",
+              title:
+                "The number of principal variations (engine lines, PV) of in browser Fairy-Stockfish.",
               disabled: !is_ready,
               min: 1,
               max: 500,
@@ -4567,6 +4628,8 @@
               "button#go",
               {
                 disabled: !is_ready,
+                title:
+                  "Click to tell the corresponding engine to start thinking.",
                 onclick: () => {
                   if ($("#advtimectrl").checked == true) {
                     $("#advtimectrl").click();
@@ -4585,6 +4648,7 @@
               "button#stop",
               {
                 disabled: !is_ready,
+                title: "Click to immediately stop all engines from thinking.",
                 onclick: () => {
                   force_stop();
                   if (fge.first_engine) {
@@ -4602,6 +4666,10 @@
             ),
             m(
               "label#label-analysis",
+              {
+                title:
+                  "When checked, interactive analysis mode is enabled and will use analysis binary engine (if loaded, otherwise in browser Fairy-Stockfish) to think on the position infinitely.",
+              },
               m("input[type=checkbox]#analysis", {
                 checked: analysis_mode,
                 disabled:
@@ -4622,6 +4690,9 @@
             ),
             m(
               "label",
+              {
+                title: "When checked, engine will play as first mover (white).",
+              },
               m("input[type=checkbox]#playwhite", {
                 checked: play_white,
                 disabled:
@@ -4637,6 +4708,10 @@
             ),
             m(
               "label",
+              {
+                title:
+                  "When checked, engine will play as second mover (black).",
+              },
               m("input[type=checkbox]#playblack", {
                 checked: play_black,
                 disabled:
@@ -4652,6 +4727,10 @@
             ),
             m(
               "label",
+              {
+                title:
+                  "When checked, random moves will be made when it's first mover (white) to move.",
+              },
               m("input[type=checkbox]#randommoverwhite", {
                 checked: random_mover_white,
                 disabled:
@@ -4667,6 +4746,10 @@
             ),
             m(
               "label",
+              {
+                title:
+                  "When checked, random moves will be made when it's second mover (black) to move.",
+              },
               m("input[type=checkbox]#randommoverblack", {
                 checked: random_mover_black,
                 disabled:
@@ -4849,6 +4932,10 @@
             m("p", "Additional Features: "),
             m(
               "label#label-advtimectrl",
+              {
+                title:
+                  "When checked, advanced timing system is used to play time controlled games.",
+              },
               m("input[type=checkbox]#advtimectrl", {
                 checked: advanced_time_control,
                 disabled: analysis_mode || review_mode || board_setup_mode,
@@ -4860,6 +4947,10 @@
             ),
             m(
               "label#label-boardsetup",
+              {
+                title:
+                  "When checked, the board will enter setup mode where you can edit the position. Uncheck to exit this mode.",
+              },
               m("input[type=checkbox]#isboardsetup", {
                 checked: board_setup_mode,
                 disabled:
@@ -4884,6 +4975,7 @@
                   "select#dropdown-whitetimemode",
                   {
                     disabled: !is_ready || review_mode,
+                    title: "The time control mode for first mover (white).",
                     onchange: () => {
                       $("#whitetimetype").innerHTML = $(
                         "#dropdown-whitetimemode",
@@ -4892,15 +4984,55 @@
                     },
                   },
                   [
-                    m("option", { value: "infinite" }, "Infinite"),
-                    m("option", { value: "tournament" }, "Tournament"),
-                    m("option", { value: "time per move" }, "Time Per Move"),
-                    m("option", { value: "hourglass" }, "Hourglass"),
-                    m("option", { value: "byoyomi" }, "Byo-yomi"),
+                    m(
+                      "option",
+                      {
+                        value: "infinite",
+                        title: "First mover has infinite time",
+                      },
+                      "Infinite",
+                    ),
+                    m(
+                      "option",
+                      {
+                        value: "tournament",
+                        title:
+                          "First mover's time is limited and they can get time increment after every move.",
+                      },
+                      "Tournament",
+                    ),
+                    m(
+                      "option",
+                      {
+                        value: "time per move",
+                        title:
+                          "First mover must make every move within a fixed time limit.",
+                      },
+                      "Time Per Move",
+                    ),
+                    m(
+                      "option",
+                      {
+                        value: "hourglass",
+                        title:
+                          "First mover's time is limited and their used time on making a move will be added to second mover.",
+                      },
+                      "Hourglass",
+                    ),
+                    m(
+                      "option",
+                      {
+                        value: "byoyomi",
+                        title:
+                          "(See [Why can I choose different time modes for two sides?] for more details on this mode)",
+                      },
+                      "Byo-yomi",
+                    ),
                   ],
                 ),
                 m("input[type=number]#whitestarttime", {
                   placeholder: "Start time (ms)",
+                  title: "The time at beginning in milliseconds.",
                   disabled:
                     !is_ready || review_mode || white_timer_type == "infinite",
                   hidden: white_timer_type == "infinite",
@@ -4908,6 +5040,8 @@
                 }),
                 m("input[type=number]#whitetimegain", {
                   placeholder: "Time gain (ms)",
+                  title:
+                    "Get a time increment in milliseconds after every move.",
                   disabled:
                     !is_ready ||
                     review_mode ||
@@ -4917,6 +5051,8 @@
                 }),
                 m("input[type=number]#whitebyoyomitime", {
                   placeholder: "Byoyomi period length (ms)",
+                  title:
+                    "The duration in milliseconds of every byoyomi period.",
                   disabled:
                     !is_ready || review_mode || white_timer_type != "byoyomi",
                   hidden: white_timer_type != "byoyomi",
@@ -4924,6 +5060,7 @@
                 }),
                 m("input[type=number]#whitebyoyomiperiodcount", {
                   placeholder: "Byoyomi period count",
+                  title: "The count of byoyomi periods.",
                   disabled:
                     !is_ready || review_mode || white_timer_type != "byoyomi",
                   hidden: white_timer_type != "byoyomi",
@@ -4931,6 +5068,8 @@
                 }),
                 m("input[type=number]#whitetimemargin", {
                   placeholder: "Timeout margin (ms)",
+                  title:
+                    "The time can be exceeded by this many milliseconds before running out of time.",
                   disabled:
                     !is_ready || review_mode || white_timer_type == "infinite",
                   hidden: white_timer_type == "infinite",
@@ -4943,6 +5082,7 @@
                   "select#dropdown-blacktimemode",
                   {
                     disabled: !is_ready || review_mode,
+                    title: "The time control mode for second mover (black).",
                     onchange: () => {
                       $("#blacktimetype").innerHTML = $(
                         "#dropdown-blacktimemode",
@@ -4951,15 +5091,55 @@
                     },
                   },
                   [
-                    m("option", { value: "infinite" }, "Infinite"),
-                    m("option", { value: "tournament" }, "Tournament"),
-                    m("option", { value: "time per move" }, "Time Per Move"),
-                    m("option", { value: "hourglass" }, "Hourglass"),
-                    m("option", { value: "byoyomi" }, "Byo-yomi"),
+                    m(
+                      "option",
+                      {
+                        value: "infinite",
+                        title: "Second mover has infinite time",
+                      },
+                      "Infinite",
+                    ),
+                    m(
+                      "option",
+                      {
+                        value: "tournament",
+                        title:
+                          "Second mover's time is limited and they can get time increment after every move.",
+                      },
+                      "Tournament",
+                    ),
+                    m(
+                      "option",
+                      {
+                        value: "time per move",
+                        title:
+                          "Second mover must make every move within a fixed time limit.",
+                      },
+                      "Time Per Move",
+                    ),
+                    m(
+                      "option",
+                      {
+                        value: "hourglass",
+                        title:
+                          "Second mover's time is limited and their used time on making a move will be added to first mover.",
+                      },
+                      "Hourglass",
+                    ),
+                    m(
+                      "option",
+                      {
+                        value: "byoyomi",
+                        title:
+                          "(See [Why can I choose different time modes for two sides?] for more details on this mode)",
+                      },
+                      "Byo-yomi",
+                    ),
                   ],
                 ),
                 m("input[type=number]#blackstarttime", {
                   placeholder: "Start time (ms)",
+                  title: "The time at beginning in milliseconds.",
                   disabled:
                     !is_ready || review_mode || black_timer_type == "infinite",
                   hidden: black_timer_type == "infinite",
@@ -4967,6 +5147,8 @@
                 }),
                 m("input[type=number]#blacktimegain", {
                   placeholder: "Time gain (ms)",
+                  title:
+                    "Get a time increment in milliseconds after every move.",
                   disabled:
                     !is_ready ||
                     review_mode ||
@@ -4976,6 +5158,8 @@
                 }),
                 m("input[type=number]#blackbyoyomitime", {
                   placeholder: "Byoyomi period length (ms)",
+                  title:
+                    "The duration in milliseconds of every byoyomi period.",
                   disabled:
                     !is_ready || review_mode || black_timer_type != "byoyomi",
                   hidden: black_timer_type != "byoyomi",
@@ -4983,6 +5167,7 @@
                 }),
                 m("input[type=number]#blackbyoyomiperiodcount", {
                   placeholder: "Byoyomi period count",
+                  title: "The count of byoyomi periods.",
                   disabled:
                     !is_ready || review_mode || black_timer_type != "byoyomi",
                   hidden: black_timer_type != "byoyomi",
@@ -4990,6 +5175,8 @@
                 }),
                 m("input[type=number]#blacktimemargin", {
                   placeholder: "Timeout margin (ms)",
+                  title:
+                    "The time can be exceeded by this many milliseconds before running out of time.",
                   disabled:
                     !is_ready || review_mode || black_timer_type == "infinite",
                   hidden: black_timer_type == "infinite",
@@ -5001,6 +5188,7 @@
                   "button#gamestart",
                   {
                     disabled: !is_ready || review_mode,
+                    title: "Click to start a game in advanced timing system.",
                     onclick: goWithTimeControl,
                   },
                   "Start Game",
@@ -5038,6 +5226,8 @@
               "select#dropdown-quickpromotion",
               {
                 disabled: !is_ready || review_mode || board_setup_mode,
+                title:
+                  "Select an option to make the promotion or demotion automatically if available.",
               },
               [
                 m("option", { value: "" }, "<DISABLED>"),
@@ -5074,17 +5264,37 @@
             ),
             m(
               "label",
+              {
+                title:
+                  "When checked, you can also make a move by clicking the piece and then clicking the target square.",
+              },
               m("input[type=checkbox]#clickclickmove", {
                 disabled: review_mode,
               }),
               "Click-click move",
             ),
-            m("button#passmove", { disabled: !is_ready }, "🔄Pass This Turn"),
-            m("button#placewall", { disabled: !is_ready }, "🅿️Place A Wall"),
+            m(
+              "button#passmove",
+              { disabled: !is_ready, title: "Click to pass your turn." },
+              "🔄Pass This Turn",
+            ),
+            m(
+              "button#placewall",
+              {
+                disabled: !is_ready,
+                title:
+                  "Click to place a wall only (Requires entering choice in prompt dialog).",
+              },
+              "🅿️Place A Wall",
+            ),
             m("p", "Fog Of War:"),
             m(
               "select#dropdown-fogofwarsettings",
-              { disabled: !is_ready || review_mode || board_setup_mode },
+              {
+                disabled: !is_ready || board_setup_mode,
+                title:
+                  "Fog of war is a visual effect that can prevent a player from seeing unreachable squares except wall squares.",
+              },
               [
                 m("option", { value: "<DISABLED>" }, "<DISABLED>"),
                 m("option", { value: "whiteonly" }, "White's View"),
@@ -5129,35 +5339,68 @@
           m("div#boardsetupsettings", { hidden: !board_setup_mode }, [
             m("p", "Board Setup:"),
             m("div#boardpiecechange", { disabled: !is_ready }, [
-              m("select#dropdown-setpiece", [
-                m("option", { value: "<move>" }, "<move>"),
-                m("option", { value: "<delete>" }, "<delete>"),
-                m("option", { value: "b" }, "b"),
-                m("option", { value: "k" }, "k"),
-                m("option", { value: "n" }, "n"),
-                m("option", { value: "p" }, "p"),
-                m("option", { value: "q" }, "q"),
-                m("option", { value: "r" }, "r"),
-                m("option", { value: "B" }, "B"),
-                m("option", { value: "K" }, "K"),
-                m("option", { value: "N" }, "N"),
-                m("option", { value: "P" }, "P"),
-                m("option", { value: "Q" }, "Q"),
-                m("option", { value: "R" }, "R"),
-              ]),
+              m(
+                "select#dropdown-setpiece",
+                {
+                  title:
+                    "<move>: Move the pieces on the board.\n<delete>: Click on a square to delete the piece on that square.\n<letter>: Click on a square to place a piece of that letter. If there is a plus ahead, it means the promoted from.",
+                },
+                [
+                  m("option", { value: "<move>" }, "<move>"),
+                  m("option", { value: "<delete>" }, "<delete>"),
+                  m("option", { value: "b" }, "b"),
+                  m("option", { value: "k" }, "k"),
+                  m("option", { value: "n" }, "n"),
+                  m("option", { value: "p" }, "p"),
+                  m("option", { value: "q" }, "q"),
+                  m("option", { value: "r" }, "r"),
+                  m("option", { value: "B" }, "B"),
+                  m("option", { value: "K" }, "K"),
+                  m("option", { value: "N" }, "N"),
+                  m("option", { value: "P" }, "P"),
+                  m("option", { value: "Q" }, "Q"),
+                  m("option", { value: "R" }, "R"),
+                ],
+              ),
               m(
                 "button#addtopocket",
-                { disabled: !is_ready },
+                {
+                  disabled: !is_ready,
+                  title:
+                    "Click to add the piece selected in the dropdown to pocket.",
+                },
                 "Add piece to pocket",
               ),
-              m("button#clearboard", { disabled: !is_ready }, "Clear Board"),
-              m("button#initboardpos", { disabled: !is_ready }, "Reset Board"),
+              m(
+                "button#clearboard",
+                { disabled: !is_ready, title: "Click to remove all pieces." },
+                "Clear Board",
+              ),
+              m(
+                "button#initboardpos",
+                {
+                  disabled: !is_ready,
+                  title: "Click to set the board to default position.",
+                },
+                "Reset Board",
+              ),
               m(
                 "button#validatepos",
-                { disabled: !is_ready },
+                {
+                  disabled: !is_ready,
+                  title: "Click to validate this position.",
+                },
                 "Validate Position",
               ),
-              m("button#boardsetupcopyfen", { disabled: !is_ready }, "Apply"),
+              m(
+                "button#boardsetupcopyfen",
+                {
+                  disabled: !is_ready,
+                  title:
+                    "Click to set the position, and then uncheck Board Setup to play or analyze.",
+                },
+                "Apply",
+              ),
             ]),
             m("div#pocketpiecechange", { hidden: true }, [
               m("form#pieceinpocket", { disabled: !is_ready }, [
@@ -5177,29 +5420,49 @@
               m("div#boardsetupsettings2", { hidden: !board_setup_mode }, [
                 m("div", [
                   m("p", "Side to move:"),
-                  m("select#dropdown-sidetomove", [
-                    m("option", { value: "First Mover" }, "First Mover"),
-                    m("option", { value: "Second Mover" }, "Second Mover"),
-                  ]),
+                  m(
+                    "select#dropdown-sidetomove",
+                    { title: "Select the side to move in this position." },
+                    [
+                      m("option", { value: "First Mover" }, "First Mover"),
+                      m("option", { value: "Second Mover" }, "Second Mover"),
+                    ],
+                  ),
                 ]),
                 m("div", [
                   m(
                     "label",
+                    {
+                      title:
+                        "Check if first mover has the right to castle kingside.",
+                    },
                     m("input[type=checkbox]#whitekingsidecastle"),
                     "White O-O",
                   ),
                   m(
                     "label",
+                    {
+                      title:
+                        "Check if first mover has the right to castle queenside.",
+                    },
                     m("input[type=checkbox]#whitequeensidecastle"),
                     "White O-O-O",
                   ),
                   m(
                     "label",
+                    {
+                      title:
+                        "Check if second mover has the right to castle kingside.",
+                    },
                     m("input[type=checkbox]#blackkingsidecastle"),
                     "Black O-O",
                   ),
                   m(
                     "label",
+                    {
+                      title:
+                        "Check if second mover has the right to castle queenside.",
+                    },
                     m("input[type=checkbox]#blackqueensidecastle"),
                     "Black O-O-O",
                   ),
@@ -5207,29 +5470,39 @@
                 m("div", [
                   m("input[type=number]#halfmoveclock", {
                     placeholder: "Half move clock",
+                    title:
+                      "The number in half move clock, which records the moves that does not capture or is not irreversible for N-move rule.",
                     min: 0,
                   }),
                   m("input[type=number]#whiteremainingchecks", {
                     placeholder: "White remaining checks",
+                    title:
+                      "The remaining checks of first mover, used in variants that limit check count such as 3 Check.",
                     min: 1,
                   }),
                   m("input[type=number]#blackremainingchecks", {
                     placeholder: "Black remaining checks",
+                    title:
+                      "The remaining checks of second mover, used in variants that limit check count such as 3 Check.",
                     min: 1,
                   }),
                   m("input[type=number]#currentmovenum", {
                     placeholder: "Current move number",
+                    title:
+                      "The number of current move in full move format (A turn that both player make a move is 1 full move, 2 half moves).",
                     min: 1,
                   }),
                 ]),
                 m("div", [
                   m("input[type=number]#enpassantfile", {
                     placeholder: "En passant file number",
+                    title: "The file (column) number of en passant square.",
                     min: 1,
                     max: 12,
                   }),
                   m("input[type=number]#enpassantrank", {
                     placeholder: "En passant rank number",
+                    title: "The rank (row) number of en passant square.",
                     min: 1,
                     max: 10,
                   }),
@@ -5237,38 +5510,67 @@
                 m("div", [
                   m("input#seirwangatingfiles", {
                     placeholder: "Seirawan gating files (e.g. ABab)",
+                    title:
+                      'The files (e.g. 1st column is a-file, 2nd column is b-file, etc.) where players can perform seirawan gating.\nGateable files for first mover is in upper case and for second mover in lower case.\nExample: "ABcd" means first mover can gate at A and B file while second mover can gate at C and D file.',
                   }),
                 ]),
               ]),
               m("div#movecontrol", { hidden: during_play }, [
                 m(
                   "button#initialposition",
-                  { onclick: displayInitialPosition, disabled: !is_ready },
+                  {
+                    onclick: displayInitialPosition,
+                    disabled: !is_ready,
+                    title:
+                      "Click to display the initial position of current game.",
+                  },
                   "⏮Initial Position",
                 ),
                 m(
                   "button#currentposition",
-                  { onclick: displayCurrentPosition, disabled: !is_ready },
+                  {
+                    onclick: displayCurrentPosition,
+                    disabled: !is_ready,
+                    title:
+                      "Click to display the latest position of current game.",
+                  },
                   "⏭Current Position",
                 ),
                 m(
                   "button#previousposition",
-                  { onclick: displayPreviousMove, disabled: !is_ready },
+                  {
+                    onclick: displayPreviousMove,
+                    disabled: !is_ready,
+                    title:
+                      "Click to display previous position of the displayed position.",
+                  },
                   "⏪Previous Position",
                 ),
                 m(
                   "button#nextposition",
-                  { onclick: displayNextMove, disabled: !is_ready },
+                  {
+                    onclick: displayNextMove,
+                    disabled: !is_ready,
+                    title:
+                      "Click to display next position of the displayed position.",
+                  },
                   "⏩Next Position",
                 ),
                 m("input[type=number]#gotomovenum", {
                   placeholder: "Half Move Number",
                   disabled: !is_ready,
+                  title:
+                    "The half number to the half move to display (A turn that both player make a move is 1 full move, 2 half moves).",
                   min: 0,
                 }),
                 m(
                   "button#specifiedposition",
-                  { onclick: displaySpecifiedPosition, disabled: !is_ready },
+                  {
+                    onclick: displaySpecifiedPosition,
+                    disabled: !is_ready,
+                    title:
+                      "Click to display the position that the half move specified in the input box is moved.",
+                  },
                   "↩️Go to Move",
                 ),
               ]),
@@ -5336,11 +5638,20 @@
                 m("div", [
                   m(
                     "input[type=range]#range-volume",
-                    { min: 0, max: 1, step: 0.05 },
+                    {
+                      min: 0,
+                      max: 1,
+                      step: 0.05,
+                      title: "Adjust sound volume here.",
+                    },
                     "range",
                   ),
                   m(
                     "label",
+                    {
+                      title:
+                        "When checked, the legal moves of the selected piece are shown on the board.",
+                    },
                     m("input[type=checkbox]#check-dests", {
                       checked: show_dests,
                       onclick: () => {
@@ -5351,6 +5662,10 @@
                   ),
                   m(
                     "label",
+                    {
+                      title:
+                        "(Legacy) When checked, show the game result in PGN.",
+                    },
                     m("input[type=checkbox]#check-adjudicate", {
                       checked: adjudicate,
                       onclick: () => {
@@ -5358,6 +5673,20 @@
                       },
                     }),
                     "Adjudicate",
+                  ),
+                  m(
+                    "label",
+                    { title: "When checked, switch the UI to dark mode." },
+                    m("input[type=checkbox]#check-darkmode", {
+                      onclick: () => {
+                        if (document.getElementById("check-darkmode").checked) {
+                          document.head.appendChild(darkmodecss);
+                        } else {
+                          document.head.removeChild(darkmodecss);
+                        }
+                      },
+                    }),
+                    "Dark Mode",
                   ),
                 ]),
               ]),
@@ -5507,6 +5836,8 @@
                   m(
                     "button#addtimeforwhite",
                     {
+                      title:
+                        "Add 10 seconds to the remaining time of first mover.",
                       onclick: () => {
                         white_remaining_time = +white_remaining_time + 10000;
                       },
@@ -5516,6 +5847,8 @@
                   m(
                     "button#addtimeforblack",
                     {
+                      title:
+                        "Add 10 seconds to the remaining time of second mover.",
                       onclick: () => {
                         black_remaining_time = +black_remaining_time + 10000;
                       },
@@ -5525,6 +5858,7 @@
                   m(
                     "button#gameabort",
                     {
+                      title: "Exit current advanced timing system based game.",
                       onclick: () => {
                         if (confirm("Are you sure to abort the game?")) {
                           gameAbort();
@@ -5563,6 +5897,7 @@
               m("div#enginecmddiv", [
                 m("input#enginecmd", {
                   placeholder: "Send command to engine...",
+                  title: "The command to send to the engine.",
                   disabled: !is_ready || during_play,
                   onkeyup: (e) => {
                     if (e.keyCode != 13) {
@@ -5578,6 +5913,8 @@
                 m(
                   "select#targetengine",
                   {
+                    title:
+                      "Select the console of the engine. This is the target engine of the command sent, and the engine that sends the message above.",
                     onchange: () => {
                       let index = $("#targetengine").selectedIndex;
                       if (index == 0) {
@@ -5634,6 +5971,7 @@
                   "button#sendenginecmd",
                   {
                     disabled: during_play,
+                    title: "Click to send the command.",
                     onclick: () => {
                       if (during_play) {
                         return;
@@ -5645,6 +5983,10 @@
                 ),
                 m(
                   "label#label-clearlogonstartthinking",
+                  {
+                    title:
+                      "When checked, automatically clear the console of the binary engine when it starts thinking.",
+                  },
                   m("input[type=checkbox]#clearlogonstartthinking", {
                     disabled: !is_ready,
                     checked: clear_log,
@@ -5657,6 +5999,7 @@
                 m(
                   "button",
                   {
+                    title: "Click to clear the consoles of the binary engines.",
                     onclick: () => {
                       first_engine_output = "";
                       second_engine_output = "";

@@ -1,0 +1,95 @@
+html {
+    color: white;
+    background: black;
+}
+
+input {
+    color: white;
+    background: black;
+}
+
+select {
+    color: white;
+    background: #555 !important;
+}
+
+button {
+    background: #555 !important;
+}
+
+    button:hover {
+        background: #777 !important;
+    }
+
+    button:active {
+        background: #000 !important;
+    }
+
+    button:disabled {
+        background: #999 !important;
+        color: black !important;
+    }
+
+div {
+    background: black !important;
+}
+
+input::-webkit-input-placeholder {
+    color: #aaa;
+}
+
+input::-moz-placeholder {
+    color: #aaa;
+}
+
+input:-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::placeholder {
+    color: #aaa;
+}  
+
+spangameresult {
+    color: white !important;
+}
+
+#evalbarprogress {
+    background-color: white !important;
+}
+
+#evalbar {
+    background-color: #444 !important;
+}
+
+#cp {
+    color: orange !important;
+}
+
+table {
+    border-color: white !important;
+}
+
+caption {
+    border-color: white !important;
+}
+
+th {
+    border-color: white !important;
+}
+
+td {
+    border-color: white !important;
+}
+
+a {
+    color: ghostwhite;
+}
+
+a:visited {
+    color: mediumpurple;
+}
