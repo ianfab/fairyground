@@ -12,6 +12,12 @@
       "headers": [
         { "key": "x-decompressed-content-length", "value": "1463349" }
       ]
+    },
+    {
+      "source": "/*.jpg",
+      "headers": [
+        { "key": "cache-control", "value": "max-age=7200,must-revalidate" }
+      ]
     }
   ]
 }

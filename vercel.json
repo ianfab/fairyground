@@ -12,6 +12,15 @@
            "value": "same-origin"
         }
         ]
+     },
+     {
+        "source": "/*.jpg",
+        "headers": [
+        { 
+           "key": "cache-control",
+           "value": "max-age=7200,must-revalidate"
+        }
+        ]
      }
   ]
 }
