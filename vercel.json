@@ -17,8 +17,8 @@
         "source": "/(.*).jpg",
         "headers": [
         { 
-           "key": "cache-control",
-           "value": "max-age=7200,must-revalidate"
+           "key": "Cache-Control",
+           "value": "max-age=86400,must-revalidate"
         }
         ]
      }
