@@ -14,7 +14,7 @@
         ]
      },
      {
-        "source": "/*.jpg",
+        "source": "/(.*).jpg",
         "headers": [
         { 
            "key": "cache-control",
