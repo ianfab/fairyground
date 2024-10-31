@@ -955,7 +955,10 @@
     height: 30px;
     overflow: hidden;
     border-radius: 10px;
-    background-color: #111111;
+    border-color: grey;
+    border-width: 2px;
+    border-style: solid;
+    background-color: black;
     position: relative;
   }
 
@@ -963,7 +966,7 @@
     float: left;
     height: 100%;
     width: 50%;
-    background-color: #eeeeee;
+    background-color: white;
   }
 
   #evalbar #cp {
@@ -975,7 +978,7 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 28px;
+    font-size: 25px;
     font-weight: bold;
     font-family: Arial, "Times New Roman", Georgia, Serif;
   }
@@ -5735,8 +5738,8 @@
                       document.getElementById("evalbarprogress");
                     const cp = document.getElementById("cp");
                     if (dropdownnotation.selectedIndex < 0) {
-                      evalbar.style.backgroundColor = "#111111";
-                      evalbarprogress.style.backgroundColor = "#eeeeee";
+                      evalbar.style.backgroundColor = "white";
+                      evalbarprogress.style.backgroundColor = "black";
                       cp.style.color = "orange";
                       return;
                     }
@@ -5747,16 +5750,16 @@
                       evalbarprogress.style.backgroundColor = "red";
                       cp.style.color = "white";
                     } else if (/shogi|usi/i.test(value)) {
-                      evalbar.style.backgroundColor = "#eeeeee";
-                      evalbarprogress.style.backgroundColor = "#111111";
+                      evalbar.style.backgroundColor = "white";
+                      evalbarprogress.style.backgroundColor = "black";
                       cp.style.color = "orange";
                     } else if (/janggi/i.test(value)) {
                       evalbar.style.backgroundColor = "red";
                       evalbarprogress.style.backgroundColor = "blue";
                       cp.style.color = "white";
                     } else {
-                      evalbar.style.backgroundColor = "#111111";
-                      evalbarprogress.style.backgroundColor = "#eeeeee";
+                      evalbar.style.backgroundColor = "black";
+                      evalbarprogress.style.backgroundColor = "white";
                       cp.style.color = "orange";
                     }
                   },
