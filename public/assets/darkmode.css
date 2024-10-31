@@ -30,10 +30,6 @@ button {
         color: black !important;
     }
 
-div {
-    background: black !important;
-}
-
 input::-webkit-input-placeholder {
     color: #aaa;
 }
@@ -52,6 +48,7 @@ input::-ms-input-placeholder {
 
 input::placeholder {
     color: #aaa;
+    opacity: 1;
 }  
 
 spangameresult {
@@ -108,5 +105,21 @@ a:visited {
 #blacktimer {
   border-color: #fff !important;
   color: white !important;
+  background-color: black !important;
+}
+
+#enginemanagementpopup {
+  background-color: black !important;
+}
+
+#enginesetuppopup {
+  background-color: black !important;
+}
+
+#enginesettingspopup {
+  background-color: black !important;
+}
+
+#loadsavedgamespopup {
   background-color: black !important;
 }
