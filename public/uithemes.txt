@@ -1,0 +1,9 @@
+#Fairyground UI themes settings file
+#Syntax: <UI theme ID>|<display name>
+#<UI theme name>: The unique ID of this theme. Fairyground will load "./assets/theme-ui-<UI theme ID>.css" to HTML stylesheet.
+#<display name>: The name of this theme, displayed in the dropdown.
+
+light|Light
+dark|Dark
+fsf|Fairy-Stockfish
+chess|Chess Set

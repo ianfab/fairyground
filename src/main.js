@@ -261,6 +261,8 @@ for (i = 0; i < maxmultipvcount; i++) {
   evaluationindex.push(0);
 }
 
+document.dispatchEvent(new Event("onpageload"));
+
 function convertChessgroundXKeyToSquare(key) {
   const ranks = [
     "1",

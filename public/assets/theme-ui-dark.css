@@ -1,0 +1,113 @@
+html {
+    color: white;
+    background: black;
+}
+
+input {
+    color: white;
+    background: black;
+}
+
+select {
+    color: white;
+    background: #555 !important;
+}
+
+button {
+    background: #555 !important;
+}
+
+    button:hover {
+        background: #777 !important;
+    }
+
+    button:active {
+        background: #000 !important;
+    }
+
+    button:disabled {
+        background: #999 !important;
+        color: black !important;
+    }
+
+input::-webkit-input-placeholder {
+    color: #aaa;
+}
+
+input::-moz-placeholder {
+    color: #aaa;
+}
+
+input:-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::placeholder {
+    color: #aaa;
+    opacity: 1;
+}  
+
+spangameresult {
+    color: white !important;
+}
+
+table {
+    border-color: white !important;
+}
+
+caption {
+    border-color: white !important;
+}
+
+th {
+    border-color: white !important;
+}
+
+td {
+    border-color: white !important;
+}
+
+a {
+    color: ghostwhite;
+}
+
+a:visited {
+    color: mediumpurple;
+}
+
+#timers {
+  border-color: #eee !important;
+  background-color: gray !important;
+}
+
+#whitetimer {
+  border-color: #000 !important;
+  color: black !important;
+  background-color: white !important;
+}
+
+#blacktimer {
+  border-color: #fff !important;
+  color: white !important;
+  background-color: black !important;
+}
+
+#enginemanagementpopup {
+  background-color: black !important;
+}
+
+#enginesetuppopup {
+  background-color: black !important;
+}
+
+#enginesettingspopup {
+  background-color: black !important;
+}
+
+#loadsavedgamespopup {
+  background-color: black !important;
+}
