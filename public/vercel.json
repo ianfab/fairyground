@@ -14,7 +14,7 @@
       ]
     },
     {
-      "source": "/(.*).webp",
+      "source": "/(.*).avif",
       "headers": [
         { "key": "Cache-Control", "value": "max-age=86400,must-revalidate" }
       ]
