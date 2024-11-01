@@ -14,7 +14,7 @@
         ]
      },
      {
-        "source": "/(.*).jpg",
+        "source": "/(.*).webp",
         "headers": [
         { 
            "key": "Cache-Control",

@@ -1367,6 +1367,7 @@
     let currentuicss = null;
     let onpageload = false;
     let uithemesparsed = false;
+    let previouschangeuitime = 0;
     const $ = (...args) => document.querySelector(...args);
 
     document.addEventListener("onpageload", () => {
@@ -5934,6 +5935,11 @@
                     "button",
                     {
                       onclick: () => {
+                        let time = Date.now();
+                        if (time - previouschangeuitime < 750) {
+                          return;
+                        }
+                        previouschangeuitime = time;
                         const uithemesdropdown =
                           document.getElementById("dropdown-uitheme");
                         changeUI(
