@@ -8,6 +8,38 @@ input {
     background: black;
 }
 
+input[type=checkbox] {
+  color: white !important;
+  background-color: black !important;
+}
+
+input[type=checkbox]:hover {
+  color: #fff !important;
+  background-color: #888 !important;
+}
+
+input[type=checkbox]:checked {
+  color: #fff !important;
+  background-color: #555 !important;
+}
+
+input[type=checkbox]:checked:hover {
+  color: #fff !important;
+  background-color: #888 !important;
+}
+
+input[type=checkbox]:disabled {
+  color: #000 !important;
+  background-color: #aaa !important;
+  opacity: 1 !important;
+}
+
+input[type=checkbox]:disabled:hover {
+  color: #000 !important;
+  background-color: #aaa !important;
+  opacity: 1 !important;
+}
+
 select {
     color: white;
     background: #555 !important;
