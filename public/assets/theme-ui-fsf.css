@@ -1,8 +1,5 @@
-html {
+#pagebackground {
   background-image: url('./assets/images/ui/fsf/FSF.webp');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
 }
 
 #enginemanagementpopup {

@@ -67,6 +67,19 @@
     background-attachment: fixed;
   }
 
+  .pagebackground {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: none;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top left;
+    z-index: -100;
+  }
+
   #pagetitle {
     font-size: 40px;
     font-family: "Times New Roman", Times, serif, Arial;
@@ -1341,6 +1354,7 @@
 
 <body>
   <div id="root"></div>
+  <div id="pagebackground" class="pagebackground"></div>
   <script>
     //Fairyground namespace for variable/function definition transfer
     window.fairyground = { super: window };
@@ -4246,18 +4260,15 @@
       }
 
       function changeUI(ui_id) {
-        const htmlComputedStyle = window.getComputedStyle(
-          document.documentElement,
-        );
+        const pagebackground = document.getElementById("pagebackground");
+        const htmlComputedStyle = window.getComputedStyle(pagebackground);
         const BGBefore = htmlComputedStyle.backgroundImage;
         if (currentuicss != null) {
           document.head.removeChild(currentuicss);
         }
         currentuicss = uithemes[2][uithemes[0].indexOf(ui_id)];
         document.head.appendChild(currentuicss);
-        const htmlComputedStyleAfter = window.getComputedStyle(
-          document.documentElement,
-        );
+        const htmlComputedStyleAfter = window.getComputedStyle(pagebackground);
         const BGAfter = htmlComputedStyleAfter.backgroundImage;
         console.log(BGBefore, BGAfter);
 
@@ -4290,7 +4301,7 @@
           tmpbg2.className = "backgroundimg";
           tmpbg2.style.opacity = "0";
           tmpbg2.style.zIndex = "-2";
-          document.documentElement.style.backgroundImage = "none";
+          pagebackground.style.backgroundImage = "none";
           document.body.appendChild(tmpbg2);
           LinearTransition(
             0,
@@ -4301,7 +4312,7 @@
               tmpbg2.style.opacity = `${val}`;
             },
             () => {
-              document.documentElement.style.backgroundImage = "";
+              pagebackground.style.backgroundImage = "";
               document.body.removeChild(tmpbg2);
             },
           );
