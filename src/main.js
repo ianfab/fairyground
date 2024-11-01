@@ -2318,6 +2318,12 @@ new Module().then((loadedModule) => {
 
   dropdownFogOfWarSettings.onchange = function () {
     updateChessground();
+    setTimeout(() => {
+      let chi = document.getElementsByTagName("spangameresult");
+      for (i = 0; i < chi.length; i++) {
+        document.body.removeChild(chi[i]);
+      }
+    }, 20);
   };
 
   updateChessground();

@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <head>
   <meta charset="utf-8" />
   <title>Fairy-Stockfish playground</title>
@@ -78,6 +78,57 @@
     background-repeat: no-repeat;
     background-position: top left;
     z-index: -100;
+  }
+
+  input[type="checkbox"] {
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    border: 2px solid #ddd;
+    overflow: hidden;
+    vertical-align: middle;
+    text-align: center;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    font: normal normal normal 14px/1 Arial;
+    outline: 0;
+    background: 0 0;
+    background-color: white;
+    margin-left: 5px;
+  }
+
+  input[type="checkbox"]:hover {
+    color: #000;
+    background-color: #ddd;
+  }
+
+  input[type="checkbox"]:checked {
+    color: #fff;
+    background-color: #000;
+  }
+
+  input[type="checkbox"]:hover:checked {
+    color: #fff;
+    background-color: #777;
+  }
+
+  input[type="checkbox"]:checked:after {
+    content: "✔";
+    font-size: 15px;
+    text-align: center;
+    line-height: 17px;
+  }
+
+  input[type="checkbox"]:disabled {
+    color: #000;
+    background-color: #aaa;
+    opacity: 0.7;
+  }
+
+  input[type="checkbox"]:disabled:hover {
+    color: #000;
+    background-color: #aaa;
+    opacity: 0.7;
   }
 
   #pagetitle {
@@ -328,14 +379,12 @@
     width: 120px;
     background: #eee;
     margin-left: 10px;
-    margin-right: 10px;
   }
 
   #gamesettings #dropdown-fogofwarsettings {
     width: 120px;
     background: #eee;
     margin-left: 10px;
-    margin-right: 10px;
   }
 
   #dropdown-boardtheme {
@@ -1061,6 +1110,10 @@
     z-index: 999;
   }
 
+  #moveselectiondialog input[type="checkbox"] {
+    border: 2px solid #ddd;
+  }
+
   #moveselectiondialog button {
     display: inline-block;
     padding: 3px 6px 3px 6px;
@@ -1177,7 +1230,14 @@
     background: #000;
   }
 
-  #enginesettingspopup input {
+  #enginesettingspopup input[type="text"] {
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    margin-left: 6px;
+    margin-right: 6px;
+  }
+
+  #enginesettingspopup input[type="number"] {
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     margin-left: 6px;
@@ -1228,7 +1288,14 @@
     background: #000;
   }
 
-  #enginemanagementpopup input {
+  #enginemanagementpopup input[type="text"] {
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    margin-left: 6px;
+    margin-right: 6px;
+  }
+
+  #enginemanagementpopup input[type="number"] {
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     margin-left: 6px;
@@ -1279,7 +1346,15 @@
     background: #000;
   }
 
-  #enginesetuppopup input {
+  #enginesetuppopup input[type="text"] {
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    margin-left: 6px;
+    margin-right: 6px;
+    min-width: 300px;
+  }
+
+  #enginesetuppopup input[type="number"] {
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     margin-left: 6px;
@@ -1333,7 +1408,14 @@
     background: #000;
   }
 
-  #loadsavedgamespopup input {
+  #loadsavedgamespopup input[type="text"] {
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    margin-left: 6px;
+    margin-right: 6px;
+  }
+
+  #loadsavedgamespopup input[type="number"] {
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     margin-left: 6px;
@@ -4697,10 +4779,11 @@
           ]),
           m("div#input", { hidden: during_play }, [
             m("p", "Position:"),
-            m("input#fen", {
+            m("input[type=text]#fen", {
               placeholder: "Input FEN Here",
               title:
                 "Input the Forsyth-Edwards Notation (FEN) of the position you want to load. Leave it blank to use default position.",
+              maxlength: 9999,
               disabled: !is_ready || review_mode,
               onkeyup: (e) => {
                 if (e.keyCode != 13) {
@@ -4710,10 +4793,11 @@
                 setFen(true, false);
               },
             }),
-            m("input#move", {
+            m("input[type=text]#move", {
               placeholder: "Input Move Here",
               title:
                 "Input the moves in UCI format based on the FEN. Leave it blank to indicate no move.",
+              maxlength: 9999,
               disabled: !is_ready || review_mode,
               onkeyup: (e) => {
                 if (e.keyCode != 13) {
@@ -5529,7 +5613,7 @@
             ],
           ),
           m("div#gamesettings", [
-            m("p", {}, "Quick promote/demote to piece: "),
+            m("p", {}, "Quick promote/demote: "),
             m(
               "select#dropdown-quickpromotion",
               {
@@ -5816,10 +5900,11 @@
                   }),
                 ]),
                 m("div", [
-                  m("input#seirwangatingfiles", {
+                  m("input[type=text]#seirwangatingfiles", {
                     placeholder: "Seirawan gating files (e.g. ABab)",
                     title:
                       'The files (e.g. 1st column is a-file, 2nd column is b-file, etc.) where players can perform seirawan gating.\nGateable files for first mover is in upper case and for second mover in lower case.\nExample: "ABcd" means first mover can gate at A and B file while second mover can gate at C and D file.',
+                    maxlength: 9999,
                   }),
                 ]),
               ]),
@@ -6223,9 +6308,10 @@
                 ),
               ]),
               m("div#enginecmddiv", [
-                m("input#enginecmd", {
+                m("input[type=text]#enginecmd", {
                   placeholder: "Send command to engine...",
                   title: "The command to send to the engine.",
+                  maxlength: 9999,
                   disabled: !is_ready || during_play,
                   onkeyup: (e) => {
                     if (e.keyCode != 13) {
@@ -6353,8 +6439,9 @@
               m("select#availablemovelist", [
                 m("option", { value: "" }, "--SELECT MOVE--"),
               ]),
-              m("input#movesearchfilter", {
+              m("input[type=text]#movesearchfilter", {
                 placeholder: "Search UCI move...",
+                maxlength: 9999,
               }),
               m(
                 "label#label-regexp1",
@@ -6378,13 +6465,15 @@
               ),
               m("hr#separatormoveselectiondialog"),
               m("p", "Additional Search Restrictions:"),
-              m("input#origfilter", {
+              m("input[type=text]#origfilter", {
                 placeholder:
                   "Original Square... (e.g. e2, leave empty to search all, useless for drops)",
+                maxlength: 9999,
               }),
-              m("input#destfilter", {
+              m("input[type=text]#destfilter", {
                 placeholder:
                   "Destination Square... (e.g. e4, leave empty to search all, effective on drops)",
+                maxlength: 9999,
               }),
               m(
                 "label#label-isdrop",

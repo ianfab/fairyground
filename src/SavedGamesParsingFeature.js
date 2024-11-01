@@ -1678,8 +1678,11 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
   operationdiv.appendChild(savetoepd);
   operationdiv.appendChild(close);
   let searchbox = document.createElement("input");
+  searchbox.type = "text";
+  searchbox.maxLength = 9999;
   searchbox.style.width = "400px";
   searchbox.placeholder = "Leave blank to search all";
+  searchbox.style.border = "1px solid #ddd";
   let searchtarget = document.createElement("select");
   let searchentry = document.createElement("option");
   searchentry.value = "Variant";

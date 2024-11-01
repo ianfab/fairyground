@@ -1,0 +1,269 @@
+html {
+    font-family: Calibri;
+}
+
+input {
+    outline-color: #3584e4;
+}
+
+input[type=text] {
+    transition-duration: 0.5s;
+    transition-property: color, background-color, border-color;
+    border-radius: 10px;
+}
+
+input[type=text]:hover {
+    background-color: #ddd;
+}
+
+input[type=text]:focus {
+    background-color: #fff;
+    border-left: 3px solid #3584e4 !important;
+    border-right: 3px solid #3584e4 !important;
+    border-top: 3px solid #3584e4 !important;
+    border-bottom: 3px solid #3584e4 !important;
+    outline: none;
+}
+
+input[type=number] {
+    transition-duration: 0.5s;
+    transition-property: color, background-color, border-color;
+    border-radius: 10px;
+}
+
+input[type=number]:hover {
+    background-color: #ddd;
+}
+
+input[type=number]:focus {
+    background-color: #fff;
+    border-left: 3px solid #3584e4 !important;
+    border-right: 3px solid #3584e4 !important;
+    border-top: 3px solid #3584e4 !important;
+    border-bottom: 3px solid #3584e4 !important;
+    outline: none;
+}
+
+input[type=checkbox] {
+  color: white !important;
+  background-color: white !important;
+  transition-duration: 0.5s;
+  transition-property: color, background-color, border-color;
+}
+
+input[type=checkbox]:hover {
+  color: #fff !important;
+  background-color: #f2f2f2 !important;
+}
+
+input[type=checkbox]:checked {
+  color: #fff !important;
+  background-color: #3584e4 !important;
+  border-color: #3584e4 !important;
+}
+
+input[type=checkbox]:checked:hover {
+  color: #fff !important;
+  background-color: #58c0f1 !important;
+  border-color: #58c0f1 !important;
+}
+
+input[type=checkbox]:disabled {
+  color: #777 !important;
+  background-color: #ccc !important;
+  border-color: #555 !important;
+  opacity: 1 !important;
+}
+
+input[type=checkbox]:disabled:hover {
+  color: #777 !important;
+  background-color: #ccc !important;
+  border-color: #555 !important;
+  opacity: 1 !important;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    height: 10px;
+    background: linear-gradient(to right, #fff 0%, #3584e4 100%);
+    border-radius: 5px;
+    opacity: 0.7;
+    transition: opacity .2s;
+    color: black;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #777;
+    border: 2px solid #cdc7c2;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+input[type=range]:hover {  
+    opacity: 1;
+}
+
+input[type=range]::-moz-range-track {  
+    height: 10px;
+    background: linear-gradient(to right, #fff 0%, #3584e4 100%);
+    border-radius: 5px;
+}
+
+input[type=range]::-moz-range-thumb {  
+    width: 20px;
+    height: 20px;
+    background: #777;
+    border: 2px solid #cdc7c2;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+input[type=range]:focus::-moz-range-thumb {  
+    background: #777;
+}  
+
+select {
+    color: #2e3436;
+    background: linear-gradient(to bottom, #f6f5f3, #efe8e1) !important;
+    background-color: rgba(248, 248, 247, 0) !important;
+    background-blend-mode: overlay;
+    border-color: #cdc7c2;
+    border-width: 1px;
+    border-style: solid;
+    transition-duration: 0.5s;
+    transition-property: color, background-color, border-color;
+    outline-color: #3584e4;
+    border-radius: 10px;
+}
+
+select:hover {
+    background-color: rgba(248, 248, 247, 1) !important;
+}
+
+select:disabled {
+    color: #aaa;
+    background-color: rgba(240, 240, 240, 1) !important;
+}
+
+option {
+    padding: 5px;
+    color: black;
+    background-color: white;
+    transition-duration: 0.5s;
+    transition-property: color, background, border-color;
+    outline-color: #3584e4;
+}
+
+option:hover {
+    color: white;
+    background-color: #3584e4;
+}
+
+button {
+    outline-color: #3584e4;
+    color: #2e3436 !important;
+    background: linear-gradient(to bottom, #f6f5f3, #efe8e1) !important;
+    background-color: rgba(248, 248, 247, 0) !important;
+    background-blend-mode: overlay;
+    border-color: #cdc7c2;
+    border-width: 1px;
+    border-style: solid;
+    transition-duration: 0.5s;
+    transition-property: color, background-color, border-color;
+    border-radius: 10px;
+}
+
+    button:hover {
+        background-color: rgba(248, 248, 247, 1) !important;
+    }
+
+    button:active {
+        transition-duration: 0.05s;
+        background-color: rgba(100, 100, 100, 1) !important;
+    }
+
+    button:disabled {
+        color: #aaa !important;
+        background-color: rgba(240, 240, 240, 1) !important;
+    }
+
+input::-webkit-input-placeholder {
+    color: #aaa;
+}
+
+input::-moz-placeholder {
+    color: #aaa;
+}
+
+input:-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::placeholder {
+    color: #aaa;
+    opacity: 1;
+}
+
+a {
+    outline-color: #3584e4;
+}
+
+#pagebackground {
+    background-image: linear-gradient(to bottom, #fff 0%, #fff 20%, #eee 100%);
+}
+
+#timers {
+  border-color: #eee !important;
+  background-color: gray !important;
+}
+
+#whitetimer {
+  border-color: #000 !important;
+  color: black !important;
+  background-color: white !important;
+}
+
+#blacktimer {
+  border-color: #fff !important;
+  color: white !important;
+  background-color: black !important;
+}
+
+#moveselectiondialog {
+    color: black !important;
+    background-image: linear-gradient(to bottom, #fff 0%, #fff 20%, #eee 100%);
+    border: 1px solid #555 !important;
+    border-radius: 10px;
+}
+
+#separatormoveselectiondialog {
+    border: dashed #3584e4 !important;
+}
+
+#separatorsearchresult {
+    border: double #3584e4 !important;
+}
+
+#enginemanagementpopup {
+    background: linear-gradient(to bottom, #fff 0%, #fff 20%, #eee 100%) !important;
+}
+
+#enginesetuppopup {
+    background: linear-gradient(to bottom, #fff 0%, #fff 20%, #eee 100%) !important;
+}
+
+#enginesettingspopup {
+    background: linear-gradient(to bottom, #fff 0%, #fff 20%, #eee 100%) !important;
+}
+
+#loadsavedgamespopup {
+    background: linear-gradient(to bottom, #fff 0%, #fff 20%, #eee 100%) !important;
+}

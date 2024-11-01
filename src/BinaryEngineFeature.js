@@ -2182,6 +2182,8 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
     subdiv.appendChild(text);
     if (value.type == "string") {
       input = document.createElement("input");
+      input.type = "text";
+      input.maxLength = 9999;
       input.value = value.default;
       subdiv.appendChild(input);
     } else if (value.type == "check") {
@@ -2492,6 +2494,8 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let engineidtext = document.createElement("p");
   engineidtext.innerText = "Engine Display Name (must be unique):";
   let engineid = document.createElement("input");
+  engineid.type = "text";
+  engineid.maxLength = 9999;
   engineid.style.border = "1px solid #ddd";
   engineid.style.width = "500px";
   iddiv.appendChild(engineidtext);
@@ -2503,6 +2507,8 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let enginepathtext = document.createElement("p");
   enginepathtext.innerText = "Engine Executable Path (Absolute Path):";
   let enginepath = document.createElement("input");
+  enginepath.type = "text";
+  enginepath.maxLength = 9999;
   enginepath.style.border = "1px solid #ddd";
   enginepath.style.width = "500px";
   pathdiv.appendChild(enginepathtext);
@@ -2514,6 +2520,8 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let enginewdtext = document.createElement("p");
   enginewdtext.innerText = "Engine Working Directory (Absolute Path):";
   let enginewd = document.createElement("input");
+  enginewd.type = "text";
+  enginewd.maxLength = 9999;
   enginewd.style.border = "1px solid #ddd";
   enginewd.style.width = "500px";
   enginewd.placeholder =
