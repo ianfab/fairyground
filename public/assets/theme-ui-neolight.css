@@ -1,5 +1,11 @@
 html {
     font-family: Calibri;
+    scrollbar-color: #3584e4 #fff;
+}
+
+::selection {
+    background-color: #3584e4;
+    color: #fff;
 }
 
 input {
@@ -10,6 +16,10 @@ input[type=text] {
     transition-duration: 0.5s;
     transition-property: color, background-color, border-color;
     border-radius: 10px;
+    border-left: 1px solid #cdc7c2 !important;
+    border-right: 1px solid #cdc7c2 !important;
+    border-top: 1px solid #cdc7c2 !important;
+    border-bottom: 1px solid #cdc7c2 !important;
 }
 
 input[type=text]:hover {
@@ -29,6 +39,10 @@ input[type=number] {
     transition-duration: 0.5s;
     transition-property: color, background-color, border-color;
     border-radius: 10px;
+    border-left: 1px solid #cdc7c2 !important;
+    border-right: 1px solid #cdc7c2 !important;
+    border-top: 1px solid #cdc7c2 !important;
+    border-bottom: 1px solid #cdc7c2 !important;
 }
 
 input[type=number]:hover {
@@ -59,7 +73,7 @@ input[type=checkbox]:hover {
 input[type=checkbox]:checked {
   color: #fff !important;
   background-color: #3584e4 !important;
-  border-color: #3584e4 !important;
+  border-color: #1b67c5 !important;
 }
 
 input[type=checkbox]:checked:hover {
@@ -214,6 +228,12 @@ input::placeholder {
 
 a {
     outline-color: #3584e4;
+    color: #3584e4;
+    text-decoration: underline !important;
+}
+
+a:visited {
+    color: #3584e4;
 }
 
 #pagebackground {
@@ -223,18 +243,45 @@ a {
 #timers {
   border-color: #eee !important;
   background-color: gray !important;
+  border-radius: 10px;
 }
 
 #whitetimer {
   border-color: #000 !important;
   color: black !important;
   background-color: white !important;
+  background-image: linear-gradient(to bottom, #fff 0%, #f7f7f7 20%, #ccc 100%);
+  border-radius: 10px;
 }
 
 #blacktimer {
   border-color: #fff !important;
   color: white !important;
   background-color: black !important;
+  background-image: linear-gradient(to bottom, #666 0%, #080808 80%, #000 100%);
+  border-radius: 10px;
+}
+
+#currentboardfen {
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 5px 5px #ddd !important;
+    scrollbar-width: none;
+    border-color: #ccc !important;
+}
+
+#label-pgn {
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 5px 5px #ddd !important;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    overflow-x: auto !important;
+    border-color: #ccc !important;
+}
+
+#output2 {
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 5px 5px #ddd !important;
+    border-color: #ccc !important;
 }
 
 #moveselectiondialog {

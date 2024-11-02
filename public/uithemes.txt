@@ -3,8 +3,9 @@
 #<UI theme name>: The unique ID of this theme. Fairyground will load "./assets/theme-ui-<UI theme ID>.css" to HTML stylesheet.
 #<display name>: The name of this theme, displayed in the dropdown.
 
-light|Light
-dark|Dark
-neo|Modern
+light|Light Classic
+dark|Dark Classic
+neolight|Light Modern
+neodark|Dark Modern
 fsf|Fairy-Stockfish
 chess|Chess Set

@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <head>
   <meta charset="utf-8" />
   <title>Fairy-Stockfish playground</title>
@@ -121,12 +121,14 @@
 
   input[type="checkbox"]:disabled {
     color: #000;
-    background-color: rgba(176, 176, 176, 0.2);
+    background-color: #aaa;
+    opacity: 0.7;
   }
 
   input[type="checkbox"]:disabled:hover {
     color: #000;
-    background-color: rgba(176, 176, 176, 0.2);
+    background-color: #aaa;
+    opacity: 0.7;
   }
 
   #pagetitle {
@@ -4344,7 +4346,10 @@
         updateThemeDropdowns(null, board_set);
       }
 
-      function changeUI(ui_id) {
+      function changeUI(ui_id, save_to_local_storage) {
+        if (uithemes[0].indexOf(ui_id) < 0) {
+          return;
+        }
         const pagebackground = document.getElementById("pagebackground");
         const htmlComputedStyle = window.getComputedStyle(pagebackground);
         const BGBefore = htmlComputedStyle.backgroundImage;
@@ -4403,6 +4408,9 @@
           );
         }
         updateUIThemeDropdown(ui_id);
+        if (save_to_local_storage) {
+          localStorage.setItem("UserSelectedUITheme", ui_id);
+        }
       }
 
       const onSelectUserGraphics = async (e) => {
@@ -5222,10 +5230,19 @@
                 hidden: true,
                 onclick: () => {
                   setupUIThemeDropdown();
-                  changeUI(
-                    $("#dropdown-uitheme")[$("#dropdown-uitheme").selectedIndex]
-                      .value,
+                  let UserSelectedUITheme = localStorage.getItem(
+                    "UserSelectedUITheme",
                   );
+                  if (UserSelectedUITheme) {
+                    changeUI(UserSelectedUITheme, false);
+                  } else {
+                    changeUI(
+                      $("#dropdown-uitheme")[
+                        $("#dropdown-uitheme").selectedIndex
+                      ].value,
+                      false,
+                    );
+                  }
                 },
               },
               "Initialize UI Themes (internal)",
@@ -6046,6 +6063,7 @@
                             (uithemesdropdown.selectedIndex + 1) %
                               uithemesdropdown.length
                           ].value,
+                          true,
                         );
                       },
                     },
@@ -6059,6 +6077,7 @@
                           $("#dropdown-uitheme")[
                             $("#dropdown-uitheme").selectedIndex
                           ].value,
+                          true,
                         );
                       },
                     },
