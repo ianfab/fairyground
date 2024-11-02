@@ -1489,8 +1489,8 @@
       }
       if (themesloaded && positionvariantsloaded && variantsettingsloaded) {
         document
-          .getElementById("dropdown-varianttype")
-          .dispatchEvent(new Event("change"));
+          .getElementById("updatevarianttypedropdown")
+          .dispatchEvent(new Event("click"));
         console.log(
           "%c Variant System %c READY %c Variant subsystem is ready.",
           "color: #fff; background: #5f5f5f",
@@ -1518,8 +1518,8 @@
       positionvariantsloaded = true;
       if (pageloaded && themesloaded && variantsettingsloaded) {
         document
-          .getElementById("dropdown-varianttype")
-          .dispatchEvent(new Event("change"));
+          .getElementById("updatevarianttypedropdown")
+          .dispatchEvent(new Event("click"));
         console.log(
           "%c Variant System %c READY %c Variant subsystem is ready.",
           "color: #fff; background: #5f5f5f",
@@ -1534,8 +1534,8 @@
       themesloaded = true;
       if (pageloaded && positionvariantsloaded && variantsettingsloaded) {
         document
-          .getElementById("dropdown-varianttype")
-          .dispatchEvent(new Event("change"));
+          .getElementById("updatevarianttypedropdown")
+          .dispatchEvent(new Event("click"));
         console.log(
           "%c Variant System %c READY %c Variant subsystem is ready.",
           "color: #fff; background: #5f5f5f",
@@ -1550,8 +1550,8 @@
       variantsettingsloaded = true;
       if (pageloaded && positionvariantsloaded && themesloaded) {
         document
-          .getElementById("dropdown-varianttype")
-          .dispatchEvent(new Event("change"));
+          .getElementById("updatevarianttypedropdown")
+          .dispatchEvent(new Event("click"));
         console.log(
           "%c Variant System %c READY %c Variant subsystem is ready.",
           "color: #fff; background: #5f5f5f",
@@ -5336,6 +5336,16 @@
                 },
               },
               "Initialize UI Themes (internal)",
+            ),
+            m(
+              "p#updatevarianttypedropdown",
+              {
+                hidden: true,
+                onclick: () => {
+                  updateVariantTypeDropdown();
+                },
+              },
+              "Update Variant Type Dropdown (internal)",
             ),
             m(
               "p#copysetfen",
