@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <head>
   <meta charset="utf-8" />
   <title>Fairy-Stockfish playground</title>
@@ -1464,22 +1464,101 @@
     let allvariants = [];
     let uithemes = [[], [], []];
     let currentuicss = null;
-    let onpageload = false;
-    let uithemesparsed = false;
+
+    //Feature loading status global variable
+    var pageloaded = false;
+    var uithemesparsed = false;
+    var themesloaded = false;
+    var positionvariantsloaded = false;
+    var variantsettingsloaded = false;
+    var variantsystemready = false;
+
     let previouschangeuitime = 0;
     const $ = (...args) => document.querySelector(...args);
 
     document.addEventListener("onpageload", () => {
-      onpageload = true;
+      pageloaded = true;
       if (uithemesparsed) {
         document.getElementById("setupuithemes").click();
+        console.log(
+          "%c UI Theme System %c READY %c UI theme subsystem is ready.",
+          "color: #fff; background: #5f5f5f",
+          "color: #fff; background: #4bc729",
+          "",
+        );
+      }
+      if (themesloaded && positionvariantsloaded && variantsettingsloaded) {
+        document
+          .getElementById("dropdown-varianttype")
+          .dispatchEvent(new Event("change"));
+        console.log(
+          "%c Variant System %c READY %c Variant subsystem is ready.",
+          "color: #fff; background: #5f5f5f",
+          "color: #fff; background: #4bc729",
+          "",
+        );
+        variantsystemready = true;
       }
     });
 
     document.addEventListener("uithemesparsed", () => {
       uithemesparsed = true;
-      if (onpageload) {
+      if (pageloaded) {
         document.getElementById("setupuithemes").click();
+        console.log(
+          "%c UI Theme System %c READY %c UI theme subsystem is ready.",
+          "color: #fff; background: #5f5f5f",
+          "color: #fff; background: #4bc729",
+          "",
+        );
+      }
+    });
+
+    document.addEventListener("positionvariantsloaded", () => {
+      positionvariantsloaded = true;
+      if (pageloaded && themesloaded && variantsettingsloaded) {
+        document
+          .getElementById("dropdown-varianttype")
+          .dispatchEvent(new Event("change"));
+        console.log(
+          "%c Variant System %c READY %c Variant subsystem is ready.",
+          "color: #fff; background: #5f5f5f",
+          "color: #fff; background: #4bc729",
+          "",
+        );
+        variantsystemready = true;
+      }
+    });
+
+    document.addEventListener("themesloaded", () => {
+      themesloaded = true;
+      if (pageloaded && positionvariantsloaded && variantsettingsloaded) {
+        document
+          .getElementById("dropdown-varianttype")
+          .dispatchEvent(new Event("change"));
+        console.log(
+          "%c Variant System %c READY %c Variant subsystem is ready.",
+          "color: #fff; background: #5f5f5f",
+          "color: #fff; background: #4bc729",
+          "",
+        );
+        variantsystemready = true;
+      }
+    });
+
+    document.addEventListener("variantsettingsloaded", () => {
+      variantsettingsloaded = true;
+      if (pageloaded && positionvariantsloaded && themesloaded) {
+        document
+          .getElementById("dropdown-varianttype")
+          .dispatchEvent(new Event("change"));
+        console.log(
+          "%c Variant System %c READY %c Variant subsystem is ready.",
+          "color: #fff; background: #5f5f5f",
+          "color: #fff; background: #4bc729",
+          "",
+        );
+        variantsystemready = true;
       }
     });
 
@@ -1696,7 +1775,7 @@
     };
 
     const LoadVariantSettings = (side, clientdata) => {
-      function StartLoad(data) {
+      function StartLoad(data, dispatchevent) {
         if (typeof data == "string") {
           let rawText = data
             .replace(/\r\n/g, "\n")
@@ -1751,14 +1830,17 @@
             `Bad data type from variantsettings.txt: ${typeof data}`,
           );
         }
+        if (dispatchevent) {
+          document.dispatchEvent(new Event("variantsettingsloaded"));
+        }
       }
       if (side == "server") {
         this.getFileFromServer("./variantsettings.txt", (res) => {
           console.log("res3:", res);
-          StartLoad(res);
+          StartLoad(res, true);
         });
       } else if (side == "client") {
-        StartLoad(clientdata);
+        StartLoad(clientdata, false);
       }
     };
 
@@ -1958,6 +2040,8 @@
         } else {
           console.error(`Bad data type from themename.txt: ${typeof namedata}`);
         }
+
+        document.dispatchEvent(new Event("themesloaded"));
       }
       this.getFileFromServer("./themes.txt", (res) => {
         console.log("res:", res);
@@ -4240,8 +4324,16 @@
                       .replace(/ var /g, " ")
                       .split(" ")
                       .sort();
-                    //variants = allvariants;
-                    updateVariantTypeDropdown();
+                    console.log(
+                      "Detected UCI_Variant parameter from Fairy-Stockfish. Updating variants and dropdowns...",
+                    );
+                    if (variantsystemready) {
+                      updateVariantTypeDropdown();
+                    } else {
+                      console.log(
+                        "Note: Fairy-Stockfish loaded before variant subsystem.",
+                      );
+                    }
                   }
                 } else if (line.startsWith(" ")) {
                 } else {

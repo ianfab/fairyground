@@ -2565,7 +2565,7 @@ function validateFEN(FEN, showNoErrorMessage) {
 }
 
 function LoadPositionVariant(side, file) {
-  function StartLoad(data) {
+  function StartLoad(data, dispatchevent) {
     let VariantTypeDirectory = new Map();
     let VariantNameDirectory = new Map();
     //This creates a tree structure to store position variants
@@ -2633,19 +2633,22 @@ function LoadPositionVariant(side, file) {
       PositionVariantsDirectory.set(variantsettings[0], VariantTypeDirectory);
     }
     console.log("PositionVariants:", PositionVariantsDirectory);
+    if (dispatchevent) {
+      document.dispatchEvent(new Event("positionvariantsloaded"));
+    }
     return true;
   }
   if (side == "server") {
     return window.getFileFromServer("./positionvariants.txt", (res) => {
       console.log("res:", res);
-      StartLoad(res);
+      StartLoad(res, true);
     });
   } else if (side == "client") {
     if (file == null || file == undefined) {
       console.warn("Empty files provided.");
       return false;
     }
-    StartLoad(file);
+    StartLoad(file, false);
     return true;
   }
   return false;
