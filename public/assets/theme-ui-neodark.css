@@ -117,9 +117,10 @@ input[type=range]::-webkit-slider-thumb {
     width: 20px;
     height: 20px;
     background: #777;
-    border: 2px solid #cdc7c2;
+    border: 2px solid #fff;
     border-radius: 50%;
     cursor: pointer;
+    box-shadow: 0px 0px 5px 2px #999;
 }
 
 input[type=range]:hover {  
@@ -136,10 +137,11 @@ input[type=range]::-moz-range-thumb {
     width: 20px;
     height: 20px;
     background: #777;
-    border: 2px solid #cdc7c2;
+    border: 2px solid #fff;
     border-radius: 50%;
     cursor: pointer;
     transition: background .2s;
+    box-shadow: 0px 0px 5px 2px #999;
 }
 
 input[type=range]:focus::-moz-range-thumb {  
@@ -233,7 +235,8 @@ input::placeholder {
 }
 
 spangameresult {
-    color: white !important;
+    color: #ff5d17 !important;
+    text-shadow: 0px 0px 2px #ff5d17;
 }
 
 table {

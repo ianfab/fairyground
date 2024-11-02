@@ -111,9 +111,10 @@ input[type=range]::-webkit-slider-thumb {
     width: 20px;
     height: 20px;
     background: #777;
-    border: 2px solid #cdc7c2;
+    border: 2px solid #fff;
     border-radius: 50%;
     cursor: pointer;
+    box-shadow: 0px 0px 5px 2px #aaa;
 }
 
 input[type=range]:hover {  
@@ -130,10 +131,11 @@ input[type=range]::-moz-range-thumb {
     width: 20px;
     height: 20px;
     background: #777;
-    border: 2px solid #cdc7c2;
+    border: 2px solid #fff;
     border-radius: 50%;
     cursor: pointer;
     transition: background .2s;
+    box-shadow: 0px 0px 5px 2px #aaa;
 }
 
 input[type=range]:focus::-moz-range-thumb {  
@@ -224,6 +226,11 @@ input::-ms-input-placeholder {
 input::placeholder {
     color: #aaa;
     opacity: 1;
+}
+
+spangameresult {
+    color: #3584e4 !important;
+    text-shadow: 0px 0px 2px #3584e4;
 }
 
 a {
