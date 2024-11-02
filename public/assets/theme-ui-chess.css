@@ -1,3 +1,8 @@
+html {
+  color: black;
+  background: white;
+}
+
 #pagebackground {
   background-image: url('./assets/images/ui/chess/chess.avif');
 }
