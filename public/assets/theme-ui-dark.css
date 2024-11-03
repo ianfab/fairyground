@@ -1,6 +1,6 @@
 html {
-    color: white;
-    background: black;
+    color: white !important;
+    background: black !important;
 }
 
 input {

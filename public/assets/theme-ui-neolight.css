@@ -1,7 +1,5 @@
 html {
     font-family: Calibri;
-    color: black;
-    background: white;
     scrollbar-color: #3584e4 #fff;
 }
 
@@ -153,8 +151,8 @@ select {
     border-width: 1px;
     border-style: solid;
     transition-duration: 0.5s;
-    transition-property: color, background-color, border-color;
-    outline-color: #3584e4;
+    transition-property: color, background-color, border-color, box-shadow;
+    outline: none;
     border-radius: 10px;
 }
 
@@ -165,6 +163,10 @@ select:hover {
 select:disabled {
     color: #aaa;
     background-color: rgba(240, 240, 240, 1) !important;
+}
+
+select:focus {
+    box-shadow: 0px 0px 3px 3px #3584e4;
 }
 
 option {
@@ -182,7 +184,7 @@ option:hover {
 }
 
 button {
-    outline-color: #3584e4;
+    outline: none;
     color: #2e3436 !important;
     background: linear-gradient(to bottom, #f6f5f3, #efe8e1) !important;
     background-color: rgba(248, 248, 247, 0) !important;
@@ -191,7 +193,7 @@ button {
     border-width: 1px;
     border-style: solid;
     transition-duration: 0.5s;
-    transition-property: color, background-color, border-color;
+    transition-property: color, background-color, border-color, box-shadow;
     border-radius: 10px;
 }
 
@@ -207,6 +209,10 @@ button {
     button:disabled {
         color: #aaa !important;
         background-color: rgba(240, 240, 240, 1) !important;
+    }
+
+    button:focus {
+        box-shadow: 0px 0px 3px 3px #3584e4;
     }
 
 input::-webkit-input-placeholder {
@@ -276,6 +282,13 @@ a:visited {
     box-shadow: inset 0px 0px 5px 5px #ddd !important;
     scrollbar-width: none;
     border-color: #ccc !important;
+    transition-duration: 0.5s;
+    transition-property: border-color, box-shadow;
+}
+
+#currentboardfen:hover {
+    box-shadow: inset 0px 0px 5px 5px #3584e4 !important;
+    border-color: #3584e4 !important;
 }
 
 #label-pgn {
@@ -285,12 +298,25 @@ a:visited {
     word-wrap: break-word;
     overflow-x: auto !important;
     border-color: #ccc !important;
+    transition-duration: 0.5s;
+    transition-property: border-color, box-shadow;
+}
+
+#label-pgn:hover {
+    box-shadow: inset 0px 0px 5px 5px #3584e4 !important;
+    border-color: #3584e4 !important;
 }
 
 #output2 {
     border-radius: 10px;
     box-shadow: inset 0px 0px 5px 5px #ddd !important;
     border-color: #ccc !important;
+    transition-property: border-color, box-shadow;
+}
+
+#output2:hover {
+    box-shadow: inset 0px 0px 5px 5px #3584e4 !important;
+    border-color: #3584e4 !important;
 }
 
 #moveselectiondialog {

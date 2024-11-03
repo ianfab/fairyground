@@ -2264,6 +2264,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   });
   let actiondiv = document.createElement("div");
   actiondiv.style.display = "flex";
+  actiondiv.style.marginTop = "5px";
   let cancel = document.createElement("button");
   let canceltext = document.createTextNode("Close");
   cancel.appendChild(canceltext);
@@ -2837,6 +2838,9 @@ function ShowEngineManagementUI(EngineList, ws) {
   enginelistdiv.style.display = "flex";
   enginecontroldiv.style.display = "flex";
   engineinfodiv.style.display = "flex";
+  enginelistdiv.style.marginBottom = "5px";
+  enginecontroldiv.style.marginBottom = "5px";
+  engineinfodiv.style.marginBottom = "5px";
   engineinfodiv.style.flexDirection = "column";
   let whiteengineinfo = document.createElement("p");
   if (window.fairyground.BinaryEngineFeature.first_engine) {
