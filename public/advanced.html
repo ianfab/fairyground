@@ -27,6 +27,13 @@
     font: inherit;
   }
 
+  @font-face {
+    font-family: "FontAwesome";
+    src: url("./assets/fonts/FontAwesome.woff2") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+  }
+
   html,
   body,
   #root {
@@ -95,7 +102,7 @@
     text-align: center;
     -webkit-appearance: none;
     -moz-appearance: none;
-    font: normal normal normal 14px/1 Arial;
+    font: normal normal normal 14px/1 FontAwesome;
     outline: 0;
     background: 0 0;
     background-color: white;
@@ -118,7 +125,7 @@
   }
 
   input[type="checkbox"]:checked:after {
-    content: "✔";
+    content: "\f00c";
     font-size: 15px;
     text-align: center;
     line-height: 17px;
