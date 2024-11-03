@@ -10,6 +10,25 @@ html {
     color: #fff;
 }
 
+button:before {
+    transition-duration: 0.5s;
+    transition-property: color, background-color;
+    background-color: #ff5d17 !important;
+}
+
+button:hover:before {
+    background-color: orange !important;
+}
+
+button:active:before {
+    background-color: black !important;
+}
+
+button:disabled:before {
+    color: black !important;
+    background-color: #999 !important;
+}
+
 input {
     outline-color: #ff5d17;
 }

@@ -23,7 +23,7 @@
         ]
      },
      {
-        "source": "/(.*).woff2",
+        "source": "/(.*).(woff2|woff|ttf)",
         "headers": [
         { 
            "key": "Cache-Control",

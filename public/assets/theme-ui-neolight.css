@@ -8,6 +8,25 @@ html {
     color: #fff;
 }
 
+button:before {
+    transition-duration: 0.5s;
+    transition-property: color, background-color;
+    background-color: #3584e4 !important;
+}
+
+button:hover:before {
+    background-color: #8bb8ef !important;
+}
+
+button:active:before {
+    background-color: black !important;
+}
+
+button:disabled:before {
+    color: black !important;
+    background-color: #ccc !important;
+}
+
 input {
     outline-color: #3584e4;
 }
