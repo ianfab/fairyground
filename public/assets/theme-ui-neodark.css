@@ -182,7 +182,6 @@ option {
     transition-duration: 0.5s;
     transition-property: color, background, border-color;
     outline-color: #ff5d17;
-    border: none;
 }
 
 option:hover {
