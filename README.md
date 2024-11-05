@@ -1,4 +1,4 @@
-# fairyground
+﻿# fairyground
 
 This is an attempt to have a simple demo and playground for [Fairy-Stockfish](https://github.com/ianfab/Fairy-Stockfish) in the browser, using its [WebAssembly port](https://github.com/ianfab/fairy-stockfish.wasm), its [ffish.js](https://www.npmjs.com/package/ffish-es6) library, and the graphical [chessgroundx](https://github.com/gbtami/chessgroundx) library. It is based on the [demo for Fairy-Stockfish WASM](https://github.com/ianfab/fairy-stockfish-nnue-wasm-demo) and [ffish-test](https://github.com/thearst3rd/ffish-test).
 
@@ -34,6 +34,9 @@ npm install
 # Build once (for end users)
 npm run build
 
+# Build once (for developers, faster build without file compression & mangling)
+npm run debug-build
+
 # or, continuously run in background and watch for changes (for developers)
 npm run watch-build
 ```
@@ -41,8 +44,11 @@ npm run watch-build
 ##### -- Windows
 
 ```batch
-::Build once (for end users)
+:: Build once (for end users)
 npm run buildwithcmd
+
+:: Build once (for developers, faster build without file compression & mangling)
+npm run debug-buildwithcmd
 
 :: or, continuously run in background and watch for changes (for developers)
 npm run watch-build

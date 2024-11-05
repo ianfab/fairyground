@@ -14,6 +14,7 @@ md .\release-builds\linux\arm64 || goto Error
 md .\release-builds\macos\x64 || goto Error
 md .\release-builds\macos\arm64 || goto Error
 
+echo Make sure that you have run "npm install" and "node_modules" folder exists in the root folder before running this script.
 echo What is the CPU architecture of your build platform (This computer)? (Enter x86_64 or ARM64)
 set /P input=^> 
 if "%input%"=="ARM64" (

@@ -10,6 +10,7 @@ function Error() {
 
 export nodeversion="node18"
 
+echo Make sure that you have run \"npm install\" and \"node_modules\" folder exists in the root folder before running this script.
 echo "What is the CPU architecture of your build platform (This computer)? (Enter x86_64 or ARM64)"
 read input || export input=null
 if [ "$input" == "ARM64" ]; then
