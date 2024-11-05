@@ -32,7 +32,7 @@
     //hiding elements instead of deleting elements can prevent webpage from glitching
     const $ = (...args) => document.querySelector(...args);
     var frame1 = document.getElementById("frame1");
-    frame1.contentWindow.document.addEventListener("onpageload", () => {
+    frame1.contentWindow.onload = function () {
       var advpage = frame1.contentWindow.document;
       const pagetitle = advpage.getElementById("pagetitle");
       const fen = advpage.getElementById("fen");
@@ -118,6 +118,6 @@
       enginecmddiv.style.display = "none";
       dropdownNotationSystem.style.display = "none";
       divconnectserver.style.display = "none";
-    });
+    };
   </script>
 </body>
