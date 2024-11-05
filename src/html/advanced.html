@@ -1120,6 +1120,7 @@
     transition: 0.5s linear;
     font-weight: bold;
     font-family: "Times New Roman", Georgia, Serif, Arial;
+    transform: translate(-50%, -50%);
     z-index: 1000;
   }
 
@@ -4371,8 +4372,8 @@
         }
         var span = document.createElement("spangameresult");
         span.innerHTML = $("#gameresult").value;
-        span.style.left = window.innerWidth / 2 + "px";
-        span.style.top = window.innerHeight / 2 + "px";
+        span.style.left = "50%";
+        span.style.top = "50%";
         setTimeout(function () {
           span.style.opacity = "1";
           span.style.transform = "scale(40)";
@@ -4400,6 +4401,7 @@
           .then(
             (_stockfish) => {
               stockfish = _stockfish;
+              window.stockfish = _stockfish;
               stockfish_state = "READY";
               stockfish.addMessageListener((line) => {
                 if (line.startsWith("option")) {

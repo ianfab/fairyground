@@ -17,6 +17,7 @@ console.log(
 app.use(function (req, res, next) {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
   res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+  //res.setHeader("Cache-Control", "no-store,no-cache,must-revalidate,post-check=0,pre-check=0");
   next();
 });
 
