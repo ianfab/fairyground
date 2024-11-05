@@ -1,95 +1,95 @@
 #fen {
-    display: none !important;
+  display: none !important;
 }
 
 #move {
-    display: none !important;
+  display: none !important;
 }
 
 #setpos {
-    display: none !important;
+  display: none !important;
 }
 
 #depth {
-    display: none !important;
+  display: none !important;
 }
 
 #movetime {
-    display: none !important;
+  display: none !important;
 }
 
 #nodes {
-    display: none !important;
+  display: none !important;
 }
 
 #threads {
-    display: none !important;
+  display: none !important;
 }
 
 #hash {
-    display: none !important;
+  display: none !important;
 }
 
 #multipv {
-    display: none !important;
+  display: none !important;
 }
 
 #go {
-    display: none !important;
+  display: none !important;
 }
 
 #stop {
-    display: none !important;
+  display: none !important;
 }
 
 #label-analysis {
-    display: none !important;
+  display: none !important;
 }
 
 #label-boardsetup {
-    display: none !important;
+  display: none !important;
 }
 
 #output2 {
-    display: none !important;
+  display: none !important;
 }
 
 #currentboardfen {
-    display: none !important;
+  display: none !important;
 }
 
 #label-pgn {
-    display: none !important;
+  display: none !important;
 }
 
 #movecontrol {
-    display: none !important;
+  display: none !important;
 }
 
 #label-advtimectrl {
-    display: none !important;
+  display: none !important;
 }
 
 #whitetimemargin {
-    display: none !important;
+  display: none !important;
 }
 
 #blacktimemargin {
-    display: none !important;
+  display: none !important;
 }
 
 #enginecmddiv {
-    display: none !important;
+  display: none !important;
 }
 
 #sannotation {
-    display: none !important;
+  display: none !important;
 }
 
 #divconnectserver {
-    display: none !important;
+  display: none !important;
 }
 
 #binengineinput {
-    display: none !important;
+  display: none !important;
 }
