@@ -17,28 +17,28 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Fairyground-Windows-x86_64
-          path: ./release_make/release-builds/win/x64/*
+          path: ./release_make/release-builds/win/x64/fairyground.7z
           compression-level: 0
           if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
         with:
           name: Fairyground-Windows-ARM64
-          path: ./release_make/release-builds/win/arm64/*
+          path: ./release_make/release-builds/win/arm64/fairyground.7z
           compression-level: 0
           if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
         with:
           name: Fairyground-Linux-x86_64
-          path: ./release_make/release-builds/linux/x64/*
+          path: ./release_make/release-builds/linux/x64/fairyground.7z
           compression-level: 0
           if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
         with:
           name: Fairyground-Linux-ARM64
-          path: ./release_make/release-builds/linux/arm64/*
+          path: ./release_make/release-builds/linux/arm64/fairyground.7z
           compression-level: 0
           if-no-files-found: error
 
