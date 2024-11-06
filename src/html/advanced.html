@@ -2385,8 +2385,8 @@
         let i = 0;
         for (i = 0; i < uithemes[0].length; i++) {
           if (!uithemes[1][i].Initialized) {
-            uithemes[0].splice(i);
-            uithemes[1].splice(i);
+            uithemes[0].splice(i, 1);
+            uithemes[1].splice(i, 1);
             i--;
           }
         }
