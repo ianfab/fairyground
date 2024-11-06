@@ -1551,7 +1551,8 @@
     let themenames = [[], []];
     let variantsettings = [[], [], [], [], []];
     let allvariants = [];
-    let uithemes = [[], [], []];
+    let uithemes = [[], []];
+    let currentthemeobj = null;
     let currentuicss = null;
 
     //Feature loading status global variable
@@ -1564,6 +1565,232 @@
 
     let previouschangeuitime = 0;
     const $ = (...args) => document.querySelector(...args);
+
+    class UIThemeObject {
+      constructor(ID, Name) {
+        if (typeof ID != "string" || typeof Name != "string") {
+          throw TypeError("UIThemeObject(ID:string, Name:string)");
+        }
+        this.Name = Name;
+        this.ID = ID;
+        this.StyleNodeList = [];
+        this.StyleDurations = [];
+        this.CurrentThemeIndex = 0;
+        this.CurrentThemeRemainingTime = 0;
+        this.Initialized = false;
+        this.Timer = null;
+        this.StyleDurationsLoaded = false;
+      }
+
+      destructor() {
+        if (this.Timer != null) {
+          clearTimeout(this.Timer);
+        }
+      }
+
+      SetStyleDurations(StyleDurationsInSeconds) {
+        if (!Array.isArray(StyleDurationsInSeconds)) {
+          throw TypeError("SetStyleDurations(StyleDurations:number[])");
+        }
+        let i = 0;
+        this.StyleDurations = [];
+        this.StyleDurationsLoaded = true;
+        for (i = 0; i < StyleDurationsInSeconds.length; i++) {
+          if (typeof StyleDurationsInSeconds[i] != "number") {
+            throw TypeError("SetStyleDurations(StyleDurations:number[])");
+          }
+          this.StyleDurations.push(StyleDurationsInSeconds[i] * 1000);
+        }
+      }
+
+      Initialize(OnInitializedCallback, OnErrorCallback) {
+        if (
+          typeof OnInitializedCallback != "function" ||
+          typeof OnErrorCallback != "function"
+        ) {
+          throw TypeError(
+            "Initialize(OnInitializedCallback:function(typeof this), OnErrorCallback:function(typeof this, Error))",
+          );
+        }
+        if (!this.StyleDurationsLoaded) {
+          throw Error(
+            "Set style durations first. (Call SetStyleDurations(StyleDurations:number[]))",
+          );
+        }
+        let received = 0;
+        let totalreceives = 0;
+        this.StyleNodeList = [];
+        if (this.StyleDurations.length == 0) {
+          this.CurrentThemeRemainingTime = -1;
+          this.CurrentThemeIndex = 0;
+          getFileFromServer(
+            `./assets/theme-ui-${this.ID}.css`,
+            (res) => {
+              let element = document.createElement("style");
+              element.style = "text/css";
+              element.appendChild(document.createTextNode(res));
+              this.StyleNodeList.push(element);
+              this.Initialized = true;
+              OnInitializedCallback(this);
+            },
+            (error) => {
+              console.error(`UI theme CSS ${this.ID} fetch failed.`);
+              OnErrorCallback(this, error);
+            },
+          );
+        } else {
+          let i = 0;
+          this.CurrentThemeRemainingTime = this.StyleDurations[0];
+          this.CurrentThemeIndex = 0;
+          this.StyleNodeList = [];
+          this.StyleNodeList.length = this.StyleDurations.length;
+          totalreceives = this.StyleDurations.length;
+          let HasError = false;
+          for (i = 0; i < this.StyleDurations.length; i++) {
+            ((index) => {
+              getFileFromServer(
+                `./assets/theme-ui-${this.ID}[${index}].css`,
+                (res) => {
+                  let element = document.createElement("style");
+                  element.style = "text/css";
+                  element.appendChild(document.createTextNode(res));
+                  this.StyleNodeList[index] = element;
+                  received++;
+                  if (received >= totalreceives) {
+                    if (HasError) {
+                      OnErrorCallback(this, error);
+                    } else {
+                      this.Initialized = true;
+                      OnInitializedCallback(this);
+                    }
+                  }
+                },
+                (error) => {
+                  HasError = true;
+                  console.error(
+                    `UI theme CSS ${this.ID}[${index}] fetch failed.`,
+                  );
+                  received++;
+                  if (received >= totalreceives) {
+                    if (HasError) {
+                      OnErrorCallback(this, error);
+                    } else {
+                      this.Initialized = true;
+                      OnInitializedCallback(this);
+                    }
+                  }
+                },
+              );
+            })(i);
+          }
+        }
+      }
+
+      StoredThemeCount() {
+        return this.StyleNodeList.length;
+      }
+
+      CancelTimer() {
+        if (this.Timer != null) {
+          clearTimeout(this.Timer);
+          this.Timer = null;
+        }
+      }
+
+      CurrentTheme() {
+        if (this.StyleDurations.length == 0) {
+          return this.StyleNodeList[0];
+        } else {
+          return this.StyleNodeList[this.CurrentThemeIndex];
+        }
+      }
+
+      SetCurrentTheme(ThemeIndex, SaveCurrentThemeIndexToLocalStorage) {
+        if (
+          typeof ThemeIndex != "number" ||
+          typeof SaveCurrentThemeIndexToLocalStorage != "boolean"
+        ) {
+          throw TypeError(
+            "SetCurrentTheme(ThemeIndex:number, SaveCurrentThemeIndexToLocalStorage:boolean)",
+          );
+        }
+        if (ThemeIndex < 0 || ThemeIndex >= this.StyleNodeList.length) {
+          throw RangeError(
+            `Max index is ${this.StyleNodeList.length}, Min index is 0.`,
+          );
+        }
+        this.CancelTimer();
+        this.CurrentThemeIndex = ThemeIndex;
+        this.CurrentThemeRemainingTime = this.StyleDurations[ThemeIndex];
+        if (SaveCurrentThemeIndexToLocalStorage) {
+          localStorage.setItem(
+            `UITheme-${this.ID}-CurrentThemeIndex`,
+            `${ThemeIndex}`,
+          );
+        }
+      }
+
+      NextTheme(
+        OnNextThemeTimeOutFinishCallback,
+        SaveCurrentThemeIndexToLocalStorage,
+      ) {
+        if (
+          typeof OnNextThemeTimeOutFinishCallback != "function" ||
+          typeof SaveCurrentThemeIndexToLocalStorage != "boolean"
+        ) {
+          throw TypeError(
+            "Next(OnNextThemeTimeOutFinishCallback:function(HTMLStyleElement), SaveCurrentThemeIndexToLocalStorage:boolean)",
+          );
+        }
+        if (this.StyleDurations.length == 0) {
+          return;
+        }
+        if (this.Timer) {
+          this.CancelTimer();
+          this.CurrentThemeIndex++;
+          if (this.CurrentThemeIndex >= this.StyleNodeList.length) {
+            this.CurrentThemeIndex = 0;
+          }
+          this.CurrentThemeRemainingTime =
+            this.StyleDurations[this.CurrentThemeIndex];
+          if (SaveCurrentThemeIndexToLocalStorage) {
+            localStorage.setItem(
+              `UITheme-${this.ID}-CurrentThemeIndex`,
+              `${this.CurrentThemeIndex}`,
+            );
+          }
+          OnNextThemeTimeOutFinishCallback(this.CurrentTheme());
+        }
+        this.Timer = setTimeout(() => {
+          this.CurrentThemeIndex++;
+          if (this.CurrentThemeIndex >= this.StyleNodeList.length) {
+            this.CurrentThemeIndex = 0;
+          }
+          this.CurrentThemeRemainingTime =
+            this.StyleDurations[this.CurrentThemeIndex];
+          if (SaveCurrentThemeIndexToLocalStorage) {
+            localStorage.setItem(
+              `UITheme-${this.ID}-CurrentThemeIndex`,
+              `${this.CurrentThemeIndex}`,
+            );
+          }
+          OnNextThemeTimeOutFinishCallback(this.CurrentTheme());
+        }, this.CurrentThemeRemainingTime);
+      }
+
+      GetCurrentThemeIndexFromLocalStorage() {
+        let ThemeIndex = localStorage.getItem(
+          `UITheme-${this.ID}-CurrentThemeIndex`,
+        );
+        if (
+          ThemeIndex != null &&
+          parseInt(ThemeIndex) >= 0 &&
+          parseInt(ThemeIndex) < this.StyleNodeList.length
+        ) {
+          this.SetCurrentTheme(parseInt(ThemeIndex), false);
+        }
+      }
+    }
 
     document.addEventListener("onpageload", () => {
       pageloaded = true;
@@ -2157,10 +2384,9 @@
       function ClearInvalid() {
         let i = 0;
         for (i = 0; i < uithemes[0].length; i++) {
-          if (uithemes[2][i] == undefined) {
-            uithemes[0].splice(i, 1);
-            uithemes[1].splice(i, 1);
-            uithemes[2].splice(i, 1);
+          if (!uithemes[1][i].Initialized) {
+            uithemes[0].splice(i);
+            uithemes[1].splice(i);
             i--;
           }
         }
@@ -2168,6 +2394,7 @@
       function StartLoad(data) {
         if (typeof data == "string") {
           let i = 0;
+          let j = 0;
           let rawText = data
             .replace(/\r\n/g, "\n")
             .replace(/\r/g, "\n")
@@ -2177,7 +2404,7 @@
               continue;
             }
             let uithemesettings = rawText[i].split("|");
-            if (uithemesettings.length != 2) {
+            if (uithemesettings.length != 2 && uithemesettings.length != 3) {
               console.warn(`At line ${i + 1} in uithemes.txt: Bad syntax\n`);
               continue;
             }
@@ -2187,35 +2414,66 @@
               );
               continue;
             }
-            if (uithemes[0].indexOf(uithemesettings[0]) > -1) {
+            if (uithemes[0].indexOf(uithemesettings[0]) >= 0) {
               console.warn(
                 `At line ${i + 1} in uithemes.txt: Theme ${uithemesettings[0]} already exists.\n`,
               );
               continue;
             }
+            let multiuithemedurations = [];
+            if (uithemesettings.length == 3) {
+              let durations = uithemesettings[2].split(",");
+              if (durations.length == 0) {
+                console.warn(
+                  `At line ${i + 1} in uithemes.txt: Bad syntax for sub-theme duration.\n`,
+                );
+                continue;
+              }
+              let haserror = false;
+              for (j = 0; j < durations.length; j++) {
+                if (isNaN(parseInt(durations[j]))) {
+                  console.warn(
+                    `At token ${j + 1} of sub-theme in line ${i + 1} in uithemes.txt: Sub-theme duration must be a positive integer.\n`,
+                  );
+                  haserror = true;
+                  break;
+                } else {
+                  let durationlength = parseInt(durations[j]);
+                  if (durationlength < 1) {
+                    console.warn(
+                      `At token ${j + 1} of sub-theme in line ${i + 1} in uithemes.txt: Sub-theme duration must be a positive integer.\n`,
+                    );
+                    haserror = true;
+                    break;
+                  }
+                  multiuithemedurations.push(durationlength);
+                }
+              }
+              if (haserror) {
+                continue;
+              }
+            }
             uithemes[0].push(uithemesettings[0]);
-            uithemes[1].push(uithemesettings[1]);
-            uithemes[2].push(undefined);
+            let uithemeobj = new UIThemeObject(
+              uithemesettings[0],
+              uithemesettings[1],
+            );
+            uithemeobj.SetStyleDurations(multiuithemedurations);
+            uithemes[1].push(uithemeobj);
           }
           totalreceives = uithemes[0].length;
           for (i = 0; i < uithemes[0].length; i++) {
-            (function (index) {
-              getFileFromServer(
-                `./assets/theme-ui-${uithemes[0][index]}.css`,
-                (res) => {
-                  uithemes[2][index] = document.createElement("style");
-                  uithemes[2][index].style = "text/css";
-                  uithemes[2][index].appendChild(document.createTextNode(res));
+            ((index) => {
+              uithemes[1][index].Initialize(
+                () => {
                   received++;
+                  uithemes[1][index].GetCurrentThemeIndexFromLocalStorage();
                   if (received >= totalreceives) {
                     ClearInvalid();
                     document.dispatchEvent(new Event("uithemesparsed"));
                   }
                 },
                 () => {
-                  console.error(
-                    `UI theme CSS ${uithemes[0][index]} fetch failed. This theme will not load.`,
-                  );
                   received++;
                   if (received >= totalreceives) {
                     ClearInvalid();
@@ -2241,6 +2499,76 @@
         },
       );
     };
+
+    function ApplyUIThemeStyleNode(HTMLStyleElementObject) {
+      if (HTMLStyleElementObject instanceof HTMLStyleElement) {
+        let chi = document.getElementsByClassName("bg-animation");
+        let i = 0;
+        for (i = 0; i < chi.length; i++) {
+          chi[i].style.display = "none";
+        }
+        const pagebackground = document.getElementById("pagebackground");
+        const htmlComputedStyle = window.getComputedStyle(pagebackground);
+        const BGBefore = htmlComputedStyle.backgroundImage;
+        if (currentuicss != null) {
+          document.head.removeChild(currentuicss);
+        }
+        currentuicss = HTMLStyleElementObject;
+        document.head.appendChild(currentuicss);
+        const htmlComputedStyleAfter = window.getComputedStyle(pagebackground);
+        const BGAfter = htmlComputedStyleAfter.backgroundImage;
+
+        if (BGBefore != "none") {
+          const tmpbg = document.createElement("div");
+          tmpbg.className = "bg-animation";
+          tmpbg.style.backgroundImage = BGBefore;
+          tmpbg.className = "backgroundimg";
+          tmpbg.style.opacity = "1";
+          tmpbg.style.zIndex = "-1";
+          document.body.appendChild(tmpbg);
+          LinearTransition(
+            1,
+            0,
+            -0.02,
+            10,
+            (val) => {
+              tmpbg.style.opacity = `${val}`;
+            },
+            () => {
+              document.body.removeChild(tmpbg);
+            },
+          );
+        }
+
+        if (BGAfter != "none") {
+          const tmpbg2 = document.createElement("div");
+          tmpbg2.className = "bg-animation";
+          tmpbg2.style.backgroundImage = BGAfter;
+          tmpbg2.className = "backgroundimg";
+          tmpbg2.style.opacity = "0";
+          tmpbg2.style.zIndex = "-2";
+          pagebackground.style.opacity = "0";
+          document.body.appendChild(tmpbg2);
+          LinearTransition(
+            0,
+            1,
+            0.02,
+            10,
+            (val) => {
+              tmpbg2.style.opacity = `${val}`;
+            },
+            () => {
+              pagebackground.style.opacity = "1";
+              document.body.removeChild(tmpbg2);
+            },
+          );
+        }
+      } else {
+        throw TypeError(
+          "ApplyUIThemeStyleNode(HTMLStyleElementObject:HTMLStyleElement)",
+        );
+      }
+    }
 
     function getThemeName(themeid) {
       if (typeof themeid != "string") {
@@ -4348,7 +4676,7 @@
           for (i = 0; i < uithemes[0].length; i++) {
             let option = document.createElement("option");
             option.value = uithemes[0][i];
-            option.text = uithemes[1][i];
+            option.text = uithemes[1][i].Name;
             uithemedropdown.appendChild(option);
           }
         }
@@ -4530,63 +4858,15 @@
         if (uithemes[0].indexOf(ui_id) < 0) {
           return;
         }
-        const pagebackground = document.getElementById("pagebackground");
-        const htmlComputedStyle = window.getComputedStyle(pagebackground);
-        const BGBefore = htmlComputedStyle.backgroundImage;
-        if (currentuicss != null) {
-          document.head.removeChild(currentuicss);
+        let index = uithemes[0].indexOf(ui_id);
+        if (currentthemeobj) {
+          currentthemeobj.CancelTimer();
         }
-        currentuicss = uithemes[2][uithemes[0].indexOf(ui_id)];
-        document.head.appendChild(currentuicss);
-        const htmlComputedStyleAfter = window.getComputedStyle(pagebackground);
-        const BGAfter = htmlComputedStyleAfter.backgroundImage;
-        console.log(BGBefore, BGAfter);
-
-        if (BGBefore != "none") {
-          const tmpbg = document.createElement("div");
-          tmpbg.id = "bg-animation";
-          tmpbg.style.backgroundImage = BGBefore;
-          tmpbg.className = "backgroundimg";
-          tmpbg.style.opacity = "1";
-          tmpbg.style.zIndex = "-1";
-          document.body.appendChild(tmpbg);
-          LinearTransition(
-            1,
-            0,
-            -0.02,
-            10,
-            (val) => {
-              tmpbg.style.opacity = `${val}`;
-            },
-            () => {
-              document.body.removeChild(tmpbg);
-            },
-          );
-        }
-
-        if (BGAfter != "none") {
-          const tmpbg2 = document.createElement("div");
-          tmpbg2.id = "bg-animation";
-          tmpbg2.style.backgroundImage = BGAfter;
-          tmpbg2.className = "backgroundimg";
-          tmpbg2.style.opacity = "0";
-          tmpbg2.style.zIndex = "-2";
-          pagebackground.style.backgroundImage = "none";
-          document.body.appendChild(tmpbg2);
-          LinearTransition(
-            0,
-            1,
-            0.02,
-            10,
-            (val) => {
-              tmpbg2.style.opacity = `${val}`;
-            },
-            () => {
-              pagebackground.style.backgroundImage = "";
-              document.body.removeChild(tmpbg2);
-            },
-          );
-        }
+        currentthemeobj = uithemes[1][index];
+        ApplyUIThemeStyleNode(uithemes[1][index].CurrentTheme());
+        uithemes[1][index].NextTheme(() => {
+          changeUI(ui_id, false);
+        }, true);
         updateUIThemeDropdown(ui_id);
         if (save_to_local_storage) {
           localStorage.setItem("UserSelectedUITheme", ui_id);

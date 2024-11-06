@@ -1,10 +1,29 @@
 #Fairyground UI themes settings file
-#Syntax: <UI theme ID>|<display name>
+#Syntax: 
+#Type 1: <UI theme ID>|<display name>
+#Type 2: <UI theme ID>|<display name>|<sub-theme duration in seconds [,...]>
 #<UI theme name>: The unique ID of this theme. Fairyground will load "./assets/theme-ui-<UI theme ID>.css" to HTML stylesheet.
 #<display name>: The name of this theme, displayed in the dropdown.
+#<sub-theme duration in seconds [,...]>: The duration that each sub-theme stays before being automatically switched to next one.
+#DO NOT ADD ANY SPACE FOR <UI theme ID> and <sub-theme duration in seconds [,...]>
 
-light|Light Classic
-dark|Dark Classic
+#Explanation on sub-theme (Experimental feature):
+#Fairyground supports automatically changing the CSS files to support some advanced style effects like switching background among several images.
+#This is enabled when you use type 2 syntax. In this case, Fairyground will load "./assets/theme-ui-<UI theme ID>[<index>].css" to HTML stylesheet.
+#<index> starts from 0, and ends at the length of  <sub-theme duration in seconds [,...]> decreased by 1.
+#For example:
+#"test001|Test 001|2,5,7"
+#The ID of this theme is "test001" and the name displayed in the dropdown is "Test 001".
+#This will load "./assets/theme-ui-test001[0].css", "./assets/theme-ui-test001[1].css" and "./assets/theme-ui-test001[2].css".
+#Meanwhile, when "Test 001" UI theme is selected in the dropdown, these 3 CSS files will get loaded in a cycle automatically.
+#"2,5,7" means "./assets/theme-ui-test001[0].css" stays for 2 seconds, "./assets/theme-ui-test001[1].css" stays for 5 seconds, and "./assets/theme-ui-test001[2].css" stays for 7 seconds.
+
+#Known issues:
+#1. Choosing a new UI theme when the background is cross fading causes animation error.
+#2. Only the background of the main page supports cross fade animation. PGN/EPD parser & binary engine UI backgrounds have no animation.
+
+light|Light
+dark|Dark
 neolight|Light Modern
 neodark|Dark Modern
 fsf|Fairy-Stockfish
