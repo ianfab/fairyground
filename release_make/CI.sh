@@ -34,6 +34,8 @@ echo "[Info] Continuous integration starts."
 
 sudo apt -y install p7zip-full || Error
 
+7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count -xr!release_make -xr!.git ./source.7z ./* || Error
+
 cd ./release_make
 
 chmod -R 744 $(pwd)/ldid
@@ -58,6 +60,7 @@ mkdir -p ./release-builds/macos/arm64
 mkdir -p ./release-builds/script/any
 
 npm install || Error
+cp -r ./node_modules ./node_modules_script
 npm install pkg || Error
 
 function TryNoByteCode() {
@@ -109,35 +112,36 @@ Make "$nodeversion"-win-arm64 ./release-builds/win/arm64/FairyGround.exe
 if [ $? -eq 11 ]; then Error; fi
 Make "$nodeversion"-linux-arm64 ./release-builds/linux/arm64/FairyGround
 if [ $? -eq 11 ]; then Error; fi
-Make "$nodeversion"-macos-x64 ./release-builds/macos/x64/FairyGround.app
-if [ $? -eq 11 ]; then Error; fi
-Make "$nodeversion"-macos-arm64 ./release-builds/macos/arm64/FairyGround.app
-if [ $? -eq 11 ]; then Error; fi
+#Make "$nodeversion"-macos-x64 ./release-builds/macos/x64/FairyGround.app
+#if [ $? -eq 11 ]; then Error; fi
+#Make "$nodeversion"-macos-arm64 ./release-builds/macos/arm64/FairyGround.app
+#if [ $? -eq 11 ]; then Error; fi
 
 cd ..
 npm install || Error
 npm run build || Error
+
+rm -f ./public/vercel.json
+find ./public -type f -name "original.*" -exec rm -f {} \;
+
 cp -r ./public ./release_make/release-builds/win/x64/
 cp -r ./public ./release_make/release-builds/linux/x64/
 cp -r ./public ./release_make/release-builds/win/arm64/
 cp -r ./public ./release_make/release-builds/linux/arm64/
-cp -r ./public ./release_make/release-builds/macos/x64/
-cp -r ./public ./release_make/release-builds/macos/arm64/
+#cp -r ./public ./release_make/release-builds/macos/x64/
+#cp -r ./public ./release_make/release-builds/macos/arm64/
 cp -r ./public ./release_make/release-builds/script/any/
-cp -r ./node_modules ./release_make/release-builds/script/any/
+cp -r ./release_make/node_modules_script ./release_make/release-builds/script/any/node_modules
 cp ./release_make/index.js ./release_make/release-builds/script/any/server.js
-echo "node server.js || (echo Please check whether you have installed node.js correctly. & echo Press any key to continue... & read -n 1)" > ./release_make/release-builds/script/any/Fairyground_Linux_macOS.sh
-echo "node server.js || (echo Please check whether you have installed node.js correctly. & pause)" > ./release_make/release-builds/script/any/Fairyground_Windows.bat
+echo "node server.js" > ./release_make/release-builds/script/any/Fairyground_Linux_macOS.sh
+echo "node server.js" > ./release_make/release-builds/script/any/Fairyground_Windows.bat
 echo "Follow steps below to use:" > ./release_make/release-builds/script/any/HOW_TO_USE.txt
-echo "1. Install node.js at https://nodejs.org/en/download/prebuilt-binaries. Find the version that meets your OS and CPU architecture." >> ./release_make/release-builds/script/any/HOW_TO_USE.txt
+echo "1. Install node.js at https://nodejs.org/en/download. Find the version that meets your OS and CPU architecture." >> ./release_make/release-builds/script/any/HOW_TO_USE.txt
 echo "2. After installation, run \"Fairyground_Windows.bat\" if you are on Windows or \"Fairyground_Linux_macOS.sh\" if on Linux/macOS." >> ./release_make/release-builds/script/any/HOW_TO_USE.txt
 echo "3. The webpage should automatically be opened. If not, open browser and go to http://localhost:5015" >> ./release_make/release-builds/script/any/HOW_TO_USE.txt
 echo "" >> ./release_make/release-builds/script/any/HOW_TO_USE.txt
-echo "If it does not work, please check your node.js installation." >> ./release_make/release-builds/script/any/HOW_TO_USE.txt
+echo "If it does not work, please check your node.js installation and make sure that port 5015 is free." >> ./release_make/release-builds/script/any/HOW_TO_USE.txt
 
-echo "[Warning] The macOS executables are not suitably signed yet. If you want them to work, you need to be an Apple Developer and sign it with your signing certificate."
-echo "[Warning] Use codesign on macOS to sign your executable. If you don't have a Mac, you can use a virtual machine."
-echo "[Warning] If you want to build a macOS virtual machine, please visit https://www.sysnettechsolutions.com/en/install-macos-vmware/"
 echo "[Info] CI build test OK."
 
 7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/win/x64/fairyground.7z ./release_make/release-builds/win/x64/* || Error
@@ -146,5 +150,5 @@ echo "[Info] CI build test OK."
 7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/linux/arm64/fairyground.7z ./release_make/release-builds/linux/arm64/* || Error
 7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/script/any/fairyground.7z ./release_make/release-builds/script/any/* || Error
 
-echo "[Info] Artifacts are ready. Pending for compression and upload..."
+echo "[Info] Artifacts are ready. Pending upload..."
 exit 0

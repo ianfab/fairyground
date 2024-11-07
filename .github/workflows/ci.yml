@@ -49,6 +49,13 @@ jobs:
           compression-level: 0
           if-no-files-found: error
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Source_Code
+          path: ./source.7z
+          compression-level: 0
+          if-no-files-found: error
+
       - uses: mholetzko/annotate_runs@1.0.1
         with:
           title: "Fairyground Download Notice"

@@ -13,6 +13,13 @@ md .\release-builds\win\arm64 || goto Error
 md .\release-builds\linux\arm64 || goto Error
 md .\release-builds\macos\x64 || goto Error
 md .\release-builds\macos\arm64 || goto Error
+md .\release-builds\script || goto Error
+md .\release-builds\script\any || goto Error
+
+if not exist .\node_modules (
+    echo Please run "npm install" in this directory first.
+    goto Error
+)
 
 echo Make sure that you have run "npm install" and "node_modules" folder exists in the root folder before running this script.
 echo What is the CPU architecture of your build platform (This computer)? (Enter x86_64 or ARM64)
@@ -60,6 +67,19 @@ xcopy .\public .\release_make\release-builds\win\arm64\public /E /H /C /I /Q || 
 xcopy .\public .\release_make\release-builds\linux\arm64\public /E /H /C /I /Q || goto Error
 xcopy .\public .\release_make\release-builds\macos\x64\public /E /H /C /I /Q || goto Error
 xcopy .\public .\release_make\release-builds\macos\arm64\public /E /H /C /I /Q || goto Error
+xcopy .\public .\release_make\release-builds\script\any\public /E /H /C /I /Q || goto Error
+xcopy .\release_make\node_modules .\release_make\release-builds\script\any\node_modules /E /H /C /I /Q || goto Error
+copy /Y .\release_make\index.js .\release_make\release-builds\script\any\server.js || goto Error
+echo node server.js> .\release_make\release-builds\script\any\Fairyground_Linux_macOS.sh
+echo node server.js> .\release_make\release-builds\script\any\Fairyground_Windows.bat
+echo Follow steps below to use:> .\release_make\release-builds\script\any\HOW_TO_USE.txt
+echo 1. Install node.js at https://nodejs.org/en/download. Find the version that meets your OS and CPU architecture.>> .\release_make\release-builds\script\any\HOW_TO_USE.txt
+echo 2. After installation, run "Fairyground_Windows.bat" if you are on Windows or "Fairyground_Linux_macOS.sh" if on Linux/macOS.>> .\release_make\release-builds\script\any\HOW_TO_USE.txt
+echo 3. The webpage should automatically be opened. If not, open browser and go to http://localhost:5015>> .\release_make\release-builds\script\any\HOW_TO_USE.txt
+echo.>> .\release_make\release-builds\script\any\HOW_TO_USE.txt
+echo If it does not work, please check your node.js installation and make sure that port 5015 is free.>> .\release_make\release-builds\script\any\HOW_TO_USE.txt
+
+
 echo Release build finished. Check "%~dp0release-builds\" to see the results.
 echo [Warning] The macOS executables are not suitably signed yet. If you want them to work, you need to be an Apple Developer and sign it with your signing certificate.
 echo [Warning] Use codesign on macOS to sign your executable. If you don't have a Mac, you can use a virtual machine.
