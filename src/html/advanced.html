@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <head>
   <meta charset="utf-8" />
   <title>Fairy-Stockfish playground</title>
@@ -106,6 +106,10 @@
     background-repeat: no-repeat;
     background-position: top left;
     z-index: -100;
+  }
+
+  .timer-active {
+    box-shadow: 0px 0px 5px 5px #f00;
   }
 
   input[type="checkbox"] {
@@ -671,12 +675,13 @@
   }
 
   #info #timers {
-    width: 600px;
-    height: 125px;
+    width: 620px;
+    height: 145px;
     border: 2px solid #eee;
-    background-color: gray;
+    background-color: rgba(118, 118, 118, 0.3);
     overflow: hidden;
     margin-bottom: 5px;
+    padding: 10px 10px 10px 10px;
   }
 
   #info #timers #whitetimer {
@@ -4044,6 +4049,8 @@
         $("#blacktime").innerHTML = "--";
         previous_mover = "";
         $("#timeoutside").value = 0;
+        document.getElementById("whitetimer").classList.remove("timer-active");
+        document.getElementById("blacktimer").classList.remove("timer-active");
       };
 
       function updateTimerOnMove() {
@@ -4103,6 +4110,10 @@
             }); //Time stamp for white's turn begin
           }
           previous_mover = "WHITE";
+          document.getElementById("whitetimer").classList.add("timer-active");
+          document
+            .getElementById("blacktimer")
+            .classList.remove("timer-active");
         } else if (stm == "black") {
           if (previous_mover == "") {
             if (black_timer_type == "tournament") {
@@ -4150,6 +4161,17 @@
             }); //Time stamp for black's turn begin
           }
           previous_mover = "BLACK";
+          document
+            .getElementById("whitetimer")
+            .classList.remove("timer-active");
+          document.getElementById("blacktimer").classList.add("timer-active");
+        } else {
+          document
+            .getElementById("whitetimer")
+            .classList.remove("timer-active");
+          document
+            .getElementById("blacktimer")
+            .classList.remove("timer-active");
         }
         move_finish_timer_updating = false;
       }

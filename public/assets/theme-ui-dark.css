@@ -112,20 +112,7 @@ a:visited {
 }
 
 #timers {
-  border-color: #eee !important;
-  background-color: gray !important;
-}
-
-#whitetimer {
-  border-color: #000 !important;
-  color: black !important;
-  background-color: white !important;
-}
-
-#blacktimer {
-  border-color: #fff !important;
-  color: white !important;
-  background-color: black !important;
+    background-color: rgba(255, 255, 255, 0.5) !important;
 }
 
 #enginemanagementpopup {

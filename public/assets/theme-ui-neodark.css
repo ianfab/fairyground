@@ -292,28 +292,26 @@ a:visited {
     color: #ff5d17;
 }
 
+.timer-active {
+    box-shadow: 0px 0px 5px 5px #ff5d17;
+}
+
 #pagebackground {
     background-image: linear-gradient(to bottom, #555 0%, #222 100%);
 }
 
 #timers {
-  border-color: #eee !important;
-  background-color: gray !important;
+  border-color: #fff !important;
+  background-color: rgba(0,0,0,0) !important;
   border-radius: 10px;
 }
 
 #whitetimer {
-  border-color: #000 !important;
-  color: black !important;
-  background-color: white !important;
   background-image: linear-gradient(to bottom, #fff 0%, #f7f7f7 20%, #ccc 100%);
   border-radius: 10px;
 }
 
 #blacktimer {
-  border-color: #fff !important;
-  color: white !important;
-  background-color: black !important;
   background-image: linear-gradient(to bottom, #666 0%, #080808 80%, #000 100%);
   border-radius: 10px;
 }
