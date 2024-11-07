@@ -112,6 +112,25 @@
     box-shadow: 0px 0px 5px 5px #f00;
   }
 
+  .time-exceeded {
+    color: red;
+  }
+
+  .time-exceeded:before {
+    content: "\f017";
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 35px;
+    height: 35px;
+    background-color: crimson;
+    color: white;
+    font-family: FontAwesome;
+    font-size: 20px;
+    border: 4px solid #000;
+    transform: translate(-20%, -20%);
+  }
+
   input[type="checkbox"] {
     display: inline-block;
     height: 20px;
@@ -2701,6 +2720,9 @@
       let black_time_margin = 0;
       let timeout_margin = 500;
       let previous_mover = "";
+      let white_time_exceeded = false;
+      let black_time_exceeded = false;
+      let previous_reality_time = -1;
       let move_finish_timer_updating = false;
       let changing_variant_type = false;
       let clear_log = true;
@@ -4049,8 +4071,12 @@
         $("#blacktime").innerHTML = "--";
         previous_mover = "";
         $("#timeoutside").value = 0;
+        white_time_exceeded = false;
+        black_time_exceeded = false;
         document.getElementById("whitetimer").classList.remove("timer-active");
         document.getElementById("blacktimer").classList.remove("timer-active");
+        document.getElementById("whitetime").classList.remove("time-exceeded");
+        document.getElementById("blacktime").classList.remove("time-exceeded");
       };
 
       function updateTimerOnMove() {
@@ -4062,7 +4088,7 @@
         console.log(`${$("#gamestatus").innerHTML}`);
         //console.log(white_moving_time_list);
         //console.log(white_moving_time_list);
-        const now = Date.now();
+        const realtimenow = Date.now();
         if (stm == "white") {
           if (previous_mover == "") {
             if (white_timer_type == "tournament") {
@@ -4071,15 +4097,16 @@
             }
             white_moving_time_list.push({
               remaining_time: white_remaining_time,
-              time_stamp: now,
+              time_stamp: realtimenow,
             }); //Time stamp for white's turn begin
           } else {
             black_moving_time_list.push({
-              remaining_time: black_remaining_time,
-              time_stamp: now,
+              remaining_time:
+                black_remaining_time < 0 ? 0 : black_remaining_time,
+              time_stamp: realtimenow,
             }); //Time stamp for black's turn end
-            if (black_remaining_time < 0) {
-              black_remaining_time = 0;
+            if (white_remaining_time < 0) {
+              white_remaining_time = 0;
             }
             //white_remaining_time = (+white_moving_time_list.at(-1).remaining_time) + ((+white_moving_time_list.at(-1).time_stamp) - (+now));
             if (white_timer_type == "tournament") {
@@ -4106,7 +4133,7 @@
             }
             white_moving_time_list.push({
               remaining_time: white_remaining_time,
-              time_stamp: now,
+              time_stamp: realtimenow,
             }); //Time stamp for white's turn begin
           }
           previous_mover = "WHITE";
@@ -4122,15 +4149,16 @@
             }
             black_moving_time_list.push({
               remaining_time: black_remaining_time,
-              time_stamp: now,
+              time_stamp: realtimenow,
             }); //Time stamp for black's turn begin
           } else {
             white_moving_time_list.push({
-              remaining_time: white_remaining_time,
-              time_stamp: now,
+              remaining_time:
+                white_remaining_time < 0 ? 0 : white_remaining_time,
+              time_stamp: realtimenow,
             }); //Time stamp for white's turn end
-            if (white_remaining_time < 0) {
-              white_remaining_time = 0;
+            if (black_remaining_time < 0) {
+              black_remaining_time = 0;
             }
             //black_remaining_time = (+black_moving_time_list.at(-1).remaining_time) + ((+black_moving_time_list.at(-1).time_stamp) - (+now));
             if (black_timer_type == "tournament") {
@@ -4157,7 +4185,7 @@
             }
             black_moving_time_list.push({
               remaining_time: black_remaining_time,
-              time_stamp: now,
+              time_stamp: realtimenow,
             }); //Time stamp for black's turn begin
           }
           previous_mover = "BLACK";
@@ -4173,6 +4201,18 @@
             .getElementById("blacktimer")
             .classList.remove("timer-active");
         }
+        if (white_time_exceeded) {
+          document
+            .getElementById("whitetime")
+            .classList.remove("time-exceeded");
+        }
+        if (black_time_exceeded) {
+          document
+            .getElementById("blacktime")
+            .classList.remove("time-exceeded");
+        }
+        white_time_exceeded = false;
+        black_time_exceeded = false;
         move_finish_timer_updating = false;
       }
 
@@ -4186,14 +4226,22 @@
           //avoid race condition
           return;
         }
+        let deltatimereality = 0;
+        let realitytimenow = Date.now();
+        if (previous_reality_time >= 0) {
+          deltatimereality = realitytimenow - previous_reality_time;
+        }
+        previous_reality_time = realitytimenow;
         $("#gamestatus").click();
-        console.log(`${$("#gamestatus").innerHTML}`);
+        //console.log(`${$("#gamestatus").innerHTML}`);
+        const whitetimelabel = document.getElementById("whitetime");
+        const blacktimelabel = document.getElementById("blacktime");
         if ($("#gamestatus").innerHTML == "PLAYING_WHITE") {
           if (white_timer_type == "infinite") {
             previous_mover = "WHITE";
             return;
           }
-          white_remaining_time = white_remaining_time - timer_interval;
+          white_remaining_time = white_remaining_time - deltatimereality;
           if (white_timer_type == "byoyomi" && white_remaining_time <= 0) {
             if (white_remaining_byoyomi_periods == 0) {
             } else {
@@ -4209,37 +4257,44 @@
             deleteTimer();
             $("#timeoutside").value = 1;
             timeIsUpFor("WHITE");
+            whitetimelabel.classList.remove("time-exceeded");
             return;
           }
           if (white_timer_type == "infinite") {
-            $("#whitetime").innerText = "∞";
+            whitetimelabel.innerText = "∞";
           } else if (white_remaining_time >= 10000) {
-            $("#whitetime").innerText = `${parseInt(
+            whitetimelabel.innerText = `${parseInt(
               white_remaining_time / 1000,
             )}`;
           } else {
-            $("#whitetime").innerText = `${(
-              parseInt(Math.max(white_remaining_time, 0) / 100) / 10
+            whitetimelabel.innerText = `${(
+              parseInt(white_remaining_time / 100) / 10
             ).toFixed(1)}`;
+            if (white_remaining_time <= 0 && !white_time_exceeded) {
+              white_time_exceeded = true;
+              whitetimelabel.classList.add("time-exceeded");
+            }
           }
           if (black_timer_type == "infinite") {
-            $("#blacktime").innerText = "∞";
+            blacktimelabel.innerText = "∞";
           } else if (black_remaining_time >= 10000) {
-            $("#blacktime").innerText = `${parseInt(
+            blacktimelabel.innerText = `${parseInt(
               black_remaining_time / 1000,
             )}`;
           } else {
-            $("#blacktime").innerText = `${(
-              parseInt(Math.max(black_remaining_time, 0) / 100) / 10
+            blacktimelabel.innerText = `${(
+              parseInt(black_remaining_time / 100) / 10
             ).toFixed(1)}`;
+            if (black_remaining_time <= 0 && !black_time_exceeded) {
+              black_time_exceeded = true;
+              blacktimelabel.classList.add("time-exceeded");
+            }
           }
           if (white_timer_type == "byoyomi") {
-            $("#whitetime").innerText +=
-              ` (${white_remaining_byoyomi_periods})`;
+            whitetimelabel.innerText += ` (${white_remaining_byoyomi_periods})`;
           }
           if (black_timer_type == "byoyomi") {
-            $("#blacktime").innerText +=
-              ` (${black_remaining_byoyomi_periods})`;
+            blacktimelabel.innerText += ` (${black_remaining_byoyomi_periods})`;
           }
           previous_mover = "WHITE";
         } else if ($("#gamestatus").innerHTML == "PLAYING_BLACK") {
@@ -4247,7 +4302,7 @@
             previous_mover = "BLACK";
             return;
           }
-          black_remaining_time = black_remaining_time - timer_interval;
+          black_remaining_time = black_remaining_time - deltatimereality;
           if (black_timer_type == "byoyomi" && black_remaining_time <= 0) {
             if (black_remaining_byoyomi_periods == 0) {
             } else {
@@ -4263,37 +4318,44 @@
             deleteTimer();
             $("#timeoutside").value = 2;
             timeIsUpFor("BLACK");
+            blacktimelabel.classList.remove("time-exceeded");
             return;
           }
           if (white_timer_type == "infinite") {
-            $("#whitetime").innerText = "∞";
+            whitetimelabel.innerText = "∞";
           } else if (white_remaining_time >= 10000) {
-            $("#whitetime").innerText = `${parseInt(
+            whitetimelabel.innerText = `${parseInt(
               white_remaining_time / 1000,
             )}`;
           } else {
-            $("#whitetime").innerText = `${(
-              parseInt(Math.max(white_remaining_time, 0) / 100) / 10
+            whitetimelabel.innerText = `${(
+              parseInt(white_remaining_time / 100) / 10
             ).toFixed(1)}`;
+            if (white_remaining_time <= 0 && !white_time_exceeded) {
+              white_time_exceeded = true;
+              whitetimelabel.classList.add("time-exceeded");
+            }
           }
           if (black_timer_type == "infinite") {
-            $("#blacktime").innerText = "∞";
+            blacktimelabel.innerText = "∞";
           } else if (black_remaining_time >= 10000) {
-            $("#blacktime").innerText = `${parseInt(
+            blacktimelabel.innerText = `${parseInt(
               black_remaining_time / 1000,
             )}`;
           } else {
-            $("#blacktime").innerText = `${(
-              parseInt(Math.max(black_remaining_time, 0) / 100) / 10
+            blacktimelabel.innerText = `${(
+              parseInt(black_remaining_time / 100) / 10
             ).toFixed(1)}`;
+            if (black_remaining_time <= 0 && !black_time_exceeded) {
+              black_time_exceeded = true;
+              blacktimelabel.classList.add("time-exceeded");
+            }
           }
           if (white_timer_type == "byoyomi") {
-            $("#whitetime").innerText +=
-              ` (${white_remaining_byoyomi_periods})`;
+            whitetimelabel.innerText += ` (${white_remaining_byoyomi_periods})`;
           }
           if (black_timer_type == "byoyomi") {
-            $("#blacktime").innerText +=
-              ` (${black_remaining_byoyomi_periods})`;
+            blacktimelabel.innerText += ` (${black_remaining_byoyomi_periods})`;
           }
           previous_mover = "BLACK";
         }
@@ -4375,6 +4437,7 @@
           }`,
         );
         console.log("Go!");
+        previous_reality_time = -1;
         setFen(false, true);
       };
 
