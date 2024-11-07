@@ -103,6 +103,7 @@ function Make() {
     return 0
 }
 
+node make_index.js > ./index.js
 
 Make "$nodeversion"-win-x64 ./release-builds/win/x64/FairyGround.exe
 if [ $? -eq 11 ]; then Error; fi
@@ -123,6 +124,9 @@ npm run build || Error
 
 rm -f ./public/vercel.json
 find ./public -type f -name "original.*" -exec rm -f {} \;
+
+cat ./src/js/server.js > ./release_make/index.js
+cat ./release_make/tail.js > ./release_make/index.js
 
 cp -r ./public ./release_make/release-builds/win/x64/
 cp -r ./public ./release_make/release-builds/linux/x64/

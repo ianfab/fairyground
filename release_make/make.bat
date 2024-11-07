@@ -42,6 +42,8 @@ start /wait "" cmd.exe /C npm install pkg ^> %TEMP%\make_fairyground.log ^& exit
 FOR /F "usebackq" %%i IN (`findstr /L /I "Error" "%TEMP%\make_fairyground.log"`) DO set result=%%i
 if not "%result%"=="" (goto Error)
 
+node make_index.js>.\index.js
+
 call :Make %nodeversion%-win-x64 .\release-builds\win\x64\FairyGround.exe
 if "%errorlevel%"=="11" (goto Error)
 call :Make %nodeversion%-linux-x64 .\release-builds\linux\x64\FairyGround

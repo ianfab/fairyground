@@ -85,6 +85,7 @@ function Make() {
     return 0
 }
 
+node make_index.js > ./index.js
 
 Make "$nodeversion"-win-x64 ./release-builds/win/x64/FairyGround.exe
 if [ $? -eq 11 ]; then Error; fi
