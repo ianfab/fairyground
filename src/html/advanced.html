@@ -389,7 +389,7 @@
   }
 
   #movecontrol #gotomovenum {
-    width: 45%;
+    width: 200px;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
@@ -1549,8 +1549,12 @@
     content: "\f06e";
   }
 
+  #starthere:before {
+    content: "\f044";
+  }
+
   #button-flip:before {
-    content: "\f021";
+    content: "\f079";
     -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";
     -webkit-transform: rotate(90deg);
     -ms-transform: rotate(90deg);
@@ -2974,6 +2978,16 @@
         stop(interrupt_ponder);
         const fen = $("#fen").value.trim();
         const moves = $("#move").value.trim();
+        const movelist = moves.split(" ");
+        let i = 0;
+        let count = 0;
+        for (i = 0; i < movelist.length; i++) {
+          if (movelist[i].length == 0) {
+            continue;
+          }
+          count++;
+        }
+        $("#gotomovenum").value = count;
 
         if (fen.length > 0) {
           stockfish.postMessage(`position fen ${fen} moves ${moves}`);
@@ -6565,12 +6579,28 @@
                   },
                   "Go to Move",
                 ),
+                m(
+                  "button#starthere",
+                  {
+                    onclick: () => {
+                      if (!review_mode) {
+                        return;
+                      }
+                      $("#move").value = $("#displaymoves").value;
+                      $("#currentposition").click();
+                    },
+                    disabled: !is_ready || !review_mode,
+                    title:
+                      "Click to set the position to the position displayed on the board. Moves after this position will be discarded.",
+                  },
+                  "Start Here",
+                ),
               ]),
               m("p", { hidden: !review_mode }, "Review mode enabled."),
               m(
                 "p",
                 { hidden: !review_mode },
-                "You can go to previous moves played to analyze your game, but you cannot make changes to the game. To exit review mode, click <reset> or <current position>.",
+                "You can go to previous moves played to analyze your game, but you cannot make changes to the game. To exit review mode, click <reset>, <current position> or <start here>.",
               ),
               m("div#controls", [
                 m("div", [
