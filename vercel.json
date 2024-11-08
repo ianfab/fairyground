@@ -14,11 +14,11 @@
         ]
      },
      {
-        "source": "/(.*).avif",
+        "source": "/(.*).(avif|svg)",
         "headers": [
         { 
            "key": "Cache-Control",
-           "value": "public,max-age=86400,must-revalidate"
+           "value": "public,max-age=172800,must-revalidate"
         }
         ]
      },

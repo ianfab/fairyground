@@ -1505,6 +1505,10 @@
     content: "\f053";
   }
 
+  #restart:before {
+    content: "\f01e";
+  }
+
   #go:before {
     content: "\f04b";
   }
@@ -1534,11 +1538,11 @@
   }
 
   #previousposition:before {
-    content: "\f04a";
+    content: "\f048";
   }
 
   #nextposition:before {
-    content: "\f04e";
+    content: "\f051";
   }
 
   #specifiedposition:before {
@@ -5404,6 +5408,22 @@
                 onclick: reset,
               },
               "Reset",
+            ),
+            m(
+              "button#restart",
+              {
+                disabled: !is_ready || review_mode,
+                title:
+                  "Click to clear the moves and set the position to initial position.",
+                onclick: () => {
+                  if (review_mode) {
+                    return;
+                  }
+                  document.getElementById("move").value = "";
+                  document.getElementById("setpos").click();
+                },
+              },
+              "Restart",
             ),
             m(
               "button#undo",
