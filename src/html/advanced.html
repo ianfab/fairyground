@@ -1119,11 +1119,28 @@
 
   #pvinfo {
     white-space: pre-line;
+    border-top: 4px solid black;
+    border-left: 4px solid black;
+    border-right: 4px solid black;
+    border-bottom: 3px solid black;
+    margin-top: 5px;
+  }
+
+  #pvinfo hr {
+    border: 1px solid black;
   }
 
   evalnum {
     font-weight: 900;
     font-family: Arial, "Times New Roman", Georgia, Serif;
+    color: orange;
+  }
+
+  evalnum:after {
+    content: " \f061 ";
+    font-family: FontAwesome;
+    font-size: 16px;
+    color: black;
   }
 
   #timecontrolduringplay {

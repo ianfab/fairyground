@@ -8,6 +8,14 @@ input {
     background: black;
 }
 
+input[type=text]:disabled {
+    background: #555;
+}
+
+input[type=number]:disabled {
+    background: #555;
+}
+
 input[type=checkbox] {
   color: white !important;
   background-color: black !important;
@@ -113,6 +121,21 @@ a:visited {
 
 #timers {
     background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+#pvinfo {
+    border-top: 4px solid white !important;
+    border-left: 4px solid white !important;
+    border-right: 4px solid white !important;
+    border-bottom: 4px solid white !important;
+}
+
+#pvinfo hr {
+    border: 1px solid white !important;
+}
+
+evalnum:after {
+    color: white !important;
 }
 
 #enginemanagementpopup {

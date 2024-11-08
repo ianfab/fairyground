@@ -1700,6 +1700,21 @@ new Module().then((loadedModule) => {
     }
     if (text.includes(" multipv ")) {
       let textparselist = text.split(/[ ]+/);
+      let pvindex = textparselist.indexOf("pv");
+      if (pvindex < 0) {
+        return;
+      }
+      let pvmove = textparselist[pvindex + 1];
+      let tmpboard = new ffish.Board(
+        board.variant(),
+        board.fen(),
+        board.is960(),
+      );
+      if (!tmpboard.push(pvmove)) {
+        tmpboard.delete();
+        return;
+      }
+      tmpboard.delete();
       multipvid =
         parseInt(textparselist[textparselist.indexOf("multipv") + 1]) - 1;
       if (multipvid + 1 > recordedmultipv) {
@@ -1788,7 +1803,7 @@ new Module().then((loadedModule) => {
             showevalnum = multipvrecord[k][1].toFixed(2).toString();
           }
         }
-        pvinfostr += `Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5] > -1 ? multipvrecord[k][5] : "❓"} Max ${multipvrecord[k][6] > -1 ? multipvrecord[k][6] : "❓"}) <evalnum>${showevalnum}</evalnum> → ${multipvrecord[k][4]}\n\n`;
+        pvinfostr += `${k > 0 ? "<hr />" : ""}Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5] > -1 ? multipvrecord[k][5] : "❓"} Max ${multipvrecord[k][6] > -1 ? multipvrecord[k][6] : "❓"}) <evalnum>${showevalnum}</evalnum> ${multipvrecord[k][4]}\n`;
         depthlist.push(multipvrecord[k][5]);
         seldepthlist.push(multipvrecord[k][6]);
       }
@@ -1843,7 +1858,7 @@ new Module().then((loadedModule) => {
     } else {
       return;
     }
-    console.log(
+    /*console.log(
       "MultiPV:",
       multipvid,
       "Bestmove:",
@@ -1854,7 +1869,7 @@ new Module().then((loadedModule) => {
       ponder[1],
       "Evaluation:",
       evaluation,
-    );
+    );*/
     if (board.turn()) {
       bestpv = evaluationindex.indexOf(
         Math.max(...evaluationindex.slice(0, recordedmultipv)),
