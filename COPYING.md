@@ -22,6 +22,7 @@ public/assets/images/pieces/(2dhanzi\|ataxx\|cannonshogi\|chak\|chennis\|dobutsu
 public/assets/images/variants/amazon/pieces/* | [dpldgr](https://github.com/dpldgr) | [dpldgr](https://github.com/dpldgr) | [GPLv3+] |
 public/assets/images/ui/chess/* | [Google Images](https://www.google.com/search/about-this-image?img=H4sIAAAAAAAA_wEYAOf_ChYIsbjLrorepu3XARD3yb7l5vWSjskBdRUZMxgAAAA%3D&q=https://abcnews.go.com/International/russian-chess-player-accused-poison-plot-championship/story?id%3D112702831&ctx=iv&hl=en&sa=X&ved=2ahUKEwiM9I-OybiJAxUUnIQIHTN8EeIQg4ILegQIABAS) | (Unknown) | (Unknown) |
 public/assets/images/ui/fsf/* | [fairy-stockfish.github.io](https://github.com/fairy-stockfish/fairy-stockfish.github.io/issues/5) | [Fabian Fichter](https://github.com/ianfab) | [CC BY-NC-SA 4.0] |
+public/assets/images/ui/landscape/* | [Alpha Coders](https://art.alphacoders.com/arts/view/43824) | (Unknown) | (Unknown) |
 public/assets/images/wallsquare/(brick\|duck).svg | [pychess-variants](https://github.com/gbtami/pychess-variants) | pychess-variants contributors (???) | [GPLv3+] |
 release_make/ldid/* | [Link Identity Editor Release](https://github.com/ProcursusTeam/ldid/releases) | [ProcursusTeam](https://github.com/ProcursusTeam) | [AGPLv3+] | Source code is not changed. Only used in the build process of this project. Files are not transferred to end users when accessing the webpage online or downloading the offline application.
 

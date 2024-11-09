@@ -123,6 +123,7 @@ npm install || Error
 npm run build || Error
 
 rm -f ./public/vercel.json
+rm -f ./public/serve.json
 find ./public -type f -name "original.*" -exec rm -f {} \;
 
 cp -r ./public ./release_make/release-builds/win/x64/
