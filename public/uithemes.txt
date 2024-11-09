@@ -28,3 +28,4 @@ neolight|Light Modern
 neodark|Dark Modern
 fsf|Fairy-Stockfish
 chess|Chess Set
+landscape|Chess Landscape

@@ -650,7 +650,6 @@
     height: 10%;
     border: 1px solid #ddd;
     padding: 10px;
-    margin-left: 20px;
     overflow-x: scroll;
     overflow-y: scroll;
     box-shadow: inset 1px 1px 2px #eee;
@@ -661,7 +660,6 @@
     height: 20%;
     border: 1px solid #ddd;
     padding: 10px;
-    margin-left: 20px;
     overflow-x: scroll;
     overflow-y: scroll;
     box-shadow: inset 1px 1px 2px #eee;
@@ -672,7 +670,6 @@
     height: 70%;
     border: 1px solid #ddd;
     padding: 10px;
-    margin-left: 20px;
     overflow-x: scroll;
     overflow-y: scroll;
     box-shadow: inset 1px 1px 2px #eee;
@@ -5096,151 +5093,153 @@
         const is_ready = stockfish_state == "READY";
 
         return m("main", [
-          m("p#pagetitle", "Advanced analysis"),
-          m("div#misc", { hidden: during_play }, [
-            m("div", [
-              `Fairy-Stockfish: ${stockfish_state} - download: `,
-              m(RequestProgress, {
-                url: "./lib/stockfish.wasm",
-                onFinishDownload,
-              }),
-            ]),
-            m("div", { hidden: during_play }, [
-              "- nnue file: ",
-              m("input", {
-                type: "file",
-                disabled: !is_ready,
-                onchange: onSelectNnueFile,
-              }),
-              m(
-                "span",
-                {
-                  style: "cursor: pointer;",
-                  onclick: () =>
-                    window.alert(
-                      "You can upload a Fairy-Stockfish compatible .nnue file. Downloads: https://fairy-stockfish.github.io/nnue/#current-best-nnue-networks.",
-                    ),
-                },
-                "[?]",
-              ),
-            ]),
-            m("div", { hidden: during_play }, [
-              "- variants.ini: ",
-              m("input#variants-ini", {
-                type: "file",
-                disabled: !is_ready || review_mode || board_setup_mode,
-                onchange: onSelectVariantsFile,
-              }),
-              m(
-                "span",
-                {
-                  style: "cursor: pointer;",
-                  onclick: () =>
-                    window.alert(
-                      "You can upload a Fairy-Stockfish compatible variants.ini file. See here for details: https://github.com/ianfab/Fairy-Stockfish/wiki/Variant-configuration.",
-                    ),
-                },
-                "[?]",
-              ),
-            ]),
-            m("div", { hidden: during_play }, [
-              "- positionvariants.txt: ",
-              m("input#posvariant-txt", {
-                type: "file",
-                disabled: !is_ready || review_mode || board_setup_mode,
-              }),
-              m(
-                "span",
-                {
-                  style: "cursor: pointer;",
-                  onclick: () =>
-                    window.alert(
-                      "You can select a Position Variant file to load different positions for different variants. Contents will be appended to the position variants provided by the server.",
-                    ),
-                },
-                "[?]",
-              ),
-            ]),
-            m("div", { hidden: during_play }, [
-              "- User Piece Graphics: ",
-              m("input#user-graphics", {
-                type: "file",
-                multiple: true,
-                disabled: !is_ready || review_mode || board_setup_mode,
-                onchange: onSelectUserGraphics,
-              }),
-              m(
-                "span",
-                {
-                  style: "cursor: pointer;",
-                  onclick: () =>
-                    window.alert(
-                      "You can upload user defined piece graphics. They must be named as follows [piece colour][+][piece letter].svg.",
-                    ),
-                },
-                "[?]",
-              ),
-            ]),
-            m("div", { hidden: during_play }, [
-              "- variantsettings.txt: ",
-              m("input#variantsettings-txt", {
-                type: "file",
-                disabled: !is_ready || review_mode || board_setup_mode,
-                onchange: onSelectVariantSettings,
-              }),
-              m(
-                "span",
-                {
-                  style: "cursor: pointer;",
-                  onclick: () =>
-                    window.alert(
-                      "You can upload a Variant Settings file to load settings for the variants including classification, names and descriptions. Contents will be appended to the variant descriptions provided by the server.",
-                    ),
-                },
-                "[?]",
-              ),
-            ]),
-            m("div#divconnectserver", { hidden: during_play }, [
-              "- External binary engine feature: ",
-              m(
-                "button",
-                {
+          m("div#pageheader", [
+            m("p#pagetitle", "Advanced analysis"),
+            m("div#misc", { hidden: during_play }, [
+              m("div", [
+                `Fairy-Stockfish: ${stockfish_state} - download: `,
+                m(RequestProgress, {
+                  url: "./lib/stockfish.wasm",
+                  onFinishDownload,
+                }),
+              ]),
+              m("div", { hidden: during_play }, [
+                "- nnue file: ",
+                m("input", {
+                  type: "file",
                   disabled: !is_ready,
-                  onclick: () => {
-                    if (!is_ready) {
-                      return;
-                    }
-                    if (fge.WebSocketStatus == "CONNECTED") {
-                      window.alert("You are already connected.");
-                      return;
-                    } else if (fge.WebSocketStatus == "CONNECTING") {
+                  onchange: onSelectNnueFile,
+                }),
+                m(
+                  "span",
+                  {
+                    style: "cursor: pointer;",
+                    onclick: () =>
                       window.alert(
-                        "Connection is during establishment process.",
-                      );
-                      return;
-                    }
-                    let port = window.prompt(
-                      "Please enter the WebSocket port of local fairyground server:",
-                      "5016",
-                    );
-                    if (port) {
-                      connectToWebSocketServer(port);
-                    }
+                        "You can upload a Fairy-Stockfish compatible .nnue file. Downloads: https://fairy-stockfish.github.io/nnue/#current-best-nnue-networks.",
+                      ),
                   },
-                },
-                "CONNECT",
-              ),
-              m(
-                "span",
-                {
-                  style: "cursor: pointer;",
-                  onclick: () =>
-                    window.alert(
-                      "If you are using online version of fairyground, external binary engine loading feature will not be enabled automatically. You need to provide the port of local (i.e. offline version) fairyground server in order to make it work.",
-                    ),
-                },
-                "[?]",
-              ),
+                  "[?]",
+                ),
+              ]),
+              m("div", { hidden: during_play }, [
+                "- variants.ini: ",
+                m("input#variants-ini", {
+                  type: "file",
+                  disabled: !is_ready || review_mode || board_setup_mode,
+                  onchange: onSelectVariantsFile,
+                }),
+                m(
+                  "span",
+                  {
+                    style: "cursor: pointer;",
+                    onclick: () =>
+                      window.alert(
+                        "You can upload a Fairy-Stockfish compatible variants.ini file. See here for details: https://github.com/ianfab/Fairy-Stockfish/wiki/Variant-configuration.",
+                      ),
+                  },
+                  "[?]",
+                ),
+              ]),
+              m("div", { hidden: during_play }, [
+                "- positionvariants.txt: ",
+                m("input#posvariant-txt", {
+                  type: "file",
+                  disabled: !is_ready || review_mode || board_setup_mode,
+                }),
+                m(
+                  "span",
+                  {
+                    style: "cursor: pointer;",
+                    onclick: () =>
+                      window.alert(
+                        "You can select a Position Variant file to load different positions for different variants. Contents will be appended to the position variants provided by the server.",
+                      ),
+                  },
+                  "[?]",
+                ),
+              ]),
+              m("div", { hidden: during_play }, [
+                "- User Piece Graphics: ",
+                m("input#user-graphics", {
+                  type: "file",
+                  multiple: true,
+                  disabled: !is_ready || review_mode || board_setup_mode,
+                  onchange: onSelectUserGraphics,
+                }),
+                m(
+                  "span",
+                  {
+                    style: "cursor: pointer;",
+                    onclick: () =>
+                      window.alert(
+                        "You can upload user defined piece graphics. They must be named as follows [piece colour][+][piece letter].svg.",
+                      ),
+                  },
+                  "[?]",
+                ),
+              ]),
+              m("div", { hidden: during_play }, [
+                "- variantsettings.txt: ",
+                m("input#variantsettings-txt", {
+                  type: "file",
+                  disabled: !is_ready || review_mode || board_setup_mode,
+                  onchange: onSelectVariantSettings,
+                }),
+                m(
+                  "span",
+                  {
+                    style: "cursor: pointer;",
+                    onclick: () =>
+                      window.alert(
+                        "You can upload a Variant Settings file to load settings for the variants including classification, names and descriptions. Contents will be appended to the variant descriptions provided by the server.",
+                      ),
+                  },
+                  "[?]",
+                ),
+              ]),
+              m("div#divconnectserver", { hidden: during_play }, [
+                "- External binary engine feature: ",
+                m(
+                  "button",
+                  {
+                    disabled: !is_ready,
+                    onclick: () => {
+                      if (!is_ready) {
+                        return;
+                      }
+                      if (fge.WebSocketStatus == "CONNECTED") {
+                        window.alert("You are already connected.");
+                        return;
+                      } else if (fge.WebSocketStatus == "CONNECTING") {
+                        window.alert(
+                          "Connection is during establishment process.",
+                        );
+                        return;
+                      }
+                      let port = window.prompt(
+                        "Please enter the WebSocket port of local fairyground server:",
+                        "5016",
+                      );
+                      if (port) {
+                        connectToWebSocketServer(port);
+                      }
+                    },
+                  },
+                  "CONNECT",
+                ),
+                m(
+                  "span",
+                  {
+                    style: "cursor: pointer;",
+                    onclick: () =>
+                      window.alert(
+                        "If you are using online version of fairyground, external binary engine loading feature will not be enabled automatically. You need to provide the port of local (i.e. offline version) fairyground server in order to make it work.",
+                      ),
+                  },
+                  "[?]",
+                ),
+              ]),
             ]),
           ]),
           m("div#posvariantdiv", [
