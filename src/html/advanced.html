@@ -190,21 +190,33 @@
 
   #input {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
     margin-bottom: 10px;
   }
 
   #input2 {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
     margin-bottom: 10px;
   }
 
   #input3 {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
     margin-bottom: 10px;
   }
 
   #gamesettings {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
     margin-bottom: 10px;
   }
 
@@ -234,20 +246,21 @@
 
   #input #fen {
     width: 50%;
+    min-width: 450px;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
-    border-right: 0;
   }
 
   #input #move {
     width: 10%;
+    min-width: 100px;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
-    border-right: 0;
   }
 
   #input2 #movetime {
     width: 5%;
+    min-width: 75px;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
@@ -260,6 +273,7 @@
 
   #input2 #depth {
     width: 5%;
+    min-width: 75px;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
@@ -272,6 +286,7 @@
 
   #input2 #nodes {
     width: 5%;
+    min-width: 75px;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
@@ -284,6 +299,7 @@
 
   #input2 #threads {
     width: 5%;
+    min-width: 75px;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
@@ -296,6 +312,7 @@
 
   #input2 #hash {
     width: 5%;
+    min-width: 75px;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
@@ -308,6 +325,7 @@
 
   #input2 #multipv {
     width: 5%;
+    min-width: 75px;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     border-right: 0;
@@ -496,7 +514,7 @@
   }
 
   #binengineinput {
-    margin-bottom: 5px;
+    margin-bottom: 10px;
   }
 
   #binengineinput button {
@@ -535,18 +553,30 @@
 
   #binengineinput #whiteenginesettings {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
   }
 
   #binengineinput #blackenginesettings {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
   }
 
   #binengineinput #analysisenginesettings {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
   }
 
   #posvariantdiv {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
     margin-bottom: 10px;
   }
 
@@ -910,6 +940,9 @@
 
   #advancedtimesettings #whitetimesettings {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
     margin-bottom: 10px;
   }
 
@@ -980,6 +1013,9 @@
 
   #advancedtimesettings #blacktimesettings {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
     margin-bottom: 10px;
   }
 
@@ -1050,6 +1086,9 @@
 
   #advancedtimesettings #gamecontrol-start {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
     margin-bottom: 10px;
   }
 
@@ -1276,6 +1315,12 @@
     overflow: scroll;
   }
 
+  #enginesettingspopup div {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
+  }
+
   #enginesettingspopup button {
     display: inline-block;
     padding: 3px 6px 3px 6px;
@@ -1332,6 +1377,12 @@
     background-color: white;
     border-radius: 5px;
     overflow: scroll;
+  }
+
+  #enginemanagementpopup div {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
   }
 
   #enginemanagementpopup button {
@@ -1392,6 +1443,12 @@
     overflow: scroll;
   }
 
+  #enginesetuppopup div {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
+  }
+
   #enginesetuppopup button {
     display: inline-block;
     padding: 3px 6px 3px 6px;
@@ -1450,6 +1507,12 @@
     background-color: white;
     border-radius: 5px;
     overflow: scroll;
+  }
+
+  #loadsavedgamespopup div {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
   }
 
   #loadsavedgamespopup button {
