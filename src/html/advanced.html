@@ -2560,6 +2560,10 @@
         const pagebackground = document.getElementById("pagebackground");
         const htmlComputedStyle = window.getComputedStyle(pagebackground);
         const BGBefore = htmlComputedStyle.backgroundImage;
+        const BGBeforeSize = htmlComputedStyle.backgroundSize;
+        const BGBeforeRepeat = htmlComputedStyle.backgroundRepeat;
+        const BGBeforePosition = htmlComputedStyle.backgroundPosition;
+        const BGBeforeAttachment = htmlComputedStyle.backgroundAttachment;
         if (currentuicss != null) {
           document.head.removeChild(currentuicss);
         }
@@ -2567,15 +2571,56 @@
         document.head.appendChild(currentuicss);
         const htmlComputedStyleAfter = window.getComputedStyle(pagebackground);
         const BGAfter = htmlComputedStyleAfter.backgroundImage;
+        const BGAfterSize = htmlComputedStyleAfter.backgroundSize;
+        const BGAfterRepeat = htmlComputedStyleAfter.backgroundRepeat;
+        const BGAfterPosition = htmlComputedStyleAfter.backgroundPosition;
+        const BGAfterAttachment = htmlComputedStyleAfter.backgroundAttachment;
+
+        const tmpbg = document.createElement("div");
+        const tmpbg2 = document.createElement("div");
 
         if (BGBefore != "none") {
-          const tmpbg = document.createElement("div");
           tmpbg.className = "bg-animation";
           tmpbg.style.backgroundImage = BGBefore;
+          tmpbg.style.backgroundSize = BGBeforeSize;
+          tmpbg.style.backgroundRepeat = BGBeforeRepeat;
+          tmpbg.style.backgroundPosition = BGBeforePosition;
+          tmpbg.style.backgroundAttachment = BGBeforeAttachment;
           tmpbg.className = "backgroundimg";
           tmpbg.style.opacity = "1";
           tmpbg.style.zIndex = "-1";
           document.body.appendChild(tmpbg);
+        }
+        if (BGAfter != "none") {
+          tmpbg2.className = "bg-animation";
+          tmpbg2.style.backgroundImage = BGAfter;
+          tmpbg2.style.backgroundSize = BGAfterSize;
+          tmpbg2.style.backgroundRepeat = BGAfterRepeat;
+          tmpbg2.style.backgroundPosition = BGAfterPosition;
+          tmpbg2.style.backgroundAttachment = BGAfterAttachment;
+          tmpbg2.className = "backgroundimg";
+          tmpbg2.style.opacity = "0";
+          tmpbg2.style.zIndex = "-2";
+          document.body.appendChild(tmpbg2);
+        }
+        if (BGBefore != "none" && BGAfter != "none") {
+          pagebackground.style.opacity = "0";
+          LinearTransition(
+            1,
+            0,
+            -0.02,
+            10,
+            (val) => {
+              tmpbg.style.opacity = `${val}`;
+              tmpbg2.style.opacity = `${1 - val}`;
+            },
+            () => {
+              pagebackground.style.opacity = "1";
+              document.body.removeChild(tmpbg);
+              document.body.removeChild(tmpbg2);
+            },
+          );
+        } else if (BGBefore != "none") {
           LinearTransition(
             1,
             0,
@@ -2588,17 +2633,8 @@
               document.body.removeChild(tmpbg);
             },
           );
-        }
-
-        if (BGAfter != "none") {
-          const tmpbg2 = document.createElement("div");
-          tmpbg2.className = "bg-animation";
-          tmpbg2.style.backgroundImage = BGAfter;
-          tmpbg2.className = "backgroundimg";
-          tmpbg2.style.opacity = "0";
-          tmpbg2.style.zIndex = "-2";
+        } else if (BGAfter != "none") {
           pagebackground.style.opacity = "0";
-          document.body.appendChild(tmpbg2);
           LinearTransition(
             0,
             1,
