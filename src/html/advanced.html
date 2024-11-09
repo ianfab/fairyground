@@ -594,14 +594,14 @@
 
   #posvariantdiv #dropdown-posvarianttype {
     min-width: 120px;
-    max-width: 200px;
+    max-width: 150px;
     background: #eee;
     margin-left: 5px;
   }
 
   #posvariantdiv #dropdown-posvariantname {
     min-width: 120px;
-    max-width: 200px;
+    max-width: 150px;
     background: #eee;
     margin-left: 5px;
     margin-right: 5px;
@@ -651,6 +651,7 @@
     padding: 10px;
     margin-left: 20px;
     font-size: 16px;
+    margin-bottom: 5px;
   }
 
   #info #timecontrolduringplay button {
@@ -661,6 +662,7 @@
     font-weight: bold;
     margin-right: 6px;
     cursor: pointer;
+    margin-bottom: 5px;
   }
 
   #info #timecontrolduringplay button:hover {
@@ -730,6 +732,11 @@
     padding: 10px 10px 10px 10px;
   }
 
+  #info #timers.vertical {
+    width: 314px;
+    height: 284px;
+  }
+
   #info #timers #whitetimer {
     float: left;
     width: 290px;
@@ -739,6 +746,10 @@
     background-color: white;
     text-align: center;
     overflow: hidden;
+  }
+
+  #info #timers.vertical #whitetimer {
+    float: none;
   }
 
   #info #timers #blacktimer {
@@ -752,8 +763,16 @@
     overflow: hidden;
   }
 
+  #info #timers.vertical #blacktimer {
+    float: none;
+    margin-top: 20px;
+  }
+
   #info #enginecmddiv {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 0px;
     margin-bottom: 10px;
   }
 
@@ -1128,6 +1147,12 @@
     position: relative;
   }
 
+  #evalbar.round {
+    width: 90px;
+    height: 90px;
+    border-radius: 45px;
+  }
+
   #evalbar #evalbarprogress {
     float: left;
     height: 100%;
@@ -1147,6 +1172,12 @@
     font-size: 25px;
     font-weight: bold;
     font-family: Arial, "Times New Roman", Georgia, Serif;
+  }
+
+  #evalbar.round #cp {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 
   #evalinfo {
@@ -1177,10 +1208,6 @@
     font-family: FontAwesome;
     font-size: 16px;
     color: black;
-  }
-
-  #timecontrolduringplay {
-    margin-bottom: 5px;
   }
 
   #evaluation {
@@ -1928,6 +1955,23 @@
         );
         variantsystemready = true;
       }
+      document
+        .getElementById("dropdown-variant")
+        .addEventListener("change", () => {
+          setTimeout(() => {
+            updateInfoDivWidth();
+          }, 10);
+        });
+      document
+        .getElementById("dropdown-uitheme")
+        .addEventListener("change", () => {
+          setTimeout(() => {
+            updateInfoDivWidth();
+          }, 10);
+        });
+      window.addEventListener("resize", () => {
+        updateInfoDivWidth();
+      });
     });
 
     document.addEventListener("uithemesparsed", () => {
@@ -2796,6 +2840,58 @@
         }
       } else {
         return variantsettings[4][index];
+      }
+    }
+
+    function updateInfoDivWidth() {
+      let cutoffwidth = 65;
+      let rootdiv = document.getElementById("root");
+      let rootdivstyle = window.getComputedStyle(rootdiv);
+      let rootwidth = parseFloat(rootdivstyle.width);
+      let rootpadding =
+        parseFloat(rootdivstyle.paddingLeft) +
+        parseFloat(rootdivstyle.paddingRight);
+      let boardstyle = window.getComputedStyle(
+        document.getElementById("chessground-board"),
+      );
+      let boardwidth = parseFloat(boardstyle.width);
+      let boardmargin =
+        parseFloat(boardstyle.marginLeft) + parseFloat(boardstyle.marginRight);
+      let infodiv = document.getElementById("info");
+      let infodivstyle = window.getComputedStyle(infodiv);
+      let infodivmargin =
+        parseFloat(infodivstyle.marginLeft) +
+        parseFloat(infodivstyle.marginRight);
+      let finalwidth =
+        rootwidth -
+        boardwidth -
+        boardmargin -
+        infodivmargin -
+        rootpadding -
+        cutoffwidth;
+      document.getElementById("output2").style.width =
+        document.getElementById("currentboardfen").style.width =
+        document.getElementById("label-pgn").style.width =
+        document.getElementById("enginecmddiv").style.width =
+        document.getElementById("positioninfo").style.width =
+        document.getElementById("evalinfo").style.width =
+        document.getElementById("pvinfo").style.width =
+        document.getElementById("sannotation").style.maxWidth =
+          `${finalwidth < 200 ? 200 : finalwidth}px`;
+      if (finalwidth < 200) {
+        document.body.style.overflowX = "scroll";
+      } else {
+        document.body.style.overflowX = "hidden";
+      }
+      if (finalwidth < 640) {
+        document.getElementById("timers").classList.add("vertical");
+      } else {
+        document.getElementById("timers").classList.remove("vertical");
+      }
+      if (finalwidth < 420) {
+        document.getElementById("evalbar").classList.add("round");
+      } else {
+        document.getElementById("evalbar").classList.remove("round");
       }
     }
 
