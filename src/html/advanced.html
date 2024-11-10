@@ -505,7 +505,13 @@
     flex: 1 1 auto;
     margin-top: 10px;
     width: 100%;
-    height: 50%;
+    height: fit-content;
+  }
+
+  #outputs.vertical {
+    position: static;
+    flex-direction: column;
+    flex-flow: column;
   }
 
   #movecontrol {
@@ -639,12 +645,13 @@
     padding: 10px;
     margin-left: 10px;
     font-size: 16px;
-    height: 600px;
+    height: fit-content;
   }
 
   #info #sannotation {
     background: #eee;
     margin-bottom: 10px;
+    height: 20px;
   }
 
   #info #timecontrolduringplay {
@@ -679,7 +686,7 @@
   }
 
   #currentboardfen {
-    height: 10%;
+    height: 60px;
     border: 1px solid #ddd;
     padding: 10px;
     overflow-x: scroll;
@@ -689,7 +696,7 @@
   }
 
   #label-pgn {
-    height: 20%;
+    height: 120px;
     border: 1px solid #ddd;
     padding: 10px;
     overflow-x: scroll;
@@ -699,7 +706,7 @@
   }
 
   #output2 {
-    height: 70%;
+    height: 420px;
     border: 1px solid #ddd;
     padding: 10px;
     overflow-x: scroll;
@@ -720,6 +727,11 @@
     margin: 20px;
     font-size: 20px;
     text-decoration: none;
+  }
+
+  #linkdivhr {
+    border: 1px solid #aaa;
+    margin-bottom: 5px;
   }
 
   #info #timers {
@@ -2869,29 +2881,47 @@
         infodivmargin -
         rootpadding -
         cutoffwidth;
-      document.getElementById("output2").style.width =
-        document.getElementById("currentboardfen").style.width =
-        document.getElementById("label-pgn").style.width =
-        document.getElementById("enginecmddiv").style.width =
-        document.getElementById("positioninfo").style.width =
-        document.getElementById("evalinfo").style.width =
-        document.getElementById("pvinfo").style.width =
-        document.getElementById("sannotation").style.maxWidth =
-          `${finalwidth < 200 ? 200 : finalwidth}px`;
-      if (finalwidth < 200) {
-        document.body.style.overflowX = "scroll";
+      if (finalwidth < 240) {
+        if (finalwidth < 20) {
+          document.body.style.overflowX = "scroll";
+        } else {
+          document.body.style.overflowX = "hidden";
+        }
+        document.getElementById("timers").classList.remove("vertical");
+        document.getElementById("evalbar").classList.remove("round");
+        document.getElementById("outputs").classList.add("vertical");
+        let finalwidth2 = rootwidth - infodivmargin - rootpadding - cutoffwidth;
+        document.getElementById("output2").style.width =
+          document.getElementById("currentboardfen").style.width =
+          document.getElementById("label-pgn").style.width =
+          document.getElementById("enginecmddiv").style.width =
+          document.getElementById("positioninfo").style.width =
+          document.getElementById("evalinfo").style.width =
+          document.getElementById("pvinfo").style.width =
+          document.getElementById("sannotation").style.maxWidth =
+            `${finalwidth2}px`;
       } else {
         document.body.style.overflowX = "hidden";
-      }
-      if (finalwidth < 640) {
-        document.getElementById("timers").classList.add("vertical");
-      } else {
-        document.getElementById("timers").classList.remove("vertical");
-      }
-      if (finalwidth < 420) {
-        document.getElementById("evalbar").classList.add("round");
-      } else {
-        document.getElementById("evalbar").classList.remove("round");
+        document.getElementById("outputs").classList.remove("vertical");
+        if (finalwidth < 420) {
+          document.getElementById("evalbar").classList.add("round");
+        } else {
+          document.getElementById("evalbar").classList.remove("round");
+        }
+        if (finalwidth < 640) {
+          document.getElementById("timers").classList.add("vertical");
+        } else {
+          document.getElementById("timers").classList.remove("vertical");
+        }
+        document.getElementById("output2").style.width =
+          document.getElementById("currentboardfen").style.width =
+          document.getElementById("label-pgn").style.width =
+          document.getElementById("enginecmddiv").style.width =
+          document.getElementById("positioninfo").style.width =
+          document.getElementById("evalinfo").style.width =
+          document.getElementById("pvinfo").style.width =
+          document.getElementById("sannotation").style.maxWidth =
+            `${finalwidth}px`;
       }
     }
 
@@ -6945,12 +6975,6 @@
                   ),
                 ]),
               ]),
-              m("div#links", [
-                m("a[href='./index.html']", "play"),
-                m("a[href='./advanced.html']", "advanced"),
-                m("a[href='./resources.html']", "resources"),
-                m("a[href='https://github.com/ianfab/fairyground']", "github"),
-              ]),
             ]),
             m("div#info", [
               m(
@@ -7274,6 +7298,13 @@
                 ),
               ]),
             ]),
+          ]),
+          m("hr#linkdivhr"),
+          m("div#links", [
+            m("a[href='./index.html']", "play"),
+            m("a[href='./advanced.html']", "advanced"),
+            m("a[href='./resources.html']", "resources"),
+            m("a[href='https://github.com/ianfab/fairyground']", "github"),
           ]),
           m("div#moveselectiondialog", { hidden: !select_move_dialog }, [
             m("div#moveslectdiv", [

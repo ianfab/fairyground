@@ -400,6 +400,11 @@ evalnum:after {
     border: double #ccc !important;
 }
 
+#linkdivhr {
+    border: 1px solid #ccc;
+    box-shadow: 0px 0px 3px 2px #000;
+}
+
 #pagebackground {
   background-image: url('./assets/images/ui/landscape/landscape.avif');
 }

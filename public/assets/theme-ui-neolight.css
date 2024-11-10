@@ -388,3 +388,7 @@ a:visited {
 #loadsavedgamespopup {
     background: linear-gradient(to bottom, #fff 0%, #fff 20%, #eee 100%) !important;
 }
+
+#linkdivhr {
+    border: 1px solid #3584e4;
+}

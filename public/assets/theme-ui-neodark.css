@@ -419,3 +419,7 @@ evalnum:after {
 #loadsavedgamespopup {
     background: linear-gradient(to bottom, #555 0%, #222 100%) !important;
 }
+
+#linkdivhr {
+    border: 1px solid #ff5d17;
+}
