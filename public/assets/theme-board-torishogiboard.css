@@ -11,6 +11,13 @@
   display: block;
 }
 
+.torishogiboard.board7x7 .cg-wrap.micro {
+  width: calc(546px * 0.5);
+  height: calc(630px * 0.5);
+  position: relative;
+  display: block;
+}
+
 .torishogiboard.board7x7 .cg-wrap piece {
   position: absolute;
 }

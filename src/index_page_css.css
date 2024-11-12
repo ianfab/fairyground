@@ -70,6 +70,10 @@
   display: none !important;
 }
 
+#label-advpgnmode {
+  display: none !important;
+}
+
 #whitetimemargin {
   display: none !important;
 }

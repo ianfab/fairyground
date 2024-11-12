@@ -11,7 +11,19 @@
   display: block;
 }
 
+.gorogoroboard.board5x6 .cg-wrap.micro {
+  width: calc(520px * 0.5);
+  height: calc(720px * 0.5);
+  position: relative;
+  display: block;
+}
+
 .gorogoroboard.board5x6 .cg-wrap piece {
   position: absolute;
   margin-left: -6px;
+}
+
+.gorogoroboard.board5x6 .cg-wrap.micro piece {
+  position: absolute;
+  margin-left: -3px;
 }

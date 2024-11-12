@@ -3,6 +3,10 @@
 }
 
 #enginemanagementpopup {
+  background-color: #0000 !important;
+}
+
+#enginemanagementpopup-background {
   background-image: url('./assets/images/ui/chess/chess.avif');
   background-size: cover;
   background-repeat: no-repeat;
@@ -10,6 +14,10 @@
 }
 
 #enginesetuppopup {
+  background-color: #0000 !important;
+}
+
+#enginesetuppopup-background {
   background-image: url('./assets/images/ui/chess/chess.avif');
   background-size: cover;
   background-repeat: no-repeat;
@@ -17,6 +25,10 @@
 }
 
 #enginesettingspopup {
+  background-color: #0000 !important;
+}
+
+#enginesettingspopup-background {
   background-image: url('./assets/images/ui/chess/chess.avif');
   background-size: cover;
   background-repeat: no-repeat;
@@ -24,6 +36,10 @@
 }
 
 #loadsavedgamespopup {
+  background-color: #0000 !important;
+}
+
+#loadsavedgamespopup-background {
   background-image: url('./assets/images/ui/chess/chess.avif');
   background-size: cover;
   background-repeat: no-repeat;

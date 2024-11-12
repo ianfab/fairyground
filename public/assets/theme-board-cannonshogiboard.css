@@ -11,6 +11,13 @@
   display: block;
 }
 
+.cannonshogiboard.board9x9 .cg-wrap.micro {
+  width: calc(587px * 0.5);
+  height: calc(640px * 0.5);
+  position: relative;
+  display: block;
+}
+
 .cannonshogiboard.board9x9 .cg-wrap piece {
   position: absolute;
 }

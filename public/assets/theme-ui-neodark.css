@@ -230,23 +230,27 @@ button {
     border-radius: 10px;
 }
 
-    button:hover {
-        background-color: rgba(150, 150, 150, 1) !important;
-    }
+button.operationdivbutton {
+    border-width: 0;
+}
 
-    button:active {
-        transition-duration: 0.05s;
-        background-color: rgba(0, 0, 0, 1) !important;
-    }
+button:hover {
+    background-color: rgba(150, 150, 150, 1) !important;
+}
 
-    button:disabled {
-        color: #000 !important;
-        background-color: rgba(100, 100, 100, 1) !important;
-    }
+button:active {
+    transition-duration: 0.05s;
+    background-color: rgba(0, 0, 0, 1) !important;
+}
 
-    button:focus {
-        box-shadow: 0px 0px 3px 3px #ff5d17;
-    }
+button:disabled {
+    color: #000 !important;
+    background-color: rgba(100, 100, 100, 1) !important;
+}
+
+button:focus {
+    box-shadow: 0px 0px 3px 3px #ff5d17;
+}
 
 input::-webkit-input-placeholder {
     color: #aaa;
@@ -269,9 +273,8 @@ input::placeholder {
     opacity: 1;
 }
 
-spangameresult {
+spangameresult, spangameresultmini {
     color: #ff5d17 !important;
-    text-shadow: 0px 0px 2px #ff5d17;
 }
 
 table {
@@ -302,6 +305,10 @@ a:visited {
 
 .timer-active {
     box-shadow: 0px 0px 5px 5px #ff5d17;
+}
+
+.position-display-label:hover {
+    background-color: #ff5d17;
 }
 
 #pagebackground {
@@ -405,21 +412,72 @@ evalnum:after {
 }
 
 #enginemanagementpopup {
+    background-color: #0000 !important;
+}
+
+#enginemanagementpopup-background {
     background: linear-gradient(to bottom, #555 0%, #222 100%) !important;
 }
 
 #enginesetuppopup {
+    background-color: #0000 !important;
+}
+
+#enginesetuppopup-background  {
     background: linear-gradient(to bottom, #555 0%, #222 100%) !important;
 }
 
 #enginesettingspopup {
+    background-color: #0000 !important;
+}
+
+#enginesettingspopup-background  {
     background: linear-gradient(to bottom, #555 0%, #222 100%) !important;
 }
 
 #loadsavedgamespopup {
+    background-color: #0000 !important;
+}
+
+#loadsavedgamespopup-background  {
     background: linear-gradient(to bottom, #555 0%, #222 100%) !important;
 }
 
 #linkdivhr {
     border: 1px solid #ff5d17;
+}
+
+#chessground-mini-board-wrapper-div {
+    background-image: linear-gradient(to bottom, #555 0%, #222 100%);
+    border: 1px solid #ccc !important;
+    border-radius: 10px;
+}
+
+#lockminiboard:before, #lockminiboard:hover:before, #lockminiboard:active:before, #lockminiboard:disabled:before {
+    background-color: #0078d7 !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+.locked #lockminiboard:before {
+    background-color: forestgreen !important;
+}
+
+#pinminiboard:before, #pinminiboard:hover:before, #pinminiboard:active:before, #pinminiboard:disabled:before {
+    background-color: orangered !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+.pinned #pinminiboard:before {
+    background-color: rebeccapurple !important;
+}
+
+#closeminiboard:before, #closeminiboard:hover:before, #closeminiboard:active:before, #closeminiboard:disabled:before {
+    background-color: crimson !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
 }

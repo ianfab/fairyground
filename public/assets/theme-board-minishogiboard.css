@@ -11,7 +11,19 @@
   display: block;
 }
 
+.minishogiboard.board5x5 .cg-wrap.micro {
+  width: calc(433px * 0.5);
+  height: calc(500px * 0.5);
+  position: relative;
+  display: block;
+}
+
 .minishogiboard.board5x5 .cg-wrap piece {
   position: absolute;
   margin-left: -5px;
+}
+
+.minishogiboard.board5x5 .cg-wrap.micro piece {
+  position: absolute;
+  margin-left: -2.5px;
 }

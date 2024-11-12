@@ -1538,6 +1538,8 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
   table.AddRows(GameList);
   let popup = document.createElement("div");
   popup.id = "loadsavedgamespopup";
+  let background = document.createElement("div");
+  background.id = "loadsavedgamespopup-background";
   let title = document.createElement("p");
   title.id = "popup-title";
   title.innerHTML =
@@ -1667,6 +1669,9 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
   let closetext = document.createTextNode("Close");
   close.appendChild(closetext);
   close.onclick = function () {
+    while (document.getElementById("loadsavedgamespopup-background") != null) {
+      document.getElementById("loadsavedgamespopup-background").remove();
+    }
     while (document.getElementById("loadsavedgamespopup") != null) {
       document.getElementById("loadsavedgamespopup").remove();
     }
@@ -1775,8 +1780,11 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
   popup.appendChild(searchdiv);
   popup.appendChild(gameshowdiv);
   popup.style.display = "block";
-  popup.style.zIndex = "1001";
+  popup.style.zIndex = "1002";
+  background.style.display = "block";
+  background.style.zIndex = "1001";
   document.body.appendChild(popup);
+  document.body.appendChild(background);
 }
 
 window.fairyground.SavedGamesParsingFeature.ShowPGNOrEPDFileUI =

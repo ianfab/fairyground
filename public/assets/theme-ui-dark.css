@@ -89,9 +89,9 @@ input::-ms-input-placeholder {
 input::placeholder {
     color: #aaa;
     opacity: 1;
-}  
+}
 
-spangameresult {
+spangameresult, spangameresultmini {
     color: white !important;
 }
 
@@ -119,6 +119,11 @@ a:visited {
     color: mediumpurple;
 }
 
+.position-display-label:hover {
+    background-color: white !important;
+    color: black !important;
+}
+
 #timers {
     background-color: rgba(255, 255, 255, 0.5) !important;
 }
@@ -136,6 +141,11 @@ a:visited {
 
 evalnum:after {
     color: white !important;
+}
+
+#chessground-mini-board-wrapper-div {
+    background-color: black !important;
+    border: 2px solid white !important;
 }
 
 #enginemanagementpopup {

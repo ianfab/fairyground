@@ -1,6 +1,7 @@
 ﻿// ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
+const divMain = document.getElementsByTagName("main")[0];
 const variantsIni = document.getElementById("variants-ini");
 const dropdownVariant = document.getElementById("dropdown-variant");
 const buttonReset = document.getElementById("reset");
@@ -19,9 +20,22 @@ const labelStm = document.getElementById("label-stm");
 const chessgroundContainerEl = document.getElementById(
   "chessground-container-div",
 );
+const chessgroundMiniContainerEl = document.getElementById(
+  "chessground-mini-container-div",
+);
+const chessgroundMini = document.getElementById("chessground-mini");
+const chessgroundMiniBoardWrapper = document.getElementById(
+  "chessground-mini-board-wrapper-div",
+);
+const chessgroundMiniBoardOperations = document.getElementById(
+  "chessground-mini-board-operation-div",
+);
 const chessgroundEl = document.getElementById("chessground-board");
+const chessgroundMiniEl = document.getElementById("chessground-board-mini");
 const pocketTopEl = document.getElementById("pocket-top");
+const pocketTopMiniEl = document.getElementById("pocket-top-mini");
 const pocketBottomEl = document.getElementById("pocket-bottom");
+const pocketBottomMiniEl = document.getElementById("pocket-bottom-mini");
 const displayMoves = document.getElementById("displaymoves");
 const displayReady = document.getElementById("displayready");
 const isReviewMode = document.getElementById("isreviewmode");
@@ -44,6 +58,7 @@ const timeOutSide = document.getElementById("timeoutside");
 const loadThemes = document.getElementById("loadthemes");
 const initializeThemes = document.getElementById("initializethemes");
 const isBoardSetup = document.getElementById("isboardsetup");
+const isAdvPGNMode = document.getElementById("isadvpgnmode");
 const dropdownSetPiece = document.getElementById("dropdown-setpiece");
 const buttonClearBoard = document.getElementById("clearboard");
 const buttonInitialBoardPosition = document.getElementById("initboardpos");
@@ -100,6 +115,7 @@ const buttonhighlightmove = document.getElementById("highlightmove");
 const searchresultinfo = document.getElementById("searchresultinfo");
 const dropdownNotationSystem = document.getElementById("sannotation");
 const pRandomMoverGo = document.getElementById("randommovergo");
+const dropdownBoardCoordinate = document.getElementById("boardcoordinate");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
@@ -239,11 +255,35 @@ const pieces = [
   "+Z",
   "*",
 ];
+const simplenotations = [
+  "DEFAULT",
+  "SAN",
+  "LAN",
+  "SHOGI_HOSKING",
+  "SHOGI_HODGES",
+  "SHOGI_HODGES_NUMBER",
+  "JANGGI",
+  "XIANGQI_WXF",
+  "THAI_SAN",
+  "THAI_LAN",
+];
+const chessgroundnotations = [
+  "ALGEBRAIC", // English letters on bottom, Arabic numbers on side
+  "SHOGI_ENGLET", // Arabic numbers on top, English letters on side
+  "SHOGI_ARBNUM", // Arabic numbers on top and side
+  "SHOGI_HANNUM", // Arabic numbers on top, Kanji numbers on side
+  "JANGGI", // Arabic numbers on bottom and side, with 0 denoting 10th rank
+  "XIANGQI_ARBNUM", // Arabic numbers on top and bottom
+  "XIANGQI_HANNUM", // Arabic numbers on top, Hanzi numbers on bottom
+  "THAI_ALGEBRAIC", // Thai letters on bottom, Thai numbers on side
+];
+let ffishnotationobjects = null;
 var PositionVariantsDirectory = new Map();
 let EmptyMap = new Map();
 let ffish = null;
 let board = null;
 let chessground = null;
+let chessground_mini = null;
 var i = 0;
 const WHITE = true;
 const BLACK = false;
@@ -255,8 +295,210 @@ const maxmultipvcount = 4096;
 var recordedmultipv = 1;
 var previousclicktime = Date.now();
 var previousclicksquare = "00";
+var multipvminiboardtimer = null;
+//var PGNDiv = generateStaticPreviewDiv(512);
+
+class MultiplePrincipalVariationMiniBoardHandler {
+  constructor() {
+    this.Element = document.createElement("div");
+    this.Element.classList.add("multipv-miniboard-div");
+    this.StoredPrincipalVariationCount = 0;
+    this.ValidPrincipalVariationCount = 0;
+    this.PrincipalVariationElementList = [];
+    this.PrincipalVariationDataList = [];
+  }
+
+  destructor() {}
+
+  SetValidPrincipalVariationCount(PrincipalVariationCount) {
+    if (typeof PrincipalVariationCount != "number") {
+      throw TypeError(
+        "SetValidPrincipalVariationCount(PrincipalVariationCount:number)",
+      );
+    }
+    this.ValidPrincipalVariationCount = PrincipalVariationCount;
+  }
+
+  SetPrincipalVariation(
+    PrincipalVariationNumber,
+    VariantID,
+    Is960,
+    CurrentBoardFEN,
+    UCIMoves,
+    IsMate,
+    EvaluationNumber,
+    Depth,
+    SelectiveDepth,
+  ) {
+    if (
+      typeof PrincipalVariationNumber != "number" ||
+      typeof VariantID != "string" ||
+      typeof Is960 != "boolean" ||
+      typeof CurrentBoardFEN != "string" ||
+      typeof UCIMoves != "string" ||
+      typeof IsMate != "boolean" ||
+      typeof EvaluationNumber != "number" ||
+      typeof Depth != "number" ||
+      typeof SelectiveDepth != "number"
+    ) {
+      throw TypeError(
+        "SetPrincipalVariation(PrincipalVariationNumber:number, VariantID:string, Is960:boolean, CurrentBoardFEN:string, UCIMoves:string, IsMate:boolean, EvaluationNumber:number, Depth:number, SelectiveDepth:number)",
+      );
+    }
+    let i = 0;
+    if (this.PrincipalVariationDataList.length < PrincipalVariationNumber) {
+      for (
+        i = this.PrincipalVariationDataList.length;
+        i < PrincipalVariationNumber;
+        i++
+      ) {
+        this.PrincipalVariationDataList.push([
+          false,
+          null,
+          null,
+          null,
+          null,
+          null,
+        ]);
+      }
+      this.ValidPrincipalVariationCount = PrincipalVariationNumber;
+    }
+    let selected =
+      this.PrincipalVariationDataList[PrincipalVariationNumber - 1];
+    let evaluation = "";
+    if (IsMate) {
+      if (EvaluationNumber > 0) {
+        evaluation = `#+${parseInt(EvaluationNumber)}`;
+      } else {
+        evaluation = `#${parseInt(EvaluationNumber)}`;
+      }
+    } else {
+      if (EvaluationNumber > 0) {
+        evaluation = `+${EvaluationNumber.toFixed(2)}`;
+      } else {
+        evaluation = `${EvaluationNumber.toFixed(2)}`;
+      }
+    }
+    selected[0] = true;
+    selected[1] = `${PrincipalVariationNumber == 1 ? "" : "<hr />"}Principal Variation ${PrincipalVariationNumber}: (Depth: Average ${Depth > -1 ? Depth : "❓"} Max ${SelectiveDepth > -1 ? SelectiveDepth : "❓"}) <evalnum>${evaluation}</evalnum> `;
+    selected[2] = VariantID;
+    selected[3] = Is960;
+    selected[4] = CurrentBoardFEN;
+    selected[5] = UCIMoves;
+  }
+
+  GetMovesDivElement() {
+    if (
+      this.PrincipalVariationDataList.length < this.ValidPrincipalVariationCount
+    ) {
+      throw Error("Missing PV.");
+    }
+    let i = 0;
+    let deletelater = [];
+    if (
+      this.PrincipalVariationElementList.length <
+      this.ValidPrincipalVariationCount
+    ) {
+      for (
+        i = this.PrincipalVariationElementList.length;
+        i < this.ValidPrincipalVariationCount;
+        i++
+      ) {
+        let lineelem = document.createElement("div");
+        lineelem.classList.add("multipv-miniboard-pvline");
+        let textelem = document.createElement("p");
+        textelem.classList.add("multipv-miniboard-pvline-header");
+        lineelem.appendChild(textelem);
+        this.PrincipalVariationElementList.push(lineelem);
+      }
+    }
+    if (
+      this.StoredPrincipalVariationCount < this.ValidPrincipalVariationCount
+    ) {
+      for (
+        i = this.StoredPrincipalVariationCount;
+        i < this.ValidPrincipalVariationCount;
+        i++
+      ) {
+        this.Element.appendChild(this.PrincipalVariationElementList[i]);
+      }
+      this.StoredPrincipalVariationCount = this.ValidPrincipalVariationCount;
+    } else if (
+      this.StoredPrincipalVariationCount > this.ValidPrincipalVariationCount
+    ) {
+      for (
+        i = this.ValidPrincipalVariationCount;
+        i < this.StoredPrincipalVariationCount;
+        i++
+      ) {
+        this.Element.removeChild(this.PrincipalVariationElementList[i]);
+      }
+      this.StoredPrincipalVariationCount = this.ValidPrincipalVariationCount;
+    }
+    for (i = 0; i < this.ValidPrincipalVariationCount; i++) {
+      let selecteddata = this.PrincipalVariationDataList[i];
+      if (selecteddata[0]) {
+        selecteddata[0] = false;
+        let selected = this.PrincipalVariationElementList[i];
+        let moveselem = null;
+        let notationindex = simplenotations.indexOf(
+          dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,
+        );
+        selected.childNodes.item(0).innerHTML = selecteddata[1];
+        let existingmoveelem = selected.childNodes.item(1);
+        if (notationindex < 0) {
+          if (existingmoveelem) {
+            existingmoveelem.innerHTML = "";
+            existingmoveelem.innerText = getNotation(
+              dropdownNotationSystem[dropdownNotationSystem.selectedIndex]
+                .value,
+              selecteddata[2],
+              selecteddata[4],
+              selecteddata[3],
+              selecteddata[5],
+            );
+          } else {
+            moveselem = document.createElement("div");
+            moveselem.classList.add("multipv-miniboard-pvline-moves");
+            moveselem.innerText = getNotation(
+              dropdownNotationSystem[dropdownNotationSystem.selectedIndex]
+                .value,
+              selecteddata[2],
+              selecteddata[4],
+              selecteddata[3],
+              selecteddata[5],
+            );
+            selected.appendChild(moveselem);
+          }
+        } else {
+          if (existingmoveelem) {
+            deletelater.push(selected.removeChild(existingmoveelem));
+          }
+          moveselem = parseUCIMovesToPreviewElements(
+            selecteddata[2],
+            selecteddata[4],
+            selecteddata[3],
+            selecteddata[5],
+            `movediv-${i}`,
+            ffishnotationobjects[notationindex],
+          );
+          moveselem.classList.add("multipv-miniboard-pvline-moves");
+          selected.appendChild(moveselem);
+        }
+      }
+    }
+    setTimeout(() => {
+      let tmp = deletelater;
+      deletelater = null;
+    }, 500);
+    return this.Element;
+  }
+}
+
+let multipvminiboardhandler = new MultiplePrincipalVariationMiniBoardHandler();
 
 for (i = 0; i < maxmultipvcount; i++) {
+  //multipvrecord: Array<Array<IsMate:boolean, EvaluationNumber:number, BestMove:string, PonderMove:string, PrincipalVariationUCIMove:string, Depth:number, SelectiveDepth:number>>
   multipvrecord.push([null, null, null, null, null, null, null]);
   evaluationindex.push(0);
 }
@@ -301,6 +543,46 @@ function convertChessgroundXKeyToSquare(key) {
     "p",
   ];
   return key.charAt(0) + (ranks.indexOf(key.charAt(1)) + 1).toString();
+}
+
+function convertSquareToChessgroundXKey(square) {
+  const ranks = [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    ":",
+    ";",
+    "<",
+    "=",
+    ">",
+    "?",
+    "@",
+  ];
+  const files = [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+  ];
+  return square.charAt(0) + ranks[parseInt(square.substring(1)) - 1];
 }
 
 function getPieceRoles(pieceLetters) {
@@ -425,8 +707,39 @@ function initBoard(variant) {
     events: {
       select: onSelectSquare,
     },
+    notation: dropdownBoardCoordinate.selectedIndex,
+  };
+
+  const configmini = {
+    dimensions: getDimensions(),
+    fen: fenBoard,
+    movable: {
+      color: undefined,
+      dests: EmptyMap,
+    },
+    premovable: {
+      enabled: false,
+    },
+    draggable: {
+      enabled: false,
+    },
+    selectable: {
+      enabled: false,
+    },
+    drawable: {
+      enabled: false,
+    },
+    pocketRoles: pocketRoles,
+    viewOnly: true,
+    notation: dropdownBoardCoordinate.selectedIndex,
   };
   chessground = Chessground(chessgroundEl, config, pocketTopEl, pocketBottomEl);
+  chessground_mini = Chessground(
+    chessgroundMiniEl,
+    configmini,
+    pocketTopMiniEl,
+    pocketBottomMiniEl,
+  );
   chessground.state.drawable.brushes.black = {
     key: "black",
     color: "#000000",
@@ -435,6 +748,58 @@ function initBoard(variant) {
   };
 
   if (pocketRoles === undefined) {
+    pocketTopEl.style.display = "none";
+    pocketBottomEl.style.display = "none";
+    pocketTopMiniEl.style.display = "none";
+    pocketBottomMiniEl.style.display = "none";
+  }
+}
+
+function redrawChessground(customFEN) {
+  let fenBoard = "";
+  if (customFEN) {
+    fenBoard = customFEN;
+  } else {
+    fenBoard = board.fen().split(" ")[0];
+  }
+  const config = {
+    autoCastle: false,
+    dimensions: getDimensions(),
+    orientation: chessground.state.orientation,
+    fen: fenBoard,
+    check: chessground.state.check,
+    lastMove: chessground.state.lastMove,
+    movable: {
+      free: true,
+      color: chessground.state.movable.color,
+      dests: chessground.state.movable.dests,
+      showDests: checkboxDests.checked,
+      events: {
+        after: afterChessgroundMove,
+        afterNewPiece: afterChessgroundDrop,
+      },
+    },
+    draggable: {
+      showGhost: true,
+    },
+    selectable: {
+      enabled: clickClickMove.checked,
+    },
+    pocketRoles: chessground.state.pocketRoles,
+    events: {
+      select: onSelectSquare,
+    },
+    notation: dropdownBoardCoordinate.selectedIndex,
+    turnColor: chessground.state.turnColor,
+  };
+  chessground = Chessground(chessgroundEl, config, pocketTopEl, pocketBottomEl);
+  chessground.state.drawable.brushes.black = {
+    key: "black",
+    color: "#000000",
+    opacity: 1,
+    lineWidth: 10,
+  };
+  if (chessground.state.pocketRoles === undefined) {
     pocketTopEl.style.display = "none";
     pocketBottomEl.style.display = "none";
   }
@@ -590,6 +955,384 @@ function parseUCIMove(ucimove) {
   return [files[0] + ranks[0], files[1] + ranks[1], additional, gatingmove];
 }
 
+function parseUCIMovesToPreviewElements(
+  variant,
+  fen,
+  is960,
+  ucimoves,
+  elementid,
+  sannotation,
+) {
+  let moves = ucimoves.trim().split(" ");
+  let i = 0;
+  let movesparagraph = document.createElement("div");
+  movesparagraph.id = elementid;
+  movesparagraph.classList.add("board-display-san");
+  let movesan = "";
+  for (i = 0; i < moves.length; i++) {
+    if (moves[i] == "") {
+      moves.splice(i, 1);
+      i--;
+    }
+  }
+  let tmpboard = new ffish.Board(variant, fen, is960);
+  for (i = 0; i < moves.length; i++) {
+    if (i == 0) {
+      if (tmpboard.turn()) {
+        let fullmovenum = document.createElement("p");
+        fullmovenum.innerText = `${tmpboard.fullmoveNumber()}.`;
+        movesparagraph.appendChild(fullmovenum);
+      } else {
+        let fullmovenum = document.createElement("p");
+        fullmovenum.innerText = `${tmpboard.fullmoveNumber()}...`;
+        movesparagraph.appendChild(fullmovenum);
+      }
+    } else if (tmpboard.turn()) {
+      let fullmovenum = document.createElement("p");
+      fullmovenum.innerText = `${tmpboard.fullmoveNumber()}.`;
+      movesparagraph.appendChild(fullmovenum);
+    }
+    movesan = tmpboard.sanMove(moves[i], sannotation);
+    if (!tmpboard.push(moves[i])) {
+      tmpboard.delete();
+      return null;
+    }
+    let moveelement = document.createElement("p");
+    let move = parseUCIMove(moves[i]);
+    moveelement.innerText = movesan;
+    moveelement.classList.add("position-display-label");
+    moveelement.fenstr = tmpboard.fen();
+    moveelement.lastmove = [
+      move[0].replace("10", ":"),
+      move[1].replace("10", ":"),
+    ];
+    moveelement.moveturn = tmpboard.turn() ? "white" : "black";
+    moveelement.checked = getCheckSquares(tmpboard);
+    moveelement.gameresult = tmpboard.result();
+    /*
+        
+        TODO: Due to dynamic element removing and adding, sometimes clicking the element has no effect, especially when it's frequently updated.
+              The shorter the intervals of deleting previous div and creating a new one using this function is, the more frequent it happens.
+              For example, let 2 random movers play against each other and this happens frequently.
+
+              This is likely to be caused by clicking during the initialization period of these elements, so probably use static allocation which does not delete and create DOM objects, but modifies its content instead.
+        
+        */
+    moveelement.onclick = function () {
+      chessground_mini.set({
+        fen: this.fenstr,
+        orientation: chessground.state.orientation,
+        turnColor: this.moveturn,
+        check: this.checked,
+        lastMove: this.lastmove,
+        notation: chessground.state.notation,
+      });
+      //console.log(this.fenstr, this.moveturn, this.checked, this.lastmove);
+      if (chessgroundMini.style.display == "none") {
+        const rect = this.getBoundingClientRect();
+        const mainrect = divMain.getBoundingClientRect();
+        let chessgroundminirect = chessgroundMini.getBoundingClientRect();
+        while (chessgroundminirect.width == 0) {
+          chessgroundMini.style.display = "";
+          chessgroundminirect = chessgroundMini.getBoundingClientRect();
+        }
+        const padding = 10;
+        let offsetX = 0;
+        let offsetY = 0;
+        if (chessgroundMini.pinned) {
+          offsetX = rect.left;
+          offsetY = rect.top;
+        } else {
+          offsetX = rect.left - mainrect.left;
+          offsetY = rect.top - mainrect.top;
+        }
+        let finalX = offsetX;
+        let finalY = offsetY + 40;
+        if (chessgroundMini.pinned) {
+          if (
+            offsetX + chessgroundminirect.width >
+            window.innerWidth - padding
+          ) {
+            finalX -= chessgroundminirect.width;
+          }
+          if (
+            offsetY + chessgroundminirect.height >
+            window.innerHeight - padding
+          ) {
+            finalY = window.innerHeight - chessgroundminirect.height - padding;
+          }
+        } else {
+          if (offsetX + chessgroundminirect.width > mainrect.right - padding) {
+            finalX -= chessgroundminirect.width;
+          }
+        }
+        chessgroundMini.style.left = `${finalX}px`;
+        chessgroundMini.style.top = `${finalY}px`;
+        setTimeout(() => {
+          chessgroundMini.style.display = "";
+        }, 25);
+      }
+      if (this.gameresult != "*") {
+        let elem = document.getElementById("gameresultcontainermini");
+        while (elem) {
+          chessgroundMiniBoardWrapper.removeChild(elem);
+          elem = document.getElementById("gameresultcontainermini");
+        }
+        let operationrect =
+          chessgroundMiniBoardOperations.getBoundingClientRect();
+        let div = document.createElement("div");
+        div.id = "gameresultcontainermini";
+        div.classList.add("inaccessble");
+        div.style.position = "absolute";
+        div.style.display = "flex";
+        div.style.overflow = "hidden";
+        div.style.top = "0";
+        div.style.left = `${operationrect.width}px`;
+        div.style.bottom = "0";
+        div.style.right = "0";
+        div.style.justifyContent = "center";
+        div.style.alignItems = "center";
+        div.style.zIndex = "1000";
+        div.style.background = "rgba(0,0,0,0)";
+        div.style.pointerEvents = "none";
+        let spangameresultmini = document.createElement("spangameresultmini");
+        //let wrapperrect = chessgroundMiniBoardWrapper.getBoundingClientRect();
+
+        //let chessgroundminirect = chessgroundMini.getBoundingClientRect();
+        spangameresultmini.innerText = this.gameresult;
+        //spangameresultmini.style.left = `${(operationrect.width / chessgroundminirect.width + wrapperrect.width / 2 / chessgroundminirect.width) * 100}%`;
+        //spangameresultmini.style.top = "50%";
+        div.appendChild(spangameresultmini);
+        setTimeout(() => {
+          spangameresultmini.style.opacity = "1";
+          spangameresultmini.style.fontSize = "90px";
+        }, 100);
+        setTimeout(() => {
+          spangameresultmini.style.opacity = "0";
+          spangameresultmini.style.fontSize = "1px";
+        }, 2600);
+        setTimeout(() => {
+          chessgroundMiniBoardWrapper.removeChild(div);
+        }, 3200);
+        chessgroundMiniBoardWrapper.appendChild(div);
+      }
+    };
+    movesparagraph.appendChild(moveelement);
+    if (tmpboard.result() != "*") {
+      break;
+    }
+  }
+  if (tmpboard.result() != "*") {
+    let gameresult = document.createElement("p");
+    gameresult.innerText = tmpboard.result();
+    movesparagraph.appendChild(gameresult);
+  }
+  tmpboard.delete();
+  movesparagraph.movecount = moves.length;
+  return movesparagraph;
+}
+
+/*function generateStaticPreviewDiv(maxfullmovenumber) {
+    let i = 0;
+    let j = 0;
+    let movesparagraph = document.createElement("div");
+    movesparagraph.maxfullmovenumber = maxfullmovenumber;
+    movesparagraph.classList.add("board-display-san");
+    for (i = 0; i < maxfullmovenumber; i++) {
+        let fullmovenum = document.createElement("p");
+        movesparagraph.appendChild(fullmovenum);
+        for (i = 0; i < 2; j++) {
+            let moveelement = document.createElement("p");
+            moveelement.classList.add("position-display-label");
+            moveelement.fenstr = "";
+            moveelement.lastmove = [];
+            moveelement.moveturn = "";
+            moveelement.isincheck = false;
+            moveelement.gameresult = "";
+            moveelement.style.display = "none";
+            moveelement.onclick = function () {
+                chessground_mini.set({
+                    fen: this.fenstr,
+                    orientation: chessground.state.orientation,
+                    turnColor: this.moveturn,
+                    check: this.isincheck,
+                    lastMove: this.lastmove,
+                    notation: chessground.state.notation,
+                });
+                if (chessgroundMini.style.display == "none") {
+                    const rect = this.getBoundingClientRect();
+                    const mainrect = divMain.getBoundingClientRect();
+                    let chessgroundminirect = chessgroundMini.getBoundingClientRect();
+                    while (chessgroundminirect.width == 0) {
+                        chessgroundMini.style.display = "";
+                        chessgroundminirect = chessgroundMini.getBoundingClientRect();
+                    }
+                    const padding = 10;
+                    let offsetX = 0;
+                    let offsetY = 0;
+                    if (chessgroundMini.pinned) {
+                        offsetX = rect.left;
+                        offsetY = rect.top;
+                    }
+                    else {
+                        offsetX = rect.left - mainrect.left;
+                        offsetY = rect.top - mainrect.top;
+                    }
+                    let finalX = offsetX;
+                    let finalY = offsetY + 40;
+                    if (chessgroundMini.pinned) {
+                        if (offsetX + chessgroundminirect.width > window.innerWidth - padding) {
+                            finalX -= chessgroundminirect.width;
+                        }
+                        if (offsetY + chessgroundminirect.height > window.innerHeight - padding) {
+                            finalY = window.innerHeight - chessgroundminirect.height - padding;
+                        }
+                    }
+                    else {
+                        if (offsetX + chessgroundminirect.width > mainrect.right - padding) {
+                            finalX -= chessgroundminirect.width;
+                        }
+                    }
+                    chessgroundMini.style.left = `${finalX}px`;
+                    chessgroundMini.style.top = `${finalY}px`;
+                    setTimeout(() => {
+                        chessgroundMini.style.display = "";
+                    }, 25);
+                }
+                if (this.gameresult != "*") {
+                    let elem = document.getElementById("gameresultcontainermini");
+                    while (elem) {
+                        chessgroundMiniBoardWrapper.removeChild(elem);
+                        elem = document.getElementById("gameresultcontainermini");
+                    }
+                    let operationrect = chessgroundMiniBoardOperations.getBoundingClientRect();
+                    let div = document.createElement("div");
+                    div.id = "gameresultcontainermini";
+                    div.classList.add("inaccessble");
+                    div.style.position = "absolute";
+                    div.style.display = "flex";
+                    div.style.overflow = "hidden";
+                    div.style.top = "0";
+                    div.style.left = `${operationrect.width}px`;
+                    div.style.bottom = "0";
+                    div.style.right = "0";
+                    div.style.justifyContent = "center";
+                    div.style.alignItems = "center";
+                    div.style.zIndex = "1000";
+                    div.style.background = "rgba(0,0,0,0)";
+                    div.style.pointerEvents = "none";
+                    let spangameresultmini = document.createElement("spangameresultmini");
+                    spangameresultmini.innerText = this.gameresult;
+                    div.appendChild(spangameresultmini);
+                    setTimeout(() => {
+                        spangameresultmini.style.opacity = "1";
+                        spangameresultmini.style.fontSize = "80px";
+                    }, 100);
+                    setTimeout(() => {
+                        spangameresultmini.style.opacity = "0";
+                        spangameresultmini.style.fontSize = "1px";
+                    }, 2600);
+                    setTimeout(() => {
+                        chessgroundMiniBoardWrapper.removeChild(div);
+                    }, 3200);
+                    chessgroundMiniBoardWrapper.appendChild(div);
+                }
+            };
+            movesparagraph.appendChild(moveelement);
+        }
+    }
+    return movesparagraph;
+}
+
+function parseUCIMovesToPreviewElementsStatic(movesparagraph, variant, fen, is960, ucimoves, sannotation) {
+    if (movesparagraph == null || movesparagraph.maxfullmovenumber == undefined) {
+        return null;
+    }
+    let moves = ucimoves.trim().split(' ');
+    let i = 0;
+    let j = 0;
+    let tmpboard = new ffish.Board(variant, fen, is960);
+    let movesan = "";
+    for (i = 0; i < moves.length; i++) {
+        if (moves[i] == "") {
+            moves.splice(i, 1);
+            i--;
+        }
+    }
+    let childnodes = movesparagraph.childNodes;
+    for (i = 0, j = 0; true; i += 3) {
+        if (moves[j] == undefined) {
+            break;
+        }
+        if (i == 0) {
+            if (tmpboard.turn()) {
+                childnodes.item(0).innerText = `${tmpboard.fullmoveNumber()}.`;
+            }
+            else {
+                childnodes.item(0).innerText = `${tmpboard.fullmoveNumber()}...`;
+            }
+            childnodes.item(0).style.display = "";
+            childnodes.item(1).style.display = "none";
+            childnodes.item(2).style.display = "none";
+        }
+        else {
+            childnodes.item(i).innerText = `${tmpboard.fullmoveNumber()}.`;
+            childnodes.item(i).style.display = "";
+        }
+        movesan = tmpboard.sanMove(moves[j], sannotation);
+        if (!tmpboard.push(moves[j])) {
+            break;
+        }
+        let move = parseUCIMove(moves[j]);
+        if (!tmpboard.turn()) {
+            childnodes.item(i + 1).innerText = movesan;
+            childnodes.item(i + 1).fenstr = tmpboard.fen();
+            childnodes.item(i + 1).lastmove = [move[0].replace("10", ":"), move[1].replace("10", ":")];
+            childnodes.item(i + 1).moveturn = "black";
+            childnodes.item(i + 1).isincheck = tmpboard.isCheck();
+            childnodes.item(i + 1).gameresult = tmpboard.result();
+            childnodes.item(i + 1).style.display = "";
+            if (moves[j + 1] == undefined) {
+                break;
+            }
+            movesan = tmpboard.sanMove(moves[j + 1], sannotation);
+            if (!tmpboard.push(moves[j + 1])) {
+                break;
+            }
+            move = parseUCIMove(moves[j + 1]);
+            childnodes.item(i + 2).innerText = movesan;
+            childnodes.item(i + 2).fenstr = tmpboard.fen();
+            childnodes.item(i + 2).lastmove = [move[0].replace("10", ":"), move[1].replace("10", ":")];
+            childnodes.item(i + 2).moveturn = "white";
+            childnodes.item(i + 2).isincheck = tmpboard.isCheck();
+            childnodes.item(i + 2).gameresult = tmpboard.result();
+            childnodes.item(i + 2).style.display = "";
+            j += 2;
+        }
+        else {
+            childnodes.item(i + 1).style.display = "none";
+            childnodes.item(i + 2).innerText = movesan;
+            childnodes.item(i + 2).fenstr = tmpboard.fen();
+            childnodes.item(i + 2).lastmove = [move[0].replace("10", ":"), move[1].replace("10", ":")];
+            childnodes.item(i + 2).moveturn = "white";
+            childnodes.item(i + 2).isincheck = tmpboard.isCheck();
+            childnodes.item(i + 2).gameresult = tmpboard.result();
+            childnodes.item(i + 2).style.display = "";
+            j++;
+        }
+    }
+    if (tmpboard.result() != "*") {
+        childnodes.item(i).innerText = tmpboard.result();
+        childnodes.item(i).style.display = "";
+        i++;
+    }
+    for (i = i; i < 3 * movesparagraph.maxfullmovenumber; i++) {
+        childnodes.item(i).style.display = "none";
+    }
+    tmpboard.delete();
+    return movesparagraph;
+}*/
+
 function showWallSquares() {
   let wall_square_list = getWallSquarePosition();
   let i = 0;
@@ -663,6 +1406,7 @@ function addPieceToPocket(pieceid, color) {
       black: chessground.state.pocketRoles.black,
     },
   });
+  redrawChessground(getFEN());
 }
 
 function clearMovesList() {
@@ -1240,6 +1984,19 @@ new Module().then((loadedModule) => {
   soundTerminal.volume = rangeVolume.value;
   loadThemes.click();
   LoadPositionVariant("server", null);
+  ffishnotationobjects = [
+    ffish.Notation.DEFAULT,
+    ffish.Notation.SAN,
+    ffish.Notation.LAN,
+    ffish.Notation.SHOGI_HOSKING,
+    ffish.Notation.SHOGI_HODGES,
+    ffish.Notation.SHOGI_HODGES_NUMBER,
+    ffish.Notation.JANGGI,
+    ffish.Notation.XIANGQI_WXF,
+    ffish.Notation.THAI_SAN,
+    ffish.Notation.THAI_LAN,
+  ];
+  const singleblankmatcher = new RegExp("[ ]+");
 
   variantsIni.onchange = function (e) {
     const selected = e.currentTarget.files[0];
@@ -1270,17 +2027,28 @@ new Module().then((loadedModule) => {
       `board${newDimensions["width"]}x${newDimensions["height"]}`,
     );
 
+    chessgroundMiniContainerEl.classList.toggle(
+      `board${oldDimensions["width"]}x${oldDimensions["height"]}`,
+    );
+    chessgroundMiniContainerEl.classList.toggle(
+      `board${newDimensions["width"]}x${newDimensions["height"]}`,
+    );
+
     if (ffish.capturesToHand(dropdownVariant.value)) {
       console.log("pockets");
-      chessgroundContainerEl.classList.add(`pockets`);
-    } else chessgroundContainerEl.classList.remove(`pockets`);
+      chessgroundContainerEl.classList.add("pockets");
+      chessgroundMiniContainerEl.classList.add("pockets");
+    } else {
+      chessgroundContainerEl.classList.remove("pockets");
+      chessgroundMiniContainerEl.classList.remove("pockets");
+    }
     resetTimer();
     clearMovesList();
     let play_white = playWhite.checked;
     let play_black = playBlack.checked;
     buttonCurrentPosition.click();
 
-    updateChessground();
+    updateChessground(true);
     initializeThemes.click();
     setPieceList(getUsedPieceID(dropdownVariant.value));
     positionInformation.innerHTML = "";
@@ -1290,6 +2058,7 @@ new Module().then((loadedModule) => {
 
   buttonFlip.onclick = function () {
     chessground.toggleOrientation();
+    chessground_mini.toggleOrientation();
   };
 
   buttonUndo.onclick = function () {
@@ -1298,7 +2067,7 @@ new Module().then((loadedModule) => {
     }
     if (board.moveStack().length === 0) return;
     board.pop();
-    updateChessground();
+    updateChessground(true);
     chessground.cancelPremove();
     recordedmultipv = 1;
   };
@@ -1324,7 +2093,7 @@ new Module().then((loadedModule) => {
     }
     const fen = textFen.value;
     const WhiteSpaceMatcher = new RegExp("[ ]+", "");
-    console.log(ffish.validateFen(fen, board.variant()));
+    //console.log(ffish.validateFen(fen, board.variant()));
 
     if (!fen || ffish.validateFen(fen, board.variant()) >= 0) {
       if (fen) board.setFen(fen);
@@ -1349,7 +2118,7 @@ new Module().then((loadedModule) => {
       }
       textMoves.value = movelist.join(" ");
 
-      updateChessground();
+      updateChessground(true);
     } else {
       window.alert("Invalid FEN");
     }
@@ -1403,7 +2172,7 @@ new Module().then((loadedModule) => {
 
   isBoardSetup.onchange = function () {
     if (isBoardSetup.checked) {
-      updateChessground();
+      updateChessground(false);
       chessground.set({
         movable: {
           color: "both",
@@ -1416,6 +2185,10 @@ new Module().then((loadedModule) => {
     } else {
       buttonCurrentPosition.click();
     }
+  };
+
+  isAdvPGNMode.onchange = function () {
+    dropdownNotationSystem.dispatchEvent(new Event("change"));
   };
 
   buttonClearBoard.onclick = function () {
@@ -1724,12 +2497,12 @@ new Module().then((loadedModule) => {
     let bestmove = [];
     let ponder = [];
     if (text.includes(" score ") && text.includes(" pv ")) {
-      let textparselist = text.split(/[ ]+/);
-      let evaltext = textparselist.at(textparselist.indexOf("score") + 1);
+      let textparselist = text.split(singleblankmatcher);
+      let scoreindex = textparselist.indexOf("score");
+      let pvindex = textparselist.indexOf("pv");
+      let evaltext = textparselist.at(scoreindex + 1);
       if (evaltext == "mate") {
-        let matenum = parseInt(
-          textparselist.at(textparselist.indexOf("score") + 2),
-        );
+        let matenum = parseInt(textparselist.at(scoreindex + 2));
         if (!board.turn()) {
           matenum = matenum * -1;
         }
@@ -1738,8 +2511,7 @@ new Module().then((loadedModule) => {
         evaluationindex[multipvid] = mateevalfactor / matenum;
         evaluation = evaluationindex[multipvid];
       } else if (evaltext == "cp") {
-        let evalval =
-          parseInt(textparselist.at(textparselist.indexOf("score") + 2)) / 100;
+        let evalval = parseInt(textparselist.at(scoreindex + 2)) / 100;
         if (!board.turn()) {
           evalval = evalval * -1;
         }
@@ -1753,7 +2525,7 @@ new Module().then((loadedModule) => {
         evaluationindex[multipvid] = 0;
         console.log("Detected bad evaluation");
       }
-      let moves = textparselist.slice(textparselist.indexOf("pv") + 1);
+      let moves = textparselist.slice(pvindex + 1);
       if (moves.length == 0) {
         return;
       } else if (moves.length == 1) {
@@ -1764,13 +2536,7 @@ new Module().then((loadedModule) => {
       }
       multipvrecord[multipvid][2] = bestmove;
       multipvrecord[multipvid][3] = ponder;
-      multipvrecord[multipvid][4] = getNotation(
-        dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,
-        board.variant(),
-        board.fen(),
-        false,
-        textparselist.slice(textparselist.indexOf("pv") + 1).join(" "),
-      );
+      multipvrecord[multipvid][4] = moves.join(" ");
       index = textparselist.indexOf("depth");
       if (index > 0) {
         multipvrecord[multipvid][5] = parseInt(textparselist[index + 1]);
@@ -1785,29 +2551,63 @@ new Module().then((loadedModule) => {
       }
       //Update Evaluation Section
       let k = 0;
-      let pvinfostr = "";
-      let showevalnum = "";
       let seldepthlist = [];
       let depthlist = [];
-      for (k = 0; k < recordedmultipv; k++) {
-        if (multipvrecord[k][0]) {
-          if (multipvrecord[k][1] > 0) {
-            showevalnum = `#+${parseInt(multipvrecord[k][1])}`;
-          } else {
-            showevalnum = `#${parseInt(multipvrecord[k][1])}`;
-          }
-        } else {
-          if (multipvrecord[k][1] > 0) {
-            showevalnum = `+${multipvrecord[k][1].toFixed(2)}`;
-          } else {
-            showevalnum = multipvrecord[k][1].toFixed(2).toString();
-          }
+      if (isAdvPGNMode.checked) {
+        if (multipvminiboardtimer == null) {
+          multipvminiboardtimer = setTimeout(() => {
+            pvinfo.innerHTML = "";
+            pvinfo.appendChild(multipvminiboardhandler.GetMovesDivElement());
+            multipvminiboardtimer = null;
+          }, 950);
         }
-        pvinfostr += `${k > 0 ? "<hr />" : ""}Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5] > -1 ? multipvrecord[k][5] : "❓"} Max ${multipvrecord[k][6] > -1 ? multipvrecord[k][6] : "❓"}) <evalnum>${showevalnum}</evalnum> ${multipvrecord[k][4]}\n`;
-        depthlist.push(multipvrecord[k][5]);
-        seldepthlist.push(multipvrecord[k][6]);
+        multipvminiboardhandler.SetValidPrincipalVariationCount(
+          recordedmultipv,
+        );
+        for (k = 0; k < recordedmultipv; k++) {
+          multipvminiboardhandler.SetPrincipalVariation(
+            k + 1,
+            board.variant(),
+            board.is960(),
+            board.fen(),
+            multipvrecord[k][4],
+            multipvrecord[k][0],
+            multipvrecord[k][1],
+            multipvrecord[k][5],
+            multipvrecord[k][6],
+          );
+          depthlist.push(multipvrecord[k][5]);
+          seldepthlist.push(multipvrecord[k][6]);
+        }
+      } else {
+        let pvinfostr = "";
+        let showevalnum = "";
+        for (k = 0; k < recordedmultipv; k++) {
+          if (multipvrecord[k][0]) {
+            if (multipvrecord[k][1] > 0) {
+              showevalnum = `#+${parseInt(multipvrecord[k][1])}`;
+            } else {
+              showevalnum = `#${parseInt(multipvrecord[k][1])}`;
+            }
+          } else {
+            if (multipvrecord[k][1] > 0) {
+              showevalnum = `+${multipvrecord[k][1].toFixed(2)}`;
+            } else {
+              showevalnum = multipvrecord[k][1].toFixed(2).toString();
+            }
+          }
+          pvinfostr += `${k > 0 ? "<hr />" : ""}Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5] > -1 ? multipvrecord[k][5] : "❓"} Max ${multipvrecord[k][6] > -1 ? multipvrecord[k][6] : "❓"}) <evalnum>${showevalnum}</evalnum> ${getNotation(
+            dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,
+            board.variant(),
+            board.fen(),
+            false,
+            multipvrecord[k][4],
+          )}\n`;
+          depthlist.push(multipvrecord[k][5]);
+          seldepthlist.push(multipvrecord[k][6]);
+        }
+        pvinfo.innerHTML = pvinfostr;
       }
-      pvinfo.innerHTML = pvinfostr;
       let nodeinfo = "❓";
       index = textparselist.indexOf("nodes");
       if (index > 0) {
@@ -1858,18 +2658,6 @@ new Module().then((loadedModule) => {
     } else {
       return;
     }
-    /*console.log(
-      "MultiPV:",
-      multipvid,
-      "Bestmove:",
-      bestmove[0],
-      bestmove[1],
-      "Ponder:",
-      ponder[0],
-      ponder[1],
-      "Evaluation:",
-      evaluation,
-    );*/
     if (board.turn()) {
       bestpv = evaluationindex.indexOf(
         Math.max(...evaluationindex.slice(0, recordedmultipv)),
@@ -2258,6 +3046,24 @@ new Module().then((loadedModule) => {
     }
   };
 
+  dropdownBoardCoordinate.onchange = function () {
+    let index = dropdownBoardCoordinate.selectedIndex;
+    chessground.set({ notation: index });
+    chessground_mini.set({ notation: index });
+    let containerdiv = document.getElementById("chessground-container-div");
+    redrawChessground();
+    if (index >= 1 && index <= 3) {
+      containerdiv.classList.add("shogi");
+      containerdiv.classList.remove("xiangqi");
+    } else if (index == 5 || index == 6) {
+      containerdiv.classList.add("xiangqi");
+      containerdiv.classList.remove("shogi");
+    } else {
+      containerdiv.classList.remove("xiangqi");
+      containerdiv.classList.remove("shogi");
+    }
+  };
+
   buttonsearchmove.onclick = function () {
     let legalmoves = board.legalMoves().trim().split(" ");
     let moves = filterMoves(
@@ -2318,7 +3124,12 @@ new Module().then((loadedModule) => {
   };
 
   dropdownNotationSystem.onchange = function () {
-    if (labelPgn) {
+    while (labelPgn.childNodes[0]) {
+      labelPgn.removeChild(labelPgn.childNodes[0]);
+    }
+    if (isAdvPGNMode.checked) {
+      labelPgn.appendChild(getPgnDiv(board));
+    } else {
       labelPgn.innerText = getPgn(board);
     }
   };
@@ -2332,16 +3143,17 @@ new Module().then((loadedModule) => {
   };
 
   dropdownFogOfWarSettings.onchange = function () {
-    updateChessground();
+    updateChessground(false);
     setTimeout(() => {
-      let chi = document.getElementsByTagName("spangameresult");
-      for (i = 0; i < chi.length; i++) {
-        document.body.removeChild(chi[i]);
+      let elem = document.getElementById("gameresultcontainermini");
+      while (elem) {
+        chessgroundMiniBoardWrapper.removeChild(elem);
+        elem = document.getElementById("gameresultcontainermini");
       }
     }, 20);
   };
 
-  updateChessground();
+  updateChessground(true);
 }); // Chessground helper functions
 
 function updateChessBoardToPosition(fen, movelist, enablemove) {
@@ -2379,7 +3191,7 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
       textMoves.value = movelistmem.join(" ");
     }
 
-    updateChessground();
+    updateChessground(true);
   } else {
     window.alert("Invalid FEN");
   }
@@ -3139,7 +3951,7 @@ function afterChessgroundDrop(piece, dest, metadata) {
 }
 
 function afterMove(capture) {
-  updateChessground();
+  updateChessground(true);
   textMoves.value = board.moveStack();
   pSetFen.click();
 
@@ -3203,6 +4015,33 @@ function getPgn(board) {
       false,
       textMoves.value,
     );
+  }
+}
+
+function getPgnDiv(board) {
+  let notationindex = simplenotations.indexOf(
+    dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,
+  );
+  if (notationindex < 0) {
+    let note = document.createElement("div");
+    note.innerText = getPgn(board);
+    return note;
+  } else {
+    let result = parseUCIMovesToPreviewElements(
+      board.variant(),
+      textFen.value == "" ? ffish.startingFen(board.variant()) : textFen.value,
+      board.is960(),
+      textMoves.value,
+      "pgndiv",
+      ffishnotationobjects[notationindex],
+    );
+    if (result) {
+      return result;
+    } else {
+      let note = document.createElement("div");
+      note.innerText = getPgn(board);
+      return note;
+    }
   }
 }
 
@@ -3275,11 +4114,33 @@ function getKnownAndUnknownSquares(board) {
   return { KnownSquares: knownsquares, UnknownSquares: unknownsquares };
 }
 
-function updateChessground() {
+function getCheckSquares(board) {
+  let checks = board.checkedPieces();
+  if (checks == "") {
+    return [];
+  }
+  let checklist = checks.split(" ");
+  let i = 0;
+  for (i = 0; i < checklist.length; i++) {
+    checklist[i] = convertSquareToChessgroundXKey(checklist[i]);
+  }
+  return checklist;
+}
+
+function updateChessground(showresult) {
   const boardfenval = board.fen();
   currentboardfen.innerHTML = `Current Board FEN:  ${boardfenval}`;
 
-  if (labelPgn) labelPgn.innerText = getPgn(board);
+  //if (labelPgn) labelPgn.innerText = getPgn(board);
+  let deletelater = [];
+  while (labelPgn.childNodes[0]) {
+    deletelater.push(labelPgn.removeChild(labelPgn.childNodes[0]));
+  }
+  if (isAdvPGNMode.checked) {
+    labelPgn.appendChild(getPgnDiv(board));
+  } else {
+    labelPgn.innerText = getPgn(board);
+  }
   if (labelStm) labelStm.innerText = getColorOrUndefined(board);
 
   if (
@@ -3297,7 +4158,7 @@ function updateChessground() {
 
   chessground.set({
     fen: board.fen(),
-    check: board.isCheck(),
+    check: getCheckSquares(board),
     turnColor: getColor(board),
     movable: {
       color: getColorOrUndefined(board),
@@ -3514,5 +4375,9 @@ function updateChessground() {
   }
 
   chessground.setAutoShapes([]);
-  getGameStatus(true);
+  getGameStatus(showresult);
+  setTimeout(() => {
+    let tmp = deletelater;
+    deletelater = null;
+  }, 500);
 }

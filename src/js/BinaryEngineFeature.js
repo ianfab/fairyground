@@ -2159,6 +2159,8 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   window.fairyground.BinaryEngineFeature.changing_engine_settings = true;
   let popup = document.createElement("div");
   popup.id = "enginesettingspopup";
+  let background = document.createElement("div");
+  background.id = "enginesettingspopup-background";
   let title = document.createElement("p");
   title.id = "popup-title";
   title.innerHTML =
@@ -2269,6 +2271,9 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   let canceltext = document.createTextNode("Close");
   cancel.appendChild(canceltext);
   cancel.onclick = function () {
+    while (document.getElementById("enginesettingspopup-background") != null) {
+      document.getElementById("enginesettingspopup-background").remove();
+    }
     while (document.getElementById("enginesettingspopup") != null) {
       document.getElementById("enginesettingspopup").remove();
     }
@@ -2445,8 +2450,11 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   actiondiv.appendChild(redetectoptionshelp);
   popup.appendChild(actiondiv);
   popup.style.display = "block";
-  popup.style.zIndex = "1003";
+  popup.style.zIndex = "1006";
+  background.style.display = "block";
+  background.style.zIndex = "1005";
   document.body.appendChild(popup);
+  document.body.appendChild(background);
   showcurrent.click();
 }
 
@@ -2481,6 +2489,8 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let isloadingengine = false;
   let popup = document.createElement("div");
   popup.id = "enginesetuppopup";
+  let background = document.createElement("div");
+  background.id = "enginesetuppopup-background";
   let title = document.createElement("p");
   title.id = "popup-title";
   title.innerHTML = "Engine Setup";
@@ -2685,6 +2695,9 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
       newengineobj.destructor();
       newengineobj = undefined;
     }
+    while (document.getElementById("enginesetuppopup-background") != null) {
+      document.getElementById("enginesetuppopup-background").remove();
+    }
     while (document.getElementById("enginesetuppopup") != null) {
       document.getElementById("enginesetuppopup").remove();
     }
@@ -2801,8 +2814,11 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   actiondiv.appendChild(cancel);
   popup.appendChild(actiondiv);
   popup.style.display = "block";
-  popup.style.zIndex = "1002";
+  popup.style.zIndex = "1004";
+  background.style.display = "block";
+  background.style.zIndex = "1003";
   document.body.appendChild(popup);
+  document.body.appendChild(background);
 }
 
 window.fairyground.BinaryEngineFeature.ShowEngineSetupUI = ShowEngineSetupUI;
@@ -2823,6 +2839,8 @@ function ShowEngineManagementUI(EngineList, ws) {
   let isloadingengine = false;
   let popup = document.createElement("div");
   popup.id = "enginemanagementpopup";
+  let background = document.createElement("div");
+  background.id = "enginemanagementpopup-background";
   let title = document.createElement("p");
   title.id = "popup-title";
   title.innerHTML = "Engine Management";
@@ -3225,6 +3243,11 @@ function ShowEngineManagementUI(EngineList, ws) {
       }
     }
     document.getElementById("binengineoutputinit").click();
+    while (
+      document.getElementById("enginemanagementpopup-background") != null
+    ) {
+      document.getElementById("enginemanagementpopup-background").remove();
+    }
     while (document.getElementById("enginemanagementpopup") != null) {
       document.getElementById("enginemanagementpopup").remove();
     }
@@ -3391,8 +3414,11 @@ function ShowEngineManagementUI(EngineList, ws) {
   };
   popup.appendChild(redetectsupportedvariants);
   popup.style.display = "block";
-  popup.style.zIndex = "1001";
+  popup.style.zIndex = "1002";
+  background.style.display = "block";
+  background.style.zIndex = "1001";
   document.body.appendChild(popup);
+  document.body.appendChild(background);
 }
 
 window.fairyground.BinaryEngineFeature.ShowEngineManagementUI =

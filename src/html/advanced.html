@@ -131,6 +131,23 @@
     transform: translate(-20%, -20%);
   }
 
+  .position-display-label {
+    cursor: pointer;
+  }
+
+  .position-display-label:hover {
+    background-color: black;
+    color: white;
+  }
+
+  .inaccessable {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+  }
+
   input[type="checkbox"] {
     display: inline-block;
     height: 20px;
@@ -442,6 +459,13 @@
     background: #000;
   }
 
+  #boardcoordinate {
+    width: 300px;
+    background: #eee;
+    margin-left: 10px;
+    margin-top: 5px;
+  }
+
   #gamesettings #dropdown-quickpromotion {
     width: 120px;
     background: #eee;
@@ -650,8 +674,8 @@
 
   #info #sannotation {
     background: #eee;
-    margin-bottom: 10px;
-    height: 20px;
+    margin-bottom: 5px;
+    height: 25px;
   }
 
   #info #timecontrolduringplay {
@@ -705,6 +729,14 @@
     font-size: 16px;
   }
 
+  #pgndiv {
+    display: flex;
+    flex-direction: row;
+    flex-flow: row;
+    gap: 10px 10px;
+    flex-wrap: wrap;
+  }
+
   #output2 {
     height: 420px;
     border: 1px solid #ddd;
@@ -717,9 +749,19 @@
 
   #pocket-top {
     display: flex;
+    margin-bottom: 16px;
+  }
+
+  #pocket-top-mini {
+    display: flex;
   }
 
   #pocket-bottom {
+    display: flex;
+    margin-top: 16px;
+  }
+
+  #pocket-bottom-mini {
     display: flex;
   }
 
@@ -1209,6 +1251,14 @@
     border: 1px solid black;
   }
 
+  .multipv-miniboard-pvline-moves {
+    display: flex;
+    flex-direction: row;
+    flex-flow: row;
+    gap: 10px 10px;
+    flex-wrap: wrap;
+  }
+
   evalnum {
     font-weight: 900;
     font-family: Arial, "Times New Roman", Georgia, Serif;
@@ -1226,18 +1276,19 @@
     margin-bottom: 10px;
   }
 
-  spangameresult {
+  spangameresult,
+  spangameresultmini {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    font-size: 10px;
-    position: fixed;
-    transition: 0.5s linear;
+    font-size: 1px;
+    transition:
+      font-size 0.5s linear,
+      opacity 0.5s linear;
     font-weight: bold;
     font-family: "Times New Roman", Georgia, Serif, Arial;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
+    white-space: nowrap;
   }
 
   #moveselectiondialog {
@@ -1354,6 +1405,18 @@
     overflow: scroll;
   }
 
+  #enginesettingspopup-background {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+    background-color: #fff;
+    overflow: hidden;
+  }
+
   #enginesettingspopup div {
     flex-direction: row;
     flex-wrap: wrap;
@@ -1418,6 +1481,18 @@
     overflow: scroll;
   }
 
+  #enginemanagementpopup-background {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+    background-color: #fff;
+    overflow: hidden;
+  }
+
   #enginemanagementpopup div {
     flex-direction: row;
     flex-wrap: wrap;
@@ -1480,6 +1555,18 @@
     background-color: white;
     border-radius: 5px;
     overflow: scroll;
+  }
+
+  #enginesetuppopup-background {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+    background-color: #fff;
+    overflow: hidden;
   }
 
   #enginesetuppopup div {
@@ -1548,6 +1635,18 @@
     overflow: scroll;
   }
 
+  #loadsavedgamespopup-background {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+    background-color: #fff;
+    overflow: hidden;
+  }
+
   #loadsavedgamespopup div {
     flex-direction: row;
     flex-wrap: wrap;
@@ -1605,8 +1704,55 @@
     border: 1px solid #ddd;
   }
 
-  #pocket-bottom {
-    margin-top: 16px;
+  #chessground-mini {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    flex-flow: row;
+    row-gap: 10px;
+    top: -10000px;
+    left: -10000px;
+    z-index: 20;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background: rgba(0, 0, 0, 0);
+  }
+
+  #chessground-mini-board-wrapper-div {
+    padding: 10px;
+    height: fit-content;
+    width: fit-content;
+    background-color: white;
+    border: 2px solid black;
+    touch-action: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  #chessground-mini-board-operation-div {
+    display: flex;
+    flex-direction: column;
+    flex-flow: column;
+  }
+
+  #chessground-mini-container-div {
+    pointer-events: none;
+  }
+
+  #chessground-mini-board-operation-div button {
+    background: rgba(0, 0, 0, 0);
+    display: block;
+  }
+
+  #chessground-mini-board-operation-div button:before {
+    width: 50px;
+    height: 50px;
+    font-size: 28px;
+    border: 4px solid black;
   }
 
   #setpos:before {
@@ -1675,6 +1821,34 @@
     -webkit-transform: rotate(90deg);
     -ms-transform: rotate(90deg);
     transform: rotate(90deg);
+  }
+
+  #lockminiboard:before {
+    background-color: #0078d7;
+    content: "\f13e";
+    cursor: pointer;
+  }
+
+  .locked #lockminiboard:before {
+    background-color: forestgreen;
+    content: "\f023";
+  }
+
+  #pinminiboard:before {
+    background-color: orangered;
+    content: "\f0f6";
+    cursor: pointer;
+  }
+
+  .pinned #pinminiboard:before {
+    background-color: rebeccapurple;
+    content: "\f2d0";
+  }
+
+  #closeminiboard:before {
+    background-color: crimson;
+    content: "\f00d";
+    cursor: pointer;
   }
 </style>
 
@@ -1981,9 +2155,199 @@
             updateInfoDivWidth();
           }, 10);
         });
+      let chessgroundmini = document.getElementById("chessground-mini");
+      let chessgroundminiboardwrapper = document.getElementById(
+        "chessground-mini-board-wrapper-div",
+      );
+      let maindiv = document.getElementsByTagName("main")[0];
+      let pgnlabel = document.getElementById("label-pgn");
+      let pvinfo = document.getElementById("pvinfo");
+      let lockminiboard = document.getElementById("lockminiboard");
+      let operationdiv = document.getElementById(
+        "chessground-mini-board-operation-div",
+      );
+      let startX, startY, initialX, initialY;
+      chessgroundminiboardwrapper.style.cursor = "move";
+      chessgroundmini.locked = false;
+      chessgroundmini.pinned = false;
       window.addEventListener("resize", () => {
         updateInfoDivWidth();
+        const maindivrect = maindiv.getBoundingClientRect();
+        const chessgroundminirect = chessgroundmini.getBoundingClientRect();
+        const scrollbarwidthright =
+          window.innerWidth - maindivrect.right > 0
+            ? window.innerWidth - maindivrect.right
+            : 0;
+        const padding = 10;
+        if (chessgroundmini.pinned) {
+          const windowwidth = window.innerWidth;
+          if (chessgroundminirect.right > windowwidth) {
+            chessgroundmini.style.left = `${windowwidth - chessgroundminirect.width - padding - scrollbarwidthright}px`;
+          }
+        } else {
+          if (chessgroundminirect.left < maindivrect.left + padding) {
+            chessgroundmini.style.left = `${maindivrect.left + padding}px`;
+          } else if (chessgroundminirect.right > maindivrect.right - padding) {
+            chessgroundmini.style.left = `${maindivrect.right - padding - chessgroundminirect.width}px`;
+          }
+        }
       });
+      function onMouseMove(e) {
+        chessgroundmini.style.left = `${startX + e.clientX - initialX}px`;
+        chessgroundmini.style.top = `${startY + e.clientY - initialY}px`;
+      }
+      function onMouseUp() {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+        chessgroundminiboardwrapper.style.cursor = "move";
+        const maindivrect = maindiv.getBoundingClientRect();
+        const chessgroundminirect = chessgroundmini.getBoundingClientRect();
+        const padding = 10;
+        const scrollbarwidthright =
+          window.innerWidth - maindivrect.right > 0
+            ? window.innerWidth - maindivrect.right
+            : 0;
+        const scrollbarwidthleft = maindivrect.left > 0 ? maindivrect.left : 0;
+        if (chessgroundmini.pinned) {
+          if (chessgroundminirect.left < padding + scrollbarwidthleft) {
+            chessgroundmini.style.left = `${padding + scrollbarwidthleft}px`;
+          } else if (
+            chessgroundminirect.right >
+            window.innerWidth - padding - scrollbarwidthright
+          ) {
+            chessgroundmini.style.left = `${window.innerWidth - chessgroundminirect.width - padding - scrollbarwidthright}px`;
+          }
+          if (chessgroundminirect.top < padding) {
+            chessgroundmini.style.top = `${padding}px`;
+          } else if (
+            chessgroundminirect.bottom >
+            window.innerHeight - padding
+          ) {
+            chessgroundmini.style.top = `${window.innerHeight - chessgroundminirect.height - padding}px`;
+          }
+        } else {
+          if (chessgroundminirect.left < maindivrect.left + padding) {
+            chessgroundmini.style.left = `${maindivrect.left + padding}px`;
+          } else if (chessgroundminirect.right > maindivrect.right - padding) {
+            chessgroundmini.style.left = `${maindivrect.right - padding - chessgroundminirect.width}px`;
+          }
+          if (chessgroundminirect.top < maindivrect.top + padding) {
+            chessgroundmini.style.top = `${maindivrect.top + padding}px`;
+          }
+        }
+      }
+      function onTouchMove(e) {
+        chessgroundmini.style.left = `${startX + e.touches[0].clientX - initialX}px`;
+        chessgroundmini.style.top = `${startY + e.touches[0].clientY - initialY}px`;
+      }
+      function onTouchEnd() {
+        document.removeEventListener("touchmove", onTouchMove);
+        document.removeEventListener("touchend", onTouchEnd);
+        document.removeEventListener("touchcancel", onTouchEnd);
+        const maindivrect = maindiv.getBoundingClientRect();
+        const chessgroundminirect = chessgroundmini.getBoundingClientRect();
+        const padding = 10;
+        const scrollbarwidthright =
+          window.innerWidth - maindivrect.right > 0
+            ? window.innerWidth - maindivrect.right
+            : 0;
+        const scrollbarwidthleft = maindivrect.left > 0 ? maindivrect.left : 0;
+        if (chessgroundmini.pinned) {
+          if (chessgroundminirect.left < padding + scrollbarwidthleft) {
+            chessgroundmini.style.left = `${padding + scrollbarwidthleft}px`;
+          } else if (
+            chessgroundminirect.right >
+            window.innerWidth - padding - scrollbarwidthright
+          ) {
+            chessgroundmini.style.left = `${window.innerWidth - chessgroundminirect.width - padding - scrollbarwidthright}px`;
+          }
+          if (chessgroundminirect.top < padding) {
+            chessgroundmini.style.top = `${padding}px`;
+          } else if (
+            chessgroundminirect.bottom >
+            window.innerHeight - padding
+          ) {
+            chessgroundmini.style.top = `${window.innerHeight - chessgroundminirect.height - padding}px`;
+          }
+        } else {
+          if (chessgroundminirect.left < maindivrect.left + padding) {
+            chessgroundmini.style.left = `${maindivrect.left + padding}px`;
+          } else if (chessgroundminirect.right > maindivrect.right - padding) {
+            chessgroundmini.style.left = `${maindivrect.right - padding - chessgroundminirect.width}px`;
+          }
+          if (chessgroundminirect.top < maindivrect.top + padding) {
+            chessgroundmini.style.top = `${maindivrect.top + padding}px`;
+          }
+        }
+      }
+      document.addEventListener("click", (event) => {
+        if (!event.isTrusted) {
+          return;
+        }
+        if (
+          !chessgroundmini.locked &&
+          !chessgroundmini.contains(event.target) &&
+          !pgnlabel.contains(event.target) &&
+          !pvinfo.contains(event.target)
+        ) {
+          chessgroundmini.style.display = "none";
+        }
+      });
+      chessgroundminiboardwrapper.addEventListener("mousedown", (event) => {
+        event.stopPropagation();
+        const maindivrect = maindiv.getBoundingClientRect();
+        const chessgroundminirect = chessgroundmini.getBoundingClientRect();
+        if (chessgroundmini.pinned) {
+          startX = chessgroundminirect.left;
+          startY = chessgroundminirect.top;
+        } else {
+          startX = chessgroundminirect.left - maindivrect.left;
+          startY = chessgroundminirect.top - maindivrect.top;
+        }
+        initialX = event.clientX;
+        initialY = event.clientY;
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+        chessgroundminiboardwrapper.style.cursor = "grabbing";
+      });
+      chessgroundminiboardwrapper.addEventListener("touchstart", (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        if (chessgroundmini.pinned) {
+          return;
+        }
+        const maindivrect = maindiv.getBoundingClientRect();
+        const chessgroundminirect = chessgroundmini.getBoundingClientRect();
+        startX = chessgroundminirect.left - maindivrect.left;
+        startY = chessgroundminirect.top - maindivrect.top;
+        initialX = event.touches[0].clientX;
+        initialY = event.touches[0].clientY;
+        document.addEventListener("touchmove", onTouchMove);
+        document.addEventListener("touchend", onTouchEnd);
+        document.addEventListener("touchcancel", onTouchEnd);
+      });
+
+      /*pgnlabel.addEventListener("mousemove", Throttle((event) => {
+            event.stopPropagation();
+            if (chessgroundmini.style.display != "none") {
+                const rect = maindiv.getBoundingClientRect();
+                const chessgroundministyle = window.getComputedStyle(chessgroundmini);
+                const chessgroundminiwidth = parseFloat(chessgroundministyle.width);
+                const chessgroundminiheight = parseFloat(chessgroundministyle.height);
+                const padding = 10;
+                const maindivwidth = rect.width;
+                const maindivheight = rect.height;
+                const offsetX = event.clientX - rect.left;
+                const offsetY = event.clientY - rect.top;
+                let finalX = offsetX;
+                let finalY = offsetY + 40;
+                if (finalX + chessgroundminiwidth > maindivwidth - 2 * padding) {
+                    finalX -= chessgroundminiwidth;
+                }
+                chessgroundmini.style.left = `${finalX}px`;
+                chessgroundmini.style.top = `${finalY}px`;
+            }
+        }, 50));*/
     });
 
     document.addEventListener("uithemesparsed", () => {
@@ -4733,6 +5097,9 @@
         let classes = [];
         let DOMListValue = "";
         const el = $("#chessground-container-div");
+        const chessgroundmini = document.getElementById(
+          "chessground-mini-container-div",
+        );
         index = themes[0].indexOf($("#dropdown-variant").value);
         if (index < 0 || $("#dropdown-variant").value == "") {
           index = themes[0].indexOf("");
@@ -4763,7 +5130,8 @@
           themename = "default";
         }
         DOMListValue[1] = themename;
-        el.classList.value = DOMListValue.join(" ");
+        chessgroundmini.classList.value = el.classList.value =
+          DOMListValue.join(" ");
         console.log(`Piece theme: ${themename}`);
         updateThemeDropdowns(themename, null);
         //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
@@ -4777,6 +5145,9 @@
         let classes = [];
         let DOMListValue = "";
         const el = $("#chessground-container-div");
+        const chessgroundmini = document.getElementById(
+          "chessground-mini-container-div",
+        );
         index = themes[0].indexOf($("#dropdown-variant").value);
         if (index < 0 || $("#dropdown-variant").value == "") {
           index = themes[0].indexOf("");
@@ -4807,7 +5178,8 @@
           boardthemename = "defaultboard";
         }
         DOMListValue[0] = boardthemename;
-        el.classList.value = DOMListValue.join(" ");
+        chessgroundmini.classList.value = el.classList.value =
+          DOMListValue.join(" ");
         console.log(`Board theme: ${boardthemename}`);
         updateThemeDropdowns(null, boardthemename);
         //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
@@ -5036,27 +5408,44 @@
       };
 
       const displayGameResult = () => {
-        let i = 0;
-        let chi = document.getElementsByTagName("spangameresult");
-        for (i = 0; i < chi.length; i++) {
-          document.body.removeChild(chi[i]);
-        }
         if (review_mode || board_setup_mode) {
           return;
         }
-        var span = document.createElement("spangameresult");
-        span.innerHTML = $("#gameresult").value;
-        span.style.left = "50%";
-        span.style.top = "50%";
-        setTimeout(function () {
+        let elem = document.getElementById("gameresultcontainermain");
+        while (elem) {
+          document.body.removeChild(elem);
+          elem = document.getElementById("gameresultcontainermain");
+        }
+        let div = document.createElement("div");
+        div.id = "gameresultcontainermain";
+        div.classList.add("inaccessble");
+        div.style.position = "fixed";
+        div.style.display = "flex";
+        div.style.overflow = "hidden";
+        div.style.top = "0";
+        div.style.bottom = "0";
+        div.style.left = "0";
+        div.style.right = "0";
+        div.style.justifyContent = "center";
+        div.style.alignItems = "center";
+        div.style.zIndex = "1000";
+        div.style.background = "rgba(0,0,0,0)";
+        div.style.pointerEvents = "none";
+        let span = document.createElement("spangameresult");
+        span.innerText = $("#gameresult").value;
+        div.appendChild(span);
+        setTimeout(() => {
           span.style.opacity = "1";
-          span.style.transform = "scale(40)";
+          span.style.fontSize = "400px";
         }, 100);
-        setTimeout(function () {
+        setTimeout(() => {
           span.style.opacity = "0";
-          span.style.transform = "scale(0.02)";
+          span.style.fontSize = "1px";
         }, 2600);
-        document.body.appendChild(span);
+        setTimeout(() => {
+          document.body.removeChild(div);
+        }, 3200);
+        document.body.appendChild(div);
       };
 
       // Make error catchable
@@ -5186,17 +5575,25 @@
 
       function changePieceSet(piece_set) {
         const el = $("#chessground-container-div");
+        const chessgroundmini = document.getElementById(
+          "chessground-mini-container-div",
+        );
         let DOMListValue = el.classList.value.split(" ");
         DOMListValue[1] = piece_set;
-        el.classList.value = DOMListValue.join(" ");
+        chessgroundmini.classList.value = el.classList.value =
+          DOMListValue.join(" ");
         updateThemeDropdowns(piece_set, null);
       }
 
       function changeBoardSet(board_set) {
         const el = $("#chessground-container-div");
+        const chessgroundmini = document.getElementById(
+          "chessground-mini-container-div",
+        );
         let DOMListValue = el.classList.value.split(" ");
         DOMListValue[0] = board_set;
-        el.classList.value = DOMListValue.join(" ");
+        chessgroundmini.classList.value = el.classList.value =
+          DOMListValue.join(" ");
         updateThemeDropdowns(null, board_set);
       }
 
@@ -6210,6 +6607,17 @@
               }),
               "Board Setup",
             ),
+            m(
+              "label#label-advpgnmode",
+              {
+                title:
+                  "(Experimental) When checked, a mini board is shown which displays the position at that time when you click the move in the move list (PV line or move history). Uncheck to exit this mode. Note that enabling this mode might make the page become slower, and only enable it if you need it as it's an experimental feature.",
+              },
+              m("input[type=checkbox]#isadvpgnmode", {
+                disabled: !is_ready,
+              }),
+              "Move Visualization",
+            ),
           ]),
           m(
             "div#advancedtimesettings",
@@ -6973,6 +7381,85 @@
                     }),
                     "Adjudicate",
                   ),
+                  m(
+                    "select#boardcoordinate",
+                    {
+                      title:
+                        "Choose the coordinate system for the chess board.",
+                    },
+                    [
+                      m(
+                        "option",
+                        {
+                          value: "ALGEBRAIC",
+                          title:
+                            "English letters on bottom, Arabic numbers on side.",
+                        },
+                        "Chess Letter-Algebraic (ALGEBRAIC)",
+                      ),
+                      m(
+                        "option",
+                        {
+                          value: "SHOGI_ENGLET",
+                          title:
+                            "Arabic numbers on top, English letters on side.",
+                        },
+                        "Shogi Algebraic-Letter (SHOGI_ENGLET)",
+                      ),
+                      m(
+                        "option",
+                        {
+                          value: "SHOGI_ARBNUM",
+                          title: "Arabic numbers on top and side.",
+                        },
+                        "Shogi Algebraic (SHOGI_ARBNUM)",
+                      ),
+                      m(
+                        "option",
+                        {
+                          value: "SHOGI_HANNUM",
+                          title:
+                            "Arabic numbers on top, Kanji numbers on side.",
+                        },
+                        "Shogi Algebraic-Kanji (SHOGI_HANNUM)",
+                      ),
+                      m(
+                        "option",
+                        {
+                          value: "JANGGI",
+                          title:
+                            "Arabic numbers on bottom and side, with 0 denoting 10th rank.",
+                        },
+                        "Janggi Algebraic (JANGGI)",
+                      ),
+                      m(
+                        "option",
+                        {
+                          value: "XIANGQI_ARBNUM",
+                          title: "Arabic numbers on top and bottom.",
+                        },
+                        "Xiangqi Algebraic (XIANGQI_ARBNUM)",
+                      ),
+                      m(
+                        "option",
+                        {
+                          value: "XIANGQI_HANNUM",
+                          title:
+                            "Arabic numbers on top, Hanzi numbers on bottom.",
+                        },
+                        "Xiangqi Algebraic-Hanzi (XIANGQI_HANNUM)",
+                      ),
+                      m(
+                        "option",
+                        {
+                          value: "THAI_ALGEBRAIC",
+                          title:
+                            "Thai letters on bottom, Thai numbers on side.",
+                        },
+                        "Mukruk Thai Letter-Thai Algebraic (THAI_ALGEBRAIC)",
+                      ),
+                    ],
+                  ),
                 ]),
               ]),
             ]),
@@ -7374,6 +7861,94 @@
               ),
               m("button#makemove", "Make Move"),
               m("button#highlightmove", "Highlight Move (Yellow Marks)"),
+            ]),
+          ]),
+          m("div#chessground-mini", [
+            m("div#chessground-mini-board-operation-div", [
+              m(
+                "button#lockminiboard.operationdivbutton",
+                {
+                  title:
+                    "Status: Unlocked\nWhen locked, the mini board will not be closed if somewhere else is clicked.",
+                  onclick: () => {
+                    const chessgroundmini =
+                      document.getElementById("chessground-mini");
+                    if (chessgroundmini.locked) {
+                      chessgroundmini.locked = false;
+                      chessgroundmini.classList.remove("locked");
+                      document.getElementById("lockminiboard").title =
+                        "Status: Unlocked\nWhen locked, the mini board will not be closed if somewhere else is clicked.";
+                    } else {
+                      chessgroundmini.locked = true;
+                      chessgroundmini.classList.add("locked");
+                      document.getElementById("lockminiboard").title =
+                        "Status: Locked\nWhen locked, the mini board will not be closed if somewhere else is clicked.";
+                    }
+                  },
+                },
+                "",
+              ),
+              m(
+                "button#pinminiboard.operationdivbutton",
+                {
+                  title:
+                    "Status: Placed On Document\nWhen placed on document, the mini board will move with the webpage when you scroll.\nWhen pinned to window, the mini board will not move when you scroll.",
+                  onclick: () => {
+                    const maindiv = document.getElementsByTagName("main")[0];
+                    const chessgroundmini =
+                      document.getElementById("chessground-mini");
+                    const maindivrect = maindiv.getBoundingClientRect();
+                    const chessgroundminirect =
+                      chessgroundmini.getBoundingClientRect();
+                    const chessgroundminiboardwrapper = document.getElementById(
+                      "chessground-mini-board-wrapper-div",
+                    );
+                    if (chessgroundmini.pinned) {
+                      chessgroundmini.pinned = false;
+                      chessgroundmini.classList.remove("pinned");
+                      document.getElementById("pinminiboard").title =
+                        "Status: Placed On Document\nWhen placed on document, the mini board will move with the webpage when you scroll.\nWhen pinned to window, the mini board will not move when you scroll.";
+                      chessgroundmini.style.left = `${chessgroundminirect.left - maindivrect.left}px`;
+                      chessgroundmini.style.top = `${chessgroundminirect.top - maindivrect.top}px`;
+                      chessgroundmini.style.position = "";
+                    } else {
+                      chessgroundmini.pinned = true;
+                      chessgroundmini.classList.add("pinned");
+                      document.getElementById("pinminiboard").title =
+                        "Status: Pinned To Window\nWhen placed on document, the mini board will move with the webpage when you scroll.\nWhen pinned to window, the mini board will not move when you scroll.";
+                      chessgroundmini.style.left = `${chessgroundminirect.left}px`;
+                      chessgroundmini.style.top = `${chessgroundminirect.top}px`;
+                      chessgroundmini.style.position = "fixed";
+                    }
+                  },
+                },
+                "",
+              ),
+              m(
+                "button#closeminiboard.operationdivbutton",
+                {
+                  title: "Close mini board.",
+                  onclick: () => {
+                    document.getElementById("chessground-mini").style.display =
+                      "none";
+                  },
+                },
+                "",
+              ),
+            ]),
+            m("div#chessground-mini-board-wrapper-div", [
+              m(
+                "div#chessground-mini-container-div.defaultboard.default.board8x8",
+                [
+                  m("div.cg-wrap.pocket-top.movemode", [
+                    m("div#pocket-top-mini"),
+                  ]),
+                  m("div#chessground-board-mini.micro"),
+                  m("div.cg-wrap.pocket-bottom.movemode", [
+                    m("div#pocket-bottom-mini"),
+                  ]),
+                ],
+              ),
             ]),
           ]),
         ]);
