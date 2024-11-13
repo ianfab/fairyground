@@ -438,11 +438,11 @@ evalnum:after {
 }
 
 .locked #lockminiboard:before {
-    background-color: forestgreen !important;
+    background-color: orangered !important;
 }
 
 #pinminiboard:before, #pinminiboard:hover:before, #pinminiboard:active:before, #pinminiboard:disabled:before {
-    background-color: orangered !important;
+    background-color: forestgreen !important;
     transition-duration: unset !important;
     transition-property: none !important;
     border-radius: 10px;
@@ -450,6 +450,13 @@ evalnum:after {
 
 .pinned #pinminiboard:before {
     background-color: rebeccapurple !important;
+}
+
+#setpositiontomainboard:before, #setpositiontomainboard:hover:before, #setpositiontomainboard:active:before, #setpositiontomainboard:disabled:before {
+    background-color: gold !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
 }
 
 #closeminiboard:before, #closeminiboard:hover:before, #closeminiboard:active:before, #closeminiboard:disabled:before {

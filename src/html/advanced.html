@@ -1201,6 +1201,18 @@
     position: relative;
   }
 
+  #evalbar.xiangqi {
+    background-color: black;
+  }
+
+  #evalbar.shogi {
+    background-color: white;
+  }
+
+  #evalbar.janggi {
+    background-color: blue;
+  }
+
   #evalbar.round {
     width: 90px;
     height: 90px;
@@ -1212,6 +1224,18 @@
     height: 100%;
     width: 50%;
     background-color: white;
+  }
+
+  #evalbar.xiangqi #evalbarprogress {
+    background-color: red;
+  }
+
+  #evalbar.shogi #evalbarprogress {
+    background-color: black;
+  }
+
+  #evalbar.janggi #evalbarprogress {
+    background-color: red;
   }
 
   #evalbar #cp {
@@ -1226,6 +1250,18 @@
     font-size: 25px;
     font-weight: bold;
     font-family: Arial, "Times New Roman", Georgia, Serif;
+  }
+
+  #evalbar.shogi #cp {
+    color: orange;
+  }
+
+  #evalbar.xiangqi #cp {
+    color: white;
+  }
+
+  #evalbar.janggi #cp {
+    color: white;
   }
 
   #evalbar.round #cp {
@@ -1830,12 +1866,12 @@
   }
 
   .locked #lockminiboard:before {
-    background-color: forestgreen;
+    background-color: orangered;
     content: "\f023";
   }
 
   #pinminiboard:before {
-    background-color: orangered;
+    background-color: forestgreen;
     content: "\f0f6";
     cursor: pointer;
   }
@@ -1843,6 +1879,12 @@
   .pinned #pinminiboard:before {
     background-color: rebeccapurple;
     content: "\f2d0";
+  }
+
+  #setpositiontomainboard:before {
+    background-color: gold;
+    content: "\f002";
+    cursor: pointer;
   }
 
   #closeminiboard:before {
@@ -7467,37 +7509,23 @@
               m(
                 "select#sannotation",
                 {
+                  title:
+                    "Select the move notation system that is used in move history and engine principal variations.",
                   onchange: () => {
                     const dropdownnotation =
                       document.getElementById("sannotation");
                     const evalbar = document.getElementById("evalbar");
-                    const evalbarprogress =
-                      document.getElementById("evalbarprogress");
-                    const cp = document.getElementById("cp");
-                    if (dropdownnotation.selectedIndex < 0) {
-                      evalbar.style.backgroundColor = "black";
-                      evalbarprogress.style.backgroundColor = "white";
-                      cp.style.color = "orange";
-                      return;
-                    }
                     const value =
                       dropdownnotation[dropdownnotation.selectedIndex].value;
+                    evalbar.classList.remove("xiangqi");
+                    evalbar.classList.remove("shogi");
+                    evalbar.classList.remove("janggi");
                     if (/xiangqi|ucci/i.test(value)) {
-                      evalbar.style.backgroundColor = "black";
-                      evalbarprogress.style.backgroundColor = "red";
-                      cp.style.color = "white";
+                      evalbar.classList.add("xiangqi");
                     } else if (/shogi|usi/i.test(value)) {
-                      evalbar.style.backgroundColor = "white";
-                      evalbarprogress.style.backgroundColor = "black";
-                      cp.style.color = "orange";
+                      evalbar.classList.add("shogi");
                     } else if (/janggi/i.test(value)) {
-                      evalbar.style.backgroundColor = "red";
-                      evalbarprogress.style.backgroundColor = "blue";
-                      cp.style.color = "white";
-                    } else {
-                      evalbar.style.backgroundColor = "black";
-                      evalbarprogress.style.backgroundColor = "white";
-                      cp.style.color = "orange";
+                      evalbar.classList.add("janggi");
                     }
                   },
                 },
@@ -7925,9 +7953,34 @@
                 "",
               ),
               m(
+                "button#setpositiontomainboard.operationdivbutton",
+                {
+                  title:
+                    "Click to set the position of mini board to main board for further investigation.",
+                  onclick: () => {
+                    const chessgroundmini =
+                      document.getElementById("chessground-mini");
+                    const fen = document.getElementById("fen");
+                    const move = document.getElementById("move");
+                    if (chessgroundmini.startingfen == undefined) {
+                      fen.value = "";
+                    } else {
+                      fen.value = chessgroundmini.startingfen;
+                    }
+                    if (chessgroundmini.moves == undefined) {
+                      move.value = "";
+                    } else {
+                      move.value = chessgroundmini.moves;
+                    }
+                    document.getElementById("setpos").click();
+                  },
+                },
+                "",
+              ),
+              m(
                 "button#closeminiboard.operationdivbutton",
                 {
-                  title: "Close mini board.",
+                  title: "Click to close mini board.",
                   onclick: () => {
                     document.getElementById("chessground-mini").style.display =
                       "none";

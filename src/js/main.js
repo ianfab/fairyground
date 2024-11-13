@@ -740,6 +740,8 @@ function initBoard(variant) {
     pocketTopMiniEl,
     pocketBottomMiniEl,
   );
+  chessgroundMini.startingfen = undefined;
+  chessgroundMini.moves = undefined;
   chessground.state.drawable.brushes.black = {
     key: "black",
     color: "#000000",
@@ -1009,6 +1011,8 @@ function parseUCIMovesToPreviewElements(
     moveelement.moveturn = tmpboard.turn() ? "white" : "black";
     moveelement.checked = getCheckSquares(tmpboard);
     moveelement.gameresult = tmpboard.result();
+    moveelement.startingfen = fen;
+    moveelement.moves = moves.slice(0, i + 1).join(" ");
     /*
         
         TODO: Due to dynamic element removing and adding, sometimes clicking the element has no effect, especially when it's frequently updated.
@@ -1027,6 +1031,8 @@ function parseUCIMovesToPreviewElements(
         lastMove: this.lastmove,
         notation: chessground.state.notation,
       });
+      chessgroundMini.startingfen = this.startingfen;
+      chessgroundMini.moves = this.moves;
       //console.log(this.fenstr, this.moveturn, this.checked, this.lastmove);
       if (chessgroundMini.style.display == "none") {
         const rect = this.getBoundingClientRect();
