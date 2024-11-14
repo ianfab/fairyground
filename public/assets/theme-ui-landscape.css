@@ -331,6 +331,10 @@ coord {
     text-shadow: var(--text-shadow-style-black);
 }
 
+#reviewmodenote1, #reviewmodenote2 {
+    text-shadow: var(--text-shadow-style-black);
+}
+
 #evalinfo {
     border-top: 1px solid #444 !important;
     border-left: 1px solid #444 !important;

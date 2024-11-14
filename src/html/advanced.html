@@ -1887,6 +1887,10 @@
     cursor: pointer;
   }
 
+  #setpositiontomainboard:disabled:before {
+    color: black;
+  }
+
   #closeminiboard:before {
     background-color: crimson;
     content: "\f00d";
@@ -4043,6 +4047,7 @@
           $("#displaymoves").value = $("#move").value;
           review_mode = false;
           $("#isreviewmode").value = 0;
+          document.getElementById("setpositiontomainboard").disabled = false;
         } else if (movenum > totalMoveNumber() || movenum < -1) {
           console.log(`${movenum} is out of range for move number.`);
           return;
@@ -4057,6 +4062,7 @@
           }
           review_mode = true;
           $("#isreviewmode").value = 1;
+          document.getElementById("setpositiontomainboard").disabled = true;
           $("#displaymoves").value = "";
           for (i = 0, j = 0; j < movenum; i++, j++) {
             if (moves_split[i].length == 0) {
@@ -6262,7 +6268,7 @@
             m("input[type=number]#hash", {
               placeholder: "Hash",
               title:
-                "The size of the hash table of in browser Fairy-Stockfish.",
+                "The size in megabytes of the hash table of in browser Fairy-Stockfish.",
               disabled: !is_ready,
               min: 1,
               max: 33554432,
@@ -7287,9 +7293,13 @@
                   "Start Here",
                 ),
               ]),
-              m("p", { hidden: !review_mode }, "Review mode enabled."),
               m(
-                "p",
+                "p#reviewmodenote1",
+                { hidden: !review_mode },
+                "Review mode enabled.",
+              ),
+              m(
+                "p#reviewmodenote2",
                 { hidden: !review_mode },
                 "You can go to previous moves played to analyze your game, but you cannot make changes to the game. To exit review mode, click <reset>, <current position> or <start here>.",
               ),
@@ -7956,7 +7966,7 @@
                 "button#setpositiontomainboard.operationdivbutton",
                 {
                   title:
-                    "Click to set the position of mini board to main board for further investigation.",
+                    "Click to move the position on mini board to main board for further investigation.",
                   onclick: () => {
                     const chessgroundmini =
                       document.getElementById("chessground-mini");
