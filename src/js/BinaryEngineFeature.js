@@ -493,6 +493,7 @@ const MessageSplitter = new RegExp("\x10", "");
 const AllBlankTestRegExp = new RegExp("^[ ]*$", "");
 const WhiteSpaceMatcher = new RegExp("[ ]+", "");
 const LineFeedCarriageReturnMatcher = new RegExp("(\r\n)|(\r)", "g");
+const BoardDimensionMatcher = new RegExp("board[0-9]+x[0-9]+", "");
 
 function GetCurrentVariantID() {
   return document.getElementById("dropdown-variant").value;
@@ -517,17 +518,15 @@ function GetBoardWidth() {
   const ClassList = document.getElementById(
     "chessground-container-div",
   ).classList;
-  let boardsize = "";
-  try {
-    ClassList.forEach((val) => {
-      if (/board[0-9]+x[0-9]+/.test(val)) {
-        throw val;
+  let i = 0;
+  for (i = 0; i < ClassList.length; i++) {
+    if (ClassList[i].startsWith("board")) {
+      if (BoardDimensionMatcher.test(ClassList[i])) {
+        return parseInt(ClassList[i].slice(5, ClassList[i].indexOf("x", 5)));
       }
-    });
-  } catch (e) {
-    boardsize = e;
+    }
   }
-  return parseInt(boardsize.replace("board", "").split("x")[0]);
+  return 8;
 }
 
 window.fairyground.BinaryEngineFeature.GetBoardWidth = GetBoardWidth;
@@ -536,17 +535,15 @@ function GetBoardHeight() {
   const ClassList = document.getElementById(
     "chessground-container-div",
   ).classList;
-  let boardsize = "";
-  try {
-    ClassList.forEach((val) => {
-      if (/board[0-9]+x[0-9]+/.test(val)) {
-        throw val;
+  let i = 0;
+  for (i = 0; i < ClassList.length; i++) {
+    if (ClassList[i].startsWith("board")) {
+      if (BoardDimensionMatcher.test(ClassList[i])) {
+        return parseInt(ClassList[i].slice(ClassList[i].indexOf("x", 5) + 1));
       }
-    });
-  } catch (e) {
-    boardsize = e;
+    }
   }
-  return parseInt(boardsize.replace("board", "").split("x")[1]);
+  return 8;
 }
 
 window.fairyground.BinaryEngineFeature.GetBoardHeight = GetBoardHeight;

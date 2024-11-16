@@ -11,7 +11,7 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "chessgroundx": "^10.5.3",
+    "chessgroundx": "^10.6.3",
     "express": "^4.18.2",
     "fairy-stockfish-nnue.wasm": "^1.1.8",
     "ffish-es6": "^0.7.6",

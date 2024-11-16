@@ -1,6 +1,7 @@
 ﻿// ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
+import * as pocketutil from "chessgroundx/pocket";
 const divMain = document.getElementsByTagName("main")[0];
 const variantsIni = document.getElementById("variants-ini");
 const dropdownVariant = document.getElementById("dropdown-variant");
@@ -750,10 +751,63 @@ function initBoard(variant) {
   };
 
   if (pocketRoles === undefined) {
-    pocketTopEl.style.display = "none";
-    pocketBottomEl.style.display = "none";
+    pocketTopEl.classList.add("no-inital-pocket-piece");
+    pocketBottomEl.classList.add("no-inital-pocket-piece");
     pocketTopMiniEl.style.display = "none";
     pocketBottomMiniEl.style.display = "none";
+  } else {
+    pocketTopEl.classList.remove("no-inital-pocket-piece");
+    pocketBottomEl.classList.remove("no-inital-pocket-piece");
+  }
+}
+
+function rerenderChessgroundPockets(falsefen) {
+  let mainboard = chessgroundContainerEl.getElementsByTagName("cg-board")[0];
+  let mainboardcontainer =
+    chessgroundContainerEl.getElementsByTagName("cg-container")[0];
+  let css_height = mainboardcontainer.style.height;
+  let css_width = mainboardcontainer.style.width;
+  let state = chessground.state;
+  let pockettoplength = 0;
+  let pocketbottomlength = 0;
+  let dimensions = getDimensions();
+  let elements = {
+    board: mainboard,
+    pocketTop: pocketTopEl,
+    pocketBottom: pocketBottomEl,
+    wrap: chessgroundEl,
+    container: chessgroundContainerEl,
+  };
+  if (chessground.state.orientation == "white") {
+    pocketbottomlength = chessground.state.pocketRoles.white.length;
+    pockettoplength = chessground.state.pocketRoles.black.length;
+  } else {
+    pocketbottomlength = chessground.state.pocketRoles.black.length;
+    pockettoplength = chessground.state.pocketRoles.white.length;
+  }
+  let pocketlength = Math.max(pockettoplength, pocketbottomlength);
+  pocketTopEl.setAttribute(
+    "style",
+    `--pocketLength: ${pocketlength}; --files: ${dimensions.width}; --ranks: ${dimensions.height}; --cg-width: ${css_width}; --cg-height: ${css_height}`,
+  );
+  pocketBottomEl.setAttribute(
+    "style",
+    `--pocketLength: ${pocketlength}; --files: ${dimensions.width}; --ranks: ${dimensions.height}; --cg-width: ${css_width}; --cg-height: ${css_height}`,
+  );
+  pocketutil.renderPocketsInitial(state, elements, pocketTopEl, pocketBottomEl);
+  pocketutil.renderPockets(state);
+  pocketTopEl.setAttribute(
+    "style",
+    `--pocketLength: ${pocketlength}; --files: ${dimensions.width}; --ranks: ${dimensions.height}; --cg-width: ${css_width}; --cg-height: ${css_height}`,
+  );
+  pocketBottomEl.setAttribute(
+    "style",
+    `--pocketLength: ${pocketlength}; --files: ${dimensions.width}; --ranks: ${dimensions.height}; --cg-width: ${css_width}; --cg-height: ${css_height}`,
+  );
+  if (falsefen) {
+    chessground.set({
+      fen: falsefen,
+    });
   }
 }
 
@@ -761,8 +815,9 @@ function redrawChessground(customFEN) {
   let fenBoard = "";
   if (customFEN) {
     fenBoard = customFEN;
+    console.log("CustomFEN:", customFEN);
   } else {
-    fenBoard = board.fen().split(" ")[0];
+    fenBoard = board.fen();
   }
   const config = {
     autoCastle: false,
@@ -910,44 +965,79 @@ function parseUCIMove(ucimove) {
   if (ucimove == "0000" || ucimove == "") {
     return [undefined, undefined, undefined, undefined];
   }
+  function SplitNumberAndLetter(move) {
+    let j = 0;
+    let numstart = 0;
+    let letterstart = 0;
+    let state = 0;
+    let nums = [];
+    let letters = [];
+    for (j = 0; j < move.length; j++) {
+      if (state == 0) {
+        if (move.charCodeAt(j) >= 48 && move.charCodeAt(j) <= 57) {
+          state = 1;
+          if (letterstart != j) {
+            letters.push(move.substring(letterstart, j));
+          }
+          numstart = j;
+        }
+      } else {
+        if (move.charCodeAt(j) >= 97 && move.charCodeAt(j) <= 122) {
+          state = 0;
+          if (numstart != j) {
+            nums.push(move.substring(numstart, j));
+          }
+          letterstart = j;
+        }
+      }
+    }
+    if (state == 1) {
+      if (numstart != j) {
+        nums.push(move.substring(numstart, j));
+      }
+    } else {
+      if (letterstart != j) {
+        letters.push(move.substring(letterstart, j));
+      }
+    }
+    return { numbers: nums, letters: letters };
+  }
   let move = ucimove;
   let gatingmove = "";
   if (move.includes(",")) {
-    let gating = move.split(",")[1];
-    move = move.split(",")[0];
-    gatingmove =
-      gating.split(/[0-9]+/).filter(function (item) {
-        return item != null && item != undefined && item != "";
-      })[1] +
-      gating.split(/[a-z]+/).filter(function (item) {
-        return item != null && item != undefined && item != "";
-      })[1];
+    let parts = move.split(",");
+    let gating = parts[1];
+    move = parts[0];
+    let targets = SplitNumberAndLetter(gating);
+    gatingmove = targets.letters[1] + targets.numbers[1];
   }
   if (move.includes("@")) {
+    let indexofat = move.indexOf("@");
     return [
-      move.slice(0, move.indexOf("@") + 1),
-      move.slice(move.indexOf("@") + 1),
+      move.slice(0, indexofat + 1),
+      move.slice(indexofat + 1),
       "",
       gatingmove,
     ];
   }
   let additional = "";
-  if (move.at(-1) == "+") {
+  let lastch = move.at(-1);
+  if (lastch == "+") {
     additional = "+";
     move = move.slice(0, -1);
-  } else if (move.at(-1) == "-") {
+  } else if (lastch == "-") {
     additional = "-";
     move = move.slice(0, -1);
-  } else if (/^[a-z]{1}$/.test(move.at(-1))) {
-    additional = move.at(-1);
-    move = move.slice(0, -1);
+  } else {
+    let chcode = lastch.charCodeAt(0);
+    if (chcode >= 97 && chcode <= 122) {
+      additional = lastch;
+      move = move.slice(0, -1);
+    }
   }
-  let files = move.split(/[0-9]+/).filter(function (item) {
-    return item != null && item != undefined && item != "";
-  });
-  let ranks = move.split(/[a-z]+/).filter(function (item) {
-    return item != null && item != undefined && item != "";
-  });
+  let target = SplitNumberAndLetter(move);
+  let files = target.letters;
+  let ranks = target.numbers;
   if (files.length != 2) {
     throw RangeError;
   }
@@ -1412,7 +1502,7 @@ function addPieceToPocket(pieceid, color) {
       black: chessground.state.pocketRoles.black,
     },
   });
-  redrawChessground(getFEN());
+  redrawChessground(getFEN(false));
 }
 
 function clearMovesList() {
@@ -1972,7 +2062,7 @@ function getDimensions() {
     files += parseInt(match[0]) - match[0].length;
   }
 
-  console.log("Board: %dx%d", files, ranks);
+  //console.log("Board: %dx%d", files, ranks);
   return {
     width: files,
     height: ranks,
@@ -2050,8 +2140,6 @@ new Module().then((loadedModule) => {
     }
     resetTimer();
     clearMovesList();
-    let play_white = playWhite.checked;
-    let play_black = playBlack.checked;
     buttonCurrentPosition.click();
 
     updateChessground(true);
@@ -2060,6 +2148,7 @@ new Module().then((loadedModule) => {
     positionInformation.innerHTML = "";
     UpdateVariantsPositionTypeDropdown();
     UpdateVariantsPositionNameDropdown();
+    pvinfo.innerHTML = "";
   };
 
   buttonFlip.onclick = function () {
@@ -2243,7 +2332,7 @@ new Module().then((loadedModule) => {
   };
 
   buttonBoardSetupCopyFEN.onclick = function () {
-    let FEN = getFEN();
+    let FEN = getFEN(true);
     if (FEN == null) {
       return;
     }
@@ -2257,7 +2346,7 @@ new Module().then((loadedModule) => {
   };
 
   buttonValidatePosition.onclick = function () {
-    validateFEN(getFEN(), true);
+    validateFEN(getFEN(true), true);
   };
 
   dropdownSetPiece.onchange = function () {
@@ -3224,10 +3313,17 @@ const onSelectPositionVariantsFile = async (e) => {
   }
 };
 
-function getFEN() {
+function getFEN(deleteinvalidpocket) {
   let FEN = chessground.getFen();
   let width = chessground.state.dimensions.width;
   let height = chessground.state.dimensions.height;
+  if (
+    deleteinvalidpocket &&
+    !ffish.capturesToHand(dropdownVariant.value) &&
+    !ffish.startingFen(dropdownVariant.value).includes("[")
+  ) {
+    FEN = FEN.replace(/\[[A-Za-z]*\]/, "");
+  }
   if (dropdownSideToMove.value == "First Mover") {
     FEN += " w";
   } else if (dropdownSideToMove.value == "Second Mover") {
@@ -4120,6 +4216,121 @@ function getKnownAndUnknownSquares(board) {
   return { KnownSquares: knownsquares, UnknownSquares: unknownsquares };
 }
 
+function displayHiddenDroppablePiece(board) {
+  let legalmoves = board.legalMoves();
+  if (legalmoves == "") {
+    return;
+  }
+  let originalfen = board.fen();
+  let moves = legalmoves.split(" ");
+  let i = 0;
+  let movepart = [];
+  let hiddenpieces = [];
+  let whitehiddenpieces = "";
+  let blackhiddenpieces = "";
+  for (i = 0; i < moves.length; i++) {
+    movepart = parseUCIMove(moves[i]);
+    if (movepart[0].endsWith("@")) {
+      if (movepart[0].charAt(0) == "+") {
+        let pieceid = board.turn()
+          ? movepart[0].charAt(1)
+          : movepart[0].charAt(1).toLowerCase();
+        if (!pieceDisplayedInPocketOfFEN(originalfen, pieceid)) {
+          if (board.turn()) {
+            whitehiddenpieces += pieceid;
+          } else {
+            blackhiddenpieces += pieceid;
+          }
+          if (hiddenpieces.indexOf(pieceid) < 0) {
+            hiddenpieces.push(pieceid);
+          }
+        }
+      } else {
+        let pieceid = board.turn()
+          ? movepart[0].charAt(0)
+          : movepart[0].charAt(0).toLowerCase();
+        if (!pieceDisplayedInPocketOfFEN(originalfen, pieceid)) {
+          if (board.turn()) {
+            whitehiddenpieces += pieceid;
+          } else {
+            blackhiddenpieces += pieceid;
+          }
+          if (hiddenpieces.indexOf(pieceid) < 0) {
+            hiddenpieces.push(pieceid);
+          }
+        }
+      }
+    }
+  }
+  if (hiddenpieces.length) {
+    if (chessground.state.pocketRoles == undefined) {
+      chessground.state.pocketRoles = { white: [], black: [] };
+    }
+    let whitehiddenpieceroles = getPieceRoles(whitehiddenpieces);
+    let blackhiddenpieceroles = getPieceRoles(blackhiddenpieces);
+    if (chessground.state.boardState.pockets == undefined) {
+      chessground.state.boardState.pockets = {
+        white: new Map(),
+        black: new Map(),
+      };
+    }
+    for (i = 0; i < whitehiddenpieceroles.length; i++) {
+      if (
+        chessground.state.pocketRoles.white.indexOf(whitehiddenpieceroles[i]) <
+        0
+      ) {
+        chessground.state.pocketRoles.white.push(whitehiddenpieceroles[i]);
+      }
+      chessground.state.boardState.pockets.white.set(
+        whitehiddenpieceroles[i],
+        1,
+      );
+    }
+    for (i = 0; i < blackhiddenpieceroles.length; i++) {
+      if (
+        chessground.state.pocketRoles.black.indexOf(blackhiddenpieceroles[i]) <
+        0
+      ) {
+        chessground.state.pocketRoles.black.push(blackhiddenpieceroles[i]);
+      }
+      chessground.state.boardState.pockets.black.set(
+        blackhiddenpieceroles[i],
+        1,
+      );
+    }
+    let fen = board.fen();
+    if (fen.includes("[")) {
+      let endoffenpocket = fen.indexOf("]");
+      fen =
+        fen.substring(0, endoffenpocket) +
+        hiddenpieces.join("") +
+        fen.substring(endoffenpocket);
+    } else {
+      let fenlist = fen.split(" ");
+      fenlist[0] += `[${hiddenpieces.join("")}]`;
+      fen = fenlist.join(" ");
+    }
+    chessgroundContainerEl.classList.add("pockets");
+    console.log("Hidden pieces:", hiddenpieces);
+    console.log("Fake FEN:", fen);
+    rerenderChessgroundPockets(fen);
+    pocketTopEl.classList.add("has-hidden-pocket-piece");
+    pocketBottomEl.classList.add("has-hidden-pocket-piece");
+  } else {
+    pocketTopEl.classList.remove("has-hidden-pocket-piece");
+    pocketBottomEl.classList.remove("has-hidden-pocket-piece");
+  }
+}
+
+function pieceDisplayedInPocketOfFEN(fen, pieceid) {
+  if (fen.includes("[")) {
+    let pieces = fen.substring(fen.indexOf("[") + 1, fen.indexOf("]"));
+    return pieces.includes(pieceid);
+  } else {
+    return false;
+  }
+}
+
 function getCheckSquares(board) {
   let checks = board.checkedPieces();
   if (checks == "") {
@@ -4163,7 +4374,7 @@ function updateChessground(showresult) {
   }
 
   chessground.set({
-    fen: board.fen(),
+    fen: boardfenval,
     check: getCheckSquares(board),
     turnColor: getColor(board),
     movable: {
@@ -4381,6 +4592,7 @@ function updateChessground(showresult) {
   }
 
   chessground.setAutoShapes([]);
+  displayHiddenDroppablePiece(board);
   getGameStatus(showresult);
   setTimeout(() => {
     let tmp = deletelater;

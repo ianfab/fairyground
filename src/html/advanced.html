@@ -752,6 +752,14 @@
     margin-bottom: 16px;
   }
 
+  #pocket-top.no-inital-pocket-piece {
+    display: none;
+  }
+
+  #pocket-top.no-inital-pocket-piece.has-hidden-pocket-piece {
+    display: flex;
+  }
+
   #pocket-top-mini {
     display: flex;
   }
@@ -759,6 +767,14 @@
   #pocket-bottom {
     display: flex;
     margin-top: 16px;
+  }
+
+  #pocket-bottom.no-inital-pocket-piece {
+    display: none;
+  }
+
+  #pocket-bottom.no-inital-pocket-piece.has-hidden-pocket-piece {
+    display: flex;
   }
 
   #pocket-bottom-mini {
@@ -2327,7 +2343,10 @@
         }
       }
       document.addEventListener("click", (event) => {
-        if (!event.isTrusted) {
+        if (
+          !event.isTrusted ||
+          (event.button !== undefined && event.button !== 0)
+        ) {
           return;
         }
         if (
@@ -2341,6 +2360,12 @@
       });
       chessgroundminiboardwrapper.addEventListener("mousedown", (event) => {
         event.stopPropagation();
+        if (
+          !event.isTrusted ||
+          (event.button !== undefined && event.button !== 0)
+        ) {
+          return;
+        }
         const maindivrect = maindiv.getBoundingClientRect();
         const chessgroundminirect = chessgroundmini.getBoundingClientRect();
         if (chessgroundmini.pinned) {
@@ -2359,6 +2384,9 @@
       chessgroundminiboardwrapper.addEventListener("touchstart", (event) => {
         event.stopPropagation();
         event.preventDefault();
+        if (event.touches && event.touches.length > 1) {
+          return;
+        }
         if (chessgroundmini.pinned) {
           return;
         }
@@ -5490,9 +5518,6 @@
           span.style.opacity = "0";
           span.style.fontSize = "1px";
         }, 2600);
-        setTimeout(() => {
-          document.body.removeChild(div);
-        }, 3200);
         document.body.appendChild(div);
       };
 
