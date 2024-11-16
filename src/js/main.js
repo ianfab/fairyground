@@ -817,7 +817,7 @@ function redrawChessground(customFEN) {
     fenBoard = customFEN;
     console.log("CustomFEN:", customFEN);
   } else {
-    fenBoard = board.fen();
+    fenBoard = chessground.state.fen;
   }
   const config = {
     autoCastle: false,
