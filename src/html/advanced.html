@@ -148,6 +148,34 @@
     pointer-events: none;
   }
 
+  .delete-piece:before {
+    content: "\f1f8";
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    background-color: crimson;
+    color: white;
+    font-family: FontAwesome;
+    font-size: 60px;
+    border: 10px solid #000;
+  }
+
+  .move-piece:before {
+    content: "\f047";
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    background-color: grey;
+    color: white;
+    font-family: FontAwesome;
+    font-size: 60px;
+    border: 10px solid #000;
+  }
+
   input[type="checkbox"] {
     display: inline-block;
     height: 20px;
@@ -1805,6 +1833,23 @@
     height: 50px;
     font-size: 28px;
     border: 4px solid black;
+  }
+
+  #boardsetuppieceidentifier {
+    position: fixed;
+    display: none;
+    z-index: 19;
+    opacity: 0.7;
+  }
+
+  #fakewrap {
+    width: 100px;
+    height: 100px;
+  }
+
+  #fakepiece {
+    width: 100px;
+    height: 100px;
   }
 
   #setpos:before {
@@ -5210,6 +5255,9 @@
           DOMListValue.join(" ");
         console.log(`Piece theme: ${themename}`);
         updateThemeDropdowns(themename, null);
+        if (board_setup_mode) {
+          triggerBoardSetupPieceIdentifier(false);
+        }
         //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
         //const nextIndex = (activeIndex + 1) % classes.length;
         //el.classList.replace(classes[activeIndex], classes[nextIndex]);
@@ -5521,6 +5569,55 @@
         document.body.appendChild(div);
       };
 
+      const onMouseMoveBoardSetupIdentifier = (event) => {
+        let identifier = document.getElementById("boardsetuppieceidentifier");
+        identifier.style.left = `${event.clientX + 60}px`;
+        identifier.style.top = `${event.clientY + 60}px`;
+      };
+
+      const triggerBoardSetupPieceIdentifier = (moveidentifier) => {
+        let identifier = document.getElementById("boardsetuppieceidentifier");
+        let fakeboard = document.getElementById("fakeboard");
+        let fakewrap = document.getElementById("fakewrap");
+        let fakeboardclasses = fakeboard.classList.value.split(" ");
+        let chessgrounddiv = document.getElementById("chessground-board");
+        let chessgroundcontainer = document.getElementById(
+          "chessground-container-div",
+        );
+        fakeboardclasses[1] = chessgroundcontainer.classList[1];
+        if (chessgrounddiv.classList.contains("orientation-white")) {
+          fakewrap.classList.remove("orientation-black");
+          fakewrap.classList.add("orientation-white");
+        } else if (chessgrounddiv.classList.contains("orientation-black")) {
+          fakewrap.classList.remove("orientation-white");
+          fakewrap.classList.add("orientation-black");
+        }
+        fakeboard.classList.value = fakeboardclasses.join(" ");
+        if (board_setup_mode) {
+          if (moveidentifier) {
+            let isboardsetuprect = document
+              .getElementById("isboardsetup")
+              .getBoundingClientRect();
+            identifier.style.top = `${isboardsetuprect.top + 60}px`;
+            identifier.style.left = `${isboardsetuprect.left + 60}px`;
+          }
+          document
+            .getElementById("dropdown-setpiece")
+            .dispatchEvent(new Event("change"));
+          identifier.style.display = "block";
+          document.addEventListener(
+            "mousemove",
+            onMouseMoveBoardSetupIdentifier,
+          );
+        } else {
+          identifier.style.display = "";
+          document.removeEventListener(
+            "mousemove",
+            onMouseMoveBoardSetupIdentifier,
+          );
+        }
+      };
+
       // Make error catchable
       const loadStockfish = async (params) => {
         return await Stockfish(params);
@@ -5656,6 +5753,9 @@
         chessgroundmini.classList.value = el.classList.value =
           DOMListValue.join(" ");
         updateThemeDropdowns(piece_set, null);
+        if (board_setup_mode) {
+          triggerBoardSetupPieceIdentifier(false);
+        }
       }
 
       function changeBoardSet(board_set) {
@@ -6676,6 +6776,7 @@
                   select_move_dialog,
                 onclick: () => {
                   board_setup_mode = !board_setup_mode;
+                  triggerBoardSetupPieceIdentifier(true);
                 },
               }),
               "Board Setup",
@@ -7071,6 +7172,49 @@
                 {
                   title:
                     "<move>: Move the pieces on the board.\n<delete>: Click on a square to delete the piece on that square.\n<letter>: Click on a square to place a piece of that letter. If there is a plus ahead, it means the promoted from.",
+                  onchange: () => {
+                    let fakepiece = document.getElementById("fakepiece");
+                    let dropdownsetpiece =
+                      document.getElementById("dropdown-setpiece");
+                    let values = [];
+                    let value =
+                      dropdownsetpiece[dropdownsetpiece.selectedIndex].value;
+                    if (value == undefined || value == "") {
+                      return;
+                    }
+                    let chcode = value.charCodeAt(0);
+                    let ch = value.charAt(0);
+                    let promoted = false;
+                    if (value.charAt(0) == "+") {
+                      chcode = value.charCodeAt(1);
+                      ch = value.charAt(1);
+                      promoted = true;
+                    }
+                    if (value == "<move>") {
+                      values.push("move-piece");
+                    } else if (value == "<delete>") {
+                      values.push("delete-piece");
+                    } else if (
+                      value.length > 2 ||
+                      (value.length == 2 && value.charAt(0) != "+")
+                    ) {
+                      return;
+                    } else if (chcode >= 65 && chcode <= 90) {
+                      values.push(
+                        `${promoted ? "p" : ""}${ch.toLowerCase()}-piece`,
+                      );
+                      values.push("white");
+                    } else if (chcode >= 97 && chcode <= 122) {
+                      values.push(`${promoted ? "p" : ""}${ch}-piece`);
+                      values.push("black");
+                    } else if (value == "*") {
+                      values.push("_-piece");
+                      values.push("black");
+                    } else {
+                      return;
+                    }
+                    fakepiece.classList.value = values.join(" ");
+                  },
                 },
                 [
                   m("option", { value: "<move>" }, "<move>"),
@@ -7381,7 +7525,19 @@
                     },
                     [m("option", { value: "defaultboard" }, "Default Board")],
                   ),
-                  m("button#button-flip", "Flip Board"),
+                  m(
+                    "button#button-flip",
+                    {
+                      onclick: () => {
+                        if (board_setup_mode) {
+                          setTimeout(() => {
+                            triggerBoardSetupPieceIdentifier(false);
+                          }, 50);
+                        }
+                      },
+                    },
+                    "Flip Board",
+                  ),
                   m(
                     "button",
                     {
@@ -8037,6 +8193,13 @@
                   ]),
                 ],
               ),
+            ]),
+          ]),
+          m("div#boardsetuppieceidentifier", [
+            m("div#fakeboard.defaultboard.default.board8x8", [
+              m("div#fakewrap.cg-wrap.orientation-white", [
+                m("piece#fakepiece"),
+              ]),
             ]),
           ]),
         ]);
