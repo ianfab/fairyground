@@ -323,6 +323,10 @@ coord {
     margin-left: 3px;
 }
 
+#boardsetupsettings p {
+    text-shadow: var(--text-shadow-style-black);
+}
+
 #boardsetupsettings2 p {
     text-shadow: var(--text-shadow-style-black);
 }
