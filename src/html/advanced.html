@@ -105,7 +105,28 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-position: top left;
+    overflow: hidden;
     z-index: -100;
+  }
+
+  .pagebackgroundcanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: none;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top left;
+    overflow: hidden;
+    z-index: -50;
+  }
+
+  .background-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
   .timer-active {
@@ -186,6 +207,7 @@
     text-align: center;
     -webkit-appearance: none;
     -moz-appearance: none;
+    appearance: none;
     font: normal normal normal 14px/1 FontAwesome;
     outline: 0;
     background: 0 0;
@@ -1379,7 +1401,7 @@
     padding: 10px;
     background-color: #000000;
     color: #ffffff;
-    border: 1px solid #ddd;
+    border: 2px solid #ddd;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
     z-index: 999;
   }
@@ -1962,6 +1984,7 @@
 <body>
   <div id="root"></div>
   <div id="pagebackground" class="pagebackground"></div>
+  <div id="pagebackgroundcanvas" class="pagebackgroundcanvas"></div>
   <script>
     //Fairyground namespace for variable/function definition transfer
     window.fairyground = { super: window };
@@ -2012,7 +2035,13 @@
         this.CurrentThemeRemainingTime = 0;
         this.Initialized = false;
         this.Timer = null;
+        this.CanvasWorker = null;
+        this.CanvasInstance = null;
+        this.CanvasState = "Uninitialized";
         this.StyleDurationsLoaded = false;
+        this.PendingCanvasReloading = false;
+        this.CanvasFrameRate = 50;
+        this.OnWindowResizeHandlerFunction = null;
       }
 
       destructor() {
@@ -2034,6 +2063,32 @@
           }
           this.StyleDurations.push(StyleDurationsInSeconds[i] * 1000);
         }
+      }
+
+      SetCanvasWorker(CanvasWorkerName) {
+        if (typeof CanvasWorkerName != "string") {
+          throw TypeError("SetCanvasWorker(CanvasWorkerName:string)");
+        }
+        if (this.CanvasWorker != null) {
+          return;
+        }
+        this.CanvasWorker = new Worker(
+          `./lib/canvas/${CanvasWorkerName}.canvas.worker.js`,
+        );
+        this.CanvasWorker.onmessage = (event) => {
+          const message = event.data;
+          if (message.message == "CanvasHandlerDestroyed") {
+            this.CanvasInstance.remove();
+            this.CanvasInstance = null;
+            this.CanvasState = "Uninitialized";
+            if (this.PendingCanvasReloading) {
+              this.PendingCanvasReloading = false;
+              this.StartCanvasAnimation();
+            }
+          }
+        };
+        this.OnWindowResizeHandlerFunction =
+          this.WindowResizeEventHandler.bind(this);
       }
 
       Initialize(OnInitializedCallback, OnErrorCallback) {
@@ -2222,6 +2277,104 @@
         ) {
           this.SetCurrentTheme(parseInt(ThemeIndex), false);
         }
+      }
+
+      SetCanvasFrameRate(FrameRate) {
+        if (typeof FrameRate != "number") {
+          throw TypeError("SetCanvasFrameRate(FrameRate:number)");
+        }
+        this.CanvasFrameRate = FrameRate;
+      }
+
+      StartCanvasAnimation() {
+        if (this.CanvasWorker == null) {
+          return false;
+        } else if (this.CanvasState != "Uninitialized") {
+          this.PendingCanvasReloading = true;
+          return true;
+        }
+        let canvas = document.createElement("canvas");
+        let pagebackground = document.getElementById("pagebackgroundcanvas");
+        canvas.setAttribute("width", `${window.innerWidth}`);
+        canvas.setAttribute("height", `${window.innerHeight}`);
+        canvas.classList.add("background-canvas");
+        const offscreenCanvas = canvas.transferControlToOffscreen();
+        pagebackground.appendChild(canvas);
+        this.CanvasWorker.postMessage(
+          {
+            message: "Start",
+            canvas: offscreenCanvas,
+            framerate: this.CanvasFrameRate,
+            id: 0,
+          },
+          [offscreenCanvas],
+        );
+        this.CanvasInstance = canvas;
+        this.CanvasState = "Running";
+        window.addEventListener("resize", this.OnWindowResizeHandlerFunction);
+        return true;
+      }
+
+      PauseCanvasAnimation() {
+        if (this.CanvasWorker == null || this.CanvasState != "Running") {
+          return false;
+        }
+        this.CanvasWorker.postMessage({ message: "Stop" });
+        this.CanvasState = "Stopped";
+        return true;
+      }
+
+      ContinueCanvasAnimation() {
+        if (this.CanvasWorker == null || this.CanvasState != "Stopped") {
+          return false;
+        }
+        this.CanvasWorker.postMessage({ message: "Continue" });
+        this.CanvasState = "Running";
+        return true;
+      }
+
+      ResizeCanvas(Width, Height) {
+        if (typeof Width != "number" || typeof Height != "number") {
+          throw TypeError("ResizeCanvas(Width:number,Height:number)");
+        }
+        if (this.CanvasWorker == null) {
+          return;
+        }
+        this.CanvasWorker.postMessage({
+          message: "Resize",
+          width: Width,
+          height: Height,
+        });
+      }
+
+      CloseCanvas() {
+        if (this.CanvasWorker == null || this.CanvasState == "Uninitialized") {
+          return false;
+        }
+        this.PendingCanvasReloading = false;
+        this.CanvasWorker.postMessage({ message: "Terminate" });
+        this.CanvasState = "Closing";
+        window.removeEventListener(
+          "resize",
+          this.OnWindowResizeHandlerFunction,
+        );
+        return true;
+      }
+
+      WindowResizeEventHandler() {
+        this.ResizeCanvas(window.innerWidth, window.innerHeight);
+      }
+
+      MoveCanvasToNewContainer(Container) {
+        if (!(Container instanceof HTMLDivElement)) {
+          throw TypeError("MoveCanvasToNewContainer(Container:HTMLDivElement)");
+        }
+        if (this.CanvasWorker == null || this.CanvasState == "Uninitialized") {
+          return false;
+        }
+        this.CanvasInstance.remove();
+        Container.appendChild(this.CanvasInstance);
+        return true;
       }
     }
 
@@ -2527,6 +2680,23 @@
           "",
         );
         variantsystemready = true;
+      }
+    });
+
+    document.addEventListener("uilayoutchange", (event) => {
+      if (currentthemeobj instanceof UIThemeObject) {
+        if (event.detail.message == null) {
+          currentthemeobj.MoveCanvasToNewContainer(
+            document.getElementById("pagebackgroundcanvas"),
+          );
+        } else if (typeof event.detail.message == "string") {
+          let element = document.getElementById(event.detail.message);
+          currentthemeobj.MoveCanvasToNewContainer(
+            element == null
+              ? document.getElementById("pagebackgroundcanvas")
+              : element,
+          );
+        }
       }
     });
 
@@ -3056,7 +3226,7 @@
               continue;
             }
             let uithemesettings = rawText[i].split("|");
-            if (uithemesettings.length != 2 && uithemesettings.length != 3) {
+            if (uithemesettings.length < 2 && uithemesettings.length > 4) {
               console.warn(`At line ${i + 1} in uithemes.txt: Bad syntax\n`);
               continue;
             }
@@ -3073,44 +3243,86 @@
               continue;
             }
             let multiuithemedurations = [];
-            if (uithemesettings.length == 3) {
+            let canvasjs = "";
+            let canvasframerate = 50;
+            if (uithemesettings.length == 3 || uithemesettings.length == 4) {
               let durations = uithemesettings[2].split(",");
-              if (durations.length == 0) {
+              if (uithemesettings[2] == "" && uithemesettings.length == 3) {
                 console.warn(
                   `At line ${i + 1} in uithemes.txt: Bad syntax for sub-theme duration.\n`,
                 );
                 continue;
               }
               let haserror = false;
-              for (j = 0; j < durations.length; j++) {
-                if (isNaN(parseInt(durations[j]))) {
-                  console.warn(
-                    `At token ${j + 1} of sub-theme in line ${i + 1} in uithemes.txt: Sub-theme duration must be a positive integer.\n`,
-                  );
-                  haserror = true;
-                  break;
-                } else {
-                  let durationlength = parseInt(durations[j]);
-                  if (durationlength < 1) {
+              if (uithemesettings[2] != "") {
+                for (j = 0; j < durations.length; j++) {
+                  if (isNaN(parseInt(durations[j]))) {
                     console.warn(
                       `At token ${j + 1} of sub-theme in line ${i + 1} in uithemes.txt: Sub-theme duration must be a positive integer.\n`,
                     );
                     haserror = true;
                     break;
+                  } else {
+                    let durationlength = parseInt(durations[j]);
+                    if (durationlength < 1) {
+                      console.warn(
+                        `At token ${j + 1} of sub-theme in line ${i + 1} in uithemes.txt: Sub-theme duration must be a positive integer.\n`,
+                      );
+                      haserror = true;
+                      break;
+                    }
+                    multiuithemedurations.push(durationlength);
                   }
-                  multiuithemedurations.push(durationlength);
                 }
               }
               if (haserror) {
                 continue;
               }
+              if (uithemesettings.length == 4) {
+                let canvasoption = uithemesettings[3].split(",");
+                if (canvasoption.length != 2) {
+                  console.warn(
+                    `At line ${i + 1} in uithemes.txt: Bad syntax for canvas settings.\n`,
+                  );
+                  continue;
+                }
+                if (canvasoption[0] == "") {
+                  console.warn(
+                    `At line ${i + 1} in uithemes.txt: Canvas worker name must not be null.\n`,
+                  );
+                  continue;
+                } else {
+                  canvasjs = canvasoption[0];
+                }
+                let frameratenum = parseInt(canvasoption[1]);
+                if (isNaN(frameratenum) || frameratenum < 1) {
+                  console.warn(
+                    `At line ${i + 1} in uithemes.txt: Frame rate must be a positive integer.\n`,
+                  );
+                  continue;
+                } else {
+                  canvasframerate = frameratenum;
+                }
+              }
             }
-            uithemes[0].push(uithemesettings[0]);
             let uithemeobj = new UIThemeObject(
               uithemesettings[0],
               uithemesettings[1],
             );
             uithemeobj.SetStyleDurations(multiuithemedurations);
+            if (canvasjs != "") {
+              try {
+                uithemeobj.SetCanvasWorker(canvasjs);
+              } catch (error) {
+                console.error("Error loading worker:", error);
+                console.warn(
+                  `At line ${i + 1} in uithemes.txt: Unable to initialize worker.\n`,
+                );
+                continue;
+              }
+              uithemeobj.SetCanvasFrameRate(canvasframerate);
+            }
+            uithemes[0].push(uithemesettings[0]);
             uithemes[1].push(uithemeobj);
           }
           totalreceives = uithemes[0].length;
@@ -3190,7 +3402,7 @@
           tmpbg.style.backgroundAttachment = BGBeforeAttachment;
           tmpbg.className = "backgroundimg";
           tmpbg.style.opacity = "1";
-          tmpbg.style.zIndex = "-1";
+          tmpbg.style.zIndex = "-51";
           document.body.appendChild(tmpbg);
         }
         if (BGAfter != "none") {
@@ -3202,7 +3414,7 @@
           tmpbg2.style.backgroundAttachment = BGAfterAttachment;
           tmpbg2.className = "backgroundimg";
           tmpbg2.style.opacity = "0";
-          tmpbg2.style.zIndex = "-2";
+          tmpbg2.style.zIndex = "-52";
           document.body.appendChild(tmpbg2);
         }
         if (BGBefore != "none" && BGAfter != "none") {
@@ -5770,19 +5982,25 @@
         updateThemeDropdowns(null, board_set);
       }
 
-      function changeUI(ui_id, save_to_local_storage) {
+      function changeUI(ui_id, save_to_local_storage, change_canvas) {
         if (uithemes[0].indexOf(ui_id) < 0) {
           return;
         }
         let index = uithemes[0].indexOf(ui_id);
         if (currentthemeobj) {
           currentthemeobj.CancelTimer();
+          if (change_canvas) {
+            currentthemeobj.CloseCanvas();
+          }
         }
         currentthemeobj = uithemes[1][index];
         ApplyUIThemeStyleNode(uithemes[1][index].CurrentTheme());
         uithemes[1][index].NextTheme(() => {
-          changeUI(ui_id, false);
+          changeUI(ui_id, false, false);
         }, true);
+        if (change_canvas) {
+          uithemes[1][index].StartCanvasAnimation();
+        }
         updateUIThemeDropdown(ui_id);
         if (save_to_local_storage) {
           localStorage.setItem("UserSelectedUITheme", ui_id);
@@ -6628,13 +6846,14 @@
                     "UserSelectedUITheme",
                   );
                   if (UserSelectedUITheme) {
-                    changeUI(UserSelectedUITheme, false);
+                    changeUI(UserSelectedUITheme, false, true);
                   } else {
                     changeUI(
                       $("#dropdown-uitheme")[
                         $("#dropdown-uitheme").selectedIndex
                       ].value,
                       false,
+                      true,
                     );
                   }
                 },
@@ -7555,6 +7774,7 @@
                               uithemesdropdown.length
                           ].value,
                           true,
+                          true,
                         );
                       },
                     },
@@ -7568,6 +7788,7 @@
                           $("#dropdown-uitheme")[
                             $("#dropdown-uitheme").selectedIndex
                           ].value,
+                          true,
                           true,
                         );
                       },

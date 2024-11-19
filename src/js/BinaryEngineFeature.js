@@ -2268,6 +2268,11 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   let canceltext = document.createTextNode("Close");
   cancel.appendChild(canceltext);
   cancel.onclick = function () {
+    document.dispatchEvent(
+      new CustomEvent("uilayoutchange", {
+        detail: { message: "enginesetuppopup-background" },
+      }),
+    );
     while (document.getElementById("enginesettingspopup-background") != null) {
       document.getElementById("enginesettingspopup-background").remove();
     }
@@ -2453,6 +2458,11 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   document.body.appendChild(popup);
   document.body.appendChild(background);
   showcurrent.click();
+  document.dispatchEvent(
+    new CustomEvent("uilayoutchange", {
+      detail: { message: "enginesettingspopup-background" },
+    }),
+  );
 }
 
 window.fairyground.BinaryEngineFeature.ShowEditEngineOptionsUI =
@@ -2692,6 +2702,11 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
       newengineobj.destructor();
       newengineobj = undefined;
     }
+    document.dispatchEvent(
+      new CustomEvent("uilayoutchange", {
+        detail: { message: "enginemanagementpopup-background" },
+      }),
+    );
     while (document.getElementById("enginesetuppopup-background") != null) {
       document.getElementById("enginesetuppopup-background").remove();
     }
@@ -2816,6 +2831,11 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   background.style.zIndex = "1003";
   document.body.appendChild(popup);
   document.body.appendChild(background);
+  document.dispatchEvent(
+    new CustomEvent("uilayoutchange", {
+      detail: { message: "enginesetuppopup-background" },
+    }),
+  );
 }
 
 window.fairyground.BinaryEngineFeature.ShowEngineSetupUI = ShowEngineSetupUI;
@@ -3240,6 +3260,9 @@ function ShowEngineManagementUI(EngineList, ws) {
       }
     }
     document.getElementById("binengineoutputinit").click();
+    document.dispatchEvent(
+      new CustomEvent("uilayoutchange", { detail: { message: null } }),
+    );
     while (
       document.getElementById("enginemanagementpopup-background") != null
     ) {
@@ -3416,6 +3439,11 @@ function ShowEngineManagementUI(EngineList, ws) {
   background.style.zIndex = "1001";
   document.body.appendChild(popup);
   document.body.appendChild(background);
+  document.dispatchEvent(
+    new CustomEvent("uilayoutchange", {
+      detail: { message: "enginemanagementpopup-background" },
+    }),
+  );
 }
 
 window.fairyground.BinaryEngineFeature.ShowEngineManagementUI =

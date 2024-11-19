@@ -1669,6 +1669,9 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
   let closetext = document.createTextNode("Close");
   close.appendChild(closetext);
   close.onclick = function () {
+    document.dispatchEvent(
+      new CustomEvent("uilayoutchange", { detail: { message: null } }),
+    );
     while (document.getElementById("loadsavedgamespopup-background") != null) {
       document.getElementById("loadsavedgamespopup-background").remove();
     }
@@ -1785,6 +1788,11 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
   background.style.zIndex = "1001";
   document.body.appendChild(popup);
   document.body.appendChild(background);
+  document.dispatchEvent(
+    new CustomEvent("uilayoutchange", {
+      detail: { message: "loadsavedgamespopup-background" },
+    }),
+  );
 }
 
 window.fairyground.SavedGamesParsingFeature.ShowPGNOrEPDFileUI =
