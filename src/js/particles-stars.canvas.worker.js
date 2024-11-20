@@ -30,8 +30,10 @@ function GenerateRandomPointInsideViewCone(
 function GenerateRandomColor() {
   let ProbablityNumber = Math.random();
   if (ProbablityNumber < 0.85) {
+    //By default 85% of the stars are white points. Decrease this value to see more colourful points at the cost of CPU usage.
     return { special: false, color1: "#fff", color2: "", color3: "" };
   } else if (ProbablityNumber < 0.9) {
+    //By default 0.9-0.85=0.05=5% of all points are light orange.
     return {
       special: true,
       color1: "#fff",
@@ -39,6 +41,7 @@ function GenerateRandomColor() {
       color3: "#ffb66c00",
     };
   } else if (ProbablityNumber < 0.95) {
+    //By default 0.95-0.9=0.05=5% of all points are light blue.
     return {
       special: true,
       color1: "#fff",
@@ -46,6 +49,7 @@ function GenerateRandomColor() {
       color3: "#91c8ff00",
     };
   } else {
+    //By default 1-0.95=0.05=5% of all points are light red.
     return {
       special: true,
       color1: "#fff",
@@ -344,6 +348,7 @@ class CanvasHandler {
       let pos = null;
       let selected = null;
       let gradient = null;
+      let size = 0;
       this.CanvasContext.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
       for (i = 0; i < this.Points.length; i++) {
         selected = this.Points[i];
@@ -371,29 +376,38 @@ class CanvasHandler {
               (this.GlobalAlpha * (selected.Z - this.MinimumZ)) / 100;
           }
           pos = selected.GetPositionOnCanvas();
+          size = selected.GetSizeFromViewPoint();
           if (selected.HasSpecialColor) {
-            gradient = this.CanvasContext.createRadialGradient(
-              pos.x,
-              pos.y,
-              0,
-              pos.x,
-              pos.y,
-              selected.GetSizeFromViewPoint(),
-            );
-            gradient.addColorStop(0, selected.Color);
-            gradient.addColorStop(0.5, selected.SecondaryColor);
-            gradient.addColorStop(1, selected.FadeColor);
-            this.CanvasContext.beginPath();
-            this.CanvasContext.arc(
-              pos.x,
-              pos.y,
-              selected.GetSizeFromViewPoint(),
-              0,
-              this.PI2,
-            );
-            this.CanvasContext.fillStyle = gradient;
-            this.CanvasContext.fill();
-            this.CanvasContext.closePath();
+            //Drawing shapes with gradient is CPU intensive, so if the point radius on the canvas (the screen) is smaller than 6 pixels, use low model which does not use gradient.
+            if (size < 6) {
+              this.CanvasContext.beginPath();
+              this.CanvasContext.arc(pos.x, pos.y, size * 0.75, 0, this.PI2);
+              this.CanvasContext.fillStyle = selected.SecondaryColor;
+              this.CanvasContext.fill();
+              this.CanvasContext.closePath();
+              this.CanvasContext.beginPath();
+              this.CanvasContext.arc(pos.x, pos.y, size / 4, 0, this.PI2);
+              this.CanvasContext.fillStyle = selected.Color;
+              this.CanvasContext.fill();
+              this.CanvasContext.closePath();
+            } else {
+              gradient = this.CanvasContext.createRadialGradient(
+                pos.x,
+                pos.y,
+                0,
+                pos.x,
+                pos.y,
+                size,
+              );
+              gradient.addColorStop(0, selected.Color);
+              gradient.addColorStop(0.5, selected.SecondaryColor);
+              gradient.addColorStop(1, selected.FadeColor);
+              this.CanvasContext.beginPath();
+              this.CanvasContext.arc(pos.x, pos.y, size, 0, this.PI2);
+              this.CanvasContext.fillStyle = gradient;
+              this.CanvasContext.fill();
+              this.CanvasContext.closePath();
+            }
           } else {
             this.CanvasContext.beginPath();
             this.CanvasContext.arc(
@@ -433,6 +447,7 @@ class CanvasHandler {
       let selected = null;
       let gradient = null;
       let EndFrame = 2 * this.FrameRate;
+      let size = 0;
       this.CanvasContext.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
       for (i = 0; i < this.Points.length; i++) {
         selected = this.Points[i];
@@ -465,29 +480,38 @@ class CanvasHandler {
               (EndFrame - this.FrameCounter) / EndFrame;
           }
           pos = selected.GetPositionOnCanvas();
+          size = selected.GetSizeFromViewPoint();
           if (selected.HasSpecialColor) {
-            gradient = this.CanvasContext.createRadialGradient(
-              pos.x,
-              pos.y,
-              0,
-              pos.x,
-              pos.y,
-              selected.GetSizeFromViewPoint(),
-            );
-            gradient.addColorStop(0, selected.Color);
-            gradient.addColorStop(0.5, selected.SecondaryColor);
-            gradient.addColorStop(1, selected.FadeColor);
-            this.CanvasContext.beginPath();
-            this.CanvasContext.arc(
-              pos.x,
-              pos.y,
-              selected.GetSizeFromViewPoint(),
-              0,
-              this.PI2,
-            );
-            this.CanvasContext.fillStyle = gradient;
-            this.CanvasContext.fill();
-            this.CanvasContext.closePath();
+            //Drawing shapes with gradient is CPU intensive, so if the point radius on the canvas (the screen) is smaller than 6 pixels, use low model which does not use gradient.
+            if (size < 6) {
+              this.CanvasContext.beginPath();
+              this.CanvasContext.arc(pos.x, pos.y, size * 0.75, 0, this.PI2);
+              this.CanvasContext.fillStyle = selected.SecondaryColor;
+              this.CanvasContext.fill();
+              this.CanvasContext.closePath();
+              this.CanvasContext.beginPath();
+              this.CanvasContext.arc(pos.x, pos.y, size / 4, 0, this.PI2);
+              this.CanvasContext.fillStyle = selected.Color;
+              this.CanvasContext.fill();
+              this.CanvasContext.closePath();
+            } else {
+              gradient = this.CanvasContext.createRadialGradient(
+                pos.x,
+                pos.y,
+                0,
+                pos.x,
+                pos.y,
+                size,
+              );
+              gradient.addColorStop(0, selected.Color);
+              gradient.addColorStop(0.5, selected.SecondaryColor);
+              gradient.addColorStop(1, selected.FadeColor);
+              this.CanvasContext.beginPath();
+              this.CanvasContext.arc(pos.x, pos.y, size, 0, this.PI2);
+              this.CanvasContext.fillStyle = gradient;
+              this.CanvasContext.fill();
+              this.CanvasContext.closePath();
+            }
           } else {
             this.CanvasContext.beginPath();
             this.CanvasContext.arc(
