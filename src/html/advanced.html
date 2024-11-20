@@ -2700,6 +2700,16 @@
       }
     });
 
+    document.addEventListener("visibilitychange", () => {
+      if (currentthemeobj instanceof UIThemeObject) {
+        if (document.visibilityState === "hidden") {
+          currentthemeobj.PauseCanvasAnimation();
+        } else if (document.visibilityState === "visible") {
+          currentthemeobj.ContinueCanvasAnimation();
+        }
+      }
+    });
+
     //Remove duplicated elements
     function uniqArr(arr) {
       var newArr = new Set(arr);

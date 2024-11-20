@@ -27,6 +27,81 @@ function GenerateRandomPointInsideViewCone(
   };
 }
 
+//Generate random numbers and sort in descending order in segements
+//Having more segements will generate faster but the numbers will be more equally distributed
+function GenerateRandomSortedNumberArray(
+  MinimumValue,
+  MaximumValue,
+  Length,
+  SegementCount,
+) {
+  if (
+    typeof MinimumValue != "number" ||
+    typeof MaximumValue != "number" ||
+    typeof Length != "number" ||
+    typeof SegementCount != "number"
+  ) {
+    throw TypeError("");
+  }
+  if (SegementCount > Length || SegementCount - Math.floor(SegementCount) > 0) {
+    throw RangeError("");
+  }
+  let Result = [];
+  let i = 0;
+  let j = 0;
+  let k = 0;
+  let temp = 0;
+  let seglength = Length / SegementCount;
+  let valueseglength = (MaximumValue - MinimumValue) / SegementCount;
+  let segstart = 0;
+  let segend = 0;
+  for (i = SegementCount - 1; i >= 0; i--) {
+    segstart = Math.floor(i * seglength);
+    segend = Math.floor((i + 1) * seglength) - 1;
+    for (j = segstart; j <= segend; j++) {
+      Result.push(MinimumValue + valueseglength * (Math.random() + i));
+    }
+  }
+  for (k = 0; k < SegementCount; k++) {
+    segstart = Math.floor(k * seglength);
+    segend = Math.floor((k + 1) * seglength) - 1;
+    for (i = segend; i > segstart; i--) {
+      for (j = segstart; j < i; j++) {
+        if (Result[j] < Result[j + 1]) {
+          temp = Result[j];
+          Result[j] = Result[j + 1];
+          Result[j + 1] = temp;
+        }
+      }
+    }
+  }
+  return Result;
+}
+
+//GenerateRandomSortedNumberArray() when Length=SegementCount
+function GenerateEquidistributionSortedRandomNumbers(
+  MinimumValue,
+  MaximumValue,
+  Count,
+) {
+  if (
+    typeof MinimumValue != "number" ||
+    typeof MaximumValue != "number" ||
+    typeof Count != "number"
+  ) {
+    throw TypeError("");
+  }
+  let Result = [];
+  let i = 0;
+  for (i = Count - 1; i >= 0; i--) {
+    Result.push(
+      MinimumValue +
+        ((MaximumValue - MinimumValue) / Count) * (Math.random() + i),
+    );
+  }
+  return Result;
+}
+
 function GenerateRandomColor() {
   let ProbablityNumber = Math.random();
   if (ProbablityNumber < 0.85) {
@@ -95,7 +170,7 @@ class Point {
       throw TypeError("");
     }
     if (
-      Z < CanvasDistanceToViewPoint ||
+      Z < MinimumZ ||
       CanvasDistanceToViewPoint <= 0 ||
       CanvasHeight <= 0 ||
       CanvasWidth <= 0
@@ -177,6 +252,7 @@ class CanvasHandler {
     this.MinimumZ = this.CanvasDistanceToViewPoint / 10;
     this.MaxZ = 1100;
     this.PointGenerationBufferHeight = 100;
+    this.InitializationMinimumZ = this.MaxZ - this.PointGenerationBufferHeight;
     this.FrameCounter = 0;
     this.RenderFunction = null;
     this.PI2 = 2 * Math.PI;
@@ -283,6 +359,11 @@ class CanvasHandler {
     this.Canvas.height = NewCanvasHeightInPixels;
     let randompos = null;
     let randomcolor = null;
+    let randomz = GenerateEquidistributionSortedRandomNumbers(
+      this.InitializationMinimumZ,
+      this.MaxZ,
+      Math.ceil((NewCanvasWidthInPixels * NewCanvasHeightInPixels) / 2500),
+    );
     for (
       i = 0;
       i < (NewCanvasWidthInPixels * NewCanvasHeightInPixels) / 2500;
@@ -292,8 +373,8 @@ class CanvasHandler {
         this.Canvas.width,
         this.Canvas.height,
         this.CanvasDistanceToViewPoint,
-        this.CanvasDistanceToViewPoint + 100,
-        this.MaxZ,
+        randomz[i],
+        randomz[i] + 1,
       );
       randomcolor = GenerateRandomColor();
       if (randomcolor.special) {
@@ -350,6 +431,12 @@ class CanvasHandler {
       let gradient = null;
       let size = 0;
       this.CanvasContext.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
+      if (this.InitializationMinimumZ > this.MinimumZ) {
+        this.InitializationMinimumZ -= 100 / this.FrameRate;
+        if (this.InitializationMinimumZ < this.MinimumZ) {
+          this.InitializationMinimumZ = this.MinimumZ;
+        }
+      }
       for (i = 0; i < this.Points.length; i++) {
         selected = this.Points[i];
         if (
