@@ -194,6 +194,7 @@ class CanvasHandler {
       (Math.log(Math.floor(FrameRate / 2) + 7) - Math.log(5));
     this.PointSizeExpandFactor = 1.8562979903656261724854012740647;
     this.RenderFunction = null;
+    this.PreviousRenderTimeStamp = -1;
     this.PI2 = 2 * Math.PI;
     let i = 0;
     let randompos = null;
@@ -318,7 +319,15 @@ class CanvasHandler {
     let i = 0;
     if (!this.Unstoppable && this.StoppedRendering) {
       return;
+    } else if (this.PreviousRenderTimeStamp > -1) {
+      if (
+        Date.now() - this.PreviousRenderTimeStamp <
+        Math.floor(this.RenderInterval)
+      ) {
+        return;
+      }
     }
+    this.PreviousRenderTimeStamp = Date.now();
     if (this.State == 0) {
       let CanvasCenterX = this.Canvas.width / 2;
       let CanvasCenterY = this.Canvas.height / 2;

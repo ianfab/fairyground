@@ -255,6 +255,7 @@ class CanvasHandler {
     this.InitializationMinimumZ = this.MaxZ - this.PointGenerationBufferHeight;
     this.FrameCounter = 0;
     this.RenderFunction = null;
+    this.PreviousRenderTimeStamp = -1;
     this.PI2 = 2 * Math.PI;
     let i = 0;
     let randompos = null;
@@ -424,7 +425,15 @@ class CanvasHandler {
     let i = 0;
     if (!this.Unstoppable && this.StoppedRendering) {
       return;
+    } else if (this.PreviousRenderTimeStamp > -1) {
+      if (
+        Date.now() - this.PreviousRenderTimeStamp <
+        Math.floor(this.RenderInterval)
+      ) {
+        return;
+      }
     }
+    this.PreviousRenderTimeStamp = Date.now();
     if (this.State == 0) {
       let pos = null;
       let selected = null;
