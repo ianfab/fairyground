@@ -563,9 +563,11 @@ class CanvasHandler {
             this.MaxZ - this.PointGenerationBufferHeight - 100
           ) {
             this.CanvasContext.globalAlpha =
-              (this.GlobalAlpha *
+              (((this.GlobalAlpha *
                 (this.MaxZ - this.PointGenerationBufferHeight - selected.Z)) /
-              100;
+                100) *
+                (EndFrame - this.FrameCounter)) /
+              EndFrame;
           } else if (selected.Z < this.MinimumZ + 100) {
             this.CanvasContext.globalAlpha =
               (((selected.Z - this.MinimumZ) / 100) *

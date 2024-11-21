@@ -74,8 +74,23 @@ Enjoy!
 
 ## Supported Browsers
 
-Most modern browsers should work, such as Google Chrome, Mozilla FireFox, Microsoft Edge, Apple Safari.
-Older browsers like Internet Explorer of any version are not supported.
+### Full Support
+
+- Google Chrome
+- Microsoft Edge
+- Mozilla Firefox
+
+### Limited Support
+
+- Apple Safari
+
+### No Support
+
+- Microsoft Internet Explorer
+- Opera Browser
+- Brave Browser
+
+Support for browsers not mentioned above are not clear. You need to check it yourself.
 
 ## Run Engines Remotely
 
