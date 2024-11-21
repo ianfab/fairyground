@@ -3568,24 +3568,27 @@
       let rootpadding =
         parseFloat(rootdivstyle.paddingLeft) +
         parseFloat(rootdivstyle.paddingRight);
-      let boardstyle = window.getComputedStyle(
-        document.getElementById("chessground-board"),
+      let boardrect = document
+        .getElementById("chessground-board")
+        .getBoundingClientRect();
+      let toppocketrect = document
+        .getElementById("pocket-top")
+        .getBoundingClientRect();
+      let bottompocketrect = document
+        .getElementById("pocket-bottom")
+        .getBoundingClientRect();
+      let boardwidth = Math.max(
+        boardrect.width,
+        toppocketrect.width,
+        bottompocketrect.width,
       );
-      let boardwidth = parseFloat(boardstyle.width);
-      let boardmargin =
-        parseFloat(boardstyle.marginLeft) + parseFloat(boardstyle.marginRight);
       let infodiv = document.getElementById("info");
       let infodivstyle = window.getComputedStyle(infodiv);
       let infodivmargin =
         parseFloat(infodivstyle.marginLeft) +
         parseFloat(infodivstyle.marginRight);
       let finalwidth =
-        rootwidth -
-        boardwidth -
-        boardmargin -
-        infodivmargin -
-        rootpadding -
-        cutoffwidth;
+        rootwidth - boardwidth - infodivmargin - rootpadding - cutoffwidth;
       if (finalwidth < 240) {
         if (finalwidth < 20) {
           document.body.style.overflowX = "scroll";
