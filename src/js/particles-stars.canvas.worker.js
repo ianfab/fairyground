@@ -253,9 +253,10 @@ class CanvasHandler {
     this.MaxZ = 1100;
     this.PointGenerationBufferHeight = 100;
     this.InitializationMinimumZ = this.MaxZ - this.PointGenerationBufferHeight;
+    this.PointSpeed = 50 / FrameRate;
     this.FrameCounter = 0;
     this.RenderFunction = null;
-    this.PreviousRenderTimeStamp = -1;
+    this.Timer = null;
     this.PI2 = 2 * Math.PI;
     let i = 0;
     let randompos = null;
@@ -281,7 +282,7 @@ class CanvasHandler {
             randompos.y,
             randompos.z,
             this.MinimumZ,
-            100 / FrameRate,
+            this.PointSpeed,
             20 + 20 * Math.random(),
             ContainerOffscreenCanvas.width,
             ContainerOffscreenCanvas.height,
@@ -300,7 +301,7 @@ class CanvasHandler {
             randompos.y,
             randompos.z,
             this.MinimumZ,
-            100 / FrameRate,
+            this.PointSpeed,
             10 + 10 * Math.random(),
             ContainerOffscreenCanvas.width,
             ContainerOffscreenCanvas.height,
@@ -322,14 +323,24 @@ class CanvasHandler {
       message: "CanvasHandlerDestroyed",
       id: this.Identification,
     });
+    if (this.Timer != null) {
+      clearInterval(this.Timer);
+    }
     CurrentCanvasWorkerState = "Uninitialized";
   }
 
   StartRender() {
     this.StoppedRendering = false;
     this.IsRendering = true;
-    this.RenderFunction = this.RenderFrame.bind(this);
-    self.requestAnimationFrame(this.RenderFunction);
+    if (this.Timer == null) {
+      this.RenderFunction = this.RenderFrame.bind(this);
+      this.Timer = setInterval(() => {
+        if (!this.Unstoppable && this.StoppedRendering) {
+          return;
+        }
+        requestAnimationFrame(this.RenderFunction);
+      }, this.RenderInterval);
+    }
   }
 
   StopRender() {
@@ -385,7 +396,7 @@ class CanvasHandler {
             randompos.y,
             randompos.z,
             this.MinimumZ,
-            100 / this.FrameRate,
+            this.PointSpeed,
             20 + 20 * Math.random(),
             this.Canvas.width,
             this.Canvas.height,
@@ -404,7 +415,7 @@ class CanvasHandler {
             randompos.y,
             randompos.z,
             this.MinimumZ,
-            100 / this.FrameRate,
+            this.PointSpeed,
             10 + 10 * Math.random(),
             this.Canvas.width,
             this.Canvas.height,
@@ -423,17 +434,6 @@ class CanvasHandler {
 
   RenderFrame() {
     let i = 0;
-    if (!this.Unstoppable && this.StoppedRendering) {
-      return;
-    } else if (this.PreviousRenderTimeStamp > -1) {
-      if (
-        Date.now() - this.PreviousRenderTimeStamp <
-        Math.floor(this.RenderInterval)
-      ) {
-        return;
-      }
-    }
-    this.PreviousRenderTimeStamp = Date.now();
     if (this.State == 0) {
       let pos = null;
       let selected = null;
@@ -631,9 +631,6 @@ class CanvasHandler {
         return;
       }
     }
-    setTimeout(() => {
-      self.requestAnimationFrame(this.RenderFunction);
-    }, this.RenderInterval);
   }
 }
 

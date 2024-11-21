@@ -179,22 +179,25 @@ class CanvasHandler {
     this.DefaultPointColor = `rgb(${this.PointColorRed},${this.PointColorGreen},${this.PointColorBlue})`;
     this.MaxPointSize = 0;
     this.ExpandFactor = 10;
-    this.ExpandDecreaseFactor = Math.pow(1 / this.ExpandFactor, 1 / FrameRate);
+    this.ExpandDecreaseFactor = Math.pow(
+      1 / this.ExpandFactor,
+      0.5 / FrameRate,
+    );
     this.Transparency = 0.7;
-    this.TransparencyDecreaseFactor = 0.2 / FrameRate;
+    this.TransparencyDecreaseFactor = 0.1 / FrameRate;
     this.PointAccelerationFactor = Math.pow(1 / 100, 1 / FrameRate);
     this.PointConcentrateAccelerationFactor = Math.pow(
       Math.pow(0.8, 50),
-      1 / FrameRate,
+      0.5 / FrameRate,
     );
     this.PointConcentrateInitialSpeedFactor =
       1 - this.PointConcentrateAccelerationFactor;
     this.PointSizeIncrementAdjustFactor =
       (Math.log(32) - Math.log(5)) /
-      (Math.log(Math.floor(FrameRate / 2) + 7) - Math.log(5));
+      (Math.log(Math.floor(FrameRate) + 7) - Math.log(5));
     this.PointSizeExpandFactor = 1.8562979903656261724854012740647;
     this.RenderFunction = null;
-    this.PreviousRenderTimeStamp = -1;
+    this.Timer = null;
     this.PI2 = 2 * Math.PI;
     let i = 0;
     let randompos = null;
@@ -222,7 +225,7 @@ class CanvasHandler {
           0,
           randomsize,
           this.DefaultPointColor,
-          FrameRate * Math.random(),
+          2 * FrameRate * Math.random(),
         ),
       );
     }
@@ -234,14 +237,24 @@ class CanvasHandler {
       message: "CanvasHandlerDestroyed",
       id: this.Identification,
     });
+    if (this.Timer != null) {
+      clearInterval(this.Timer);
+    }
     CurrentCanvasWorkerState = "Uninitialized";
   }
 
   StartRender() {
     this.StoppedRendering = false;
     this.IsRendering = true;
-    this.RenderFunction = this.RenderFrame.bind(this);
-    requestAnimationFrame(this.RenderFunction);
+    if (this.Timer == null) {
+      this.RenderFunction = this.RenderFrame.bind(this);
+      this.Timer = setInterval(() => {
+        if (!this.Unstoppable && this.StoppedRendering) {
+          return;
+        }
+        requestAnimationFrame(this.RenderFunction);
+      }, this.RenderInterval);
+    }
   }
 
   StopRender() {
@@ -299,7 +312,7 @@ class CanvasHandler {
           0,
           randomsize,
           this.DefaultPointColor,
-          this.FrameRate * Math.random(),
+          2 * this.FrameRate * Math.random(),
         ),
       );
     }
@@ -317,17 +330,6 @@ class CanvasHandler {
 
   RenderFrame() {
     let i = 0;
-    if (!this.Unstoppable && this.StoppedRendering) {
-      return;
-    } else if (this.PreviousRenderTimeStamp > -1) {
-      if (
-        Date.now() - this.PreviousRenderTimeStamp <
-        Math.floor(this.RenderInterval)
-      ) {
-        return;
-      }
-    }
-    this.PreviousRenderTimeStamp = Date.now();
     if (this.State == 0) {
       let CanvasCenterX = this.Canvas.width / 2;
       let CanvasCenterY = this.Canvas.height / 2;
@@ -381,7 +383,7 @@ class CanvasHandler {
           if (selected.CooldownFrames <= 0) {
             selected.Speed = 100 / this.FrameRate;
             selected.Acceleration = this.PointAccelerationFactor;
-            selected.CooldownFrames = 0.35 * this.FrameRate * Math.random();
+            selected.CooldownFrames = this.FrameRate * Math.random();
             selected.SetAngle(Math.random() * this.PI2);
           }
           selected.CooldownFrames--;
@@ -458,7 +460,7 @@ class CanvasHandler {
             selected.Size +=
               (this.PointSizeIncrementAdjustFactor * selected.OriginalSize) /
               (selected.FrameCounter + 5);
-            if (selected.FrameCounter > this.FrameRate / 2) {
+            if (selected.FrameCounter > this.FrameRate) {
               selected.State = 1;
             }
             selected.FrameCounter++;
@@ -494,11 +496,8 @@ class CanvasHandler {
       this.CanvasContext.fill();
       this.CanvasContext.closePath();
       this.CanvasContext.globalAlpha = this.GlobalAlpha;
-      this.Transparency -= 1 / this.FrameRate;
+      this.Transparency -= 0.5 / this.FrameRate;
     }
-    setTimeout(() => {
-      requestAnimationFrame(this.RenderFunction);
-    }, this.RenderInterval);
   }
 }
 

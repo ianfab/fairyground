@@ -38,5 +38,5 @@ neodark|Dark Modern
 fsf|Fairy-Stockfish
 chess|Chess Set
 landscape|Chess Landscape
-bubbles|Bubbles||particles-bubbles,50
-stars|Star Space||particles-stars,50
+bubbles|Bubbles||particles-bubbles,30
+stars|Star Space||particles-stars,30
