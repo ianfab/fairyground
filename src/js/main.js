@@ -2098,7 +2098,6 @@ new Module().then((loadedModule) => {
     const selected = e.currentTarget.files[0];
     resetTimer();
     recordedmultipv = 1;
-
     if (selected) {
       selected.text().then(function (ini) {
         console.log(ini);
@@ -2214,6 +2213,30 @@ new Module().then((loadedModule) => {
       textMoves.value = movelist.join(" ");
 
       updateChessground(true);
+
+      if (
+        board.isGameOver() ||
+        board.isGameOver(true) ||
+        board.isGameOver(false)
+      ) {
+        if (board.result() != "*") {
+          document.dispatchEvent(
+            new CustomEvent("gameend", { detail: { result: board.result() } }),
+          );
+        } else if (board.result(true) != "*") {
+          document.dispatchEvent(
+            new CustomEvent("gameend", {
+              detail: { result: board.result(true) },
+            }),
+          );
+        } else if (board.result(false) != "*") {
+          document.dispatchEvent(
+            new CustomEvent("gameend", {
+              detail: { result: board.result(false) },
+            }),
+          );
+        }
+      }
     } else {
       window.alert("Invalid FEN");
     }

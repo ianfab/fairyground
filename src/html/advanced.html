@@ -1073,6 +1073,57 @@
     border: 1px solid #ddd;
   }
 
+  #enginematch {
+    margin-bottom: 10px;
+  }
+
+  #enginematch button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+
+  #enginematch button:hover {
+    background: #aaa;
+  }
+
+  #enginematch button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #enginematch button:active {
+    background: #000;
+  }
+
+  #enginematch #enginematchgamecount {
+    min-width: 150px;
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+  }
+
+  #enginematch #enginematchgamecount:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
+  #enginematch #enginematchsettings {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 5px;
+    margin-bottom: 5px;
+  }
+
+  #enginematch #enginematchinfo {
+    font-weight: bold;
+  }
+
   #advancedtimesettings {
     margin-bottom: 10px;
   }
@@ -3683,12 +3734,54 @@
       let clear_log = true;
       let game_list = [];
       let throttle_threshold = 400; //in milliseconds, increase this if the GUI lags
+      let engine_match_mode = false;
+      let during_engine_match = false;
+      let engine_match_total_game_count = 0;
+      let engine_match_played_game_count = 0;
+      let engine_match_white_wins = 0;
+      let engine_match_black_wins = 0;
+      let engine_match_draws = 0;
       let timer;
 
       let variants = [];
       let varianttypes = [];
 
       let engine_list = [];
+
+      document.addEventListener("gameend", (event) => {
+        if (engine_match_mode && during_engine_match) {
+          if (event.detail.result == "1-0") {
+            engine_match_white_wins++;
+          } else if (event.detail.result == "0-1") {
+            engine_match_black_wins++;
+          } else if (event.detail.result == "1/2-1/2") {
+            engine_match_draws++;
+          }
+          engine_match_played_game_count++;
+          document.getElementById("enginematchinfo").innerText =
+            `Games played: ${engine_match_played_game_count} | Total games to play: ${engine_match_total_game_count} | First engine wins: ${engine_match_white_wins} | Second engine wins: ${engine_match_black_wins} | Draws: ${engine_match_draws}`;
+          if (engine_match_played_game_count < engine_match_total_game_count) {
+            setTimeout(() => {
+              document.getElementById("restart").click();
+              play_white = true;
+              play_black = true;
+              if (advanced_time_control) {
+                setTimeout(() => {
+                  document.getElementById("gamestart").click();
+                }, 500);
+              } else {
+                setTimeout(() => {
+                  document.getElementById("set").click();
+                }, 500);
+              }
+            }, 500);
+          } else {
+            setTimeout(() => {
+              document.getElementById("stop").click();
+            }, 500);
+          }
+        }
+      });
 
       const checkconnectionnumber = parseInt(Math.random() * 100000);
       let wsport = window.location.port;
@@ -5346,10 +5439,16 @@
           white_remaining_time = 0;
           $("#timeoutside").value = 1;
           $("#whitetime").innerHTML = "Out Of Time";
+          document.dispatchEvent(
+            new CustomEvent("gameend", { detail: { result: "0-1" } }),
+          );
         } else if (side == "BLACK") {
           black_remaining_time = 0;
           $("#timeoutside").value = 2;
           $("#blacktime").innerHTML = "Out Of Time";
+          document.dispatchEvent(
+            new CustomEvent("gameend", { detail: { result: "1-0" } }),
+          );
         }
         $("#gamestatus").click();
         gameEnd();
@@ -6673,6 +6772,14 @@
                   if (fge.analysis_engine) {
                     fge.analysis_engine.ForceStop();
                   }
+                  if (during_engine_match) {
+                    during_engine_match = false;
+                    setTimeout(() => {
+                      window.alert(
+                        `Played games: ${engine_match_played_game_count}\nFirst engine wins: ${engine_match_white_wins}\nSecond engine wins: ${engine_match_black_wins}\nDraws: ${engine_match_draws}`,
+                      );
+                    }, 500);
+                  }
                 },
               },
               "Stop",
@@ -6691,7 +6798,8 @@
                   advanced_time_control ||
                   board_setup_mode ||
                   random_mover_white ||
-                  random_mover_black,
+                  random_mover_black ||
+                  engine_match_mode,
                 onclick: () => {
                   analysis_mode = !analysis_mode;
                   document
@@ -6750,7 +6858,8 @@
                   analysis_mode ||
                   review_mode ||
                   board_setup_mode ||
-                  play_white,
+                  play_white ||
+                  engine_match_mode,
                 onclick: () => {
                   random_mover_white = !random_mover_white;
                 },
@@ -6769,7 +6878,8 @@
                   analysis_mode ||
                   review_mode ||
                   board_setup_mode ||
-                  play_black,
+                  play_black ||
+                  engine_match_mode,
                 onclick: () => {
                   random_mover_black = !random_mover_black;
                 },
@@ -7005,7 +7115,8 @@
                   analysis_mode ||
                   review_mode ||
                   advanced_time_control ||
-                  select_move_dialog,
+                  select_move_dialog ||
+                  engine_match_mode,
                 onclick: () => {
                   board_setup_mode = !board_setup_mode;
                   triggerBoardSetupPieceIdentifier(true);
@@ -7024,7 +7135,196 @@
               }),
               "Move Visualization",
             ),
+            m(
+              "label#label-enginematchmode",
+              {
+                title:
+                  "When checked, the first engine and the second engine will play against each other continuously for some times specified.",
+              },
+              m("input[type=checkbox]#isenginematchmode", {
+                checked: engine_match_mode,
+                disabled:
+                  !is_ready ||
+                  during_engine_match ||
+                  analysis_mode ||
+                  review_mode ||
+                  board_setup_mode ||
+                  random_mover_white ||
+                  random_mover_black,
+                onclick: () => {
+                  engine_match_mode = !engine_match_mode;
+                },
+              }),
+              "Engine Match",
+            ),
           ]),
+          m(
+            "div#enginematch",
+            {
+              hidden:
+                !engine_match_mode || (!during_engine_match && during_play),
+            },
+            [
+              m("div#enginematchsettings", [
+                m("p", "Game count to self play:"),
+                m("input[type=number]#enginematchgamecount", {
+                  placeholder: "Game count",
+                  min: 1,
+                  title:
+                    "The count of the games to let the engines play against each other.",
+                }),
+                m(
+                  "button#startenginematch",
+                  {
+                    title: "Click to start a series of engine vs engine games.",
+                    disabled: !is_ready || during_engine_match || review_mode,
+                    onclick: () => {
+                      if (
+                        !engine_match_mode ||
+                        during_engine_match ||
+                        review_mode
+                      ) {
+                        return;
+                      }
+                      const whitedepth = document.getElementById("whitedepth");
+                      const whitemovetime =
+                        document.getElementById("whitemovetime");
+                      const whitenodes = document.getElementById("whitenodes");
+                      const blackdepth = document.getElementById("blackdepth");
+                      const blackmovetime =
+                        document.getElementById("blackmovetime");
+                      const blacknodes = document.getElementById("blacknodes");
+                      const depth = document.getElementById("depth");
+                      const movetime = document.getElementById("movetime");
+                      const nodes = document.getElementById("nodes");
+                      if (advanced_time_control) {
+                        if (
+                          white_timer_type == "infinite" ||
+                          black_timer_type == "infinite"
+                        ) {
+                          window.alert(
+                            "Cannot start engine match with infinite time.",
+                          );
+                          return;
+                        }
+                      } else {
+                        if (fge) {
+                          if (fge.first_engine && fge.first_engine.IsUsing) {
+                            if (
+                              (!whitedepth.validity.valid ||
+                                whitedepth.value == "") &&
+                              (!whitemovetime.validity.valid ||
+                                whitemovetime.value == "") &&
+                              (!whitenodes.validity.valid ||
+                                whitenodes.value == "")
+                            ) {
+                              window.alert(
+                                "Move control is not set or invalid for first binary engine. Set depth/movetime/nodes before starting an engine match.",
+                              );
+                              return;
+                            }
+                          } else {
+                            if (
+                              (!depth.validity.valid || depth.value == "") &&
+                              (!movetime.validity.valid ||
+                                movetime.value == "") &&
+                              (!nodes.validity.valid || nodes.value == "")
+                            ) {
+                              window.alert(
+                                "Move control is not set or invalid for in browser Fairy-Stockfish. Set depth/movetime/nodes before starting an engine match.",
+                              );
+                              return;
+                            }
+                          }
+                          if (fge.second_engine && fge.second_engine.IsUsing) {
+                            if (
+                              (!blackdepth.validity.valid ||
+                                blackdepth.value == "") &&
+                              (!blackmovetime.validity.valid ||
+                                blackmovetime.value == "") &&
+                              (!blacknodes.validity.valid ||
+                                blacknodes.value == "")
+                            ) {
+                              window.alert(
+                                "Move control is not set or invalid for second binary engine. Set depth/movetime/nodes before starting an engine match.",
+                              );
+                              return;
+                            }
+                          } else {
+                            if (
+                              (!depth.validity.valid || depth.value == "") &&
+                              (!movetime.validity.valid ||
+                                movetime.value == "") &&
+                              (!nodes.validity.valid || nodes.value == "")
+                            ) {
+                              window.alert(
+                                "Move control is not set or invalid for in browser Fairy-Stockfish. Set depth/movetime/nodes before starting an engine match.",
+                              );
+                              return;
+                            }
+                          }
+                        } else {
+                          if (
+                            (!depth.validity.valid || depth.value == "") &&
+                            (!movetime.validity.valid ||
+                              movetime.value == "") &&
+                            (!nodes.validity.valid || nodes.value == "")
+                          ) {
+                            window.alert(
+                              "Move control is not set or invalid for in browser Fairy-Stockfish. Set depth/movetime/nodes before starting an engine match.",
+                            );
+                            return;
+                          }
+                        }
+                      }
+                      let game_count = document.getElementById(
+                        "enginematchgamecount",
+                      ).value;
+                      play_white = true;
+                      play_black = true;
+                      during_engine_match = true;
+                      engine_match_played_game_count = 0;
+                      if (
+                        !document.getElementById("enginematchgamecount")
+                          .validity.valid ||
+                        game_count == ""
+                      ) {
+                        engine_match_total_game_count = 1;
+                      } else {
+                        engine_match_total_game_count = parseInt(game_count);
+                      }
+                      engine_match_white_wins = 0;
+                      engine_match_black_wins = 0;
+                      engine_match_draws = 0;
+                      document.getElementById("enginematchinfo").innerText =
+                        `Games played: 0 | Total games to play: ${engine_match_total_game_count}`;
+                      if (advanced_time_control) {
+                        document.getElementById("gamestart").click();
+                      } else {
+                        document.getElementById("set").click();
+                      }
+                    },
+                  },
+                  "Start Engine Match",
+                ),
+                m(
+                  "span",
+                  {
+                    style: "cursor: pointer;",
+                    onclick: () =>
+                      window.alert(
+                        "You can let the engines play against each other (Supports binary engines, based on your settings) for a certain count of games automatically and Fairyground will collect the statistics on win/draw/loss counts for you to test variant balance or engine strength.\nYou need to setup time settings first, e.g. depth/move time/nodes controlled moving or use advanced time control. All the matches uses that setting after you click <Start Engine Match>.\nYou can click <Stop> to exit this mode at any time. If you use advanced time control, abort game first and then click <Stop>.\nThis will not swap sides, so if you want to let engines play each side, you can let them play N games and then swap side manually to play another N games.\nYou can also parallelize this progress by opening multiple Fairyground instances.\nDo not do unnecessary things like setting FEN or changing variant during the match, otherwise something unexpected may happen.\nWARNING: It's recommended to use binary engines as in browser Fairy-Stockfish is less stable. If the match stops unexpectedly, then it usually indicates an engine crash.",
+                      ),
+                  },
+                  "[?]",
+                ),
+              ]),
+              m(
+                "p#enginematchinfo",
+                'Click <Start Engine Match> to automatically start engine vs engine games for some times specified in "Game count".',
+              ),
+            ],
+          ),
           m(
             "div#advancedtimesettings",
             { hidden: !advanced_time_control || during_play },

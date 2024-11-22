@@ -315,6 +315,10 @@ coord {
     margin-left: 3px;
 }
 
+#enginematch p,#enginematch span {
+    text-shadow: var(--text-shadow-style-black);
+}
+
 #advancedtimesettings p,#advancedtimesettings span {
     text-shadow: var(--text-shadow-style-black);
 }
