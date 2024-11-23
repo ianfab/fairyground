@@ -137,10 +137,21 @@ function GetCurrentGameInformation(FFishJSLibrary) {
     let Termination = "Normal";
     if (TimeoutSide != 0) {
       Termination = "Time forfeit";
-    } else if (tmpboard.result() == "*") {
+    } else if (
+      tmpboard.result() == "*" &&
+      tmpboard.result(true) == "*" &&
+      tmpboard.result(false) == "*"
+    ) {
       Termination = "Unterminated";
     }
     let gameresult = tmpboard.result();
+    if (gameresult == "*") {
+      if (tmpboard.result(true) != "*") {
+        gameresult = tmpboard.result(true);
+      } else if (tmpboard.result(false) != "*") {
+        gameresult = tmpboard.result(true);
+      }
+    }
     tmpboard.delete();
     return {
       Event: GameEvent,
@@ -248,6 +259,13 @@ class Game {
         }
       }
       let gameresult = tmpboard.result();
+      if (gameresult == "*") {
+        if (tmpboard.result(true) != "*") {
+          gameresult = tmpboard.result(true);
+        } else if (tmpboard.result(false) != "*") {
+          gameresult = tmpboard.result(false);
+        }
+      }
       if (this.FEN == "") {
         tmpboard.reset();
       } else {

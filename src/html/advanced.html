@@ -3741,6 +3741,7 @@
       let engine_match_white_wins = 0;
       let engine_match_black_wins = 0;
       let engine_match_draws = 0;
+      let engine_match_game_list = [];
       let timer;
 
       let variants = [];
@@ -3760,6 +3761,30 @@
           engine_match_played_game_count++;
           document.getElementById("enginematchinfo").innerText =
             `Games played: ${engine_match_played_game_count} | Total games to play: ${engine_match_total_game_count} | First engine wins: ${engine_match_white_wins} | Second engine wins: ${engine_match_black_wins} | Draws: ${engine_match_draws}`;
+          if (fgs) {
+            let info = fgs.GetCurrentGameInformation(window.ffishlib);
+            engine_match_game_list.push(
+              new fgs.Game(
+                info.Variant,
+                info.FEN,
+                info.UCIMoves,
+                info.Result,
+                info.Event,
+                info.Site,
+                info.Date,
+                1,
+                info.FirstPlayerName,
+                info.SecondPlayerName,
+                0,
+                0,
+                "0000",
+                "0000",
+                0.0,
+                info.Termination,
+                false,
+              ),
+            );
+          }
           if (engine_match_played_game_count < engine_match_total_game_count) {
             setTimeout(() => {
               document.getElementById("restart").click();
@@ -6775,9 +6800,25 @@
                   if (during_engine_match) {
                     during_engine_match = false;
                     setTimeout(() => {
-                      window.alert(
-                        `Played games: ${engine_match_played_game_count}\nFirst engine wins: ${engine_match_white_wins}\nSecond engine wins: ${engine_match_black_wins}\nDraws: ${engine_match_draws}`,
-                      );
+                      if (
+                        window.confirm(
+                          `Played games: ${engine_match_played_game_count}\nFirst engine wins: ${engine_match_white_wins}\nSecond engine wins: ${engine_match_black_wins}\nDraws: ${engine_match_draws}\n\nDo you want to download the PGN of played games?`,
+                        )
+                      ) {
+                        let filecontent = "";
+                        engine_match_game_list.forEach((val) => {
+                          filecontent += `${val.ToPortableGameNotation(window.ffishlib)}\n`;
+                        });
+                        const blob = new Blob([filecontent], {
+                          type: "text/plain",
+                        });
+                        const a = document.createElement("a");
+                        a.href = URL.createObjectURL(blob);
+                        a.download = "EngineMatch.pgn";
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                      }
                     }, 500);
                   }
                 },
@@ -7277,6 +7318,7 @@
                           }
                         }
                       }
+                      engine_match_game_list = [];
                       let game_count = document.getElementById(
                         "enginematchgamecount",
                       ).value;

@@ -1068,6 +1068,7 @@ function parseUCIMovesToPreviewElements(
     }
   }
   let tmpboard = new ffish.Board(variant, fen, is960);
+  let gameresult = "";
   for (i = 0; i < moves.length; i++) {
     if (i == 0) {
       if (tmpboard.turn()) {
@@ -1089,6 +1090,14 @@ function parseUCIMovesToPreviewElements(
       tmpboard.delete();
       return null;
     }
+    gameresult = tmpboard.result();
+    if (gameresult == "*") {
+      if (tmpboard.result(true) != "*") {
+        gameresult = tmpboard.result(true);
+      } else if (tmpboard.result(false) != "*") {
+        gameresult = tmpboard.result(false);
+      }
+    }
     let moveelement = document.createElement("p");
     let move = parseUCIMove(moves[i]);
     moveelement.innerText = movesan;
@@ -1100,7 +1109,7 @@ function parseUCIMovesToPreviewElements(
     ];
     moveelement.moveturn = tmpboard.turn() ? "white" : "black";
     moveelement.checked = getCheckSquares(tmpboard);
-    moveelement.gameresult = tmpboard.result();
+    moveelement.gameresult = gameresult;
     moveelement.startingfen = fen;
     moveelement.moves = moves.slice(0, i + 1).join(" ");
     /*
@@ -1214,14 +1223,14 @@ function parseUCIMovesToPreviewElements(
       }
     };
     movesparagraph.appendChild(moveelement);
-    if (tmpboard.result() != "*") {
+    if (gameresult != "*") {
       break;
     }
   }
-  if (tmpboard.result() != "*") {
-    let gameresult = document.createElement("p");
-    gameresult.innerText = tmpboard.result();
-    movesparagraph.appendChild(gameresult);
+  if (gameresult != "*") {
+    let pgameresult = document.createElement("p");
+    pgameresult.innerText = gameresult;
+    movesparagraph.appendChild(pgameresult);
   }
   tmpboard.delete();
   movesparagraph.movecount = moves.length;
@@ -1828,6 +1837,13 @@ function getNotation(notation, variant, startfen, is960, ucimovestr) {
               }
             }
             tmpboardresult = tmpboard.result();
+            if (tmpboardresult == "*") {
+              if (tmpboard.result(true) != "*") {
+                tmpboardresult = tmpboard.result(true);
+              } else if (tmpboard.result(false) != "*") {
+                tmpboardresult = tmpboard.result(false);
+              }
+            }
             if (notation == "DEFAULT") {
               tmpboard.setFen(startfen);
               result =
