@@ -3760,7 +3760,7 @@
           }
           engine_match_played_game_count++;
           document.getElementById("enginematchinfo").innerText =
-            `Games played: ${engine_match_played_game_count} | Total games to play: ${engine_match_total_game_count} | First engine wins: ${engine_match_white_wins} | Second engine wins: ${engine_match_black_wins} | Draws: ${engine_match_draws}`;
+            `Games played: ${engine_match_played_game_count} | Total games to play: ${engine_match_total_game_count} | First engine (WHITE) wins: ${engine_match_white_wins} | Second engine (BLACK) wins: ${engine_match_black_wins} | Draws: ${engine_match_draws}`;
           if (fgs) {
             let info = fgs.GetCurrentGameInformation(window.ffishlib);
             engine_match_game_list.push(
@@ -3769,10 +3769,10 @@
                 info.FEN,
                 info.UCIMoves,
                 info.Result,
-                info.Event,
+                "Fairy-Stockfish Playground engine match",
                 info.Site,
                 info.Date,
-                1,
+                engine_match_played_game_count,
                 info.FirstPlayerName,
                 info.SecondPlayerName,
                 0,
