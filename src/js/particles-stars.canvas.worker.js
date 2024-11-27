@@ -21,8 +21,8 @@ function GenerateRandomPointInsideViewCone(
   let ViewRectangleWidth = (Z / CanvasDistanceToViewPoint) * CanvasWidth;
   let ViewRectangleHeight = (Z / CanvasDistanceToViewPoint) * CanvasHeight;
   return {
-    x: ViewRectangleWidth * Math.random() - ViewRectangleWidth / 2,
-    y: ViewRectangleHeight * Math.random() - ViewRectangleHeight / 2,
+    x: ViewRectangleWidth * (Math.random() - 0.5),
+    y: ViewRectangleHeight * (Math.random() - 0.5),
     z: Z,
   };
 }
@@ -254,9 +254,11 @@ class CanvasHandler {
     this.PointGenerationBufferHeight = 100;
     this.InitializationMinimumZ = this.MaxZ - this.PointGenerationBufferHeight;
     this.PointSpeed = 50 / FrameRate;
+    this.PointSpeedPerSecond = 50;
     this.FrameCounter = 0;
     this.RenderFunction = null;
     this.Timer = null;
+    this.PreviousTime = 0;
     this.PI2 = 2 * Math.PI;
     let i = 0;
     let randompos = null;
@@ -332,6 +334,7 @@ class CanvasHandler {
   StartRender() {
     this.StoppedRendering = false;
     this.IsRendering = true;
+    this.PreviousTime = Date.now();
     if (this.Timer == null) {
       this.RenderFunction = this.RenderFrame.bind(this);
       this.Timer = setInterval(() => {
@@ -434,6 +437,9 @@ class CanvasHandler {
 
   RenderFrame() {
     let i = 0;
+    const now = Date.now();
+    let deltatime = now - this.PreviousTime;
+    this.PreviousTime = now;
     if (this.State == 0) {
       let pos = null;
       let selected = null;
@@ -448,16 +454,9 @@ class CanvasHandler {
       }
       for (i = 0; i < this.Points.length; i++) {
         selected = this.Points[i];
-        if (
-          selected.CanvasWidth != this.Canvas.width ||
-          selected.CanvasHeight != this.Canvas.height
-        ) {
-          selected.CanvasWidth = this.Canvas.width;
-          selected.CanvasHeight = this.Canvas.height;
-        }
+        selected.Z -= (deltatime / 1000) * this.PointSpeedPerSecond;
         if (selected.IsInViewCone()) {
           if (selected.Z > this.MaxZ - this.PointGenerationBufferHeight) {
-            selected.NextPosition();
             continue;
           } else if (
             selected.Z >
@@ -518,7 +517,6 @@ class CanvasHandler {
             this.CanvasContext.closePath();
           }
           this.CanvasContext.globalAlpha = this.GlobalAlpha;
-          selected.NextPosition();
         } else {
           pos = GenerateRandomPointInsideViewCone(
             this.Canvas.width,
@@ -542,21 +540,14 @@ class CanvasHandler {
       let pos = null;
       let selected = null;
       let gradient = null;
-      let EndFrame = 2 * this.FrameRate;
+      let EndFrame = 4 * this.FrameRate;
       let size = 0;
       this.CanvasContext.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
       for (i = 0; i < this.Points.length; i++) {
         selected = this.Points[i];
-        if (
-          selected.CanvasWidth != this.Canvas.width ||
-          selected.CanvasHeight != this.Canvas.height
-        ) {
-          selected.CanvasWidth = this.Canvas.width;
-          selected.CanvasHeight = this.Canvas.height;
-        }
+        selected.Z -= (deltatime / 1000) * this.PointSpeedPerSecond;
         if (selected.IsInViewCone()) {
           if (selected.Z > this.MaxZ - this.PointGenerationBufferHeight) {
-            selected.NextPosition();
             continue;
           } else if (
             selected.Z >
@@ -624,7 +615,6 @@ class CanvasHandler {
             this.CanvasContext.closePath();
           }
           this.CanvasContext.globalAlpha = this.GlobalAlpha;
-          selected.NextPosition();
         }
       }
       this.FrameCounter++;
