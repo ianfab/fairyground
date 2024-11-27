@@ -117,6 +117,7 @@ const searchresultinfo = document.getElementById("searchresultinfo");
 const dropdownNotationSystem = document.getElementById("sannotation");
 const pRandomMoverGo = document.getElementById("randommovergo");
 const dropdownBoardCoordinate = document.getElementById("boardcoordinate");
+const checkboxFischerRandom = document.getElementById("isfischerrandommode");
 const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
@@ -658,8 +659,17 @@ function generatePassTurnNotationSVG(backgroundcolor) {
 
 function initBoard(variant) {
   if (board !== null) board.delete();
-  board = new ffish.Board(variant);
-  console.log("Variant:", board.variant()); // Figuring out pocket roles from initial FEN
+  board = new ffish.Board(
+    variant,
+    ffish.startingFen(variant),
+    checkboxFischerRandom.checked,
+  );
+  console.log(
+    "Variant:",
+    board.variant(),
+    "; Is fischer random: ",
+    board.is960(),
+  ); // Figuring out pocket roles from initial FEN
 
   const fenBoard = board.fen().split(" ")[0];
   var pocketRoles = undefined;
@@ -1454,10 +1464,10 @@ function showWallSquares() {
   chessground.setAutoShapes(DrawShapeList);
 }
 
-function getUsedPieceID(variant) {
+function getUsedPieceID(variant, isfischerrandom) {
   console.log("Now testing piece set! You may see a lot of warnings here.");
   let validPieceID = pieces.filter((element) => {
-    return ffish.validateFen(element, variant) != -10;
+    return ffish.validateFen(element, variant, isfischerrandom) != -10;
   });
   return validPieceID;
 }
@@ -2159,7 +2169,9 @@ new Module().then((loadedModule) => {
 
     updateChessground(true);
     initializeThemes.click();
-    setPieceList(getUsedPieceID(dropdownVariant.value));
+    setPieceList(
+      getUsedPieceID(dropdownVariant.value, checkboxFischerRandom.checked),
+    );
     positionInformation.innerHTML = "";
     UpdateVariantsPositionTypeDropdown();
     UpdateVariantsPositionNameDropdown();
@@ -2205,7 +2217,7 @@ new Module().then((loadedModule) => {
     const WhiteSpaceMatcher = new RegExp("[ ]+", "");
     //console.log(ffish.validateFen(fen, board.variant()));
 
-    if (!fen || ffish.validateFen(fen, board.variant()) >= 0) {
+    if (!fen || ffish.validateFen(fen, board.variant(), board.is960()) >= 0) {
       if (fen) board.setFen(fen);
       else board.reset();
       const moves = textMoves.value.trim().split(WhiteSpaceMatcher).reverse();
@@ -2606,7 +2618,7 @@ new Module().then((loadedModule) => {
       return;
     }
     if (text.includes(" multipv ")) {
-      let textparselist = text.split(/[ ]+/);
+      let textparselist = text.split(singleblankmatcher);
       let pvindex = textparselist.indexOf("pv");
       if (pvindex < 0) {
         return;
@@ -2734,7 +2746,7 @@ new Module().then((loadedModule) => {
             dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,
             board.variant(),
             board.fen(),
-            false,
+            board.is960(),
             multipvrecord[k][4],
           )}\n`;
           depthlist.push(multipvrecord[k][5]);
@@ -3298,7 +3310,7 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
   //console.log(Error());
   //console.log(ffish.validateFen(fen, board.variant()));
 
-  if (!fen || ffish.validateFen(fen, board.variant()) >= 0) {
+  if (!fen || ffish.validateFen(fen, board.variant(), board.is960()) >= 0) {
     if (fen) board.setFen(fen);
     else board.reset();
     const moves = movelist.trim().split(WhiteSpaceMatcher).reverse();
@@ -3473,7 +3485,11 @@ function validateFEN(FEN, showNoErrorMessage) {
   if (FEN == null) {
     return false;
   }
-  let result = ffish.validateFen(FEN, dropdownVariant.value);
+  let result = ffish.validateFen(
+    FEN,
+    dropdownVariant.value,
+    checkboxFischerRandom.checked,
+  );
   if (result >= 0) {
     if (showNoErrorMessage) {
       window.alert("No errors found.");
@@ -3482,7 +3498,7 @@ function validateFEN(FEN, showNoErrorMessage) {
   }
   //-10 Contains invalid piece characters or syntax error
   //-9 Bad piece position
-  //-8 Line/column amount invalid
+  //-8 Line/column count invalid
   //-7 Bad piece character in pocket
   //-6 Bad side to move flag
   //-5 Bad castling position or notation
@@ -3499,7 +3515,7 @@ function validateFEN(FEN, showNoErrorMessage) {
     return false;
   }
   if (result == -8) {
-    window.alert("Error: Line/column amount invalid.");
+    window.alert("Error: Line/column count invalid.");
     return false;
   }
   if (result == -7) {
@@ -3630,8 +3646,11 @@ function UpdateVariantsPositionTypeDropdown() {
   let VariantTypeList = [];
   let i = 0;
   let option = null;
-  if (PositionVariantsDirectory.has(dropdownVariant.value)) {
-    VariantTypeDirectory = PositionVariantsDirectory.get(dropdownVariant.value);
+  let VariantName = checkboxFischerRandom.checked
+    ? dropdownVariant.value + "960"
+    : dropdownVariant.value;
+  if (PositionVariantsDirectory.has(VariantName)) {
+    VariantTypeDirectory = PositionVariantsDirectory.get(VariantName);
     VariantTypeList = [...VariantTypeDirectory];
     for (i = 0; i < VariantTypeList.length; i++) {
       option = document.createElement("option");
@@ -3651,9 +3670,12 @@ function UpdateVariantsPositionNameDropdown() {
   let VariantNameDirectory = null;
   let i = 0;
   let option = null;
+  let VariantName = checkboxFischerRandom.checked
+    ? dropdownVariant.value + "960"
+    : dropdownVariant.value;
   let VariantNameList = [];
-  if (PositionVariantsDirectory.has(dropdownVariant.value)) {
-    VariantTypeDirectory = PositionVariantsDirectory.get(dropdownVariant.value);
+  if (PositionVariantsDirectory.has(VariantName)) {
+    VariantTypeDirectory = PositionVariantsDirectory.get(VariantName);
     if (VariantTypeDirectory.has(dropdownPositionVariantType.value)) {
       VariantNameDirectory = VariantTypeDirectory.get(
         dropdownPositionVariantType.value,
@@ -4153,7 +4175,7 @@ function getPgn(board) {
       dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,
       board.variant(),
       textFen.value == "" ? ffish.startingFen(board.variant()) : textFen.value,
-      false,
+      board.is960(),
       textMoves.value,
     );
   }

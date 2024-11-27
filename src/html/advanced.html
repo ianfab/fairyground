@@ -3735,6 +3735,7 @@
       let game_list = [];
       let throttle_threshold = 400; //in milliseconds, increase this if the GUI lags
       let engine_match_mode = false;
+      let fischer_random_mode = false;
       let during_engine_match = false;
       let engine_match_total_game_count = 0;
       let engine_match_played_game_count = 0;
@@ -3781,7 +3782,7 @@
                 "0000",
                 0.0,
                 info.Termination,
-                false,
+                fischer_random_mode,
               ),
             );
           }
@@ -4003,24 +4004,27 @@
         } else {
           stockfish.postMessage(`setoption name UCI_Variant value ${variant}`);
         }
+        stockfish.postMessage(
+          `setoption name UCI_Chess960 value ${fischer_random_mode}`,
+        );
         stockfish.postMessage(`position startpos`);
         if (fge.WebSocketStatus == "CONNECTED") {
           if (fge.first_engine) {
-            if (fge.first_engine.SetVariant(variant)) {
+            if (fge.first_engine.SetVariant(variant, fischer_random_mode)) {
               document.getElementById("whiteunsupportedvariant").hidden = true;
             } else {
               document.getElementById("whiteunsupportedvariant").hidden = false;
             }
           }
           if (fge.second_engine) {
-            if (fge.second_engine.SetVariant(variant)) {
+            if (fge.second_engine.SetVariant(variant, fischer_random_mode)) {
               document.getElementById("blackunsupportedvariant").hidden = true;
             } else {
               document.getElementById("blackunsupportedvariant").hidden = false;
             }
           }
           if (fge.analysis_engine) {
-            if (fge.analysis_engine.SetVariant(variant)) {
+            if (fge.analysis_engine.SetVariant(variant, fischer_random_mode)) {
               document.getElementById("analysisunsupportedvariant").hidden =
                 true;
             } else {
@@ -6771,6 +6775,9 @@
                   if ($("#advtimectrl").checked == true) {
                     $("#advtimectrl").click();
                   }
+                  if (board_setup_mode) {
+                    return;
+                  }
                   setTimeout(() => {
                     if (!review_mode) {
                       setFen(true, false);
@@ -7185,6 +7192,29 @@
                 },
               }),
               "Engine Match",
+            ),
+            m(
+              "label#label-isfischerrandommode",
+              {
+                title:
+                  "When checked, enable fischer random (chess960) mode, which enables fischer random castling rules. This has no effect to variants that do not have castling.",
+              },
+              m("input[type=checkbox]#isfischerrandommode", {
+                checked: fischer_random_mode,
+                disabled:
+                  !is_ready ||
+                  during_engine_match ||
+                  during_play ||
+                  review_mode ||
+                  board_setup_mode,
+                onclick: () => {
+                  fischer_random_mode = !fischer_random_mode;
+                  document
+                    .getElementById("dropdown-variant")
+                    .dispatchEvent(new Event("change"));
+                },
+              }),
+              "Fischer Random",
             ),
           ]),
           m(

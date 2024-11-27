@@ -502,6 +502,13 @@ function GetCurrentVariantID() {
 window.fairyground.BinaryEngineFeature.GetCurrentVariantID =
   GetCurrentVariantID;
 
+function CurrentVariantFischerRandomEnabled() {
+  return document.getElementById("isfischerrandommode").checked;
+}
+
+window.fairyground.BinaryEngineFeature.CurrentVariantFischerRandomEnabled =
+  CurrentVariantFischerRandomEnabled;
+
 function MakeMoveOnBoard(ucimove) {
   if (typeof ucimove != "string") {
     throw TypeError();
@@ -1018,6 +1025,7 @@ class Engine {
     this.IsThinking = false;
     this.MoveRightCount = 0;
     this.LoadTimeOut = LoadTimeOut;
+    this.SupportsFischerRandom = false;
     this.LoadFinishCallBack = undefined;
     this.LoadFailureCallBack = undefined;
     this.IsReadyCallBack = undefined;
@@ -1213,9 +1221,14 @@ class Engine {
                   `${this.Name} (${this.Color}) suggests current mover to resign.`,
                 );
               } else {
+                this.Move = "0000";
                 window.alert(`${this.Name} (${this.Color}) has resigned.`);
               }
             } else if (bestmoveline[1] == "win" || bestmoveline[1] == "lose") {
+              this.Move = "0000";
+              window.alert(
+                `${this.Name} (${this.Color}) has claimed a ${bestmoveline[1]}.`,
+              );
             } else {
               this.SetMoveInUCIFormat(bestmoveline[1]);
               if (this.Move == undefined) {
@@ -1260,82 +1273,6 @@ class Engine {
         if (/( upperbound )|( lowerbound )/.test(Message)) {
           return;
         }
-        /*let multipvid = 0;
-                let bestpv = 0;
-                if (Message.includes(" multipv ")) {
-                    let textparselist = Message.split(" ");
-                    multipvid = parseInt(textparselist[textparselist.indexOf("multipv") + 1]) - 1;
-                    if (multipvid + 1 > this.RecordedMultiplePrincipalVariation) {
-                        this.RecordedMultiplePrincipalVariation = multipvid + 1;
-                    }
-                }
-                let bestmove = [];
-                let ponder = [];
-                if (Message.includes(" score ") && Message.includes(" pv ")) {
-                    let textparselist = Message.split(" ");
-                    let evaltext = textparselist.at(textparselist.indexOf("score") + 1);
-                    if (evaltext == "mate") {
-                        let matenum = parseInt(
-                            textparselist.at(textparselist.indexOf("score") + 2),
-                        );
-                        this.MultiplePrincipalVariationRecord[multipvid][0] = true;
-                        this.MultiplePrincipalVariationRecord[multipvid][1] = matenum;
-                        this.EvaluationIndex[multipvid] = mateevalfactor / matenum;
-                        evaluation = this.EvaluationIndex[multipvid];
-                    } else if (evaltext == "cp") {
-                        let evalval =
-                            parseInt(textparselist.at(textparselist.indexOf("score") + 2)) / 100;
-                        this.MultiplePrincipalVariationRecord[multipvid][0] = false;
-                        this.MultiplePrincipalVariationRecord[multipvid][1] = evalval;
-                        this.EvaluationIndex[multipvid] = evalval;
-                        evaluation = this.EvaluationIndex[multipvid];
-                    } else {
-                        this.MultiplePrincipalVariationRecord[multipvid][0] = false;
-                        this.MultiplePrincipalVariationRecord[multipvid][1] = 0;
-                        this.EvaluationIndex[multipvid] = 0;
-                        console.log("Detected bad evaluation");
-                    }
-                    let moves = textparselist.slice(textparselist.indexOf("pv") + 1);
-                    if (moves.length == 0) {
-                        return;
-                    } else if (moves.length == 1) {
-                        bestmove = this.ParseMove(moves[0]);
-                    } else {
-                        bestmove = this.ParseMove(moves[0]);
-                        ponder = this.ParseMove(moves[1]);
-                    }
-                    this.MultiplePrincipalVariationRecord[multipvid][2] = bestmove;
-                    this.MultiplePrincipalVariationRecord[multipvid][3] = ponder;
-                    if (this.Protocol == "USI") {
-                        this.MultiplePrincipalVariationRecord[multipvid][4] = convertUSImovestoUCImoves(textparselist.slice(textparselist.indexOf("pv") + 1).join(" "), GetBoardWidth(), GetBoardHeight());
-                    }
-                    else if (this.Protocol == "UCCI" || this.Protocol == "UCI_CYCLONE") {
-                        this.MultiplePrincipalVariationRecord[multipvid][4] = convertUCCImovestoUCImoves(textparselist.slice(textparselist.indexOf("pv") + 1).join(" "), GetBoardWidth(), GetBoardHeight());
-                    }
-                    else {
-                        this.MultiplePrincipalVariationRecord[multipvid][4] = textparselist.slice(textparselist.indexOf("pv") + 1).join(" ");
-                    }
-                    this.MultiplePrincipalVariationRecord[multipvid][5] = parseInt(
-                        textparselist[textparselist.indexOf("depth") + 1],
-                    );
-                    this.MultiplePrincipalVariationRecord[multipvid][6] = parseInt(
-                        textparselist[textparselist.indexOf("seldepth") + 1],
-                    );
-                    this.EvaluationUpdateCallBack(this.RecordedMultiplePrincipalVariation, this.MultiplePrincipalVariationRecord, this.EvaluationIndex, parseInt(textparselist[textparselist.indexOf("nodes") + 1]), parseInt(textparselist[textparselist.indexOf("nps") + 1]));
-                }
-                else if (Message.includes("bestmove")) {
-                    let textparselist = Message.split(" ");
-                    bestpv = this.EvaluationIndex.indexOf(
-                        Math.max(...this.EvaluationIndex.slice(0, this.RecordedMultiplePrincipalVariation)),
-                    );
-                    bestmove = this.ParseMove(textparselist[1]);
-                    if (textparselist[3] != undefined) {
-                        ponder = this.ParseMove(textparselist[3]);
-                    }
-                    this.MultiplePrincipalVariationRecord[bestpv][2] = bestmove;
-                    this.MultiplePrincipalVariationRecord[bestpv][3] = ponder;
-                    this.EvaluationUpdateCallBack(this.RecordedMultiplePrincipalVariation, this.MultiplePrincipalVariationRecord, this.EvaluationIndex, NaN, NaN);
-                }*/
         if (Message.includes(" score ") && Message.includes(" pv ")) {
           let msglist = Message.trim().split(WhiteSpaceMatcher);
           let pv = msglist.slice(msglist.indexOf("pv") + 1);
@@ -1421,10 +1358,14 @@ class Engine {
         );
         this.IsLoaded = true;
         this.IsLoading = false;
-        if (this.Variants.includes(GetCurrentVariantID())) {
+        let isfischerrandom = CurrentVariantFischerRandomEnabled();
+        if (
+          this.Variants.includes(GetCurrentVariantID()) &&
+          ((isfischerrandom && this.SupportsFischerRandom) || !isfischerrandom)
+        ) {
           this.IsUsing = true;
           if (this.HasVariantsOption) {
-            this.SetVariant(GetCurrentVariantID());
+            this.SetVariant(GetCurrentVariantID(), isfischerrandom);
           }
           this.NewGame();
           let position = GetBoardPosition();
@@ -1467,72 +1408,6 @@ class Engine {
         }
       }
     }
-  }
-
-  ParseMove(MoveNotation) {
-    if (typeof MoveNotation != "string") {
-      throw TypeError;
-    }
-    let move = "";
-    if (this.Protocol == "USI") {
-      move = convertUSImovestoUCImoves(
-        MoveNotation,
-        GetBoardWidth(),
-        GetBoardHeight(),
-      );
-    } else if (this.Protocol == "UCCI" || this.Protocol == "UCI_CYCLONE") {
-      move = convertUCCImovestoUCImoves(
-        MoveNotation,
-        GetBoardWidth(),
-        GetBoardHeight(),
-      );
-    } else {
-      move = MoveNotation;
-    }
-    let gatingmove = "";
-    if (move.includes(",")) {
-      let gating = move.split(",")[1];
-      move = move.split(",")[0];
-      gatingmove =
-        gating.split(/[0-9]+/).filter(function (item) {
-          return item != null && item != undefined && item != "";
-        })[1] +
-        gating.split(/[a-z]+/).filter(function (item) {
-          return item != null && item != undefined && item != "";
-        })[1];
-    }
-    if (move.includes("@")) {
-      return [
-        move.slice(0, move.indexOf("@") + 1),
-        move.slice(move.indexOf("@") + 1),
-        "",
-        gatingmove,
-      ];
-    }
-    let additional = "";
-    if (move.at(-1) == "+") {
-      additional = "+";
-      move = move.slice(0, -1);
-    } else if (move.at(-1) == "-") {
-      additional = "-";
-      move = move.slice(0, -1);
-    } else if (/^[a-z]{1}$/.test(move.at(-1))) {
-      additional = move.at(-1);
-      move = move.slice(0, -1);
-    }
-    let files = move.split(/[0-9]+/).filter(function (item) {
-      return item != null && item != undefined && item != "";
-    });
-    let ranks = move.split(/[a-z]+/).filter(function (item) {
-      return item != null && item != undefined && item != "";
-    });
-    if (files.length != 2) {
-      throw RangeError;
-    }
-    if (ranks.length != 2) {
-      throw RangeError;
-    }
-    return [files[0] + ranks[0], files[1] + ranks[1], additional, gatingmove];
   }
 
   ParseEngineInitializationOutput(MessageBuffer) {
@@ -1589,6 +1464,9 @@ class Engine {
               ponder = false;
             }
           }
+          if (optionname == "UCI_Chess960" && optiontype == "check") {
+            this.SupportsFischerRandom = true;
+          }
         } else if (optiontype == "spin") {
           optionlist.push({
             name: optionname,
@@ -1631,7 +1509,7 @@ class Engine {
         //console.log(optionlist);
         if (variants.length == 0) {
           if (this.Protocol == "UCI") {
-            variants = ["chess", "fischerandom", ""];
+            variants = ["chess", ""];
           } else if (this.Protocol == "USI") {
             variants = ["shogi"];
           } else if (
@@ -1823,12 +1701,16 @@ class Engine {
     }
   }
 
-  SetVariant(VariantID) {
-    if (typeof VariantID != "string") {
+  SetVariant(VariantID, IsFischerRandom) {
+    if (typeof VariantID != "string" || typeof IsFischerRandom != "boolean") {
       throw TypeError();
     }
     this.RecordedMultiplePrincipalVariation = 0;
     if (this.Variants.includes(VariantID)) {
+      if (IsFischerRandom && !this.SupportsFischerRandom) {
+        this.IsUsing = false;
+        return false;
+      }
       if (this.HasVariantsOption) {
         if (this.Protocol == "UCI" || this.Protocol == "UCI_CYCLONE") {
           this.PostMessage(`setoption name UCI_Variant value ${VariantID}`);
@@ -1837,6 +1719,11 @@ class Engine {
         } else if (this.Protocol == "UCCI") {
           this.PostMessage(`setoption UCCI_Variant ${VariantID}`);
         }
+      }
+      if (this.SupportsFischerRandom) {
+        this.PostMessage(
+          `setoption name UCI_Chess960 value ${IsFischerRandom}`,
+        );
       }
       this.NewGame();
       this.PostMessage("position startpos");
@@ -3222,6 +3109,7 @@ function ShowEngineManagementUI(EngineList, ws) {
       if (
         window.fairyground.BinaryEngineFeature.first_engine.SetVariant(
           document.getElementById("dropdown-variant")[SelectedIndex].value,
+          document.getElementById("isfischerrandommode").checked,
         )
       ) {
         document.getElementById("whiteunsupportedvariant").hidden = true;
@@ -3237,6 +3125,7 @@ function ShowEngineManagementUI(EngineList, ws) {
       if (
         window.fairyground.BinaryEngineFeature.second_engine.SetVariant(
           document.getElementById("dropdown-variant")[SelectedIndex].value,
+          document.getElementById("isfischerrandommode").checked,
         )
       ) {
         document.getElementById("blackunsupportedvariant").hidden = true;
@@ -3252,6 +3141,7 @@ function ShowEngineManagementUI(EngineList, ws) {
       if (
         window.fairyground.BinaryEngineFeature.analysis_engine.SetVariant(
           document.getElementById("dropdown-variant")[SelectedIndex].value,
+          document.getElementById("isfischerrandommode").checked,
         )
       ) {
         document.getElementById("analysisunsupportedvariant").hidden = true;
