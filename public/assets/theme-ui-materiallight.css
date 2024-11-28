@@ -1,0 +1,473 @@
+html {
+    font-family: "Segoe UI",Arial,"Microsoft Yahei",sans-serif;
+}
+
+div.ripple-wrapper {
+    background: #0000;
+    display: block !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.5;
+    transition: opacity 1s ease;
+}
+
+button div.ripple-wrapper {
+    border-radius: 200px;
+}
+
+div.ripple-wrapper.ripple-fade-out {
+    opacity: 0;
+}
+
+span.ripple-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: #f7f7f7;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    opacity: 1;
+    transition: width 1s ease, height 1s ease;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+}
+
+button div.ripple-wrapper span.ripple-effect {
+    background: #fff;
+}
+
+button:before {
+    background-color: #0b57d0 !important;
+}
+
+button:active:before {
+    background-color: black !important;
+}
+
+button:disabled:before {
+    color: black !important;
+    background-color: #ccc !important;
+}
+
+input {
+    outline-color: #105ad1;
+}
+
+input[type=text] {
+    border-radius: 200px;
+    border-left: 1px solid #0000 !important;
+    border-right: 1px solid #0000 !important;
+    border-top: 1px solid #0000 !important;
+    border-bottom: 1px solid #0000 !important;
+    background-color: #eceff7;
+}
+
+input[type=text]:hover {
+    background-color: #dbdee6;
+}
+
+input[type=text]:focus {
+    background-color: #eceff7;
+    border-left: 1px solid #105ad1 !important;
+    border-right: 1px solid #105ad1 !important;
+    border-top: 1px solid #105ad1 !important;
+    border-bottom: 1px solid #105ad1 !important;
+    margin: 3px !important;
+    box-shadow: 0px 0px 0px 3px #99d3f8;
+    outline: none;
+}
+
+input[type=text]:disabled {
+    background-color: #ccc;
+}
+
+input[type=number] {
+    border-radius: 200px;
+    border-left: 1px solid #0000 !important;
+    border-right: 1px solid #0000 !important;
+    border-top: 1px solid #0000 !important;
+    border-bottom: 1px solid #0000 !important;
+    background-color: #eceff7;
+}
+
+input[type=number]:hover {
+    background-color: #dbdee6;
+}
+
+input[type=number]:focus {
+    background-color: #eceff7;
+    border-left: 1px solid #105ad1 !important;
+    border-right: 1px solid #105ad1 !important;
+    border-top: 1px solid #105ad1 !important;
+    border-bottom: 1px solid #105ad1 !important;
+    margin: 3px !important;
+    box-shadow: 0px 0px 0px 3px #99d3f8;
+    outline: none;
+}
+
+input[type=number]:disabled {
+    background-color: #ccc;
+}
+
+input[type=checkbox] {
+  color: white !important;
+  background-color: white !important;
+}
+
+input[type="checkbox"]:after {
+    content: "\f00c";
+    font-size: 0px;
+    text-align: center;
+    line-height: 17px;
+    transition-property: font-size;
+    transition-duration: 0.25s;
+    transition-timing-function: linear;
+}
+
+input[type=checkbox]:hover {
+  color: #fff !important;
+  background-color: #ededed !important;
+}
+
+input[type=checkbox]:checked {
+  color: #fff !important;
+  background-color: #0b57d0 !important;
+  border-color: #0b57d0 !important;
+}
+
+input[type=checkbox]:checked:hover {
+  color: #fff !important;
+  background-color: #0b57d0 !important;
+  border-color: #0b57d0 !important;
+}
+
+input[type=checkbox]:disabled {
+  color: #777 !important;
+  background-color: #ccc !important;
+  border-color: #555 !important;
+  opacity: 1 !important;
+}
+
+input[type=checkbox]:disabled:hover {
+  color: #777 !important;
+  background-color: #ccc !important;
+  border-color: #555 !important;
+  opacity: 1 !important;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    height: 10px;
+    background: linear-gradient(to right, #fff 0%, #0b57d0 100%);
+    border-radius: 5px;
+    opacity: 0.7;
+    transition: opacity .2s;
+    color: black;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #777;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px 2px #aaa;
+}
+
+input[type=range]:hover {  
+    opacity: 1;
+}
+
+input[type=range]::-moz-range-track {  
+    height: 10px;
+    background: linear-gradient(to right, #fff 0%, #0b57d0 100%);
+    border-radius: 5px;
+}
+
+input[type=range]::-moz-range-thumb {  
+    width: 20px;
+    height: 20px;
+    background: #777;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background .2s;
+    box-shadow: 0px 0px 5px 2px #aaa;
+}
+
+input[type=range]:focus::-moz-range-thumb {  
+    background: #777;
+}  
+
+select {
+    background-color: #fff !important;
+    border-color: #c7c7c7;
+    border-width: 1px;
+    border-style: solid;
+    outline: none;
+    border-radius: 10px;
+}
+
+select:hover {
+    background-color: #f2f2f2 !important;
+}
+
+select:disabled {
+    color: #aaa;
+    background-color: #ccc !important;
+}
+
+select:focus {
+    border-color: #0b57d0;
+    border-width: 1px;
+    border-style: solid;
+    box-shadow: 0px 0px 0px 2px #0b57d0;
+}
+
+option {
+    padding: 5px;
+    color: black;
+    background-color: white;
+    transition-duration: 0.5s;
+    transition-property: color, background, border-color;
+    outline-color: #0b57d0;
+}
+
+option:hover {
+    color: white;
+    background-color: #0b57d0;
+}
+
+button {
+    outline: none;
+    color: #fff !important;
+    background-color: #0b57d0 !important;
+    border-color: #0000;
+    border-width: 0px;
+    border-style: solid;
+    border-radius: 200px;
+    padding: 5px 8px 5px 8px !important;
+}
+
+button.operationdivbutton {
+    border-width: 0;
+    padding: 0px 0px 0px 0px !important;
+    border-radius: 10px;
+}
+
+button:hover {
+    background-color: #407eff !important;
+}
+
+button:active {
+    background-color: #407eff !important;
+}
+
+button:disabled {
+    color: #aaa !important;
+    background-color: rgba(240, 240, 240, 1) !important;
+}
+
+input::-webkit-input-placeholder {
+    color: #aaa;
+}
+
+input::-moz-placeholder {
+    color: #aaa;
+}
+
+input:-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::placeholder {
+    color: #aaa;
+    opacity: 1;
+}
+
+.position-display-label:hover {
+    background-color: #0b57d0;
+}
+
+#timers {
+  border-color: #ccc !important;
+  background-color: #fff !important;
+  border-radius: 10px;
+  box-shadow: 0px 0px 3px 3px #ddd !important;
+}
+
+#whitetimer {
+  box-shadow: 0px 0px 3px 3px #ddd;
+  border-radius: 10px;
+}
+
+#whitetimer.timer-active {
+    box-shadow: 0px 0px 5px 5px red;
+}
+
+#blacktimer {
+  box-shadow: 0px 0px 3px 3px #ddd;
+  border-radius: 10px;
+}
+
+#blacktimer.timer-active {
+    box-shadow: 0px 0px 5px 5px red;
+}
+
+#halfmoveclock {
+    width: 20% !important;
+}
+
+#whiteremainingchecks {
+    width: 20% !important;
+}
+
+#blackremainingchecks {
+    width: 20% !important;
+}
+
+#currentmovenum {
+    width: 20% !important;
+}
+
+#pvinfo {
+    border-top: 1px solid #ccc !important;
+    border-left: 1px solid #ccc !important;
+    border-right: 1px solid #ccc !important;
+    border-bottom: 1px solid #ccc !important;
+    border-radius: 10px;
+    box-shadow: 0px 0px 3px 3px #ddd;
+}
+
+#pvinfo hr {
+    border: 1px solid #ccc !important;
+}
+
+#currentboardfen {
+    border-radius: 10px 10px 0px 0px;
+    box-shadow: 0px 0px 3px 3px #ddd !important;
+    scrollbar-width: none;
+    border-color: #ccc !important;
+}
+
+#label-pgn {
+    border-radius: 0px;
+    box-shadow: 0px 0px 3px 3px #ddd !important;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    overflow-x: auto !important;
+    border-color: #ccc !important;
+}
+
+#output2 {
+    border-radius: 0px 0px 10px 10px;
+    box-shadow: 0px 0px 3px 3px #ddd !important;
+    border-color: #ccc !important;
+}
+
+#moveselectiondialog {
+    color: black !important;
+    background: #fff !important;
+    border: 1px solid #ccc !important;
+    border-radius: 10px;
+    box-shadow: 0px 0px 3px 3px #ddd;
+}
+
+#separatormoveselectiondialog {
+    border: solid #ccc !important;
+}
+
+#separatorsearchresult {
+    border: solid #ccc !important;
+}
+
+#enginemanagementpopup {
+    background: #fff !important;
+}
+
+#enginesetuppopup {
+    background: #fff !important;
+}
+
+#enginesettingspopup {
+    background: #fff !important;
+}
+
+#loadsavedgamespopup {
+    background: #fff !important;
+}
+
+#enginecmddiv {
+    margin-top: 5px;
+}
+
+#linkdivhr {
+    border: 1px solid #ccc;
+}
+
+#chessground-mini-board-operation-div {
+    margin-right: 3px;
+}
+
+#chessground-mini-board-wrapper-div {
+    background-color: #fff;
+    border: 1px solid #ccc !important;
+    border-radius: 10px;
+    box-shadow: 0px 0px 3px 3px #ddd;
+}
+
+#lockminiboard:before, #lockminiboard:hover:before, #lockminiboard:active:before, #lockminiboard:disabled:before {
+    background-color: #0078d7 !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+.locked #lockminiboard:before {
+    background-color: orangered !important;
+}
+
+#pinminiboard:before, #pinminiboard:hover:before, #pinminiboard:active:before, #pinminiboard:disabled:before {
+    background-color: forestgreen !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+.pinned #pinminiboard:before {
+    background-color: rebeccapurple !important;
+}
+
+#setpositiontomainboard:before, #setpositiontomainboard:hover:before, #setpositiontomainboard:active:before, #setpositiontomainboard:disabled:before {
+    background-color: gold !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+#closeminiboard:before, #closeminiboard:hover:before, #closeminiboard:active:before, #closeminiboard:disabled:before {
+    background-color: crimson !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}

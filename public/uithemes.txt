@@ -35,6 +35,8 @@ light|Light
 dark|Dark
 neolight|Light Modern
 neodark|Dark Modern
+materiallight|Light Material
+materialdark|Dark Material
 fsf|Fairy-Stockfish
 chess|Chess Set
 landscape|Chess Landscape

@@ -2119,6 +2119,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
       subdiv.appendChild(restrictiontext);
     } else if (value.type == "button") {
       input = document.createElement("button");
+      input.classList.add("ripple");
       input.onclick = function () {
         EngineClass.SetButtonOption(value.name);
       };
@@ -2152,6 +2153,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   actiondiv.style.display = "flex";
   actiondiv.style.marginTop = "5px";
   let cancel = document.createElement("button");
+  cancel.classList.add("ripple");
   let canceltext = document.createTextNode("Close");
   cancel.appendChild(canceltext);
   cancel.onclick = function () {
@@ -2172,6 +2174,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
     }
   };
   let save = document.createElement("button");
+  save.classList.add("ripple");
   let savetext = document.createTextNode("Apply Changes");
   save.onclick = function () {
     let Elem = null;
@@ -2210,6 +2213,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   save.appendChild(savetext);
   actiondiv.appendChild(save);
   let showcurrent = document.createElement("button");
+  showcurrent.classList.add("ripple");
   let showcurrenttext = document.createTextNode("Show Current Value");
   showcurrent.onclick = function () {
     let Elem = null;
@@ -2244,6 +2248,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   showcurrent.appendChild(showcurrenttext);
   actiondiv.appendChild(showcurrent);
   let showdefault = document.createElement("button");
+  showdefault.classList.add("ripple");
   let showdefaulttext = document.createTextNode("Show Default Value");
   showdefault.onclick = function () {
     let Elem = null;
@@ -2278,6 +2283,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   showdefault.appendChild(showdefaulttext);
   actiondiv.appendChild(showdefault);
   let redetectoptions = document.createElement("button");
+  redetectoptions.classList.add("ripple");
   let redetectoptionstext = document.createTextNode("Re-detect");
   redetectoptions.appendChild(redetectoptionstext);
   redetectoptions.onclick = function () {
@@ -2350,6 +2356,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
       detail: { message: "enginesettingspopup-background" },
     }),
   );
+  document.dispatchEvent(new Event("initializeripples"));
 }
 
 window.fairyground.BinaryEngineFeature.ShowEditEngineOptionsUI =
@@ -2475,6 +2482,7 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let engineoptionstext = document.createElement("p");
   engineoptionstext.innerText = "Engine Options:";
   let engineoptions = document.createElement("button");
+  engineoptions.classList.add("ripple");
   engineoptions.onclick = function () {
     if (isloadingengine) {
       window.alert("Engine is loading.");
@@ -2574,6 +2582,7 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let actiondiv = document.createElement("div");
   actiondiv.style.display = "flex";
   let cancel = document.createElement("button");
+  cancel.classList.add("ripple");
   let canceltext = document.createTextNode("Cancel");
   cancel.onclick = function () {
     if (isloadingengine) {
@@ -2603,6 +2612,7 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   };
   cancel.appendChild(canceltext);
   let confirm = document.createElement("button");
+  confirm.classList.add("ripple");
   let confirmtext = document.createTextNode("");
   if (EngineClass) {
     confirmtext.textContent = "Save Changes";
@@ -2723,6 +2733,7 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
       detail: { message: "enginesetuppopup-background" },
     }),
   );
+  document.dispatchEvent(new Event("initializeripples"));
 }
 
 window.fairyground.BinaryEngineFeature.ShowEngineSetupUI = ShowEngineSetupUI;
@@ -2798,6 +2809,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   enginelistdiv.appendChild(availableenginestext);
   enginelistdiv.appendChild(availableenginesdropdown);
   let addengine = document.createElement("button");
+  addengine.classList.add("ripple");
   addengine.onclick = function () {
     ShowEngineSetupUI(EngineList, undefined, true, ws);
   };
@@ -2805,6 +2817,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   addengine.appendChild(addenginetext);
   enginecontroldiv.appendChild(addengine);
   let removeengine = document.createElement("button");
+  removeengine.classList.add("ripple");
   removeengine.onclick = function () {
     if (availableenginesdropdown.selectedIndex < 0) {
       window.alert("Please select a engine to remove.");
@@ -2827,6 +2840,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   removeengine.appendChild(removeenginetext);
   enginecontroldiv.appendChild(removeengine);
   let editsettings = document.createElement("button");
+  editsettings.classList.add("ripple");
   editsettings.onclick = function () {
     if (availableenginesdropdown.selectedIndex < 0) {
       window.alert("Please select a engine.");
@@ -2865,6 +2879,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   editsettings.appendChild(editsettingstext);
   enginecontroldiv.appendChild(editsettings);
   let selectaswhite = document.createElement("button");
+  selectaswhite.classList.add("ripple");
   selectaswhite.onclick = function () {
     if (window.fairyground.BinaryEngineFeature.first_engine) {
       if (window.fairyground.BinaryEngineFeature.first_engine.IsLoading) {
@@ -2904,6 +2919,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   selectaswhite.appendChild(selectaswhitetext);
   enginecontroldiv.appendChild(selectaswhite);
   let selectasblack = document.createElement("button");
+  selectasblack.classList.add("ripple");
   selectasblack.onclick = function () {
     if (window.fairyground.BinaryEngineFeature.second_engine) {
       if (window.fairyground.BinaryEngineFeature.second_engine.IsLoading) {
@@ -2943,6 +2959,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   selectasblack.appendChild(selectasblacktext);
   enginecontroldiv.appendChild(selectasblack);
   let selectasanalysis = document.createElement("button");
+  selectasanalysis.classList.add("ripple");
   selectasanalysis.onclick = function () {
     if (window.fairyground.BinaryEngineFeature.analysis_engine) {
       if (window.fairyground.BinaryEngineFeature.analysis_engine.IsLoading) {
@@ -2988,6 +3005,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   storagediv.style.display = "flex";
   storagediv.style.marginBottom = "5px";
   let savelist = document.createElement("button");
+  savelist.classList.add("ripple");
   let savelisttext = document.createTextNode("Save Engine List");
   savelist.appendChild(savelisttext);
   savelist.onclick = function () {
@@ -3009,6 +3027,7 @@ function ShowEngineManagementUI(EngineList, ws) {
     }
   };
   let loadlist = document.createElement("button");
+  loadlist.classList.add("ripple");
   let loadlisttext = document.createTextNode("Load Engine List");
   loadlist.appendChild(loadlisttext);
   loadlist.onclick = function () {
@@ -3035,6 +3054,7 @@ function ShowEngineManagementUI(EngineList, ws) {
     }
   };
   let savelisttofile = document.createElement("button");
+  savelisttofile.classList.add("ripple");
   let savelisttofiletext = document.createTextNode("Save Engine List To File");
   savelisttofile.appendChild(savelisttofiletext);
   savelisttofile.onclick = function () {
@@ -3045,6 +3065,7 @@ function ShowEngineManagementUI(EngineList, ws) {
     );
   };
   let loadlistfromfile = document.createElement("button");
+  loadlistfromfile.classList.add("ripple");
   let loadlistfromfiletext = document.createTextNode(
     "Load Engine List From File",
   );
@@ -3092,6 +3113,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   storagediv.appendChild(savelisttofile);
   popup.appendChild(storagediv);
   let cancel = document.createElement("button");
+  cancel.classList.add("ripple");
   let canceltext = document.createTextNode("Close");
   cancel.appendChild(canceltext);
   cancel.onclick = function () {
@@ -3164,6 +3186,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   };
   popup.appendChild(cancel);
   let supportedvariants = document.createElement("button");
+  supportedvariants.classList.add("ripple");
   let supportedvariantstext = document.createTextNode("Supported Variants");
   supportedvariants.appendChild(supportedvariantstext);
   supportedvariants.onclick = function () {
@@ -3179,6 +3202,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   };
   popup.appendChild(supportedvariants);
   let redetectsupportedvariants = document.createElement("button");
+  redetectsupportedvariants.classList.add("ripple");
   let redetectsupportedvariantstext = document.createTextNode(
     "Re-detect Supported Variants",
   );
@@ -3334,6 +3358,7 @@ function ShowEngineManagementUI(EngineList, ws) {
       detail: { message: "enginemanagementpopup-background" },
     }),
   );
+  document.dispatchEvent(new Event("initializeripples"));
 }
 
 window.fairyground.BinaryEngineFeature.ShowEngineManagementUI =

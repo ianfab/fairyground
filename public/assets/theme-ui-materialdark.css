@@ -1,0 +1,488 @@
+html {
+    font-family: "Segoe UI",Arial,"Microsoft Yahei",sans-serif;
+    background: #000 !important;
+    color: #fff !important;
+}
+
+div.ripple-wrapper {
+    background: #0000;
+    display: block !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.5;
+    transition: opacity 1s ease;
+}
+
+button div.ripple-wrapper {
+    border-radius: 200px;
+}
+
+div.ripple-wrapper.ripple-fade-out {
+    opacity: 0;
+}
+
+span.ripple-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: #333;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    opacity: 1;
+    transition: width 1s ease, height 1s ease;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+}
+
+button div.ripple-wrapper span.ripple-effect {
+    background: #000;
+}
+
+button:before {
+    background-color: #0b57d0 !important;
+}
+
+button:active:before {
+    background-color: black !important;
+}
+
+button:disabled:before {
+    color: black !important;
+    background-color: #ccc !important;
+}
+
+input {
+    color: white;
+    background-color: black;
+    outline-color: #a8c7fa;
+}
+
+input[type=text] {
+    border-radius: 200px;
+    border-left: 1px solid #0000 !important;
+    border-right: 1px solid #0000 !important;
+    border-top: 1px solid #0000 !important;
+    border-bottom: 1px solid #0000 !important;
+    background-color: #282828;
+}
+
+input[type=text]:hover {
+    background-color: #555;
+}
+
+input[type=text]:focus {
+    background-color: #000;
+    border-left: 1px solid #fff !important;
+    border-right: 1px solid #fff !important;
+    border-top: 1px solid #fff !important;
+    border-bottom: 1px solid #fff !important;
+    margin: 3px !important;
+    box-shadow: 0px 0px 0px 3px #999;
+    outline: none;
+}
+
+input[type=text]:disabled {
+    background-color: #888;
+}
+
+input[type=number] {
+    border-radius: 200px;
+    border-left: 1px solid #0000 !important;
+    border-right: 1px solid #0000 !important;
+    border-top: 1px solid #0000 !important;
+    border-bottom: 1px solid #0000 !important;
+    background-color: #282828;
+}
+
+input[type=number]:hover {
+    background-color: #555;
+}
+
+input[type=number]:focus {
+    background-color: #000;
+    border-left: 1px solid #fff !important;
+    border-right: 1px solid #fff !important;
+    border-top: 1px solid #fff !important;
+    border-bottom: 1px solid #fff !important;
+    margin: 3px !important;
+    box-shadow: 0px 0px 0px 3px #999;
+    outline: none;
+}
+
+input[type=number]:disabled {
+    background-color: #888;
+}
+
+input[type=checkbox] {
+  color: black !important;
+  background-color: #000 !important;
+}
+
+input[type="checkbox"]:after {
+    content: "\f00c";
+    font-size: 0px;
+    text-align: center;
+    line-height: 17px;
+    transition-property: font-size;
+    transition-duration: 0.25s;
+    transition-timing-function: linear;
+}
+
+input[type=checkbox]:hover {
+  color: #000 !important;
+  background-color: #555 !important;
+}
+
+input[type=checkbox]:checked {
+  color: #000 !important;
+  background-color: #a8c7fa !important;
+  border-color: #a8c7fa !important;
+}
+
+input[type=checkbox]:checked:hover {
+  color: #000 !important;
+  background-color: #a8c7fa !important;
+  border-color: #a8c7fa !important;
+}
+
+input[type=checkbox]:disabled {
+  color: #777 !important;
+  background-color: #ccc !important;
+  border-color: #555 !important;
+  opacity: 1 !important;
+}
+
+input[type=checkbox]:disabled:hover {
+  color: #777 !important;
+  background-color: #ccc !important;
+  border-color: #555 !important;
+  opacity: 1 !important;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    height: 10px;
+    background: linear-gradient(to right, #fff 0%, #a8c7fa 100%);
+    border-radius: 5px;
+    opacity: 0.7;
+    transition: opacity .2s;
+    color: black;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #777;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px 2px #aaa;
+}
+
+input[type=range]:hover {  
+    opacity: 1;
+}
+
+input[type=range]::-moz-range-track {  
+    height: 10px;
+    background: linear-gradient(to right, #fff 0%, #a8c7fa 100%);
+    border-radius: 5px;
+}
+
+input[type=range]::-moz-range-thumb {  
+    width: 20px;
+    height: 20px;
+    background: #777;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background .2s;
+    box-shadow: 0px 0px 5px 2px #aaa;
+}
+
+input[type=range]:focus::-moz-range-thumb {  
+    background: #777;
+}  
+
+select {
+    color: #fff !important;
+    background-color: #333 !important;
+    border-color: #757575;
+    border-width: 1px;
+    border-style: solid;
+    outline: none;
+    border-radius: 10px;
+}
+
+select:hover {
+    background-color: #555 !important;
+}
+
+select:disabled {
+    color: #aaa;
+    background-color: #ccc !important;
+}
+
+select:focus {
+    border-color: #a8c7fa;
+    border-width: 1px;
+    border-style: solid;
+    box-shadow: 0px 0px 0px 2px #a8c7fa;
+}
+
+option {
+    padding: 5px;
+    color: white;
+    background-color: black;
+    outline-color: #a8c7fa;
+}
+
+option:hover {
+    color: white;
+    background-color: #a8c7fa;
+}
+
+button {
+    outline: none;
+    color: #000 !important;
+    background-color: #a8c7fa !important;
+    border-color: #0000;
+    border-width: 0px;
+    border-style: solid;
+    border-radius: 200px;
+    padding: 5px 8px 5px 8px !important;
+}
+
+button.operationdivbutton {
+    border-width: 0;
+    padding: 0px 0px 0px 0px !important;
+    border-radius: 10px;
+}
+
+button:hover {
+    background-color: #a0bded !important;
+}
+
+button:active {
+    background-color: #a0bded !important;
+}
+
+button:disabled {
+    color: #aaa !important;
+    background-color: rgba(240, 240, 240, 1) !important;
+}
+
+input::-webkit-input-placeholder {
+    color: #aaa;
+}
+
+input::-moz-placeholder {
+    color: #aaa;
+}
+
+input:-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::placeholder {
+    color: #aaa;
+    opacity: 1;
+}
+
+spangameresult, spangameresultmini {
+    color: white !important;
+}
+
+table {
+    border-color: white !important;
+}
+
+caption {
+    border-color: white !important;
+}
+
+th {
+    border-color: white !important;
+}
+
+td {
+    border-color: white !important;
+}
+
+a {
+    color: ghostwhite;
+}
+
+a:visited {
+    color: mediumpurple;
+}
+
+.position-display-label:hover {
+    background-color: #a8c7fa;
+}
+
+#timers {
+  border-color: #666 !important;
+  background-color: #333 !important;
+  border-radius: 10px;
+}
+
+#whitetimer {
+  border-radius: 10px;
+}
+
+#blacktimer {
+  border-radius: 10px;
+}
+
+#halfmoveclock {
+    width: 20% !important;
+}
+
+#whiteremainingchecks {
+    width: 20% !important;
+}
+
+#blackremainingchecks {
+    width: 20% !important;
+}
+
+#currentmovenum {
+    width: 20% !important;
+}
+
+#pvinfo {
+    background-color: #333;
+    border-top: 1px solid #0000 !important;
+    border-left: 1px solid #0000 !important;
+    border-right: 1px solid #0000 !important;
+    border-bottom: 1px solid #0000 !important;
+    border-radius: 10px;
+}
+
+#pvinfo hr {
+    border: 1px solid #666 !important;
+}
+
+evalnum:after {
+    color: #fff !important;
+}
+
+#currentboardfen {
+    border-radius: 10px 10px 0px 0px;
+    scrollbar-width: none;
+    border-color: #666 !important;
+}
+
+#label-pgn {
+    border-radius: 0px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    overflow-x: auto !important;
+    border-color: #666 !important;
+}
+
+#output2 {
+    border-radius: 0px 0px 10px 10px;
+    border-color: #666 !important;
+}
+
+#moveselectiondialog {
+    color: white !important;
+    background: #333 !important;
+    border: 1px solid #666 !important;
+    border-radius: 10px;
+}
+
+#separatormoveselectiondialog {
+    border: solid #666 !important;
+}
+
+#separatorsearchresult {
+    border: solid #666 !important;
+}
+
+#enginemanagementpopup {
+    background: #000 !important;
+}
+
+#enginesetuppopup {
+    background: #000 !important;
+}
+
+#enginesettingspopup {
+    background: #000 !important;
+}
+
+#loadsavedgamespopup {
+    background: #000 !important;
+}
+
+#enginecmddiv {
+    margin-top: 5px;
+}
+
+#linkdivhr {
+    border: 1px solid #666;
+}
+
+#chessground-mini-board-wrapper-div {
+    background: #333;
+    border: 1px solid #666 !important;
+    border-radius: 10px;
+}
+
+#lockminiboard:before, #lockminiboard:hover:before, #lockminiboard:active:before, #lockminiboard:disabled:before {
+    background-color: #0078d7 !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+.locked #lockminiboard:before {
+    background-color: orangered !important;
+}
+
+#pinminiboard:before, #pinminiboard:hover:before, #pinminiboard:active:before, #pinminiboard:disabled:before {
+    background-color: forestgreen !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+.pinned #pinminiboard:before {
+    background-color: rebeccapurple !important;
+}
+
+#setpositiontomainboard:before, #setpositiontomainboard:hover:before, #setpositiontomainboard:active:before, #setpositiontomainboard:disabled:before {
+    background-color: gold !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+#closeminiboard:before, #closeminiboard:hover:before, #closeminiboard:active:before, #closeminiboard:disabled:before {
+    background-color: crimson !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}

@@ -70,6 +70,32 @@
     transition-delay: 0s;
   }
 
+  /* div.ripple-wrapper {
+    background: #0000;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.5;
+    transition: opacity 1s ease;
+  }
+
+  div.ripple-wrapper.ripple-fade-out {
+    opacity: 0;
+  } */
+
+  div.ripple-wrapper {
+    display: none;
+  }
+
   button:before {
     display: inline-flex;
     justify-content: center;
@@ -82,6 +108,24 @@
     font-size: 14px;
     border: 2px solid #000;
   }
+
+  /* span.ripple-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: #fff;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    opacity: 1;
+    transition: width 1s ease, height 1s ease;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+  } */
 
   .backgroundimg {
     content: "";
@@ -195,6 +239,10 @@
     font-family: FontAwesome;
     font-size: 60px;
     border: 10px solid #000;
+  }
+
+  .ripple {
+    position: relative;
   }
 
   input[type="checkbox"] {
@@ -2650,6 +2698,10 @@
         document.addEventListener("touchcancel", onTouchEnd);
       });
 
+      setTimeout(() => {
+        document.dispatchEvent(new Event("initializeripples"));
+      }, 10);
+
       /*pgnlabel.addEventListener("mousemove", Throttle((event) => {
             event.stopPropagation();
             if (chessgroundmini.style.display != "none") {
@@ -2757,6 +2809,109 @@
           currentthemeobj.PauseCanvasAnimation();
         } else if (document.visibilityState === "visible") {
           currentthemeobj.ContinueCanvasAnimation();
+        }
+      }
+    });
+
+    document.addEventListener("initializeripples", () => {
+      let list = document.querySelectorAll(".ripple");
+      let val = null;
+      let i = 0;
+      for (i = 0; i < list.length; i++) {
+        val = list.item(i);
+        if (val instanceof HTMLElement) {
+          if (!Array.isArray(val.rippleelements)) {
+            val.rippleelements = [];
+            val.addEventListener("mousedown", function (event) {
+              if (!event.isTrusted) {
+                return;
+              }
+              const targetrect = this.getBoundingClientRect();
+              const x = event.clientX - targetrect.left;
+              const y = event.clientY - targetrect.top;
+              const mx = targetrect.right - event.clientX;
+              const my = targetrect.bottom - event.clientY;
+              let radius = Math.ceil(
+                2 *
+                  Math.sqrt(
+                    Math.max(
+                      x * x + y * y,
+                      x * x + my * my,
+                      mx * mx + y * y,
+                      mx * mx + my * my,
+                    ),
+                  ),
+              );
+              let ripplewrapper = document.createElement("div");
+              ripplewrapper.classList.add("ripple-wrapper");
+              ripplewrapper.style.top = `${this.scrollTop}px`;
+              ripplewrapper.style.left = `${this.scrollLeft}px`;
+              let rippleelem = document.createElement("span");
+              rippleelem.classList.add("ripple-effect");
+              rippleelem.style.left = `${x}px`;
+              rippleelem.style.top = `${y}px`;
+              ripplewrapper.appendChild(rippleelem);
+              this.appendChild(ripplewrapper);
+              this.rippleelements.push(ripplewrapper);
+              setTimeout(() => {
+                rippleelem.style.width =
+                  rippleelem.style.height = `${radius}px`;
+              }, 10);
+            });
+            val.addEventListener("mouseleave", function (event) {
+              if (!event.isTrusted) {
+                return;
+              }
+              let i = 0;
+              if (Array.isArray(this.rippleelements)) {
+                let style = null;
+                for (i = 0; i < this.rippleelements.length; i++) {
+                  style = window.getComputedStyle(this.rippleelements[i]);
+                  if (
+                    parseFloat(style.opacity) == 0 ||
+                    style.display == "none"
+                  ) {
+                    this.rippleelements[i].remove();
+                    this.rippleelements.splice(i, 1);
+                    i--;
+                  } else {
+                    this.rippleelements[i].classList.add("ripple-fade-out");
+                  }
+                }
+              }
+            });
+            val.addEventListener("mouseup", function (event) {
+              if (!event.isTrusted) {
+                return;
+              }
+              let i = 0;
+              if (Array.isArray(this.rippleelements)) {
+                let style = null;
+                for (i = 0; i < this.rippleelements.length; i++) {
+                  style = window.getComputedStyle(this.rippleelements[i]);
+                  if (
+                    parseFloat(style.opacity) == 0 ||
+                    style.display == "none"
+                  ) {
+                    this.rippleelements[i].remove();
+                    this.rippleelements.splice(i, 1);
+                    i--;
+                  } else {
+                    this.rippleelements[i].classList.add("ripple-fade-out");
+                  }
+                }
+              }
+            });
+            val.addEventListener("scroll", function (event) {
+              let i = 0;
+              if (Array.isArray(this.rippleelements)) {
+                for (i = 0; i < this.rippleelements.length; i++) {
+                  this.rippleelements[i].style.top = `${this.scrollTop}px`;
+                  this.rippleelements[i].style.left = `${this.scrollLeft}px`;
+                }
+              }
+            });
+          }
         }
       }
     });
@@ -5174,7 +5329,7 @@
         }
         move_finish_timer_updating = true;
         const stm = document.getElementById("label-stm").innerText;
-        console.log(`${$("#gamestatus").innerHTML}`);
+        console.log(`${$("#gamestatus").innerText}`);
         //console.log(white_moving_time_list);
         //console.log(white_moving_time_list);
         const realtimenow = Date.now();
@@ -5306,7 +5461,8 @@
       }
 
       function updateTimer() {
-        if ($("#gamestatus").innerHTML == "END") {
+        const gamestatus = document.getElementById("gamestatus");
+        if (gamestatus.innerText == "END") {
           deleteTimer();
           gameEnd();
           return;
@@ -5321,11 +5477,10 @@
           deltatimereality = realitytimenow - previous_reality_time;
         }
         previous_reality_time = realitytimenow;
-        $("#gamestatus").click();
-        //console.log(`${$("#gamestatus").innerHTML}`);
+        gamestatus.click();
         const whitetimelabel = document.getElementById("whitetime");
         const blacktimelabel = document.getElementById("blacktime");
-        if ($("#gamestatus").innerHTML == "PLAYING_WHITE") {
+        if (gamestatus.innerText == "PLAYING_WHITE") {
           if (white_timer_type == "infinite") {
             previous_mover = "WHITE";
             return;
@@ -5386,7 +5541,7 @@
             blacktimelabel.innerText += ` (${black_remaining_byoyomi_periods})`;
           }
           previous_mover = "WHITE";
-        } else if ($("#gamestatus").innerHTML == "PLAYING_BLACK") {
+        } else if (gamestatus.innerText == "PLAYING_BLACK") {
           if (black_timer_type == "infinite") {
             previous_mover = "BLACK";
             return;
@@ -5496,12 +5651,12 @@
 
       const gameAbort = () => {
         deleteTimer();
-        $("#gamestatus").innerHTML = "END";
+        $("#gamestatus").innerText = "END";
         gameEnd();
       };
 
       const goWithTimeControl = () => {
-        if ($("#gamestatus").innerHTML != "END") {
+        if ($("#gamestatus").innerText != "END") {
           return;
         }
         //We need to prevent user from doing unnecessary actions during countdown, so we'll hide these divs
@@ -6355,7 +6510,7 @@
               m("div#divconnectserver", { hidden: during_play }, [
                 "- External binary engine feature: ",
                 m(
-                  "button",
+                  "button.ripple",
                   {
                     disabled: !is_ready,
                     onclick: () => {
@@ -6455,7 +6610,7 @@
               [],
             ),
             m(
-              "button#aboutposition",
+              "button#aboutposition.ripple",
               {
                 disabled: !is_ready || review_mode,
                 title:
@@ -6464,7 +6619,7 @@
               "Position INFO",
             ),
             m(
-              "button#aboutvariant",
+              "button#aboutvariant.ripple",
               {
                 disabled: !is_ready || review_mode,
                 title:
@@ -6507,7 +6662,7 @@
               "Variant INFO",
             ),
             m(
-              "button",
+              "button.ripple",
               {
                 disabled: !is_ready || review_mode,
                 title: "Click to open PGN file and EPD file parser.",
@@ -6556,7 +6711,7 @@
               },
             }),
             m(
-              "button#setpos",
+              "button#setpos.ripple",
               {
                 disabled: !is_ready || review_mode,
                 title: "Click to set the FEN and the moves to the board.",
@@ -6585,7 +6740,7 @@
               "Set",
             ),
             m(
-              "button#reset",
+              "button#reset.ripple",
               {
                 disabled: !is_ready,
                 title: "Click to reset the position to default position.",
@@ -6594,7 +6749,7 @@
               "Reset",
             ),
             m(
-              "button#restart",
+              "button#restart.ripple",
               {
                 disabled: !is_ready || review_mode,
                 title:
@@ -6610,7 +6765,7 @@
               "Restart",
             ),
             m(
-              "button#undo",
+              "button#undo.ripple",
               {
                 disabled: !is_ready || review_mode || board_setup_mode,
                 title: "Click to undo last move.",
@@ -6625,7 +6780,7 @@
             { hidden: during_play || fge.WebSocketStatus != "CONNECTED" },
             [
               m(
-                "button",
+                "button.ripple",
                 {
                   title: "Click to enter binary engine management UI.",
                   onclick: () => {
@@ -6766,7 +6921,7 @@
               max: 500,
             }),
             m(
-              "button#go",
+              "button#go.ripple",
               {
                 disabled: !is_ready,
                 title:
@@ -6789,7 +6944,7 @@
               "Go",
             ),
             m(
-              "button#stop",
+              "button#stop.ripple",
               {
                 disabled: !is_ready,
                 title: "Click to immediately stop all engines from thinking.",
@@ -7233,7 +7388,7 @@
                     "The count of the games to let the engines play against each other.",
                 }),
                 m(
-                  "button#saveenginematchgames",
+                  "button#saveenginematchgames.ripple",
                   {
                     title:
                       "Click to save the games played in engine match to PGN file.",
@@ -7264,7 +7419,7 @@
                   "Save Played Games To PGN",
                 ),
                 m(
-                  "button#startenginematch",
+                  "button#startenginematch.ripple",
                   {
                     title: "Click to start a series of engine vs engine games.",
                     disabled: !is_ready || during_engine_match || review_mode,
@@ -7636,7 +7791,7 @@
               ]),
               m("div#gamecontrol-start", [
                 m(
-                  "button#gamestart",
+                  "button#gamestart.ripple",
                   {
                     disabled: !is_ready || review_mode,
                     title: "Click to start a game in advanced timing system.",
@@ -7725,12 +7880,12 @@
               "Click-click move",
             ),
             m(
-              "button#passmove",
+              "button#passmove.ripple",
               { disabled: !is_ready, title: "Click to pass your turn." },
               "Pass This Turn",
             ),
             m(
-              "button#placewall",
+              "button#placewall.ripple",
               {
                 disabled: !is_ready,
                 title:
@@ -7857,7 +8012,7 @@
                 ],
               ),
               m(
-                "button#addtopocket",
+                "button#addtopocket.ripple",
                 {
                   disabled: !is_ready,
                   title:
@@ -7866,12 +8021,12 @@
                 "Add piece to pocket",
               ),
               m(
-                "button#clearboard",
+                "button#clearboard.ripple",
                 { disabled: !is_ready, title: "Click to remove all pieces." },
                 "Clear Board",
               ),
               m(
-                "button#initboardpos",
+                "button#initboardpos.ripple",
                 {
                   disabled: !is_ready,
                   title: "Click to set the board to default position.",
@@ -7879,7 +8034,7 @@
                 "Reset Board",
               ),
               m(
-                "button#validatepos",
+                "button#validatepos.ripple",
                 {
                   disabled: !is_ready,
                   title: "Click to validate this position.",
@@ -7887,7 +8042,7 @@
                 "Validate Position",
               ),
               m(
-                "button#boardsetupcopyfen",
+                "button#boardsetupcopyfen.ripple",
                 {
                   disabled: !is_ready,
                   title:
@@ -8012,7 +8167,7 @@
               ]),
               m("div#movecontrol", { hidden: during_play }, [
                 m(
-                  "button#initialposition",
+                  "button#initialposition.ripple",
                   {
                     onclick: displayInitialPosition,
                     disabled: !is_ready,
@@ -8022,7 +8177,7 @@
                   "Initial Position",
                 ),
                 m(
-                  "button#currentposition",
+                  "button#currentposition.ripple",
                   {
                     onclick: displayCurrentPosition,
                     disabled: !is_ready,
@@ -8032,7 +8187,7 @@
                   "Current Position",
                 ),
                 m(
-                  "button#previousposition",
+                  "button#previousposition.ripple",
                   {
                     onclick: displayPreviousMove,
                     disabled: !is_ready,
@@ -8042,7 +8197,7 @@
                   "Previous Position",
                 ),
                 m(
-                  "button#nextposition",
+                  "button#nextposition.ripple",
                   {
                     onclick: displayNextMove,
                     disabled: !is_ready,
@@ -8059,7 +8214,7 @@
                   min: 0,
                 }),
                 m(
-                  "button#specifiedposition",
+                  "button#specifiedposition.ripple",
                   {
                     onclick: displaySpecifiedPosition,
                     disabled: !is_ready,
@@ -8069,7 +8224,7 @@
                   "Go to Move",
                 ),
                 m(
-                  "button#starthere",
+                  "button#starthere.ripple",
                   {
                     onclick: () => {
                       if (!review_mode) {
@@ -8098,7 +8253,7 @@
               m("div#controls", [
                 m("div", [
                   m(
-                    "button",
+                    "button.ripple",
                     {
                       onclick: () => {
                         changePieces(false);
@@ -8127,7 +8282,7 @@
                     ],
                   ),
                   m(
-                    "button",
+                    "button.ripple",
                     {
                       onclick: () => {
                         changeBoard(false);
@@ -8149,7 +8304,7 @@
                     [m("option", { value: "defaultboard" }, "Default Board")],
                   ),
                   m(
-                    "button#button-flip",
+                    "button#button-flip.ripple",
                     {
                       onclick: () => {
                         if (board_setup_mode) {
@@ -8162,7 +8317,7 @@
                     "Flip Board",
                   ),
                   m(
-                    "button",
+                    "button.ripple",
                     {
                       onclick: () => {
                         let time = Date.now();
@@ -8444,7 +8599,7 @@
                 { hidden: !advanced_time_control || !during_play },
                 [
                   m(
-                    "button#addtimeforwhite",
+                    "button#addtimeforwhite.ripple",
                     {
                       title:
                         "Add 10 seconds to the remaining time of first mover.",
@@ -8455,7 +8610,7 @@
                     "Add 10s for white",
                   ),
                   m(
-                    "button#addtimeforblack",
+                    "button#addtimeforblack.ripple",
                     {
                       title:
                         "Add 10 seconds to the remaining time of second mover.",
@@ -8466,7 +8621,7 @@
                     "Add 10s for black",
                   ),
                   m(
-                    "button#gameabort",
+                    "button#gameabort.ripple",
                     {
                       title: "Exit current advanced timing system based game.",
                       onclick: () => {
@@ -8485,7 +8640,7 @@
                 m("p#pvinfo", ""),
               ]),
               m("p#currentboardfen"),
-              m("p#label-pgn"),
+              m("p#label-pgn.ripple"),
               m("div#output2", { onupdate: scrollOutput }, [
                 m("pre#fsfoutput", output2),
                 m(
@@ -8579,7 +8734,7 @@
                   ],
                 ),
                 m(
-                  "button#sendenginecmd",
+                  "button#sendenginecmd.ripple",
                   {
                     disabled: during_play,
                     title: "Click to send the command.",
@@ -8608,7 +8763,7 @@
                   "Clear Log On Start Thinking",
                 ),
                 m(
-                  "button",
+                  "button.ripple",
                   {
                     title: "Click to clear the consoles of the binary engines.",
                     onclick: () => {
@@ -8654,7 +8809,7 @@
                 }),
                 "Regular Expression",
               ),
-              m("button#searchmove", "Search Moves"),
+              m("button#searchmove.ripple", "Search Moves"),
             ]),
             m("div#movefilters", [
               m("p#searchresultinfo", "Click <Search Moves> to search!"),
@@ -8703,8 +8858,8 @@
                 }),
                 "Include moves having promotion/demotion or seirawan gating",
               ),
-              m("button#makemove", "Make Move"),
-              m("button#highlightmove", "Highlight Move (Yellow Marks)"),
+              m("button#makemove.ripple", "Make Move"),
+              m("button#highlightmove.ripple", "Highlight Move (Yellow Marks)"),
             ]),
           ]),
           m("div#chessground-mini", [

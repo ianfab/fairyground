@@ -1646,6 +1646,7 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
     }
   };
   let cleargames = document.createElement("button");
+  cleargames.classList.add("ripple");
   let cleargamestext = document.createTextNode("Clear List");
   cleargames.appendChild(cleargamestext);
   cleargames.onclick = function () {
@@ -1655,6 +1656,7 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
     table.InitializeTable();
   };
   let addtolist = document.createElement("button");
+  addtolist.classList.add("ripple");
   let addtolisttext = document.createTextNode("Add Current Game To List");
   addtolist.appendChild(addtolisttext);
   addtolist.onclick = function () {
@@ -1689,6 +1691,7 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
     table.AddRows(GameList);
   };
   let savetopgn = document.createElement("button");
+  savetopgn.classList.add("ripple");
   let savetopgntext = document.createTextNode("Save PGN");
   savetopgn.appendChild(savetopgntext);
   savetopgn.onclick = function () {
@@ -1699,6 +1702,7 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
     DownloadFile(filecontent, "PortableGameNotation.pgn", "text/plain");
   };
   let savetoepd = document.createElement("button");
+  savetoepd.classList.add("ripple");
   let savetoepdtext = document.createTextNode("Save EPD");
   savetoepd.appendChild(savetoepdtext);
   savetoepd.onclick = function () {
@@ -1709,6 +1713,7 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
     DownloadFile(filecontent, "ExtendedPositionDescription.epd", "text/plain");
   };
   let close = document.createElement("button");
+  close.classList.add("ripple");
   close.id = "pgnepd-close";
   let closetext = document.createTextNode("Close");
   close.appendChild(closetext);
@@ -1795,6 +1800,7 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
   searchonresultlabel.appendChild(searchonresult);
   searchonresultlabel.innerHTML += "Search In Current Results";
   let search = document.createElement("button");
+  search.classList.add("ripple");
   let searchtext = document.createTextNode("Search");
   search.appendChild(searchtext);
   search.onclick = function () {
@@ -1837,6 +1843,7 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
       detail: { message: "loadsavedgamespopup-background" },
     }),
   );
+  document.dispatchEvent(new Event("initializeripples"));
 }
 
 window.fairyground.SavedGamesParsingFeature.ShowPGNOrEPDFileUI =

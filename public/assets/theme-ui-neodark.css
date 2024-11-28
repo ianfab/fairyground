@@ -98,6 +98,16 @@ input[type=checkbox] {
   transition-property: color, background-color, border-color;
 }
 
+input[type="checkbox"]:after {
+    content: "\f00c";
+    font-size: 0px;
+    text-align: center;
+    line-height: 17px;
+    transition-property: font-size;
+    transition-duration: 0.25s;
+    transition-timing-function: linear;
+}
+
 input[type=checkbox]:hover {
   color: #fff !important;
   background-color: #aaa !important;

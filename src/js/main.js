@@ -2292,7 +2292,7 @@ new Module().then((loadedModule) => {
   };
 
   gameStatus.onclick = function () {
-    gameStatus.innerHTML = getGameStatus(false);
+    gameStatus.innerText = getGameStatus(false);
   };
 
   buttonGameStart.onclick = function () {
