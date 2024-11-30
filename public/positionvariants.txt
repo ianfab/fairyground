@@ -46,7 +46,7 @@ chess|Opposite-color Bishop Endgame|Down Pawns On 2 Wings|4k3/7p/p5p1/1p3p2/1Bb5
 chess|Opposite-color Bishop Endgame|Two Extra Pawns|4k3/6p1/2p2p2/1bB5/1P3P2/P3K1P1/7P/8 w - - 0 1|You need 2 passed pawns on each side to gain advantage.
 
 chess|Rook Endgame|Symmetrical Pawns|6k1/1r4pp/8/8/8/8/R5PP/6K1 w - - 0 1|Centralize your king to prevent your opponent from gaining advantage.
-chess|Rook Endgame|An Extra Pawn|6k1/5ppp/pr6/8/1P6/P7/5PPP/2R3K1 w - - 0 1|Activate your rook and king and seek to pressure any other weaknesses that you can create.
+chess|Rook Endgame|An Extra Pawn|6k1/5ppp/pr6/8/1P6/P7/5PPP/1R4K1 w - - 0 1|Activate your rook and king and seek to pressure any other weaknesses that you can create.
 chess|Rook Endgame|Outside Passed Pawn|3K4/r6p/5ppk/5P2/PR4PP/8/8/8 b - - 0 1|Playing as Black, try to draw in this game by developing active pieces.
 chess|Rook Endgame|Rook Behind Passed Pawn|5k2/6pp/5p2/r7/P7/8/R4PPP/5K2 w - - 0 1|Try to win this game by including your king.
 chess|Rook Endgame|Rook Beside Passed Pawn|5k2/6pp/r4p2/8/8/P3R3/5PPP/5K2 w - - 0 1|Make progress with your king and pawns. Consider castling queenside.
