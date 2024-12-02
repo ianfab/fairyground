@@ -683,6 +683,7 @@ for (i="a".charCodeAt(0);i<"z".charCodeAt(0);i++) {
     result+=`.letters .cg-wrap piece.${String.fromCharCode(i)}-piece.black{background-image:url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='80px' height='80px'><text font-size='30' x='50%' y='50%' fill='black' class='black' text-anchor='middle' dominant-baseline='central'>${String.fromCharCode(i)}</text></svg>\")}`;
 }
 result+=`.letters .cg-wrap piece._-piece{background-image:url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='80px' height='80px'><text font-size='30' x='50%' y='50%' fill='red' class='red' text-anchor='middle' dominant-baseline='central'>✽</text></svg>\")}`;
+result+=`.letters .cg-wrap piece.unknown{background-image:url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='80px' height='80px'><text font-size='30' x='50%' y='50%' fill='grey' class='grey' text-anchor='middle' dominant-baseline='central'>❔</text></svg>\")}`;
 
 fs.writeFileSync("./public/assets/theme-piece-letters.css", result, "utf8");
 if (!HIDE_OUTPUT) {
