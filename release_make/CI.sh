@@ -34,7 +34,9 @@ echo "[Info] Continuous integration starts."
 
 sudo apt -y install p7zip-full || Error
 
-7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count -xr!release_make -xr!.git ./source.7z ./* || Error
+if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
+    7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count -xr!release_make -xr!.git ./source.7z ./* || Error
+fi
 
 cd ./release_make
 
@@ -146,11 +148,16 @@ echo "If it does not work, please check your node.js installation and make sure 
 
 echo "[Info] CI build test OK."
 
-7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/win/x64/fairyground.7z ./release_make/release-builds/win/x64/* || Error
-7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/linux/x64/fairyground.7z ./release_make/release-builds/linux/x64/* || Error
-7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/win/arm64/fairyground.7z ./release_make/release-builds/win/arm64/* || Error
-7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/linux/arm64/fairyground.7z ./release_make/release-builds/linux/arm64/* || Error
-7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/script/any/fairyground.7z ./release_make/release-builds/script/any/* || Error
+if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
+    7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/win/x64/fairyground.7z ./release_make/release-builds/win/x64/* || Error
+    7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/linux/x64/fairyground.7z ./release_make/release-builds/linux/x64/* || Error
+    7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/win/arm64/fairyground.7z ./release_make/release-builds/win/arm64/* || Error
+    7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/linux/arm64/fairyground.7z ./release_make/release-builds/linux/arm64/* || Error
+    7za a -y -t7z -m0=lzma2 -mx=9 -mfb=256 -md=256m -ms=on -mmt=$thread_count ./release_make/release-builds/script/any/fairyground.7z ./release_make/release-builds/script/any/* || Error
 
-echo "[Info] Artifacts are ready. Pending upload..."
+    echo "[Info] Artifacts are ready. Pending upload..."
+else
+    echo "[Notice] Artifacts are not uploaded in pull requests."
+fi
+
 exit 0
