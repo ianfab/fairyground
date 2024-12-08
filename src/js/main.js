@@ -118,10 +118,10 @@ const dropdownNotationSystem = document.getElementById("sannotation");
 const pRandomMoverGo = document.getElementById("randommovergo");
 const dropdownBoardCoordinate = document.getElementById("boardcoordinate");
 const checkboxFischerRandom = document.getElementById("isfischerrandommode");
-const soundMove = new Audio("assets/sound/thearst3rd/move.wav");
-const soundCapture = new Audio("assets/sound/thearst3rd/capture.wav");
-const soundCheck = new Audio("assets/sound/thearst3rd/check.wav");
-const soundTerminal = new Audio("assets/sound/thearst3rd/terminal.wav");
+const soundMove = new Audio("assets/sound/thearst3rd/move.mp3");
+const soundCapture = new Audio("assets/sound/thearst3rd/capture.mp3");
+const soundCheck = new Audio("assets/sound/thearst3rd/check.mp3");
+const soundTerminal = new Audio("assets/sound/thearst3rd/terminal.mp3");
 const files = [
   "a",
   "b",
