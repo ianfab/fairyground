@@ -92,11 +92,13 @@ const positionVariantTxt = document.getElementById("posvariant-txt");
 const quickPromotionPiece = document.getElementById("dropdown-quickpromotion");
 const buttonPassMove = document.getElementById("passmove");
 const buttonPlaceWall = document.getElementById("placewall");
-const dropdownFogOfWarSettings = document.getElementById(
-  "dropdown-fogofwarsettings",
+const dropdownVisualEffect = document.getElementById("dropdown-visualeffect");
+const dropdownVisualEffectPerspective = document.getElementById(
+  "dropdown-visualeffectperspective",
 );
 const engineOutput = document.getElementById("engineoutputline");
 const isAnalysis = document.getElementById("analysis");
+const pcheckCounts = document.getElementById("checkcounts");
 const evaluationBar = document.getElementById("evalbarprogress");
 const evalscore = document.getElementById("cp");
 const multipv = document.getElementById("multipv");
@@ -602,23 +604,9 @@ function generateMoveNotationSVG(text, backgroundcolor, textcolor, position) {
     return null;
   }
   if (position == "TopRight") {
-    return `
-    <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100px' height='100px'>
-    <path style="fill:${backgroundcolor};stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none" d="m 100,2 a 20,20 0 0 0 -20,19.999999 20,20 0 0 0 20,20 z" />
-    <g transform="scale(1.5)">
-    <text style="fill:${textcolor}" font-size="15" font-family="Arial" font-weight="bold" x="60" y="15" text-anchor="middle" dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text>
-    </g>
-    </svg>
-    `;
+    return `<svg xmlns='http://www.w3.org/2000/svg'version='1.1'width='100px'height='100px'><path style="fill:${backgroundcolor};stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"d="m 100,2 a 20,20 0 0 0 -20,19.999999 20,20 0 0 0 20,20 z"/><g transform="scale(1.5)"><text style="fill:${textcolor}"font-size="15"font-family="Arial"font-weight="bold"x="60"y="15"text-anchor="middle"dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text></g></svg>`;
   } else if (position == "TopLeft") {
-    return `
-    <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100px' height='100px'>
-    <path style="fill:${backgroundcolor};stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none" d="m 0,2 a 20,20 0 0 1 20,19.999999 20,20 0 0 1 -20,20 z" />
-    <g transform="scale(1.5)">
-    <text style="fill:${textcolor}" font-size="15" font-family="Arial" font-weight="bold" x="6" y="15" text-anchor="middle" dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text>
-    </g>
-    </svg>
-    `;
+    return `<svg xmlns='http://www.w3.org/2000/svg'version='1.1'width='100px'height='100px'><path style="fill:${backgroundcolor};stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"d="m 0,2 a 20,20 0 0 1 20,19.999999 20,20 0 0 1 -20,20 z"/><g transform="scale(1.5)"><text style="fill:${textcolor}"font-size="15"font-family="Arial"font-weight="bold"x="6"y="15"text-anchor="middle"dominant-baseline="central">${text.replace("-", "━").replace("+", "✚")}</text></g></svg>`;
   } else {
     return null;
   }
@@ -632,29 +620,7 @@ function generatePassTurnNotationSVG(backgroundcolor) {
   if (backgroundcolor != "") {
     bgcolor = backgroundcolor;
   }
-  return `
-    <svg
-   width="100"
-   height="100"
-   viewBox="0 0 26.458333 26.458333"
-   version="1.1"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <g>
-    <ellipse
-       style="fill:${bgcolor};stroke:#000000;stroke-width:1.05833333;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
-       id="background"
-       cx="13.229165"
-       cy="13.229164"
-       rx="11.906248"
-       ry="11.906247" />
-    <path
-       id="foreground"
-       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0;stroke-linecap:butt;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;image-rendering:auto"
-       d="m 13.229166,3.9687505 -2.778125,2.7781249 2.778125,2.7781248 V 7.672917 a 5.5562497,5.5562497 0 0 1 5.55625,5.556251 5.5562497,5.5562497 0 0 1 -3.271893,5.06248 l 1.377486,1.377487 a 7.4083326,7.4083326 0 0 0 3.74649,-6.439967 7.4083326,7.4083326 0 0 0 -7.408333,-7.4083344 z m -3.6607575,2.821533 a 7.4083326,7.4083326 0 0 0 -3.7475747,6.4388845 7.4083326,7.4083326 0 0 0 7.4083322,7.408331 v 1.852084 l 2.778125,-2.778125 -2.778125,-2.778125 v 1.852083 A 5.5562497,5.5562497 0 0 1 7.672917,13.229168 5.5562497,5.5562497 0 0 1 10.945171,8.1670469 Z" />
-  </g>
-</svg>
-  `;
+  return `<svg width="100"height="100"viewBox="0 0 26.458333 26.458333"version="1.1"xmlns="http://www.w3.org/2000/svg"xmlns:svg="http://www.w3.org/2000/svg"><g><ellipse style="fill:${bgcolor};stroke:#000000;stroke-width:1.05833333;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"id="background"cx="13.229165"cy="13.229164"rx="11.906248"ry="11.906247"/><path id="foreground"style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0;stroke-linecap:butt;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;image-rendering:auto"d="m 13.229166,3.9687505 -2.778125,2.7781249 2.778125,2.7781248 V 7.672917 a 5.5562497,5.5562497 0 0 1 5.55625,5.556251 5.5562497,5.5562497 0 0 1 -3.271893,5.06248 l 1.377486,1.377487 a 7.4083326,7.4083326 0 0 0 3.74649,-6.439967 7.4083326,7.4083326 0 0 0 -7.408333,-7.4083344 z m -3.6607575,2.821533 a 7.4083326,7.4083326 0 0 0 -3.7475747,6.4388845 7.4083326,7.4083326 0 0 0 7.4083322,7.408331 v 1.852084 l 2.778125,-2.778125 -2.778125,-2.778125 v 1.852083 A 5.5562497,5.5562497 0 0 1 7.672917,13.229168 5.5562497,5.5562497 0 0 1 10.945171,8.1670469 Z"/></g></svg>`;
 }
 
 function initBoard(variant) {
@@ -1447,6 +1413,177 @@ function parseUCIMovesToPreviewElementsStatic(movesparagraph, variant, fen, is96
     tmpboard.delete();
     return movesparagraph;
 }*/
+
+/* function ParseFEN(fen) {
+  if (typeof fen!="string") {
+    throw TypeError;
+  }
+  let i=0;
+  let j=0;
+  const pieceprefixes=['+','|'];
+  const piecesuffixes=['~'];
+  const specialpieces=['*'];
+  let boardwidth=0;
+  let boardheight=0;
+  let chcode=0;
+  let ParserState=-1;
+  let pieces=[];
+  let piececolor="";
+  let pieceid="";
+  let firstrow=true;
+  let columncount=0;
+  let prefix="";
+  let suffix="";
+  let blankcount=0;
+  let ch;
+  const fenelem=fen.split(/[ ]+/);
+  const position=fenelem[0];
+  for (i=0;i<position.length;i++) {
+    ch=position[i];
+    chcode=ch.charCodeAt(0);
+    if (ParserState==-1) {  //Initial state
+      if (chcode>=65 && chcode<=90) {
+        boardheight=1;
+        columncount++;
+        piececolor="white";
+        pieceid=String.fromCharCode(chcode+32);
+        ParserState=1;
+      }
+      else if (chcode>=97 && chcode<=122) {
+        boardheight=1;
+        columncount++;
+        piececolor="black";
+        pieceid=ch;
+        ParserState=1;
+      }
+      else if (chcode>=48 && chcode<=57) {
+        boardheight=1;
+        blankcount=parseInt(ch);
+        ParserState=0;
+      }
+      else if (pieceprefixes.includes(ch)) {
+        if (prefix.includes(ch)) {
+          console.warn(`Duplicated piece prefix "${ch}" at char ${i+1} of FEN.`);
+          return null;
+        }
+        boardheight=1;
+        prefix+=ch;
+        ParserState=0;
+      }
+      else if (specialpieces.includes(ch)) {
+        columncount++;
+        boardheight=1;
+        pieces.push({role: ch, color: null, prefix: null, suffix: null});
+        ParserState=0;
+      }
+      else {
+        console.warn(`Illegal character "${ch}" at char ${i+1} of FEN.`);
+        return null;
+      }
+    }
+    else if (ParserState==0) {  //Main state
+      if (blankcount>0 && (chcode<48 || chcode>57)) {
+        for (j=0;j<blankcount;j++) {
+          pieces.push({role: null, color: null, prefix: null, suffix: null});
+        }
+        columncount+=blankcount;
+        blankcount=0;
+      }
+      if (chcode>=65 && chcode<=90) {
+        piececolor="white";
+        pieceid=String.fromCharCode(chcode+32);
+        columncount++;
+        ParserState=1;
+      }
+      else if (chcode>=97 && chcode<=122) {
+        piececolor="black";
+        pieceid=ch;
+        columncount++;
+        ParserState=1;
+      }
+      else if (chcode>=48 && chcode<=57) {
+        if (prefix.length>0) {
+          console.warn(`Illegal prefix "${prefix}" describing empty squares at char ${i+1} of FEN.`);
+          return null;
+        }
+        blankcount=blankcount*10+parseInt(ch);
+        prefix="";
+        suffix="";
+      }
+      else if (pieceprefixes.includes(ch)) {
+        if (prefix.includes(ch)) {
+          console.warn(`Duplicated piece prefix "${ch}" at char ${i+1} of FEN.`);
+          return null;
+        }
+        prefix+=ch;
+      }
+      else if (specialpieces.includes(ch)) {
+        if (prefix.length>0) {
+          console.warn(`Illegal prefix "${prefix}" describing special piece at char ${i+1} of FEN.`);
+          return null;
+        }
+        columncount++;
+        pieces.push({role: ch, color: null, prefix: null, suffix: null});
+      }
+      else if (ch=='/') {
+        if (firstrow) {
+          boardwidth=columncount;
+          firstrow=false;
+        }
+        else if (columncount!=boardwidth) {
+          console.warn(`Column count mismatch at row ${boardheight}. Expected: ${boardwidth}, Actual: ${columncount}`);
+          return null;
+        }
+        columncount=0;
+        boardheight++;
+        if (prefix.length>0) {
+          console.warn(`Illegal prefix "${prefix}" at end of row at char ${i+1} of FEN.`);
+          return null;
+        }
+      }
+      else {
+        console.warn(`Illegal character "${ch}" at char ${i+1} of FEN.`);
+        return null;
+      }
+    }
+    else if (ParserState==1) {  //Parsing suffixes
+      if (piecesuffixes.includes(ch)) {
+        suffix+=ch;
+      }
+      else {
+        pieces.push({role: pieceid, color: piececolor, prefix: prefix, suffix: suffix});
+        prefix="";
+        suffix="";
+        i--;
+        ParserState=0;
+      }
+    }
+  }
+  if (ParserState==0) {
+    if (blankcount>0) {
+      for (j=0;j<blankcount;j++) {
+        pieces.push({role: null, color: null, prefix: null, suffix: null});
+      }
+      columncount+=blankcount;
+    }
+  }
+  else if (ParserState==1) {
+    pieces.push({role: pieceid, color: piececolor, prefix: prefix, suffix: suffix});
+    prefix="";
+  }
+  if (firstrow) {
+    boardwidth=columncount;
+  }
+  else if (columncount!=boardwidth) {
+    console.warn(`Column count mismatch at row ${boardheight}. Expected: ${boardwidth}, Actual: ${columncount}`);
+    return null;
+  }
+  if (prefix.length>0) {
+    console.warn(`Illegal prefix "${prefix}" at end of row at char ${i+1} of FEN.`);
+    return null;
+  }
+  return pieces;
+} */
 
 function showWallSquares() {
   let wall_square_list = getWallSquarePosition();
@@ -3183,13 +3320,12 @@ new Module().then((loadedModule) => {
   isAnalysis.onchange = function () {
     recordedmultipv = 1;
     if (isAnalysis.checked) {
-      console.log("Observing.");
-      //observer.observe(engineOutput, observerconfig);
+      //console.log("Observing.");
     } else {
-      console.log("Clear auto shapes.");
+      //console.log("Clear auto shapes.");
       chessground.setAutoShapes([]);
-      //observer.disconnect();
     }
+    dropdownVisualEffect.dispatchEvent(new Event("change"));
   };
 
   dropdownBoardCoordinate.onchange = function () {
@@ -3288,16 +3424,17 @@ new Module().then((loadedModule) => {
     pSetFen.click();
   };
 
-  dropdownFogOfWarSettings.onchange = function () {
-    updateChessground(false);
-    setTimeout(() => {
-      let elem = document.getElementById("gameresultcontainermini");
-      while (elem) {
-        chessgroundMiniBoardWrapper.removeChild(elem);
-        elem = document.getElementById("gameresultcontainermini");
-      }
-    }, 20);
-  };
+  dropdownVisualEffect.onchange = dropdownVisualEffectPerspective.onchange =
+    function () {
+      updateChessground(false);
+      setTimeout(() => {
+        let elem = document.getElementById("gameresultcontainermini");
+        while (elem) {
+          chessgroundMiniBoardWrapper.removeChild(elem);
+          elem = document.getElementById("gameresultcontainermini");
+        }
+      }, 20);
+    };
 
   updateChessground(true);
 }); // Chessground helper functions
@@ -4405,9 +4542,299 @@ function getCheckSquares(board) {
   return checklist;
 }
 
+function ApplyVisualEffectToBoard(effect, perspective, chessground, board) {
+  if (effect == "fogofwar") {
+    if (perspective == "white") {
+      if (board.turn()) {
+        const fogofwarsquarevisibility = getKnownAndUnknownSquares(board);
+        const unknownsquares = Array.from(
+          fogofwarsquarevisibility.UnknownSquares,
+        );
+        let i = 0;
+        let val1;
+        for (i = 0; i < unknownsquares.length; i++) {
+          val1 = unknownsquares[i].replace("10", ":");
+          if (chessground.state.boardState.pieces.has(val1)) {
+            let piece = chessground.state.boardState.pieces.get(val1);
+            if (piece.role == "_-piece" || piece.color == "white") {
+              continue;
+            }
+            piece.role = "unknown";
+          } else {
+            chessground.state.boardState.pieces.set(val1, {
+              color: "black",
+              role: "unknown",
+            });
+          }
+        }
+      } else {
+        let i = 0;
+        let j = 0;
+        let boardsize = getCurrentBoardSize();
+        let square = "";
+        chessground.set({
+          movable: {
+            color: undefined,
+            dests: EmptyMap,
+          },
+        });
+        for (i = 0; i < boardsize.width; i++) {
+          for (j = 0; j < boardsize.height; j++) {
+            square = `${files[i]}${j + 1}`.replace("10", ":");
+            if (
+              chessground.state.boardState.pieces.has(square) &&
+              (chessground.state.boardState.pieces.get(square).color ==
+                "white" ||
+                chessground.state.boardState.pieces.get(square).role ==
+                  "_-piece")
+            ) {
+              continue;
+            } else {
+              chessground.state.boardState.pieces.set(square, {
+                color: "black",
+                role: "unknown",
+              });
+            }
+          }
+        }
+      }
+    } else if (perspective == "black") {
+      if (board.turn()) {
+        let i = 0;
+        let j = 0;
+        let boardsize = getCurrentBoardSize();
+        let square = "";
+        chessground.set({
+          movable: {
+            color: undefined,
+            dests: EmptyMap,
+          },
+        });
+        for (i = 0; i < boardsize.width; i++) {
+          for (j = 0; j < boardsize.height; j++) {
+            square = `${files[i]}${j + 1}`.replace("10", ":");
+            if (
+              chessground.state.boardState.pieces.has(square) &&
+              (chessground.state.boardState.pieces.get(square).color ==
+                "black" ||
+                chessground.state.boardState.pieces.get(square).role ==
+                  "_-piece")
+            ) {
+              continue;
+            } else {
+              chessground.state.boardState.pieces.set(square, {
+                color: "white",
+                role: "unknown",
+              });
+            }
+          }
+        }
+      } else {
+        const fogofwarsquarevisibility = getKnownAndUnknownSquares(board);
+        const unknownsquares = Array.from(
+          fogofwarsquarevisibility.UnknownSquares,
+        );
+        let i = 0;
+        let val1;
+        for (i = 0; i < unknownsquares.length; i++) {
+          val1 = unknownsquares[i].replace("10", ":");
+          if (chessground.state.boardState.pieces.has(val1)) {
+            let piece = chessground.state.boardState.pieces.get(val1);
+            if (piece.role == "_-piece" || piece.color == "black") {
+              continue;
+            }
+            piece.role = "unknown";
+          } else {
+            chessground.state.boardState.pieces.set(val1, {
+              color: "white",
+              role: "unknown",
+            });
+          }
+        }
+      }
+    } else if (perspective == "alternate") {
+      const fogofwarsquarevisibility = getKnownAndUnknownSquares(board);
+      const unknownsquares = Array.from(
+        fogofwarsquarevisibility.UnknownSquares,
+      );
+      let i = 0;
+      let val1;
+      const movercolor = getColor(board);
+      for (i = 0; i < unknownsquares.length; i++) {
+        val1 = unknownsquares[i].replace("10", ":");
+        if (chessground.state.boardState.pieces.has(val1)) {
+          let piece = chessground.state.boardState.pieces.get(val1);
+          if (piece.role == "_-piece" || piece.color == movercolor) {
+            continue;
+          }
+          piece.role = "unknown";
+        } else {
+          chessground.state.boardState.pieces.set(val1, {
+            color: board.turn() ? "black" : "white",
+            role: "unknown",
+          });
+        }
+      }
+    }
+  } else if (effect == "wargame") {
+    if (perspective == "white") {
+      let i = 0;
+      let j = 0;
+      let boardsize = getCurrentBoardSize();
+      let square = "";
+      if (!board.turn()) {
+        chessground.set({
+          movable: {
+            color: undefined,
+            dests: EmptyMap,
+          },
+        });
+      }
+      for (i = 0; i < boardsize.width; i++) {
+        for (j = 0; j < boardsize.height; j++) {
+          square = `${files[i]}${j + 1}`.replace("10", ":");
+          if (
+            chessground.state.boardState.pieces.has(square) &&
+            chessground.state.boardState.pieces.get(square).color == "black" &&
+            chessground.state.boardState.pieces.get(square).role != "_-piece"
+          ) {
+            chessground.state.boardState.pieces.delete(square);
+          }
+        }
+      }
+    } else if (perspective == "black") {
+      let i = 0;
+      let j = 0;
+      let boardsize = getCurrentBoardSize();
+      let square = "";
+      if (board.turn()) {
+        chessground.set({
+          movable: {
+            color: undefined,
+            dests: EmptyMap,
+          },
+        });
+      }
+      for (i = 0; i < boardsize.width; i++) {
+        for (j = 0; j < boardsize.height; j++) {
+          square = `${files[i]}${j + 1}`.replace("10", ":");
+          if (
+            chessground.state.boardState.pieces.has(square) &&
+            chessground.state.boardState.pieces.get(square).color == "white" &&
+            chessground.state.boardState.pieces.get(square).role != "_-piece"
+          ) {
+            chessground.state.boardState.pieces.delete(square);
+          }
+        }
+      }
+    } else if (perspective == "alternate") {
+      let i = 0;
+      let j = 0;
+      let boardsize = getCurrentBoardSize();
+      let square = "";
+      if (board.turn()) {
+        for (i = 0; i < boardsize.width; i++) {
+          for (j = 0; j < boardsize.height; j++) {
+            square = `${files[i]}${j + 1}`.replace("10", ":");
+            if (
+              chessground.state.boardState.pieces.has(square) &&
+              chessground.state.boardState.pieces.get(square).color ==
+                "black" &&
+              chessground.state.boardState.pieces.get(square).role != "_-piece"
+            ) {
+              chessground.state.boardState.pieces.delete(square);
+            }
+          }
+        }
+      } else {
+        for (i = 0; i < boardsize.width; i++) {
+          for (j = 0; j < boardsize.height; j++) {
+            square = `${files[i]}${j + 1}`.replace("10", ":");
+            if (
+              chessground.state.boardState.pieces.has(square) &&
+              chessground.state.boardState.pieces.get(square).color ==
+                "white" &&
+              chessground.state.boardState.pieces.get(square).role != "_-piece"
+            ) {
+              chessground.state.boardState.pieces.delete(square);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+function DisplayLastMoveWithVisualEffect(
+  effect,
+  chessground,
+  lastMoveFrom,
+  lastMoveTo,
+) {
+  if (effect == "fogofwar") {
+    if (
+      chessground.state.boardState.pieces.has(lastMoveFrom) &&
+      chessground.state.boardState.pieces.get(lastMoveFrom).role == "unknown"
+    ) {
+      if (
+        chessground.state.boardState.pieces.get(lastMoveTo) == undefined ||
+        chessground.state.boardState.pieces.get(lastMoveTo).role != "unknown"
+      ) {
+        chessground.set({
+          lastMove: [lastMoveTo, lastMoveTo],
+        });
+      } else {
+        chessground.set({
+          lastMove: undefined,
+        });
+      }
+    } else if (
+      chessground.state.boardState.pieces.has(lastMoveTo) &&
+      chessground.state.boardState.pieces.get(lastMoveTo).role == "unknown"
+    ) {
+      if (
+        chessground.state.boardState.pieces.get(lastMoveFrom) == undefined ||
+        chessground.state.boardState.pieces.get(lastMoveFrom).role != "unknown"
+      ) {
+        chessground.set({
+          lastMove: [lastMoveFrom, lastMoveFrom],
+        });
+      } else {
+        chessground.set({
+          lastMove: undefined,
+        });
+      }
+    } else {
+      chessground.set({
+        lastMove: [lastMoveFrom, lastMoveTo],
+      });
+    }
+  } else if (effect == "wargame") {
+    if (chessground.state.boardState.pieces.has(lastMoveTo)) {
+      chessground.set({
+        lastMove: [lastMoveFrom, lastMoveTo],
+      });
+    } else {
+      chessground.set({
+        lastMove: undefined,
+      });
+    }
+  }
+}
+
 function updateChessground(showresult) {
   const boardfenval = board.fen();
-  currentboardfen.innerHTML = `Current Board FEN:  ${boardfenval}`;
+  const boardfenvallist = boardfenval.split(" ");
+  currentBoardFen.innerText = `Current Board FEN:  ${boardfenval}`;
+
+  if (boardfenvallist.length == 7) {
+    const checknums = boardfenvallist[4].split("+");
+    pcheckCounts.innerText = `White remaining checks: ${checknums[1]} - Black remaining checks: ${checknums[0]}`;
+    pcheckCounts.hidden = false;
+  } else {
+    pcheckCounts.innerText = "";
+    pcheckCounts.hidden = true;
+  }
 
   //if (labelPgn) labelPgn.innerText = getPgn(board);
   let deletelater = [];
@@ -4422,145 +4849,42 @@ function updateChessground(showresult) {
   if (labelStm) labelStm.innerText = getColorOrUndefined(board);
 
   if (
-    dropdownFogOfWarSettings.value == "alternate" &&
-    !isBoardSetup.checked &&
-    !isAnalysis.checked &&
-    labelStm.innerText != "undefined"
-  ) {
-    chessground.set({
-      animation: {
-        enabled: false,
-      },
-    });
-  }
-
-  chessground.set({
-    fen: boardfenval,
-    check: getCheckSquares(board),
-    turnColor: getColor(board),
-    movable: {
-      color: getColorOrUndefined(board),
-      dests: getDests(board),
-    },
-  });
-
-  if (
-    dropdownFogOfWarSettings.value == "<DISABLED>" ||
+    dropdownVisualEffect.value == "<DISABLED>" ||
     isBoardSetup.checked ||
     isAnalysis.checked ||
     labelStm.innerText == "undefined"
   ) {
-  } else if (dropdownFogOfWarSettings.value == "whiteonly") {
-    if (board.turn()) {
-      const fogofwarsquarevisibility = getKnownAndUnknownSquares(board);
-      fogofwarsquarevisibility.UnknownSquares.forEach((val) => {
-        let val1 = val.replace("10", ":");
-        if (chessground.state.boardState.pieces.has(val1)) {
-          let piece = chessground.state.boardState.pieces.get(val1);
-          if (piece.role == "_-piece" || piece.color == "white") {
-            return;
-          }
-          piece.role = "unknown";
-        } else {
-          chessground.state.boardState.pieces.set(val1, {
-            color: "black",
-            role: "unknown",
-          });
-        }
-      });
-    } else {
-      let i = 0;
-      let j = 0;
-      let boardsize = getCurrentBoardSize();
-      let square = "";
-      chessground.set({
-        movable: {
-          color: undefined,
-          dests: EmptyMap,
-        },
-      });
-      for (i = 0; i < boardsize.width; i++) {
-        for (j = 0; j < boardsize.height; j++) {
-          square = `${files[i]}${j + 1}`.replace("10", ":");
-          if (
-            chessground.state.boardState.pieces.has(square) &&
-            (chessground.state.boardState.pieces.get(square).color == "white" ||
-              chessground.state.boardState.pieces.get(square).role == "_-piece")
-          ) {
-            continue;
-          } else {
-            chessground.state.boardState.pieces.set(square, {
-              color: "black",
-              role: "unknown",
-            });
-          }
-        }
-      }
-    }
-  } else if (dropdownFogOfWarSettings.value == "blackonly") {
-    if (board.turn()) {
-      let i = 0;
-      let j = 0;
-      let boardsize = getCurrentBoardSize();
-      let square = "";
-      chessground.set({
-        movable: {
-          color: undefined,
-          dests: EmptyMap,
-        },
-      });
-      for (i = 0; i < boardsize.width; i++) {
-        for (j = 0; j < boardsize.height; j++) {
-          square = `${files[i]}${j + 1}`.replace("10", ":");
-          if (
-            chessground.state.boardState.pieces.has(square) &&
-            (chessground.state.boardState.pieces.get(square).color == "black" ||
-              chessground.state.boardState.pieces.get(square).role == "_-piece")
-          ) {
-            continue;
-          } else {
-            chessground.state.boardState.pieces.set(square, {
-              color: "white",
-              role: "unknown",
-            });
-          }
-        }
-      }
-    } else {
-      const fogofwarsquarevisibility = getKnownAndUnknownSquares(board);
-      fogofwarsquarevisibility.UnknownSquares.forEach((val) => {
-        let val1 = val.replace("10", ":");
-        if (chessground.state.boardState.pieces.has(val1)) {
-          let piece = chessground.state.boardState.pieces.get(val1);
-          if (piece.role == "_-piece" || piece.color == "black") {
-            return;
-          }
-          piece.role = "unknown";
-        } else {
-          chessground.state.boardState.pieces.set(val1, {
-            color: "white",
-            role: "unknown",
-          });
-        }
-      });
-    }
-  } else if (dropdownFogOfWarSettings.value == "alternate") {
-    const fogofwarsquarevisibility = getKnownAndUnknownSquares(board);
-    fogofwarsquarevisibility.UnknownSquares.forEach((val) => {
-      let val1 = val.replace("10", ":");
-      if (chessground.state.boardState.pieces.has(val1)) {
-        let piece = chessground.state.boardState.pieces.get(val1);
-        if (piece.role == "_-piece" || piece.color == getColor(board)) {
-          return;
-        }
-        piece.role = "unknown";
-      } else {
-        chessground.state.boardState.pieces.set(val1, {
-          color: board.turn() ? "black" : "white",
-          role: "unknown",
-        });
-      }
+    chessground.set({
+      fen: boardfenval,
+      check: getCheckSquares(board),
+      turnColor: getColor(board),
+      movable: {
+        color: getColorOrUndefined(board),
+        dests: getDests(board),
+      },
     });
+  } else {
+    if (dropdownVisualEffectPerspective.value == "alternate") {
+      chessground.set({ animation: { enabled: false } });
+    }
+    chessground.set({
+      fen: boardfenval,
+      check: getCheckSquares(board),
+      turnColor: getColor(board),
+      movable: {
+        color: getColorOrUndefined(board),
+        dests: getDests(board),
+      },
+    });
+    ApplyVisualEffectToBoard(
+      dropdownVisualEffect.value,
+      dropdownVisualEffectPerspective.value,
+      chessground,
+      board,
+    );
+    if (dropdownVisualEffectPerspective.value == "alternate") {
+      chessground.set({ animation: { enabled: true } });
+    }
   }
 
   const moveStack = board.moveStack();
@@ -4588,7 +4912,7 @@ function updateChessground(showresult) {
       }
     }
     if (
-      dropdownFogOfWarSettings.value == "<DISABLED>" ||
+      dropdownVisualEffect.value == "<DISABLED>" ||
       isBoardSetup.checked ||
       isAnalysis.checked ||
       labelStm.innerText == "undefined"
@@ -4597,59 +4921,14 @@ function updateChessground(showresult) {
         lastMove: [lastMoveFrom, lastMoveTo],
       });
     } else {
-      if (
-        chessground.state.boardState.pieces.has(lastMoveFrom) &&
-        chessground.state.boardState.pieces.get(lastMoveFrom).role == "unknown"
-      ) {
-        if (
-          chessground.state.boardState.pieces.get(lastMoveTo) == undefined ||
-          chessground.state.boardState.pieces.get(lastMoveTo).role != "unknown"
-        ) {
-          chessground.set({
-            lastMove: [lastMoveTo, lastMoveTo],
-          });
-        } else {
-          chessground.set({
-            lastMove: undefined,
-          });
-        }
-      } else if (
-        chessground.state.boardState.pieces.has(lastMoveTo) &&
-        chessground.state.boardState.pieces.get(lastMoveTo).role == "unknown"
-      ) {
-        if (
-          chessground.state.boardState.pieces.get(lastMoveFrom) == undefined ||
-          chessground.state.boardState.pieces.get(lastMoveFrom).role !=
-            "unknown"
-        ) {
-          chessground.set({
-            lastMove: [lastMoveFrom, lastMoveFrom],
-          });
-        } else {
-          chessground.set({
-            lastMove: undefined,
-          });
-        }
-      } else {
-        chessground.set({
-          lastMove: [lastMoveFrom, lastMoveTo],
-        });
-      }
+      DisplayLastMoveWithVisualEffect(
+        dropdownVisualEffect.value,
+        chessground,
+        lastMoveFrom,
+        lastMoveTo,
+      );
     }
     buttonUndo.disabled = false;
-  }
-
-  if (
-    dropdownFogOfWarSettings.value == "alternate" &&
-    !isBoardSetup.checked &&
-    !isAnalysis.checked &&
-    labelStm.innerText != "undefined"
-  ) {
-    chessground.set({
-      animation: {
-        enabled: true,
-      },
-    });
   }
 
   chessground.setAutoShapes([]);

@@ -327,6 +327,20 @@
     margin-bottom: 10px;
   }
 
+  #visualeffects {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 5px;
+    margin-bottom: 10px;
+  }
+
+  #visualeffects select {
+    min-width: 120px;
+    height: 25px;
+    background: #eee;
+  }
+
   #gamesettings {
     display: flex;
     flex-direction: row;
@@ -570,12 +584,6 @@
     margin-left: 10px;
   }
 
-  #gamesettings #dropdown-fogofwarsettings {
-    width: 120px;
-    background: #eee;
-    margin-left: 10px;
-  }
-
   #dropdown-boardtheme {
     min-width: 100px;
     background: #eee;
@@ -710,12 +718,14 @@
 
   #posvariantdiv #dropdown-variant {
     width: 150px;
+    min-height: 25px;
     background: #eee;
     margin-left: 5px;
   }
 
   #posvariantdiv #dropdown-varianttype {
     width: 150px;
+    min-height: 25px;
     background: #eee;
     margin-left: 5px;
   }
@@ -723,6 +733,7 @@
   #posvariantdiv #dropdown-posvarianttype {
     min-width: 120px;
     max-width: 150px;
+    min-height: 25px;
     background: #eee;
     margin-left: 5px;
   }
@@ -730,6 +741,7 @@
   #posvariantdiv #dropdown-posvariantname {
     min-width: 120px;
     max-width: 150px;
+    min-height: 25px;
     background: #eee;
     margin-left: 5px;
     margin-right: 5px;
@@ -934,6 +946,10 @@
   #info #timers.vertical #blacktimer {
     float: none;
     margin-top: 20px;
+  }
+
+  #info #checkcounts {
+    margin-bottom: 5px;
   }
 
   #info #enginecmddiv {
@@ -6993,9 +7009,6 @@
                   engine_match_mode,
                 onclick: () => {
                   analysis_mode = !analysis_mode;
-                  document
-                    .getElementById("dropdown-fogofwarsettings")
-                    .dispatchEvent(new Event("change"));
                 },
               }),
               "Analysis",
@@ -7826,8 +7839,81 @@
               ]),
             ],
           ),
+          m("div#visualeffects", [
+            m("p", "Visual effect: "),
+            m(
+              "select#dropdown-visualeffect",
+              {
+                disabled: !is_ready || board_setup_mode,
+                title:
+                  "A visual effect is a change on the visibility of the board. Usually it's restricting piece visibility.",
+              },
+              [
+                m(
+                  "option",
+                  {
+                    value: "<DISABLED>",
+                    title: "No visual effect. The board is shown as is.",
+                  },
+                  "<DISABLED>",
+                ),
+                m(
+                  "option",
+                  {
+                    value: "fogofwar",
+                    title:
+                      "Fog of war is a visual effect that can prevent a player from seeing unreachable squares except wall squares.",
+                  },
+                  "Fog Of War",
+                ),
+                m(
+                  "option",
+                  {
+                    value: "wargame",
+                    title:
+                      "War game is a visual effect that can prevent a player from seeing opponent's pieces",
+                  },
+                  "War Game",
+                ),
+              ],
+            ),
+            m("p", "Perspective: "),
+            m(
+              "select#dropdown-visualeffectperspective",
+              {
+                disabled: !is_ready || board_setup_mode,
+                title: "Choose the perspective of visual effect.",
+              },
+              [
+                m(
+                  "option",
+                  {
+                    value: "white",
+                    title: "See the board at white's perspective.",
+                  },
+                  "White's View",
+                ),
+                m(
+                  "option",
+                  {
+                    value: "black",
+                    title: "See the board at black's perspective.",
+                  },
+                  "Black's View",
+                ),
+                m(
+                  "option",
+                  {
+                    value: "alternate",
+                    title: "See the board at current mover's perspective.",
+                  },
+                  "View Alternately",
+                ),
+              ],
+            ),
+          ]),
           m("div#gamesettings", [
-            m("p", {}, "Quick promote/demote: "),
+            m("p", "Quick promote/demote: "),
             m(
               "select#dropdown-quickpromotion",
               {
@@ -7892,21 +7978,6 @@
                   "Click to place a wall only (Requires entering choice in prompt dialog).",
               },
               "Place A Wall",
-            ),
-            m("p", "Fog Of War:"),
-            m(
-              "select#dropdown-fogofwarsettings",
-              {
-                disabled: !is_ready || board_setup_mode,
-                title:
-                  "Fog of war is a visual effect that can prevent a player from seeing unreachable squares except wall squares.",
-              },
-              [
-                m("option", { value: "<DISABLED>" }, "<DISABLED>"),
-                m("option", { value: "whiteonly" }, "White's View"),
-                m("option", { value: "blackonly" }, "Black's View"),
-                m("option", { value: "alternate" }, "View Alternately"),
-              ],
             ),
             m(
               "label#label-showmovediv",
@@ -8634,6 +8705,7 @@
                   ),
                 ],
               ),
+              m("p#checkcounts"),
               m("div#evaluation", { hidden: !analysis_mode }, [
                 m("div#evalbar", [m("p#cp", "0.00"), m("div#evalbarprogress")]),
                 m("p#evalinfo", ""),
