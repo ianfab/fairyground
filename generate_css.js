@@ -1,7 +1,7 @@
 /* 
  * 
  * Generates SVG files for generic boards and CSS files for "FEN Style Letters" theme and generic boards.
- * node generate_css.js [--silent] [--max-rank <int>] [--max-file <int>]
+ * "node generate_css.js --help" for more information.
  * 
  */ 
 
@@ -74,10 +74,7 @@ function GenerateGenericBoardSVGTiling(width, height, squareWidth, squareHeight,
     for (i=0;i<width;i+=1) { //From left to right, 0 to N-1
         for (j=0;j<height;j+=1) { //From bottom to top, 0 to N-1
             //Square at bottom left corner is always dark
-            if ((j&1)==0 && (i&1)==0) {
-                result+=`<rect x="${i*squareWidth}" y="${(height-j-1)*squareHeight}" width="${squareWidth}" height="${squareHeight}"/>`;
-            }
-            else if ((j&1)==1 && (i&1)==1) {
+            if ((j&1)==(i&1)) {
                 result+=`<rect x="${i*squareWidth}" y="${(height-j-1)*squareHeight}" width="${squareWidth}" height="${squareHeight}"/>`;
             }
         }
@@ -636,7 +633,7 @@ const colors= ((colorsparam.length==0) ? [
 result="";
 
 for (k=0;k<colors.length;k++){
-    result="/* Automatically generated, do not edit!!! */\n";
+    result=`/* Automatically generated, do not edit!!! */\n.${colors[k].color}board{--dark-square-color:${colors[k].colorCodeDark};--light-square-color:${colors[k].colorCodeLight}}`;
     if (!directoryExists(`./public/assets/images/board/${colors[k].color}`)) {
         if (!makeDirectory(`./public/assets/images/board/${colors[k].color}`)) {
             console.error(`Failed to make directory: ./public/assets/images/board/${colors[k].color}`);

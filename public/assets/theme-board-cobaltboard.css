@@ -1,3 +1,7 @@
+.cobaltboard {
+  --dark-square-color: #6882a8;
+  --light-square-color: #9bb5db;
+}
 .cobaltboard.board1x1 cg-board {
   background-image: url('images/board/cobalt/cobalt_1x1.svg');
 }

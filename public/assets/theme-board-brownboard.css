@@ -1,3 +1,7 @@
+.brownboard {
+  --dark-square-color: #b58863;
+  --light-square-color: #f0d9b5;
+}
 .brownboard.board1x1 cg-board {
   background-image: url('images/board/brown/brown1x1.svg');
 }

@@ -244,6 +244,10 @@ coord {
     text-shadow: var(--text-shadow-style-black);
 }
 
+.inner coord {
+    text-shadow: none;
+}
+
 .timer-active {
     box-shadow: 0px 0px 5px 5px #629924;
 }

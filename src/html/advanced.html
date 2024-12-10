@@ -8544,6 +8544,31 @@
                       ),
                     ],
                   ),
+                  m(
+                    "label",
+                    {
+                      title:
+                        "When checked, the board coordinates are shown inside of the board. Otherwise they are outside of the board.",
+                    },
+                    m("input[type=checkbox]#check-innercoordinate", {
+                      disabled: !is_ready,
+                      onclick: () => {
+                        if (
+                          document.getElementById("check-innercoordinate")
+                            .checked
+                        ) {
+                          document
+                            .getElementById("chessground-container-div")
+                            .classList.add("inner");
+                        } else {
+                          document
+                            .getElementById("chessground-container-div")
+                            .classList.remove("inner");
+                        }
+                      },
+                    }),
+                    "Inner Board Coordinate",
+                  ),
                 ]),
               ]),
             ]),

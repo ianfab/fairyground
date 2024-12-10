@@ -120,6 +120,9 @@ const dropdownNotationSystem = document.getElementById("sannotation");
 const pRandomMoverGo = document.getElementById("randommovergo");
 const dropdownBoardCoordinate = document.getElementById("boardcoordinate");
 const checkboxFischerRandom = document.getElementById("isfischerrandommode");
+const checkBoxInnerCoordinate = document.getElementById(
+  "check-innercoordinate",
+);
 const soundMove = new Audio("assets/sound/thearst3rd/move.mp3");
 const soundCapture = new Audio("assets/sound/thearst3rd/capture.mp3");
 const soundCheck = new Audio("assets/sound/thearst3rd/check.mp3");
@@ -833,8 +836,156 @@ function redrawChessground(customFEN) {
     lineWidth: 10,
   };
   if (chessground.state.pocketRoles === undefined) {
-    pocketTopEl.style.display = "none";
-    pocketBottomEl.style.display = "none";
+    pocketTopEl.classList.add("no-inital-pocket-piece");
+    pocketBottomEl.classList.add("no-inital-pocket-piece");
+  } else {
+    pocketTopEl.classList.remove("no-inital-pocket-piece");
+    pocketBottomEl.classList.remove("no-inital-pocket-piece");
+  }
+  updateInnerCoordinateColor(chessground);
+}
+
+function updateInnerCoordinateColor(chessground) {
+  const coordinateobj =
+    chessground.state.dom.elements.container.getElementsByTagName("coords");
+  let i, j;
+  let elem, childs;
+  for (i = 0; i < coordinateobj.length; i++) {
+    elem = coordinateobj[i];
+    if (elem instanceof HTMLElement) {
+      childs = elem.childNodes;
+      for (j = 0; j < childs.length; j++) {
+        childs.item(j).classList.remove("light");
+        childs.item(j).classList.remove("dark");
+      }
+    }
+  }
+  if (!checkBoxInnerCoordinate.checked) {
+    return;
+  }
+  const size = getCurrentBoardSize();
+  let classes, styles, isblack;
+  //If the parity of rank number and the parity of file number are the same, it's a dark square. Otherwise it's a light square.
+  for (i = 0; i < coordinateobj.length; i++) {
+    elem = coordinateobj[i];
+    if (elem instanceof HTMLElement) {
+      classes = elem.classList;
+      styles = window.getComputedStyle(elem);
+      isblack = classes.contains("black");
+      if (classes.contains("bottom")) {
+        childs = elem.childNodes;
+        let startsdark = false;
+        if (styles.flexDirection == "row") {
+          if (isblack) {
+            //If the start square is a light square, the coordinate should start with dark color.
+            if ((size.width & 1) != (size.height & 1)) {
+              startsdark = true;
+            }
+          }
+        } else if (styles.flexDirection == "row-reverse") {
+          if (isblack) {
+            if (1 != (size.height & 1)) {
+              startsdark = true;
+            }
+          } else {
+            if ((size.width & 1) != 1) {
+              startsdark = true;
+            }
+          }
+        }
+        if (startsdark) {
+          for (j = 0; j < size.width; j++) {
+            if (j & 1) {
+              childs.item(j).classList.add("light");
+            } else {
+              childs.item(j).classList.add("dark");
+            }
+          }
+        } else {
+          for (j = 0; j < size.width; j++) {
+            if (j & 1) {
+              childs.item(j).classList.add("dark");
+            } else {
+              childs.item(j).classList.add("light");
+            }
+          }
+        }
+      } else if (classes.contains("top")) {
+        childs = elem.childNodes;
+        let startsdark = false;
+        if (styles.flexDirection == "row") {
+          if (isblack) {
+            if ((size.width & 1) != 1) {
+              startsdark = true;
+            }
+          } else {
+            if (1 != (size.height & 1)) {
+              startsdark = true;
+            }
+          }
+        } else if (styles.flexDirection == "row-reverse") {
+          if (!isblack) {
+            if ((size.width & 1) != (size.height & 1)) {
+              startsdark = true;
+            }
+          }
+        }
+        if (startsdark) {
+          for (j = 0; j < size.width; j++) {
+            if (j & 1) {
+              childs.item(j).classList.add("light");
+            } else {
+              childs.item(j).classList.add("dark");
+            }
+          }
+        } else {
+          for (j = 0; j < size.width; j++) {
+            if (j & 1) {
+              childs.item(j).classList.add("dark");
+            } else {
+              childs.item(j).classList.add("light");
+            }
+          }
+        }
+      } else if (classes.contains("side")) {
+        childs = elem.childNodes;
+        let startsdark = false;
+        if (styles.flexDirection == "column") {
+          if (!isblack) {
+            if ((size.width & 1) != (size.height & 1)) {
+              startsdark = true;
+            }
+          }
+        } else if (styles.flexDirection == "column-reverse") {
+          if (isblack) {
+            if (1 != (size.height & 1)) {
+              startsdark = true;
+            }
+          } else {
+            if ((size.width & 1) != 1) {
+              startsdark = true;
+            }
+          }
+        }
+        if (startsdark) {
+          for (j = 0; j < size.width; j++) {
+            if (j & 1) {
+              childs.item(j).classList.add("light");
+            } else {
+              childs.item(j).classList.add("dark");
+            }
+          }
+        } else {
+          for (j = 0; j < size.width; j++) {
+            if (j & 1) {
+              childs.item(j).classList.add("dark");
+            } else {
+              childs.item(j).classList.add("light");
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -2313,11 +2464,14 @@ new Module().then((loadedModule) => {
     UpdateVariantsPositionTypeDropdown();
     UpdateVariantsPositionNameDropdown();
     pvinfo.innerHTML = "";
+
+    updateInnerCoordinateColor(chessground);
   };
 
   buttonFlip.onclick = function () {
     chessground.toggleOrientation();
     chessground_mini.toggleOrientation();
+    updateInnerCoordinateColor(chessground);
   };
 
   buttonUndo.onclick = function () {
@@ -2441,6 +2595,7 @@ new Module().then((loadedModule) => {
       chessground.set({
         orientation: "black",
       });
+      updateInnerCoordinateColor(chessground);
     }
     if (
       playWhite.checked == false &&
@@ -2450,6 +2605,7 @@ new Module().then((loadedModule) => {
       chessground.set({
         orientation: "white",
       });
+      updateInnerCoordinateColor(chessground);
     }
   };
 
@@ -3333,7 +3489,6 @@ new Module().then((loadedModule) => {
     chessground.set({ notation: index });
     chessground_mini.set({ notation: index });
     let containerdiv = document.getElementById("chessground-container-div");
-    redrawChessground();
     if (index >= 1 && index <= 3) {
       containerdiv.classList.add("shogi");
       containerdiv.classList.remove("xiangqi");
@@ -3344,6 +3499,7 @@ new Module().then((loadedModule) => {
       containerdiv.classList.remove("xiangqi");
       containerdiv.classList.remove("shogi");
     }
+    redrawChessground();
   };
 
   buttonsearchmove.onclick = function () {
@@ -3436,6 +3592,12 @@ new Module().then((loadedModule) => {
       }, 20);
     };
 
+  checkBoxInnerCoordinate.onchange = function () {
+    updateInnerCoordinateColor(chessground);
+  };
+
+  updateInnerCoordinateColor(chessground);
+
   updateChessground(true);
 }); // Chessground helper functions
 
@@ -3444,8 +3606,6 @@ function updateChessBoardToPosition(fen, movelist, enablemove) {
     continue;
   }
   const WhiteSpaceMatcher = new RegExp("[ ]+", "");
-  //console.log(Error());
-  //console.log(ffish.validateFen(fen, board.variant()));
 
   if (!fen || ffish.validateFen(fen, board.variant(), board.is960()) >= 0) {
     if (fen) board.setFen(fen);
@@ -4374,13 +4534,14 @@ function getCurrentBoardSize() {
   const ClassList = document.getElementById(
     "chessground-container-div",
   ).classList;
+  const matcherobj = new RegExp("board[0-9]+x[0-9]+");
   for (i = 0; i < ClassList.length; i++) {
-    if (/board[0-9]+x[0-9]+/.test(ClassList[i])) {
+    if (matcherobj.test(ClassList[i])) {
       boardsize = ClassList[i].replace("board", "").split("x"); //[width, height]
       break;
     }
   }
-  return { width: boardsize[0], height: boardsize[1] };
+  return { width: parseInt(boardsize[0]), height: parseInt(boardsize[1]) };
 }
 
 function getKnownAndUnknownSquares(board) {
