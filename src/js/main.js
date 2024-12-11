@@ -301,6 +301,7 @@ const mateevalfactor = 2147483647;
 const maxmultipvcount = 4096;
 var recordedmultipv = 1;
 var previousclicktime = Date.now();
+var hasdoubleclicked = false;
 var previousclicksquare = "00";
 var multipvminiboardtimer = null;
 //var PGNDiv = generateStaticPreviewDiv(512);
@@ -1029,11 +1030,13 @@ function onSelectSquare(key) {
     chessground.set({
       lastMove: undefined,
     });
+    hasdoubleclicked = false;
   } else {
     if (
       isReviewMode.value == "0" &&
       Date.now() - previousclicktime < 1000 &&
-      key == previousclicksquare
+      key == previousclicksquare &&
+      !hasdoubleclicked
     ) {
       let square = convertChessgroundXKeyToSquare(key);
       afterChessgroundMove(square, square, {
@@ -1048,6 +1051,9 @@ function onSelectSquare(key) {
         predrop: false,
       });
       chessground.cancelMove();
+      hasdoubleclicked = true;
+    } else {
+      hasdoubleclicked = false;
     }
     previousclicktime = Date.now();
     previousclicksquare = key;
