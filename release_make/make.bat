@@ -1,5 +1,6 @@
 @echo off
 SETLOCAL ENABLEEXTENSIONS
+SETLOCAL ENABLEDELAYEDEXPANSION
 set nodeversion=node18
 cd /d "%~dp0"
 rd /s /q .\release-builds
@@ -45,17 +46,17 @@ if not "%result%"=="" (goto Error)
 node make_index.js>.\index.js
 
 call :Make %nodeversion%-win-x64 .\release-builds\win\x64\FairyGround.exe
-if "%errorlevel%"=="11" (goto Error)
+if "%ERROR%"=="1" (goto Error)
 call :Make %nodeversion%-linux-x64 .\release-builds\linux\x64\FairyGround
-if "%errorlevel%"=="11" (goto Error)
+if "%ERROR%"=="1" (goto Error)
 call :Make %nodeversion%-win-arm64 .\release-builds\win\arm64\FairyGround.exe
-if "%errorlevel%"=="11" (goto Error)
+if "%ERROR%"=="1" (goto Error)
 call :Make %nodeversion%-linux-arm64 .\release-builds\linux\arm64\FairyGround
-if "%errorlevel%"=="11" (goto Error)
+if "%ERROR%"=="1" (goto Error)
 call :Make %nodeversion%-macos-x64 .\release-builds\macos\x64\FairyGround.app
-if "%errorlevel%"=="11" (goto Error)
+if "%ERROR%"=="1" (goto Error)
 call :Make %nodeversion%-macos-arm64 .\release-builds\macos\arm64\FairyGround.app
-if "%errorlevel%"=="11" (goto Error)
+if "%ERROR%"=="1" (goto Error)
 
 cd ..
 set result=
@@ -95,13 +96,16 @@ pause
 exit /b 1
 
 :Make
+set ERROR=0
 start /WAIT /MIN "" cmd.exe /C ^(npx pkg . --target %~1 --output %2 ^& exit ^) ^> %TEMP%\make_fairyground.log 2^>^&1
 set result=
 FOR /F "usebackq" %%i IN (`findstr /L /I "Error" "%TEMP%\make_fairyground.log"`) DO set result=%%i
 if not "%result%"=="" (
     echo Fail: Bytecode generation failed. Trying --no-bytecode...
     call :TryNoByteCode %~1 %2
-    if "%errorlevel%"=="11" (exit /b 11)
+    if "!ERROR!"=="1" (
+        exit /b 1
+    )
     echo Pass: %~1
     exit /b 0
 )
@@ -110,7 +114,9 @@ FOR /F "usebackq" %%i IN (`findstr /L /I "Failed to make bytecode" "%TEMP%\make_
 if not "%result%"=="" (
     echo Fail: Bytecode generation failed. Trying --no-bytecode...
     call :TryNoByteCode %~1 %2
-    if "%errorlevel%"=="11" (exit /b 11)
+    if "!ERROR!"=="1" (
+        exit /b 1
+    )
     echo Pass: %~1
     exit /b 0
 )
@@ -129,7 +135,8 @@ FOR /F "usebackq" %%i IN (`findstr /L /I "Error" "%TEMP%\make_fairyground.log"`)
 if not "%result%"=="" (
     echo Error: Build failed. Check the log below to see what's going on. File: %TEMP%\make_fairyground.log
     type "%TEMP%\make_fairyground.log"
-    exit /b 11
+    set ERROR=1
+    exit /b 1
 )
 set result=
 FOR /F "usebackq" %%i IN (`findstr /L /I "Warning" "%TEMP%\make_fairyground.log"`) DO set result=%%i
