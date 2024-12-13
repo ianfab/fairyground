@@ -4775,7 +4775,10 @@
 
       const reset = () => {
         review_mode = false;
-        board_setup_mode = false;
+        if (board_setup_mode) {
+          board_setup_mode = false;
+          triggerBoardSetupPieceIdentifier(false);
+        }
         $("#fen").value = "";
         $("#move").value = "";
         resetTimer();
