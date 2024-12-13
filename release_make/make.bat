@@ -1,7 +1,7 @@
 @echo off
 SETLOCAL ENABLEEXTENSIONS
 SETLOCAL ENABLEDELAYEDEXPANSION
-set nodeversion=node18
+set nodeversion=node20
 cd /d "%~dp0"
 rd /s /q .\release-builds
 md .\release-builds || goto Error
@@ -39,7 +39,7 @@ set PATH=%PATH%;%~dp0ldid\win\%arch%
 
 ::Platforms include x86, x64, arm, arm64
 set result=
-start /wait "" cmd.exe /C npm install pkg ^> %TEMP%\make_fairyground.log ^& exit
+start /wait "" cmd.exe /C npm install @yao-pkg/pkg@5.16.1 ^> %TEMP%\make_fairyground.log ^& exit
 FOR /F "usebackq" %%i IN (`findstr /L /I "Error" "%TEMP%\make_fairyground.log"`) DO set result=%%i
 if not "%result%"=="" (goto Error)
 

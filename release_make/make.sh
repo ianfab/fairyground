@@ -8,7 +8,7 @@ function Error() {
     exit 1
 }
 
-export nodeversion="node18"
+export nodeversion="node20"
 
 if [ -d "./node_modules" ]; then
     echo
@@ -43,7 +43,7 @@ mkdir -p ./release-builds/macos/x64
 mkdir -p ./release-builds/macos/arm64
 mkdir -p ./release-builds/script/any
 
-npm install pkg || Error
+npm install @yao-pkg/pkg@5.16.1 || Error
 
 function TryNoByteCode() {
     npx pkg . --no-bytecode --public --public-packages --target $1 --output $2 >/tmp/make_fairyground.log 2>&1

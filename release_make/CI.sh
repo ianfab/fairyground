@@ -8,7 +8,7 @@ function Error() {
     exit 1
 }
 
-export nodeversion="node18"
+export nodeversion="node20"
 
 echo ""
 echo "[Info] Continuous integration platform specification:"
@@ -63,7 +63,7 @@ mkdir -p ./release-builds/script/any
 
 npm install || Error
 cp -r ./node_modules ./node_modules_script
-npm install pkg || Error
+npm install @yao-pkg/pkg@5.16.1 || Error
 
 function TryNoByteCode() {
     npx pkg . --no-bytecode --public --public-packages --target $1 --output $2 >/tmp/make_fairyground.log 2>&1
@@ -126,6 +126,7 @@ npm run build || Error
 
 rm -f ./public/vercel.json
 rm -f ./public/serve.json
+rm -f ./public/_headers
 find ./public -type f -name "original.*" -exec rm -f {} \;
 
 cp -r ./public ./release_make/release-builds/win/x64/
