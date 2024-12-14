@@ -2606,6 +2606,9 @@
             chessgroundmini.style.top = `${window.innerHeight - chessgroundminirect.height - padding}px`;
           }
         } else {
+          chessgroundmini.style.left = `${chessgroundminirect.left - maindivrect.left}px`;
+          chessgroundmini.style.top = `${chessgroundminirect.top - maindivrect.top}px`;
+          chessgroundmini.style.position = "";
           if (chessgroundminirect.left < maindivrect.left + padding) {
             chessgroundmini.style.left = `${maindivrect.left + padding}px`;
           } else if (chessgroundminirect.right > maindivrect.right - padding) {
@@ -2650,6 +2653,9 @@
             chessgroundmini.style.top = `${window.innerHeight - chessgroundminirect.height - padding}px`;
           }
         } else {
+          chessgroundmini.style.left = `${chessgroundminirect.left - maindivrect.left}px`;
+          chessgroundmini.style.top = `${chessgroundminirect.top - maindivrect.top}px`;
+          chessgroundmini.style.position = "";
           if (chessgroundminirect.left < maindivrect.left + padding) {
             chessgroundmini.style.left = `${maindivrect.left + padding}px`;
           } else if (chessgroundminirect.right > maindivrect.right - padding) {
@@ -2684,15 +2690,14 @@
         ) {
           return;
         }
-        const maindivrect = maindiv.getBoundingClientRect();
         const chessgroundminirect = chessgroundmini.getBoundingClientRect();
-        if (chessgroundmini.pinned) {
-          startX = chessgroundminirect.left;
-          startY = chessgroundminirect.top;
-        } else {
-          startX = chessgroundminirect.left - maindivrect.left;
-          startY = chessgroundminirect.top - maindivrect.top;
+        if (!chessgroundmini.pinned) {
+          chessgroundmini.style.left = `${chessgroundminirect.left}px`;
+          chessgroundmini.style.top = `${chessgroundminirect.top}px`;
+          chessgroundmini.style.position = "fixed";
         }
+        startX = chessgroundminirect.left;
+        startY = chessgroundminirect.top;
         initialX = event.clientX;
         initialY = event.clientY;
         document.addEventListener("mousemove", onMouseMove);
@@ -2705,13 +2710,14 @@
         if (event.touches && event.touches.length > 1) {
           return;
         }
-        if (chessgroundmini.pinned) {
-          return;
-        }
-        const maindivrect = maindiv.getBoundingClientRect();
         const chessgroundminirect = chessgroundmini.getBoundingClientRect();
-        startX = chessgroundminirect.left - maindivrect.left;
-        startY = chessgroundminirect.top - maindivrect.top;
+        if (!chessgroundmini.pinned) {
+          chessgroundmini.style.left = `${chessgroundminirect.left}px`;
+          chessgroundmini.style.top = `${chessgroundminirect.top}px`;
+          chessgroundmini.style.position = "fixed";
+        }
+        startX = chessgroundminirect.left;
+        startY = chessgroundminirect.top;
         initialX = event.touches[0].clientX;
         initialY = event.touches[0].clientY;
         document.addEventListener("touchmove", onTouchMove);
