@@ -969,7 +969,7 @@ function updateInnerCoordinateColor(chessground) {
           }
         }
         if (startsdark) {
-          for (j = 0; j < size.width; j++) {
+          for (j = 0; j < size.height; j++) {
             if (j & 1) {
               childs.item(j).classList.add("light");
             } else {
@@ -977,7 +977,7 @@ function updateInnerCoordinateColor(chessground) {
             }
           }
         } else {
-          for (j = 0; j < size.width; j++) {
+          for (j = 0; j < size.height; j++) {
             if (j & 1) {
               childs.item(j).classList.add("dark");
             } else {
@@ -2619,6 +2619,7 @@ new Module().then((loadedModule) => {
     if (isBoardSetup.checked) {
       updateChessground(false);
       chessground.set({
+        check: [],
         movable: {
           color: "both",
           dests: EmptyMap,
@@ -3509,8 +3510,13 @@ new Module().then((loadedModule) => {
   };
 
   buttonsearchmove.onclick = function () {
-    let legalmoves = board.legalMoves().trim().split(" ");
-    let moves = filterMoves(
+    const legalmovesstr = board.legalMoves();
+    if (legalmovesstr == "") {
+      window.alert("There is no legal move in this position.");
+      return;
+    }
+    const legalmoves = legalmovesstr.trim().split(" ");
+    const moves = filterMoves(
       legalmoves,
       movesearchfilter.value,
       issearchregexp.checked,
