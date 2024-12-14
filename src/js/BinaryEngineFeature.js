@@ -1154,8 +1154,10 @@ class Engine {
         this.IsLoading = false;
         this.IsLoaded = false;
         this.IsUsing = false;
+        console.error(
+          `Engine ID ${this.ID} Color ${this.Color} exited unexpectedly.`,
+        );
         if (typeof this.LoadFailureCallBack == "function") {
-          console.error("Engine exited unexpectedly.");
           this.LoadFailureCallBack("Engine exited unexpectedly.");
         }
       } else if (
@@ -2776,21 +2778,30 @@ function ShowEngineManagementUI(EngineList, ws) {
   engineinfodiv.style.marginBottom = "5px";
   engineinfodiv.style.flexDirection = "column";
   let whiteengineinfo = document.createElement("p");
-  if (window.fairyground.BinaryEngineFeature.first_engine) {
+  if (
+    window.fairyground.BinaryEngineFeature.first_engine &&
+    window.fairyground.BinaryEngineFeature.first_engine.IsLoaded
+  ) {
     whiteengineinfo.innerText = `First Engine (WHITE) → ID: ${window.fairyground.BinaryEngineFeature.first_engine.ID} Name: ${window.fairyground.BinaryEngineFeature.first_engine.Name} Author: ${window.fairyground.BinaryEngineFeature.first_engine.Author}`;
   } else {
     whiteengineinfo.innerText = "First Engine (WHITE) → (Not Loaded)";
   }
   engineinfodiv.appendChild(whiteengineinfo);
   let blackengineinfo = document.createElement("p");
-  if (window.fairyground.BinaryEngineFeature.second_engine) {
+  if (
+    window.fairyground.BinaryEngineFeature.second_engine &&
+    window.fairyground.BinaryEngineFeature.second_engine.IsLoaded
+  ) {
     blackengineinfo.innerText = `Second Engine (BLACK) → ID: ${window.fairyground.BinaryEngineFeature.second_engine.ID} Name: ${window.fairyground.BinaryEngineFeature.second_engine.Name} Author: ${window.fairyground.BinaryEngineFeature.second_engine.Author}`;
   } else {
     blackengineinfo.innerText = "Second Engine (BLACK) → (Not Loaded)";
   }
   engineinfodiv.appendChild(blackengineinfo);
   let analysisengineinfo = document.createElement("p");
-  if (window.fairyground.BinaryEngineFeature.analysis_engine) {
+  if (
+    window.fairyground.BinaryEngineFeature.analysis_engine &&
+    window.fairyground.BinaryEngineFeature.analysis_engine.IsLoaded
+  ) {
     analysisengineinfo.innerText = `Analysis Engine (ANALYSIS) → ID: ${window.fairyground.BinaryEngineFeature.analysis_engine.ID} Name: ${window.fairyground.BinaryEngineFeature.analysis_engine.Name} Author: ${window.fairyground.BinaryEngineFeature.analysis_engine.Author}`;
   } else {
     analysisengineinfo.innerText = "Analysis Engine (ANALYSIS) → (Not Loaded)";
@@ -2912,6 +2923,9 @@ function ShowEngineManagementUI(EngineList, ws) {
       },
       (err) => {
         whiteengineinfo.innerText = `First Engine (WHITE) → (Not Loaded) (Error: ${err})`;
+        document.getElementById("whiteengineoutput").textContent +=
+          "\n[Error] ❌ " + err + "\n\n";
+        window.alert("Engine WHITE Error: " + err);
       },
     );
   };
@@ -2952,6 +2966,9 @@ function ShowEngineManagementUI(EngineList, ws) {
       },
       (err) => {
         blackengineinfo.innerText = `Second Engine (BLACK) → (Not Loaded) (Error: ${err})`;
+        document.getElementById("blackengineoutput").textContent +=
+          "\n[Error] ❌ " + err + "\n\n";
+        window.alert("Engine BLACK Error: " + err);
       },
     );
   };
@@ -2992,6 +3009,9 @@ function ShowEngineManagementUI(EngineList, ws) {
       },
       (err) => {
         analysisengineinfo.innerText = `Analysis Engine (ANALYSIS) → (Not Loaded) (Error: ${err})`;
+        document.getElementById("analysisengineoutput").textContent +=
+          "\n[Error] ❌ " + err + "\n\n";
+        window.alert("Engine ANALYSIS Error: " + err);
       },
     );
   };

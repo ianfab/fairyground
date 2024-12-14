@@ -3863,7 +3863,7 @@
     const App = () => {
       let stockfish = null;
       let stockfish_state = "INIT"; // 'READY', 'FAILED'
-      let output2 = "";
+      let engineoutput = "";
       let first_engine_output = "";
       let second_engine_output = "";
       let analysis_engine_output = "";
@@ -5086,11 +5086,11 @@
                   //console.log("WHITE: go " + wargs);
                 }
               } else if (!black_engine_ponder_and_human_white) {
-                output2 = "";
+                engineoutput = "";
                 stockfish.postMessage(`go ${args}`);
               }
             } else if (!black_engine_ponder_and_human_white) {
-              output2 = "";
+              engineoutput = "";
               stockfish.postMessage(`go ${args}`);
             }
             if (fge.second_engine) {
@@ -5178,11 +5178,11 @@
                   //console.log("BLACK: go " + bargs);
                 }
               } else if (!white_engine_ponder_and_human_black) {
-                output2 = "";
+                engineoutput = "";
                 stockfish.postMessage(`go ${args}`);
               }
             } else if (!white_engine_ponder_and_human_black) {
-              output2 = "";
+              engineoutput = "";
               stockfish.postMessage(`go ${args}`);
             }
             if (fge.first_engine) {
@@ -5217,7 +5217,7 @@
             }
           }
         } else {
-          output2 = "";
+          engineoutput = "";
           stockfish.postMessage(`go ${args}`);
         }
       };
@@ -6057,8 +6057,9 @@
       };
 
       const scrollOutput = () => {
-        $("#output2").scrollTo({
-          top: $("#output2").scrollHeight,
+        //Modern browsers will automatically create a variable for an element that has ID, with its name the same as the ID
+        output2.scrollTo({
+          top: output2.scrollHeight,
           behavior: "smooth",
         });
       };
@@ -6204,7 +6205,7 @@
                     $("#move").value += " " + line.split(" ")[1];
                     $("#set").click();
                   }
-                  output2 += line + "\n";
+                  engineoutput += line + "\n";
                   if (fge.analysis_engine) {
                     if (!fge.analysis_engine.IsUsing) {
                       $("#engineoutputline").value = line;
@@ -7228,10 +7229,9 @@
                 hidden: true,
                 onclick: () => {
                   if (fge.first_engine) {
+                    const target = document.getElementById("whiteengineoutput");
                     const OutputUpdateThrottleFunction = Throttle(() => {
-                      document.getElementById(
-                        "whiteengineoutput",
-                      ).textContent += first_engine_output;
+                      target.textContent += first_engine_output;
                       first_engine_output = "";
                       scrollOutput();
                     }, throttle_threshold);
@@ -7250,10 +7250,9 @@
                     };
                   }
                   if (fge.second_engine) {
+                    const target = document.getElementById("blackengineoutput");
                     const OutputUpdateThrottleFunction = Throttle(() => {
-                      document.getElementById(
-                        "blackengineoutput",
-                      ).textContent += second_engine_output;
+                      target.textContent += second_engine_output;
                       second_engine_output = "";
                       scrollOutput();
                     }, throttle_threshold);
@@ -7272,10 +7271,13 @@
                     };
                   }
                   if (fge.analysis_engine) {
+                    const target = document.getElementById(
+                      "analysisengineoutput",
+                    );
+                    const outputline =
+                      document.getElementById("engineoutputline");
                     const OutputUpdateThrottleFunction = Throttle(() => {
-                      document.getElementById(
-                        "analysisengineoutput",
-                      ).textContent += analysis_engine_output;
+                      target.textContent += analysis_engine_output;
                       analysis_engine_output = "";
                       scrollOutput();
                     }, throttle_threshold);
@@ -7284,8 +7286,8 @@
                       OutputUpdateThrottleFunction();
                     };
                     fge.analysis_engine.EvaluationUpdateCallBack = (msg) => {
-                      document.getElementById("engineoutputline").value = msg;
-                      document.getElementById("engineoutputline").click();
+                      outputline.value = msg;
+                      outputline.click();
                     };
                     fge.analysis_engine.SendMessageCallBack = (msg) => {
                       analysis_engine_output += "\n▶▶ " + msg + "\n\n";
@@ -8747,7 +8749,7 @@
               m("p#currentboardfen"),
               m("p#label-pgn.ripple"),
               m("div#output2", { onupdate: scrollOutput }, [
-                m("pre#fsfoutput", output2),
+                m("pre#fsfoutput", engineoutput),
                 m(
                   "pre#whiteengineoutput",
                   { hidden: true },
