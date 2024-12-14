@@ -256,6 +256,7 @@ cg-board piece.fading {
 .inner .cg-wrap coords.top coord {
   align-items: flex-start;
   justify-content: left;
+  padding-top: 2px;
   padding-left: 3px;
 }
 .inner .cg-wrap coords.side coord {
