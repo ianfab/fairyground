@@ -17,6 +17,11 @@
 <!-- CSS -->
 
 <style>
+  :root {
+    --console-font: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+      Liberation Mono, monospace;
+  }
+
   *,
   *::before,
   *::after {
@@ -1579,11 +1584,11 @@
   }
 
   #fsfoutput {
-    font-family: Consolas;
+    font-family: var(--console-font);
   }
 
   #whiteengineoutput {
-    font-family: Consolas;
+    font-family: var(--console-font);
   }
 
   #whiteunsupportedvariant {
@@ -1592,7 +1597,7 @@
   }
 
   #blackengineoutput {
-    font-family: Consolas;
+    font-family: var(--console-font);
   }
 
   #blackunsupportedvariant {
@@ -1601,7 +1606,7 @@
   }
 
   #analysisengineoutput {
-    font-family: Consolas;
+    font-family: var(--console-font);
   }
 
   #analysisunsupportedvariant {
