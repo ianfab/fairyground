@@ -1,0 +1,189 @@
+html {
+    color: white !important;
+    background: black !important;
+}
+
+::selection {
+    background-color: #6495edaa;
+}
+
+input {
+    color: white;
+    background: #0000;
+}
+
+input[type=file] {
+    background: #0000;
+}
+
+input[type=text]:disabled {
+    background: #ccc7;
+}
+
+input[type=number]:disabled {
+    background: #ccc7;
+}
+
+input[type=checkbox] {
+  color: white !important;
+  background-color: #0000 !important;
+}
+
+input[type=checkbox]:hover {
+  color: #fff !important;
+  background-color: #8887 !important;
+}
+
+input[type=checkbox]:checked {
+  color: #fff !important;
+  background-color: #5557 !important;
+}
+
+input[type=checkbox]:checked:hover {
+  color: #fff !important;
+  background-color: #8887 !important;
+}
+
+input[type=checkbox]:disabled {
+  color: #000 !important;
+  background-color: #ccc7 !important;
+  opacity: 1 !important;
+}
+
+input[type=checkbox]:disabled:hover {
+  color: #000 !important;
+  background-color: #ccc7 !important;
+  opacity: 1 !important;
+}
+
+select {
+    color: white;
+    background: #555 !important;
+}
+
+button {
+    background: #555 !important;
+}
+
+button:hover {
+    background: #777 !important;
+}
+
+button:active {
+    background: #000 !important;
+}
+
+button:disabled {
+    background: #999 !important;
+    color: black !important;
+}
+
+input::-webkit-input-placeholder {
+    color: #aaa;
+}
+
+input::-moz-placeholder {
+    color: #aaa;
+}
+
+input:-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::placeholder {
+    color: #aaa;
+    opacity: 1;
+}
+
+spangameresult, spangameresultmini {
+    color: white !important;
+}
+
+table {
+    border-color: white !important;
+}
+
+caption {
+    border-color: white !important;
+}
+
+th {
+    border-color: white !important;
+}
+
+td {
+    border-color: white !important;
+}
+
+a {
+    color: ghostwhite;
+}
+
+a:visited {
+    color: mediumpurple;
+}
+
+.position-display-label:hover {
+    background-color: white !important;
+    color: black !important;
+}
+
+#timers {
+    background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+#pvinfo {
+    border-top: 4px solid white !important;
+    border-left: 4px solid white !important;
+    border-right: 4px solid white !important;
+    border-bottom: 4px solid white !important;
+}
+
+#pvinfo hr {
+    border: 1px solid white !important;
+}
+
+evalnum:after {
+    color: white !important;
+}
+
+#chessground-mini-board-wrapper-div {
+    background-color: black !important;
+    border: 2px solid white !important;
+}
+
+#enginemanagementpopup {
+  background-color: #0000 !important;
+}
+
+#enginesetuppopup {
+  background-color: #0000 !important;
+}
+
+#enginesettingspopup {
+  background-color: #0000 !important;
+}
+
+#loadsavedgamespopup {
+  background-color: #0000 !important;
+}
+
+#enginemanagementpopup-background {
+  background-color: #000 !important;
+}
+
+#enginesetuppopup-background {
+  background-color: #000 !important;
+}
+
+#enginesettingspopup-background {
+  background-color: #000 !important;
+}
+
+#loadsavedgamespopup-background {
+  background-color: #000 !important;
+}

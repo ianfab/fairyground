@@ -56,19 +56,26 @@ function RemoveSANMoveNotes(MoveList) {
 window.fairyground.SavedGamesParsingFeature.RemoveSANMoveNotes =
   RemoveSANMoveNotes;
 
-function SetPosition(FEN, UCIMoves, Variant) {
+function SetPosition(FEN, UCIMoves, Variant, Is960) {
   if (
     typeof FEN != "string" ||
     typeof UCIMoves != "string" ||
-    typeof Variant != "string"
+    typeof Variant != "string" ||
+    typeof Is960 != "boolean"
   ) {
     throw TypeError();
   }
   const varianttype = document.getElementById("dropdown-varianttype");
   const variantname = document.getElementById("dropdown-variant");
+  const isfischerrandommode = document.getElementById("isfischerrandommode");
   if (variantname.value != Variant) {
     window.alert(
       `This position uses variant "${Variant}", but the current selected variant is "${variantname.value}". Change the variant to "${Variant}" before setting this position.`,
+    );
+    return false;
+  } else if (isfischerrandommode.checked != Is960) {
+    window.alert(
+      `This position has fischer random ${Is960 ? "enabled" : "disabled"}, but the current selected variant mismatches with it. ${isfischerrandommode.checked ? "Uncheck" : "Check"} "Fischer Random" before setting this position.`,
     );
     return false;
   }
@@ -96,6 +103,7 @@ function GetCurrentGameInformation(FFishJSLibrary) {
   const GameEvent = "Fairy-Stockfish Playground match";
   const Site = window.location.host;
   const TimeoutSide = document.getElementById("timeoutside").value;
+  const Is960 = document.getElementById("isfischerrandommode").checked;
   let whitename = "";
   let blackname = "";
   if (EngineWhite) {
@@ -118,12 +126,12 @@ function GetCurrentGameInformation(FFishJSLibrary) {
   }
   if (
     FFishJSLibrary.variants().split(" ").includes(Variant) &&
-    FFishJSLibrary.validateFen(FEN, Variant, false) >= 0
+    FFishJSLibrary.validateFen(FEN, Variant, Is960) >= 0
   ) {
     let tmpboard = new FFishJSLibrary.Board(
       Variant,
       FEN == "" ? FFishJSLibrary.startingFen(Variant) : FEN,
-      false,
+      Is960,
     );
     let moveslist = UCIMoves.split(WhiteSpaceMatcher2).slice().reverse();
     if (moveslist.length == 1 && moveslist[0] == "") {
@@ -137,10 +145,21 @@ function GetCurrentGameInformation(FFishJSLibrary) {
     let Termination = "Normal";
     if (TimeoutSide != 0) {
       Termination = "Time forfeit";
-    } else if (tmpboard.result() == "*") {
+    } else if (
+      tmpboard.result() == "*" &&
+      tmpboard.result(true) == "*" &&
+      tmpboard.result(false) == "*"
+    ) {
       Termination = "Unterminated";
     }
     let gameresult = tmpboard.result();
+    if (gameresult == "*") {
+      if (tmpboard.result(true) != "*") {
+        gameresult = tmpboard.result(true);
+      } else if (tmpboard.result(false) != "*") {
+        gameresult = tmpboard.result(true);
+      }
+    }
     tmpboard.delete();
     return {
       Event: GameEvent,
@@ -149,6 +168,7 @@ function GetCurrentGameInformation(FFishJSLibrary) {
       FEN: FEN,
       UCIMoves: UCIMoves,
       Variant: Variant,
+      Is960: Is960,
       FirstPlayerName: whitename,
       SecondPlayerName: blackname,
       Result: gameresult,
@@ -248,6 +268,13 @@ class Game {
         }
       }
       let gameresult = tmpboard.result();
+      if (gameresult == "*") {
+        if (tmpboard.result(true) != "*") {
+          gameresult = tmpboard.result(true);
+        } else if (tmpboard.result(false) != "*") {
+          gameresult = tmpboard.result(false);
+        }
+      }
       if (this.FEN == "") {
         tmpboard.reset();
       } else {
@@ -287,7 +314,7 @@ class Game {
       if (this.SecondPlayerElo > 0) {
         result += `[BlackElo "${this.SecondPlayerElo}"]\n`;
       }
-      result += `[FEN "${tmpboard.fen()}"]\n[Result "${GameResult}"]\n[Variant "${this.Variant}"]\n[Termination "${Termination}"]\n\n`;
+      result += `[FEN "${tmpboard.fen()}"]\n[Result "${GameResult}"]\n[Variant "${this.Is960 ? this.Variant + "960" : this.Variant}"]\n[Termination "${Termination}"]\n\n`;
       result += tmpboard.variationSan(
         this.UCIMoves.join(" "),
         FFishJSLibrary.Notation.SAN,
@@ -348,7 +375,7 @@ class Game {
         }
       }
       let result = `${tmpboard.fen()};`;
-      result += ` variant "${this.Variant}";`;
+      result += ` variant "${this.Is960 ? this.Variant + "960" : this.Variant}";`;
       result += ` id "${this.Event}";`;
       result += ` site "${this.Site}";`;
       result += ` date "${year.toString() + "." + month.toString() + "." + day.toString()}";`;
@@ -576,6 +603,7 @@ class PortableGameNotation {
     let i = 0;
     let CurrentGame = 0;
     let Variant = "";
+    let IsFischerRandom = false;
     let FEN = "";
     let SANMoves = "";
     let Result = "";
@@ -617,13 +645,16 @@ class PortableGameNotation {
             CurrentGame++;
             if (Variant == "") {
               Variant = "chess";
+            } else if (Variant.endsWith("960")) {
+              Variant = Variant.slice(0, -3);
+              IsFischerRandom = true;
             }
             let UCIMoves = this.ConvertSANToUCI(
               Variant,
               FEN,
               SANMoves,
               SANVariation,
-              false,
+              IsFischerRandom,
               undefined,
             );
             if (UCIMoves != null) {
@@ -645,7 +676,7 @@ class PortableGameNotation {
                   "0000",
                   0.0,
                   Termination,
-                  false,
+                  IsFischerRandom,
                 ),
               );
             } else {
@@ -670,6 +701,7 @@ class PortableGameNotation {
               }
             }
             Variant = "";
+            IsFischerRandom = false;
             FEN = "";
             SANMoves = "";
             Result = "";
@@ -777,13 +809,16 @@ class PortableGameNotation {
       CurrentGame++;
       if (Variant == "") {
         Variant = "chess";
+      } else if (Variant.endsWith("960")) {
+        Variant = Variant.slice(0, -3);
+        IsFischerRandom = true;
       }
       let UCIMoves = this.ConvertSANToUCI(
         Variant,
         FEN,
         SANMoves,
         SANVariation,
-        false,
+        IsFischerRandom,
         undefined,
       );
       if (UCIMoves != null) {
@@ -805,7 +840,7 @@ class PortableGameNotation {
             "0000",
             0.0,
             Termination,
-            false,
+            IsFischerRandom,
           ),
         );
       } else {
@@ -882,6 +917,7 @@ class ExtendedPositionDescription {
     let index = 0;
     let CurrentGame = 0;
     let Variant = "";
+    let IsFischerRandom = false;
     let FEN = "";
     let Result = "";
     let Site = "";
@@ -907,6 +943,7 @@ class ExtendedPositionDescription {
       }
       let textentry = rawText[i].trim().split(";");
       Variant = "";
+      IsFischerRandom = false;
       Result = "";
       Site = "";
       GameEvent = "";
@@ -1029,10 +1066,13 @@ class ExtendedPositionDescription {
       CurrentGame++;
       if (Variant == "") {
         Variant = "chess";
+      } else if (Variant.endsWith("960")) {
+        Variant = Variant.slice(0, -3);
+        IsFischerRandom = true;
       }
       if (
         this.FFishJSLibrary.variants().split(" ").includes(Variant) &&
-        this.FFishJSLibrary.validateFen(FEN, Variant, false) >= 0
+        this.FFishJSLibrary.validateFen(FEN, Variant, IsFischerRandom) >= 0
       ) {
         this.GameList.push(
           new Game(
@@ -1043,7 +1083,7 @@ class ExtendedPositionDescription {
             GameEvent,
             Site,
             GameDate,
-            1,
+            Round,
             FirstPlayerName,
             SecondPlayerName,
             FirstPlayerElo,
@@ -1052,7 +1092,7 @@ class ExtendedPositionDescription {
             SuppliedMove,
             Evaluation,
             Termination,
-            false,
+            IsFischerRandom,
           ),
         );
       } else {
@@ -1221,12 +1261,15 @@ class GameDisplayTable {
   }
 
   AddRow(GameObject) {
-    if (!Game.prototype.isPrototypeOf(GameObject)) {
+    if (!(GameObject instanceof Game)) {
       throw TypeError();
     }
     let row = document.createElement("tr");
     let entry = document.createElement("td");
     entry.innerText = GameObject.Variant;
+    if (GameObject.Is960) {
+      entry.innerText += " (Fischer Random)";
+    }
     entry.style.border = "1px solid black";
     row.appendChild(entry);
     entry = document.createElement("td");
@@ -1292,6 +1335,7 @@ class GameDisplayTable {
           GameObject.FEN,
           GameObject.UCIMoves.join(" "),
           GameObject.Variant,
+          GameObject.Is960,
         )
       ) {
         document.getElementById("pgnepd-close").click();
@@ -1538,6 +1582,8 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
   table.AddRows(GameList);
   let popup = document.createElement("div");
   popup.id = "loadsavedgamespopup";
+  let background = document.createElement("div");
+  background.id = "loadsavedgamespopup-background";
   let title = document.createElement("p");
   title.id = "popup-title";
   title.innerHTML =
@@ -1600,6 +1646,7 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
     }
   };
   let cleargames = document.createElement("button");
+  cleargames.classList.add("ripple");
   let cleargamestext = document.createTextNode("Clear List");
   cleargames.appendChild(cleargamestext);
   cleargames.onclick = function () {
@@ -1609,6 +1656,7 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
     table.InitializeTable();
   };
   let addtolist = document.createElement("button");
+  addtolist.classList.add("ripple");
   let addtolisttext = document.createTextNode("Add Current Game To List");
   addtolist.appendChild(addtolisttext);
   addtolist.onclick = function () {
@@ -1636,13 +1684,14 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
       "0000",
       0.0,
       info.Termination,
-      false,
+      info.Is960,
     );
     GameList.push(gameobj);
     table.InitializeTable();
     table.AddRows(GameList);
   };
   let savetopgn = document.createElement("button");
+  savetopgn.classList.add("ripple");
   let savetopgntext = document.createTextNode("Save PGN");
   savetopgn.appendChild(savetopgntext);
   savetopgn.onclick = function () {
@@ -1653,6 +1702,7 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
     DownloadFile(filecontent, "PortableGameNotation.pgn", "text/plain");
   };
   let savetoepd = document.createElement("button");
+  savetoepd.classList.add("ripple");
   let savetoepdtext = document.createTextNode("Save EPD");
   savetoepd.appendChild(savetoepdtext);
   savetoepd.onclick = function () {
@@ -1663,10 +1713,17 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
     DownloadFile(filecontent, "ExtendedPositionDescription.epd", "text/plain");
   };
   let close = document.createElement("button");
+  close.classList.add("ripple");
   close.id = "pgnepd-close";
   let closetext = document.createTextNode("Close");
   close.appendChild(closetext);
   close.onclick = function () {
+    document.dispatchEvent(
+      new CustomEvent("uilayoutchange", { detail: { message: null } }),
+    );
+    while (document.getElementById("loadsavedgamespopup-background") != null) {
+      document.getElementById("loadsavedgamespopup-background").remove();
+    }
     while (document.getElementById("loadsavedgamespopup") != null) {
       document.getElementById("loadsavedgamespopup").remove();
     }
@@ -1678,8 +1735,11 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
   operationdiv.appendChild(savetoepd);
   operationdiv.appendChild(close);
   let searchbox = document.createElement("input");
+  searchbox.type = "text";
+  searchbox.maxLength = 9999;
   searchbox.style.width = "400px";
-  searchbox.placeholder = "Leave blank to search all";
+  searchbox.placeholder = "Leave blank to display all games";
+  searchbox.style.border = "1px solid #ddd";
   let searchtarget = document.createElement("select");
   let searchentry = document.createElement("option");
   searchentry.value = "Variant";
@@ -1740,6 +1800,7 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
   searchonresultlabel.appendChild(searchonresult);
   searchonresultlabel.innerHTML += "Search In Current Results";
   let search = document.createElement("button");
+  search.classList.add("ripple");
   let searchtext = document.createTextNode("Search");
   search.appendChild(searchtext);
   search.onclick = function () {
@@ -1772,8 +1833,17 @@ function ShowPGNOrEPDFileUI(GameList, FFishJSLibrary) {
   popup.appendChild(searchdiv);
   popup.appendChild(gameshowdiv);
   popup.style.display = "block";
-  popup.style.zIndex = "1001";
+  popup.style.zIndex = "1002";
+  background.style.display = "block";
+  background.style.zIndex = "1001";
   document.body.appendChild(popup);
+  document.body.appendChild(background);
+  document.dispatchEvent(
+    new CustomEvent("uilayoutchange", {
+      detail: { message: "loadsavedgamespopup-background" },
+    }),
+  );
+  document.dispatchEvent(new Event("initializeripples"));
 }
 
 window.fairyground.SavedGamesParsingFeature.ShowPGNOrEPDFileUI =

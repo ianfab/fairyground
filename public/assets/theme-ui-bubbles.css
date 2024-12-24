@@ -1,0 +1,116 @@
+input {
+  background-color: #fff7;
+}
+
+input[type=file] {
+  background: #0000;
+}
+
+input[type=text]:disabled {
+  background: #0000;
+}
+
+input[type=number]:disabled {
+  background: #0000;
+}
+
+input[type=checkbox] {
+  color: white !important;
+  background-color: #fff7 !important;
+}
+
+input[type=checkbox]:hover {
+  color: #fff !important;
+  background-color: #fffb !important;
+}
+
+input[type=checkbox]:checked {
+  color: #fff !important;
+  background-color: #0007 !important;
+}
+
+input[type=checkbox]:checked:hover {
+  color: #fff !important;
+  background-color: #000b !important;
+}
+
+input[type=checkbox]:disabled {
+  color: #000 !important;
+  background-color: #0000 !important;
+  opacity: 1 !important;
+}
+
+input[type=checkbox]:disabled:hover {
+  color: #000 !important;
+  background-color: #0000 !important;
+  opacity: 1 !important;
+}
+
+select {
+  background: #eee9 !important;
+}
+
+button {
+  background: #eee9 !important;
+  color: #000 !important;
+}
+
+button:hover {
+    background: #fffb !important;
+}
+
+button:active {
+    background: #0007 !important;
+}
+
+button:disabled {
+    background: #9999 !important;
+    color: #fff !important;
+}
+
+#pagebackground {
+  background-image: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
+}
+  
+#enginemanagementpopup {
+  background-color: #0000 !important;
+}
+
+#enginemanagementpopup-background {
+  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
+}
+
+#enginesetuppopup {
+  background-color: #0000 !important;
+}
+
+#enginesetuppopup-background {
+  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
+}
+
+#enginesettingspopup {
+  background-color: #0000 !important;
+}
+
+#enginesettingspopup-background {
+  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
+}
+
+#loadsavedgamespopup {
+  background-color: #0000 !important;
+}
+
+#loadsavedgamespopup-background {
+  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
+}
+
+#chessground-mini-board-wrapper-div {
+  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
+  border: 2px solid white !important;
+}
+
+#moveselectiondialog {
+  color: #000 !important;
+  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
+  border: 2px solid white !important;
+}

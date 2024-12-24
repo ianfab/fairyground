@@ -12,6 +12,22 @@
       "headers": [
         { "key": "x-decompressed-content-length", "value": "1463349" }
       ]
+    },
+    {
+      "source": "/(.*).(avif|svg)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public,max-age=3600,must-revalidate,stale-while-revalidate=2419200" },
+        { "key": "CDN-Cache-Control", "value": "public,max-age=10,stale-while-revalidate=590" },
+        { "key": "Vercel-CDN-Cache-Control", "value": "public,max-age=10,stale-while-revalidate=590" }
+      ]
+    },
+    {
+      "source": "/(.*).(woff2|woff|ttf)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public,max-age=86400,must-revalidate,stale-while-revalidate=2419200" },
+        { "key": "CDN-Cache-Control", "value": "public,max-age=10,stale-while-revalidate=590" },
+        { "key": "Vercel-CDN-Cache-Control", "value": "public,max-age=10,stale-while-revalidate=590" }
+      ]
     }
   ]
 }

@@ -72,3 +72,7 @@
 .spartan .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/barrier.svg');
 }
+
+.spartan .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknown.svg');
+}

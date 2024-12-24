@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   sodipodi:docname="unknowntile.svg"
+   id="svg4546"
+   version="1.1"
+   viewBox="0 0 42.332224 42.332224"
+   clip-rule="evenodd"
+   fill-rule="evenodd"
+   image-rendering="optimizeQuality"
+   shape-rendering="geometricPrecision"
+   height="150"
+   width="150"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <metadata
+     id="metadata4550">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     showgrid="false"
+     id="namedview4548"
+     guidetolerance="10"
+     gridtolerance="10"
+     objecttolerance="10"
+     borderopacity="1"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     units="px" />
+  <defs
+     id="defs4540">
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="37.469002"
+       x2="77.669998"
+       y1="37.099998"
+       x1="21.09"
+       id="0-90">
+      <stop
+         id="stop5246"
+         stop-color="#fff" />
+      <stop
+         id="stop5248"
+         stop-opacity="0"
+         stop-color="#fff"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="37.469002"
+       x2="77.639999"
+       y1="37.591999"
+       x1="21.253"
+       id="0-6"
+       gradientTransform="matrix(0.86273417,0,0,0.86273417,1.424805,-2.5098781)">
+      <stop
+         id="stop5894"
+         stop-color="#fff" />
+      <stop
+         id="stop5896"
+         stop-opacity="0"
+         stop-color="#fff"
+         offset="1" />
+    </linearGradient>
+    <clipPath
+       id="clipPath2016"
+       clipPathUnits="userSpaceOnUse">
+      <rect
+         y="33.686436"
+         x="3.6016948"
+         height="15.042373"
+         width="44.067795"
+         id="rect2018"
+         style="opacity:1;fill:#d40000;fill-opacity:1;stroke:#000000;stroke-width:0.19755;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+    </clipPath>
+  </defs>
+  <g
+     id="g908"
+     transform="translate(51.194527,-12.999233)">
+    <rect
+       y="-44.139156"
+       x="20.054564"
+       height="28.221483"
+       width="28.221563"
+       id="rect4513-1-4-3-0-4-4-6-0-8-2-23-3-4-1-5-7-5"
+       style="fill:#969696;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.31859"
+       transform="matrix(0,1,1,0,0,0)" />
+    <rect
+       style="fill:#7f7f7f;fill-opacity:1;stroke-width:0.176886"
+       id="rect7912-0-8-5-29-5-5"
+       width="22.577187"
+       height="22.577187"
+       x="-41.317009"
+       y="22.876751" />
+    <rect
+       style="fill:#e6e6e6;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.266646"
+       id="rect5424-1-57-6-81-8-82-8-0-0-3-4-3-6-79-3-9-2-1-59-1-3"
+       width="21.730541"
+       height="21.730541"
+       x="23.300074"
+       y="-40.893684"
+       transform="matrix(0,1,1,0,0,0)" />
+    <g
+       aria-label="?"
+       transform="translate(-51.194527,12.999233)"
+       id="text909"
+       style="font-weight:bold;font-stretch:condensed;font-size:21.0721px;line-height:0;font-family:Arial;-inkscape-font-specification:'Arial Bold Condensed';text-align:center;text-anchor:middle;stroke:#000000;stroke-width:0;stroke-linecap:round;stroke-linejoin:round">
+      <path
+         d="m 20.409903,25.122209 -0.02058,-0.555612 q 0,-1.491921 0.504167,-2.500254 0.349829,-0.699659 1.471343,-1.903485 0.761394,-0.81284 0.998043,-1.317007 0.23665,-0.514455 0.23665,-1.111224 0,-1.131802 -0.720238,-1.924063 -0.720238,-0.792262 -1.656547,-0.792262 -0.956887,0 -1.625679,0.730527 -0.658503,0.730527 -0.853997,2.325339 l -1.563944,-0.22636 q 0.22636,-2.181292 1.286138,-3.261649 1.070068,-1.090645 2.747193,-1.090645 1.687414,0 2.808928,1.162669 1.131802,1.152381 1.131802,2.952975 0,0.987755 -0.370408,1.810884 -0.370408,0.823129 -1.481632,2.037244 -0.946598,1.018622 -1.183248,1.61539 -0.22636,0.586479 -0.257228,2.047533 z m -0.102891,3.714369 v -2.109267 h 1.728571 v 2.109267 z"
+         style="font-weight:normal;-inkscape-font-specification:'Arial Condensed'"
+         id="path853" />
+    </g>
+  </g>
+</svg>

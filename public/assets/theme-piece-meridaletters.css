@@ -314,3 +314,8 @@
 .meridaletters .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/barrier.svg');
 }
+
+
+.meridaletters .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknowncarbonfiber.svg');
+}

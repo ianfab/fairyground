@@ -15,29 +15,62 @@ jobs:
       - run: ./release_make/CI.sh
 
       - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
         with:
           name: Fairyground-Windows-x86_64
-          path: ./release_make/release-builds/win/x64/*
-          compression-level: 9
+          path: ./release_make/release-builds/win/x64/fairyground.7z
+          compression-level: 0
           if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
         with:
           name: Fairyground-Windows-ARM64
-          path: ./release_make/release-builds/win/arm64/*
-          compression-level: 9
+          path: ./release_make/release-builds/win/arm64/fairyground.7z
+          compression-level: 0
           if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
         with:
           name: Fairyground-Linux-x86_64
-          path: ./release_make/release-builds/linux/x64/*
-          compression-level: 9
+          path: ./release_make/release-builds/linux/x64/fairyground.7z
+          compression-level: 0
           if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
         with:
           name: Fairyground-Linux-ARM64
-          path: ./release_make/release-builds/linux/arm64/*
-          compression-level: 9
+          path: ./release_make/release-builds/linux/arm64/fairyground.7z
+          compression-level: 0
           if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
+        with:
+          name: Fairyground-Script-AllPlatform
+          path: ./release_make/release-builds/script/any/fairyground.7z
+          compression-level: 0
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
+        with:
+          name: Source_Code
+          path: ./source.7z
+          compression-level: 0
+          if-no-files-found: error
+
+      - uses: mholetzko/annotate_runs@1.0.1
+        if: github.event_name != 'pull_request'
+        with:
+          title: "Fairyground Download Notice"
+          info: "Choose the version that matches your platform (i.e. CPU architecture and operating system).\n\"Fairyground-Script-AllPlatform\" is a script version that theorically supports all platforms but you need to install node.js before running it (See HOW_TO_USE.txt in the archive).\nOther versions are provided with a binary executable and are portable.\n ❗ If you don't know which version to download or no version suits your platform (e.g. macOS), select \"Fairyground-Script-AllPlatform\" and then follow HOW_TO_USE.txt in the archive."
+          warning: "All archives are double-packed in ZIP + 7ZIP(LZMA2) format. You will need an archive manager that supports both ZIP and 7ZIP(LZMA2) to extract them."
+
+      - uses: mholetzko/annotate_runs@1.0.1
+        if: github.event_name == 'pull_request'
+        with:
+          title: "Fairyground Download Notice"
+          warning: "This job is triggered by a pull request, which does not provide the one-click-to-run version. To download one-click-to-run version, find the jobs not triggered by pull requests by using the filter to search results with \"Event\" equals to \"push\" or \"workflow_dispatch\"."

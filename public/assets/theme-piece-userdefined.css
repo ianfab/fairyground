@@ -313,3 +313,8 @@
 .userdefined .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/lettertilebarrier.svg');
 }
+
+
+.userdefined .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknowntile.svg');
+}

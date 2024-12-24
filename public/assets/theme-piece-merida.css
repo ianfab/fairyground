@@ -334,3 +334,7 @@
 .merida.board9x10 .cg-wrap piece.c-piece.black {
   background-image: url('images/pieces/merida/bCa.svg');
 }
+
+.merida .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknowncarbonfiber.svg');
+}

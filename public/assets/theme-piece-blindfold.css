@@ -1,3 +1,7 @@
 .blindfold .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/noentry.svg');
 }
+
+.blindfold .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknown.svg');
+}

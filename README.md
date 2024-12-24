@@ -1,4 +1,4 @@
-# fairyground
+﻿# fairyground
 
 This is an attempt to have a simple demo and playground for [Fairy-Stockfish](https://github.com/ianfab/Fairy-Stockfish) in the browser, using its [WebAssembly port](https://github.com/ianfab/fairy-stockfish.wasm), its [ffish.js](https://www.npmjs.com/package/ffish-es6) library, and the graphical [chessgroundx](https://github.com/gbtami/chessgroundx) library. It is based on the [demo for Fairy-Stockfish WASM](https://github.com/ianfab/fairy-stockfish-nnue-wasm-demo) and [ffish-test](https://github.com/thearst3rd/ffish-test).
 
@@ -8,7 +8,7 @@ You can see it deployed at: [https://fairyground.vercel.app/](https://fairygroun
 
 The following steps (_**Installation**_ and _**Run Application**_) show the process to install a development environment.
 
-If you want a one-click-to-run version, you can download the executables in the [Latest Build Actions](https://github.com/ianfab/fairyground/actions/workflows/ci.yml) section. (requires logging in to github)
+If you want a one-click-to-run version, you can download the executables in the [Latest Build Actions](https://github.com/ianfab/fairyground/actions/workflows/ci.yml?query=event%3Apush+event%3Aworkflow_dispatch) section. (Requires logging in to GitHub)
 
 ### ◎ Installation
 
@@ -34,6 +34,9 @@ npm install
 # Build once (for end users)
 npm run build
 
+# Build once (for developers, faster build without file compression & mangling)
+npm run debug-build
+
 # or, continuously run in background and watch for changes (for developers)
 npm run watch-build
 ```
@@ -41,8 +44,11 @@ npm run watch-build
 ##### -- Windows
 
 ```batch
-::Build once (for end users)
+:: Build once (for end users)
 npm run buildwithcmd
+
+:: Build once (for developers, faster build without file compression & mangling)
+npm run debug-buildwithcmd
 
 :: or, continuously run in background and watch for changes (for developers)
 npm run watch-build
@@ -68,8 +74,23 @@ Enjoy!
 
 ## Supported Browsers
 
-Most modern browsers should work, such as Google Chrome, Mozilla FireFox, Microsoft Edge, Apple Safari.
-Older browsers like Internet Explorer of any version are not supported.
+### Full Support
+
+- Google Chrome
+- Microsoft Edge
+- Mozilla Firefox
+
+### Limited Support
+
+- Apple Safari
+
+### No Support
+
+- Microsoft Internet Explorer
+- Opera Browser
+- Brave Browser
+
+Support for browsers not mentioned above are not clear. You need to check it yourself.
 
 ## Run Engines Remotely
 

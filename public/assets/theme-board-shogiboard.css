@@ -11,7 +11,19 @@
   display: block;
 }
 
+.shogiboard.board9x9 .cg-wrap.micro {
+    width: calc(587px * 0.5);
+    height: calc(640px * 0.5);
+    position: relative;
+    display: block;
+}
+
 .shogiboard.board9x9 .cg-wrap piece {
   position: absolute;
   margin-left: -2px;
+}
+
+.shogiboard.board9x9 .cg-wrap.micro piece {
+    position: absolute;
+    margin-left: -1px;
 }

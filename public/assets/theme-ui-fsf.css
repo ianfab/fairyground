@@ -1,0 +1,47 @@
+#pagebackground {
+  background-image: url('./assets/images/ui/fsf/FSF.avif');
+}
+
+#enginemanagementpopup {
+  background-color: #0000 !important;
+}
+
+#enginemanagementpopup-background {
+  background-image: url('./assets/images/ui/fsf/FSF.avif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+#enginesetuppopup {
+  background-color: #0000 !important;
+}
+
+#enginesetuppopup-background {
+  background-image: url('./assets/images/ui/fsf/FSF.avif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+#enginesettingspopup {
+  background-color: #0000 !important;
+}
+
+#enginesettingspopup-background {
+  background-image: url('./assets/images/ui/fsf/FSF.avif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+#loadsavedgamespopup {
+  background-color: #0000 !important;
+}
+
+#loadsavedgamespopup-background {
+  background-image: url('./assets/images/ui/fsf/FSF.avif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}

@@ -1,3 +1,7 @@
+.blueboard {
+  --dark-square-color: #8ca2ad;
+  --light-square-color: #dee3e6;
+}
 .blueboard.board1x1 cg-board {
   background-image: url('images/board/blue/blue1x1.svg');
 }

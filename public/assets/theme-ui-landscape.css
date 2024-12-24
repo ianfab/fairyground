@@ -1,0 +1,559 @@
+:root {
+    --text-shadow-style-black: 2px 2px 2px #000, 2px 2px 2px #000, -2px -2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, -2px 2px 2px #000;
+    --text-shadow-style-white: 2px 2px 2px #fff, 2px 2px 2px #fff, -2px -2px 2px #fff, -2px -2px 2px #fff, 2px -2px 2px #fff, 2px -2px 2px #fff, -2px 2px 2px #fff, -2px 2px 2px #fff;
+}
+
+html {
+    font-family: "Noto Sans", sans-serif;
+    color: #ccc !important;
+    background: black !important;
+}
+
+::selection {
+    background-color: #bf811d;
+    color: #fff;
+}
+
+button:before {
+    background-color: #bf811d !important;
+}
+
+button:disabled:before {
+    color: black !important;
+    background-color: #999 !important;
+}
+
+input[type=text] {
+    border-radius: 10px;
+    color: #ccc;
+    background-color: #0009;
+    border-left: 1px solid #444 !important;
+    border-right: 1px solid #444 !important;
+    border-top: 1px solid #444 !important;
+    border-bottom: 1px solid #444 !important;
+}
+
+input[type=text]:disabled {
+    background-color: #7779;
+}
+
+input[type=number] {
+    border-radius: 10px;
+    color: #ccc;
+    background-color: #0009;
+    border-left: 1px solid #444 !important;
+    border-right: 1px solid #444 !important;
+    border-top: 1px solid #444 !important;
+    border-bottom: 1px solid #444 !important;
+}
+
+input[type=number]:disabled {
+    background-color: #5559;
+}
+
+input[type=checkbox] {
+  color: white !important;
+  background-color: #000 !important;
+  margin-right: 3px;
+}
+
+input[type=checkbox]:checked {
+  color: #fff !important;
+  background-color: #629924 !important;
+  border-color: #629924 !important;
+}
+
+input[type=checkbox]:disabled {
+  color: #000 !important;
+  background-color: #777 !important;
+  border-color: #444 !important;
+  opacity: 1 !important;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    height: 10px;
+    background: linear-gradient(to right, #fff 0%, #629924 100%);
+    border-radius: 5px;
+    opacity: 0.7;
+    transition: opacity .2s;
+    color: black;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #777;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px 2px #999;
+}
+
+input[type=range]:hover {  
+    opacity: 1;
+}
+
+input[type=range]::-moz-range-track {  
+    height: 10px;
+    background: linear-gradient(to right, #fff 0%, #629924 100%);
+    border-radius: 5px;
+}
+
+input[type=range]::-moz-range-thumb {  
+    width: 20px;
+    height: 20px;
+    background: #777;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background .2s;
+    box-shadow: 0px 0px 5px 2px #999;
+}
+
+input[type=range]:focus::-moz-range-thumb {  
+    background: #777;
+}  
+
+select {
+    color: #ccc;
+    background-color: #0009 !important;
+    border-color: #444;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 10px;
+}
+
+select:hover {
+    background-color: #d64f0066 !important;
+}
+
+select:disabled {
+    color: #000;
+    background-color: rgba(150, 150, 150, 1) !important;
+}
+
+option {
+    padding: 5px;
+    color: #ccc;
+    background-color: black;
+}
+
+option:hover {
+    color: #ccc;
+    background-color: #bf811d;
+}
+
+button {
+    color: #ccc !important;
+    background-color: #0009 !important;
+    border-color: #444;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 10px;
+}
+
+button.operationdivbutton {
+    border-width: 0;
+}
+
+button:hover {
+    background-color: #d64f0066 !important;
+}
+
+button:active {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+button:disabled {
+    color: #000 !important;
+    background-color: rgba(150, 150, 150, 1) !important;
+}
+
+button:focus {
+    box-shadow: 0px 0px 3px 3px #bf811d;
+}
+
+input::-webkit-input-placeholder {
+    color: #aaa;
+}
+
+input::-moz-placeholder {
+    color: #aaa;
+}
+
+input:-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::placeholder {
+    color: #aaa;
+    opacity: 1;
+}
+
+spangameresult {
+    color: #fff !important;
+    text-shadow: 2px 2px 30px #fffa, -2px 2px 30px #fffa, 2px -2px 30px #fffa, -2px -2px 30px #fffa;
+}
+
+spangameresultmini {
+    color: #fff !important;
+    text-shadow: 2px 2px 10px #fffa, -2px 2px 10px #fffa, 2px -2px 10px #fffa, -2px -2px 10px #fffa;
+}
+
+table {
+    border-color: #ccc !important;
+    background-color: #0000;
+}
+
+caption {
+    border-color: #ccc !important;
+    background-color: #0006;
+}
+
+th {
+    border-color: #ccc !important;
+    background-color: #0006;
+}
+
+td {
+    border-color: #ccc !important;
+    background-color: #0006;
+}
+
+a {
+    color: #ccc;
+    text-decoration: underline !important;
+    text-shadow: var(--text-shadow-style-black);
+}
+
+a:visited {
+    color: #ccc;
+}
+
+label {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+coord {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+.inner coord {
+    text-shadow: none;
+}
+
+.timer-active {
+    box-shadow: 0px 0px 5px 5px #629924;
+}
+
+.position-display-label:hover {
+    background-color: #bf811d;
+}
+
+#pagetitle {
+    margin-top: 10px;
+    color: #fff;
+    text-shadow: 0px 0px 5px #fff, 0px 0px 5px #fff, 0px 0px 5px #fff;
+}
+
+#popup-title {
+    color: #fff;
+    text-shadow: 0px 0px 5px #fff, 0px 0px 5px #fff, 0px 0px 5px #fff !important;
+}
+
+#pageheader {
+    backdrop-filter: blur(10px);
+    background-color: #0005;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#posvariantdiv p {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#posvariantdiv select {
+    margin-right: 3px;
+}
+
+#input p {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#binengineinput p {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#whiteunsupportedvariant {
+    text-shadow: var(--text-shadow-style-white) !important;
+}
+
+#blackunsupportedvariant {
+    text-shadow: var(--text-shadow-style-white) !important;
+}
+
+#analysisunsupportedvariant {
+    text-shadow: var(--text-shadow-style-white) !important;
+}
+
+#input2 p {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#input3 p {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#gamesettings p,#gamesettings span {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#gamesettings span {
+    margin-left: 3px;
+}
+
+#enginematch p,#enginematch span {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#advancedtimesettings p,#advancedtimesettings span {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#gamecontrol-start p {
+    margin-left: 3px;
+}
+
+#boardsetupsettings p {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#boardsetupsettings2 p {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#positioninfo {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#reviewmodenote1, #reviewmodenote2 {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#checkcounts {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#visualeffects p {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#evalinfo {
+    border-top: 1px solid #444 !important;
+    border-left: 1px solid #444 !important;
+    border-right: 1px solid #444 !important;
+    border-bottom: 1px solid #444 !important;
+    border-radius: 10px;
+    background-color: #0009;
+    box-shadow: inset 1px 1px 2px #eee;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+#timers {
+  border-color: #444 !important;
+  background-color: #0009 !important;
+  border-radius: 10px;
+}
+
+#whitetimer {
+  background-image: linear-gradient(to bottom, #fff 0%, #f7f7f7 20%, #ccc 100%);
+  border-radius: 10px;
+}
+
+#blacktimer {
+  background-image: linear-gradient(to bottom, #666 0%, #080808 80%, #000 100%);
+  border-radius: 10px;
+}
+
+#pvinfo {
+    border-top: 1px solid #444 !important;
+    border-left: 1px solid #444 !important;
+    border-right: 1px solid #444 !important;
+    border-bottom: 1px solid #444 !important;
+    border-radius: 10px;
+    background-color: #0009;
+    box-shadow: inset 1px 1px 2px #eee;
+    padding: 10px;
+}
+
+#pvinfo hr {
+    border: 0.5px solid #444 !important;
+    box-shadow: 0px 1px 2px #eee;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+evalnum:after {
+    color: #ccc !important;
+}
+
+#currentboardfen {
+    border-radius: 10px;
+    scrollbar-width: none;
+    border-color: #444 !important;
+    background-color: #0009;
+}
+
+#label-pgn {
+    border-radius: 10px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    overflow-x: auto !important;
+    border-color: #444 !important;
+    background-color: #0009;
+}
+
+#output2 {
+    border-radius: 10px;
+    border-color: #444 !important;
+    background-color: #0009;
+}
+
+#moveselectiondialog {
+    color: #ccc !important;
+    background-color: #0009;
+    border: 1px solid #444 !important;
+    border-radius: 10px;
+}
+
+#separatormoveselectiondialog {
+    border: dashed #ccc !important;
+}
+
+#separatorsearchresult {
+    border: double #ccc !important;
+}
+
+#linkdivhr {
+    border: 1px solid #ccc;
+    box-shadow: 0px 0px 3px 2px #000;
+}
+
+#chessground-mini-board-wrapper-div {
+    border: 1px solid #444 !important;
+    border-radius: 10px;
+    background-color: #0009 !important;
+    box-shadow: inset 1px 1px 2px #eee;
+}
+
+#lockminiboard:before, #lockminiboard:hover:before, #lockminiboard:active:before, #lockminiboard:disabled:before {
+    background-color: #0078d7 !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+.locked #lockminiboard:before {
+    background-color: orangered !important;
+}
+
+#pinminiboard:before, #pinminiboard:hover:before, #pinminiboard:active:before, #pinminiboard:disabled:before {
+    background-color: forestgreen !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+.pinned #pinminiboard:before {
+    background-color: rebeccapurple !important;
+}
+
+#setpositiontomainboard:before, #setpositiontomainboard:hover:before, #setpositiontomainboard:active:before, #setpositiontomainboard:disabled:before {
+    background-color: gold !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+#closeminiboard:before, #closeminiboard:hover:before, #closeminiboard:active:before, #closeminiboard:disabled:before {
+    background-color: crimson !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+#pagebackground {
+  background-image: url('./assets/images/ui/landscape/landscape.avif');
+}
+
+#enginemanagementpopup {
+  background-color: #0000 !important;
+}
+
+#enginemanagementpopup-background {
+  background-image: url('./assets/images/ui/landscape/landscape.avif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+}
+
+#enginemanagementpopup p {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#enginesetuppopup {
+  background-color: #0000 !important;
+}
+
+#enginesetuppopup-background {
+  background-image: url('./assets/images/ui/landscape/landscape.avif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+}
+
+#enginesetuppopup p {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#enginesettingspopup {
+  background-color: #0000 !important;
+}
+
+#enginesettingspopup-background {
+  background-image: url('./assets/images/ui/landscape/landscape.avif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+}
+
+#enginesettingspopup p {
+    text-shadow: var(--text-shadow-style-black);
+}
+
+#loadsavedgamespopup {
+  background-color: #0000 !important;
+}
+
+#loadsavedgamespopup-background {
+  background-image: url('./assets/images/ui/landscape/landscape.avif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+}
+
+#loadsavedgamespopup p {
+    text-shadow: var(--text-shadow-style-black);
+}

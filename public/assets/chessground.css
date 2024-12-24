@@ -138,42 +138,139 @@ cg-board piece.fading {
   z-index: 2;
   opacity: 0.9;
   font-family: "Consolas";
-  font-weight: "bold";
+  font-weight: bold;
 }
 .cg-wrap coords {
   position: absolute;
   display: flex;
   pointer-events: none;
-  opacity: 0.8;
-  font-size: 9px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 1;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: "Arial";
+}
+.inner .cg-wrap coords {
+  z-index: 1;
+  font-size: 18px;
+}
+.cg-wrap.micro coords {
+  display: none;
 }
 .cg-wrap coords.side {
-  right: -15px;
+  right: -20px;
   top: 0;
   flex-flow: column-reverse;
   height: 100%;
-  width: 12px;
+  width: 20px;
+}
+.inner .cg-wrap coords.side {
+  right: 0;
 }
 .cg-wrap coords.side.black {
   flex-flow: column;
 }
 .cg-wrap coords.bottom {
-  bottom: -16px;
+  bottom: -20px;
   left: 0;
   flex-flow: row;
   width: 100%;
-  height: 16px;
+  height: 20px;
   text-transform: uppercase;
   text-align: center;
+}
+.inner .cg-wrap coords.bottom {
+  bottom: 0;
+}
+.cg-wrap coords.top {
+  top: -20px;
+  left: 0;
+  flex-flow: row;
+  width: 100%;
+  height: 20px;
+  text-transform: uppercase;
+  text-align: center;
+}
+.inner .cg-wrap coords.top {
+  top: 0;
 }
 .cg-wrap coords.bottom.black {
   flex-flow: row-reverse;
 }
-.cg-wrap coords coord {
-  flex: 1 1 auto;
+.cg-wrap coords.top.black {
+  flex-flow: row-reverse;
+}
+
+.shogi .cg-wrap coords.top.black {
+  flex-flow: row;
+}
+.shogi .cg-wrap coords.top {
+  flex-flow: row-reverse;
+}
+.shogi .cg-wrap coords.side.black {
+  flex-flow: column-reverse;
+}
+.shogi .cg-wrap coords.side {
+  flex-flow: column;
+}
+.xiangqi .cg-wrap coords.top {
+  flex-flow: row;
+}
+.xiangqi .cg-wrap coords.top.black {
+  flex-flow: row-reverse;
+}
+.xiangqi .cg-wrap coords.bottom.black {
+  flex-flow: row;
+}
+.xiangqi .cg-wrap coords.bottom {
+  flex-flow: row-reverse;
+}
+
+.cg-wrap coords.bottom coord {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.cg-wrap coords.top coord {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 .cg-wrap coords.side coord {
-  transform: translateY(39%);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding-left: 2px;
+}
+.inner .cg-wrap coords.bottom coord {
+  align-items: flex-end;
+  justify-content: right;
+  padding-right: 3px;
+}
+.inner .cg-wrap coords.top coord {
+  align-items: flex-start;
+  justify-content: left;
+  padding-top: 2px;
+  padding-left: 3px;
+}
+.inner .cg-wrap coords.side coord {
+  align-items: flex-start;
+  justify-content: right;
+  padding-top: 2px;
+  padding-right: 3px;
+}
+
+.inner .cg-wrap coords coord.dark {
+  color: var(--dark-square-color,#000);
+}
+.inner .cg-wrap coords coord.light {
+  color: var(--light-square-color,#000);
 }
 
 /* Drop variants */
@@ -238,6 +335,9 @@ cg-board piece.fading {
 .pocket piece[data-nb='0'] {
   cursor: auto;
   opacity: 0.1;
+}
+.movemode .pocket piece[data-nb='0'] {
+  cursor: inherit;
 }
 .pocket piece::after {
   content: attr(data-nb);

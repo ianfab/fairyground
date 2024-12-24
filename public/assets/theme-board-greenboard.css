@@ -1,3 +1,7 @@
+.greenboard {
+  --dark-square-color: #86a666;
+  --light-square-color: #ffffdd;
+}
 .greenboard.board1x1 cg-board {
   background-image: url('images/board/green/green1x1.svg');
 }

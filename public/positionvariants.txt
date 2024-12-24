@@ -11,57 +11,57 @@
 
 chess|Mate Endgame|Queen Mate|8/8/8/8/3k4/1Q6/8/K7 w - - 0 1|Mate black king with your queen! If you can win this, then it means that you can simply win with a promoted pawn! However, queen cannot mate by herself. King's support is needed.
 chess|Mate Endgame|Rook Mate|8/8/8/8/4k3/8/8/4K2R w K - 0 1|Mate black king with your rook! Remember a rook a control a whole file & rank, which can block the king from passing it.
-chess|Mate Endgame|Two Bishops Mate|8/8/8/B7/B2k4/8/8/K7 w - - 0 1|Mate black king with your bishops! Teamwork is important this case. Your bishops must push the king into a corner as only there you can mate him. A way to reach that is to push with your king and bishops stang side by side blocking the escape route. BE CAREFUL ON STALEMATES!
+chess|Mate Endgame|Two Bishops Mate|8/8/8/B7/B2k4/8/8/K7 w - - 0 1|Mate black king with your bishops! Teamwork is important this case. Your bishops must push the king into a corner as only there you can mate him. A way to reach that is to push with your king and bishops stang side by side blocking the escape route. Be careful on stalemates!
 chess|Mate Endgame|Bishop And Knight Mate - The Edge|5k2/5N2/5K2/5B2/8/8/8/8 w - - 0 1|This is a challenging position for you to try. You need to mate black for more than 5 times before you try the next one. Remember that you can only mate the king in the corner that has the same color with the bishop.
 chess|Mate Endgame|Bishop And Knight Mate (Advanced)|K1k1B3/8/8/8/8/8/7N/8 w - - 0 1|Before solving this, try to solve the previous one. This is one of the hardest endgames. Remember that you can only mate the king in the corner that has the same color with the bishop. You need to organize all of your pieces and push black king into edge. And then, you can use the experience you got in the previous one.
-chess|Mate Endgame|2 Knights VS Pawn|8/4k3/4p3/8/8/1K1N4/8/2N5 w - - 0 1|This is a very very hard mate. It's well known that 2 knights cannot mate a king against best defense, but if there's an extra pawn present, which can prevent stalemate at a key moment, white has a chance to win. Block the pawn with one knight and use your king and the other knight to trap the king in corner. Finally release the blockade on the pawn and bring the other knight over to deliver checkmate while the pawn advances.
-chess|Mate Endgame|2 Knights VS Pawn (Advanced)|8/8/8/8/2N4p/7N/2K5/k7 w - - 0 1|This mate is harder than the previous one. The pawn is more advanced and you must coordinate your knights correctly. Remember that taking the pawn will result in immediate draw. You must block the pawn and let it advance at correct time to avoid stalemate and avoid its promotion.
+chess|Mate Endgame|2 Knights VS Pawn Mate|8/4k3/4p3/8/8/1K1N4/8/2N5 w - - 0 1|This is a very very hard mate. It's well known that 2 knights cannot mate a king against best defense, but if there's an extra pawn present, which can prevent stalemate at a key moment, the story is completely different. Block the pawn with one knight and use your king and the other knight to trap the king in corner. Finally release the blockade on the pawn and bring the other knight over to deliver checkmate while the pawn advances.
+chess|Mate Endgame|2 Knights VS Pawn Mate (Advanced)|8/8/8/8/2N4p/7N/2K5/k7 w - - 0 1|This mate is harder than the previous one. The pawn is more advanced and you must coordinate your knights correctly. Remember that taking the pawn will result in immediate draw. You must block the pawn and let it advance at correct time to avoid stalemate and avoid its promotion.
 
-chess|Pawn Endgame|Two Extra Pawns|6k1/pp4pp/8/8/8/8/PPP2PPP/6K1 w - - 0 1|Show your basic pawn endgame skills by winning this against the very toughest of competition. You are able to make a passed pawn on both sides of the board. When you have a passed pawn, the opponent's king will have to block it from queening, and you will have two main plans for winning: go attack the pawns on the other side with your king or defend the passed pawn with your king, and advance the extra pawn on the other side of the board to make a second passed pawn.
-chess|Pawn Endgame|Using An Extra Passed Pawn|2k5/5ppp/8/4p3/4P3/8/P4PPP/2K5 w - - 0 1|At some point, you must use your extra passed pawn on the queenside as a decoy, allowing your king to hunt pawns.
-chess|Pawn Endgame|Creating An Outside Passed Pawn|4k3/5ppp/4p3/1p6/8/PP5P/4KPP1/8 w - - 0 1|Use the outside passed pawn and an active king to grab the kingside pawns while Black is worrying about the queenside pawn.
-chess|Pawn Endgame|Using The Active King|8/p7/1p1k2p1/6P1/P1K5/8/1P6/8 w - - 0 1|Force Black's king into a passive position by attacking the queenside.
-chess|Pawn Endgame|Using An Outside Passed Pawn|8/8/8/6p1/1kp2p1p/5P1P/PK4P1/8 w - - 0 1|Your pawns cannot always promote on their own, but you can use them as decoys to draw the enemy king into a bad position.
-chess|Pawn Endgame|Creating Zugzwang|8/5pp1/Kp5p/1Pk5/8/8/5PPP/8 w - - 0 1|Note that if either king moves, the moving side will lose their b-pawn and with it, the game. Don't be first to run out of pawn moves!
-chess|Pawn Endgame|3 VS 3|6k1/5ppp/8/8/8/8/5PPP/6K1 w - - 0 1|Get your king as far advanced as possible. Your pawns should act as a unit, defending each other.
-chess|Pawn Endgame|Opposing Majorities|8/ppp1kppp/8/8/3KP3/P7/1P3PPP/8 w - - 0 1|White has an active king, but you will have to make good use of your kingside majority here to maintain the advantage.
+chess|Pawn Endgame|Two Extra Pawns|6k1/pp4pp/8/8/8/8/PPP2PPP/6K1 w - - 0 1|Take advantage of the 2 extra pawns by making 2 passed pawns or using the king to attack the side where the opponent king cannot defend.
+chess|Pawn Endgame|Using An Extra Passed Pawn|2k5/5ppp/8/4p3/4P3/8/P4PPP/2K5 w - - 0 1|Use your extra passed pawn on the queenside as a decoy at correct time to create the way to clear your opponent's pawns on the other side.
+chess|Pawn Endgame|Creating An Outside Passed Pawn|4k3/5ppp/4p3/1p6/8/PP5P/4KPP1/8 w - - 0 1|Use the outside passed pawn and an active king to clear your opponent's kingside pawns.
+chess|Pawn Endgame|Using The Active King|8/p7/1p1k2p1/6P1/P1K5/8/1P6/8 w - - 0 1|Force Black's king into a passive position by attacking the queenside and try to promote a pawn on either side.
+chess|Pawn Endgame|Using An Outside Passed Pawn|8/8/8/6p1/1kp2p1p/5P1P/PK4P1/8 w - - 0 1|Use your pawn as a decoy to draw the enemy king into a bad position and clear the pawns on the other side.
+chess|Pawn Endgame|Creating Zugzwang|8/5pp1/Kp5p/1Pk5/8/8/5PPP/8 w - - 0 1|If either king moves, the moving side will lose their b-pawn and the game. Try to make your opponent run out of pawn moves.
+chess|Pawn Endgame|3 VS 3|6k1/5ppp/8/8/8/8/5PPP/6K1 w - - 0 1|Advance your king as far as possible. Your pawns should act as a unit and defend each other.
+chess|Pawn Endgame|Opposing Majorities|8/ppp1kppp/8/8/3KP3/P7/1P3PPP/8 w - - 0 1|Make good use of your kingside majority and your active king here to maintain the advantage.
 
-chess|Knight Endgame|Symmetrical Pawns|3n2k1/p4pp1/1p5p/4pN2/8/1P4P1/P3PPKP/8 w - - 0 1|You must play soundly, activating your king and your knight, and be especially careful about knight forks.
-chess|Knight Endgame|An Extra Pawn|8/6k1/p3n1pp/1p6/1P6/5P2/P5PP/4N1K1 w - - 0 1|If a pawn endgame is winning, adding knights should not change the evaluation - but it can be much harder to win.
-chess|Knight Endgame|Few Pawns Remain|8/8/5pk1/6p1/8/2n5/5KP1/4N3 w - - 0 1|When only a few pawns remain, you can sacrifice the knight for the last pawns and draw.
-chess|Knight Endgame|Space Advantage|4n3/p3kpp1/1p5p/1P2P2P/4KPP1/5N2/8/8 w - - 0 1|Use your space advantage patiently, pressuring Black on both sides of the board. Black will be unable to defend both wings.
-chess|Knight Endgame|Queenside Majorities|6k1/pp3pp1/4pn1p/8/2P5/5N1P/PP3PP1/6K1 w - - 0 1|Make the most of your majority on the queenside. A passed pawn can be dangerous on the far side of the board.
-chess|Knight Endgame|Kingside Majorities|6k1/pp3pp1/5n1p/2p5/8/4PN1P/PP3PP1/6K1 w - - 0 1|You can hold the draw. Address your king first. You may want to mobilize your kingside pawns at some point.
+chess|Knight Endgame|Symmetrical Pawns|3n2k1/p4pp1/1p5p/4pN2/8/1P4P1/P3PPKP/8 w - - 0 1|Play soundly, activating your king and your knight, and be especially careful about knight forks.
+chess|Knight Endgame|An Extra Pawn|8/6k1/p3n1pp/1p6/1P6/5P2/P5PP/4N1K1 w - - 0 1|Adding knights to a winning pawn endgame will not change the result, but the progress can be more complicated.
+chess|Knight Endgame|Few Pawns Remain|8/8/5pk1/6p1/8/2n5/5KP1/4N3 w - - 0 1|When there is only a few pawns remain, you can sacrifice the knight for the last pawns to draw.
+chess|Knight Endgame|Space Advantage|4n3/p3kpp1/1p5p/1P2P2P/4KPP1/5N2/8/8 w - - 0 1|Use your space advantage patiently by pressuring Black on both sides of the board as Black cannot defend both sides.
+chess|Knight Endgame|Queenside Majorities|6k1/pp3pp1/4pn1p/8/2P5/5N1P/PP3PP1/6K1 w - - 0 1|Take advantage of your queenside majority. A passed pawn can be dangerous on the far side of the board.
+chess|Knight Endgame|Kingside Majorities|6k1/pp3pp1/5n1p/2p5/8/4PN1P/PP3PP1/6K1 w - - 0 1|Hold the draw by addressing your king first and mobilize your kingside pawns at correct time.
 
-chess|Same-color Bishop Endgame|An Extra Pawn|8/p4k1p/1p2bpp1/8/8/2P5/PP3PPP/1B4K1 w - - 0 1|Keep your pawns on the opposite color of the bishops and lock Black's pawns on the bishops' color. Avoid too many pawn trades.
-chess|Same-color Bishop Endgame|Gruenfeld Endgame|6k1/p3ppbp/1p4p1/8/3PP3/4B3/P3KPPP/8 w - - 0 1|King activity will make all the difference here.
-chess|Same-color Bishop Endgame|Queenside Majority|3b2k1/pp3pp1/4p2p/8/2P5/7P/PP3PPB/6K1 w - - 0 1|The queenside majority is a nice advantage. Create a passed pawn and you will be doing well. Don't forget to activate your king!
-chess|Same-color Bishop Endgame|Kingside Majority|6k1/pp3ppb/7p/2p5/8/4P2P/PP3PP1/3B2K1 w - - 0 1|Get your pieces to the queenside before things become dangerous and, at the right time, use your own kingside pawn majority.
-chess|Same-color Bishop Endgame|Centralization|1B6/4b3/pp3k1p/6p1/3PK1p1/1P6/P6P/8 w - - 0 1|You are better here, thanks to your central control and central passed pawn. Make those advantages count.
-chess|Same-color Bishop Endgame|Bishop Pair|4r1k1/2n1bppp/p3p3/1p6/8/1P2B1P1/P3PPBP/R5K1 w - - 0 1|Make confident, patient progress knowing that as the game progresses, your bishops should only get stronger.
+chess|Same-color Bishop Endgame|An Extra Pawn|8/p4k1p/1p2bpp1/8/8/2P5/PP3PPP/1B4K1 w - - 0 1|Keep your pawns on the opposite color of the bishops and lock Black's pawns on the same color of the bishops. Avoid too many pawn trades which opens the way for king's entrance.
+chess|Same-color Bishop Endgame|Gruenfeld Endgame|6k1/p3ppbp/1p4p1/8/3PP3/4B3/P3KPPP/8 w - - 0 1|Take advantage of king activity, which is the key factor here.
+chess|Same-color Bishop Endgame|Queenside Majority|3b2k1/pp3pp1/4p2p/8/2P5/7P/PP3PPB/6K1 w - - 0 1|Take advantage of queenside majority by creating a passed pawn and activating your king.
+chess|Same-color Bishop Endgame|Kingside Majority|6k1/pp3ppb/7p/2p5/8/4P2P/PP3PP1/3B2K1 w - - 0 1|Get your pieces to the queenside to defend the extra pawn on the queenside and use your own kingside pawn majority at the right time.
+chess|Same-color Bishop Endgame|Centralization|1B6/4b3/pp3k1p/6p1/3PK1p1/1P6/P6P/8 w - - 0 1|Take advantage of your central control and central passed pawn.
+chess|Same-color Bishop Endgame|Bishop Pair|4r1k1/2n1bppp/p3p3/1p6/8/1P2B1P1/P3PPBP/R5K1 w - - 0 1|Your bishop pair should only get stronger when the game progresses.
 
-chess|Opposite-color Bishop Endgame|Making Blockade|1k6/8/1b2pp2/6p1/2P4p/5K1P/2B5/8 w - - 0 1|Choose the correct move order for White to draw. Practice holding this tough endgame while down several pawns.
-chess|Opposite-color Bishop Endgame|Drawing Technique|8/4b1k1/8/6p1/7p/p6P/4BKP1/8 w - - 0 1|Stop Black's a-pawn with your bishop, and use your bishop to defend your own pawns. If you do this, drawing should be easy.
-chess|Opposite-color Bishop Endgame|Down Pawns On 2 Wings|4k3/7p/p5p1/1p3p2/1Bb5/2P2P2/6P1/4K3 w - - 0 1|Position your kingside pawns to get the best exchanges as Black advances.
-chess|Opposite-color Bishop Endgame|Two Extra Pawns|4k3/6p1/2p2p2/1bB5/1P3P2/P3K1P1/7P/8 w - - 0 1|You already have an extra passed pawn on the queenside, but you need one on the kingside too...
+chess|Opposite-color Bishop Endgame|Making Blockade|1k6/8/1b2pp2/6p1/2P4p/5K1P/2B5/8 w - - 0 1|Place your king and bishop correctly by attacking all light squares to make a draw.
+chess|Opposite-color Bishop Endgame|Drawing Technique|8/4b1k1/8/6p1/7p/p6P/4BKP1/8 w - - 0 1|Stop Black's a-pawn with your bishop, and use your bishop to defend your own pawns to make a draw.
+chess|Opposite-color Bishop Endgame|Down Pawns On 2 Wings|4k3/7p/p5p1/1p3p2/1Bb5/2P2P2/6P1/4K3 w - - 0 1|Position your kingside pawns to get the best exchanges to draw.
+chess|Opposite-color Bishop Endgame|Two Extra Pawns|4k3/6p1/2p2p2/1bB5/1P3P2/P3K1P1/7P/8 w - - 0 1|You need 2 passed pawns on each side to gain advantage.
 
-chess|Rook Endgame|Symmetrical Pawns|6k1/1r4pp/8/8/8/8/R5PP/6K1 w - - 0 1|Prevent your opponent from achieving what they want in this basic rook ending. Start by improving your king!
-chess|Rook Endgame|An Extra Pawn|6k1/5ppp/pr6/8/1P6/P7/5PPP/2R3K1 w - - 0 1|You need to use everything you have. Activate your rook and king and seek to pressure any other weaknesses that you can create.
-chess|Rook Endgame|Outside Passed Pawn|3K4/r6p/5ppk/5P2/PR4PP/8/8/8 b - - 0 1|Active pieces are required here. What is Black's drawing plan?
-chess|Rook Endgame|Rook Behind Passed Pawn|5k2/6pp/5p2/r7/P7/8/R4PPP/5K2 w - - 0 1|Try to learn from both sides of the board here. White can press, but Black has strong drawing chances. Start by including your king.
-chess|Rook Endgame|Rook Beside Passed Pawn|5k2/6pp/r4p2/8/8/P3R3/5PPP/5K2 w - - 0 1|Make steady progress with your king and pawns, and you have chances. Consider castling queenside.
-chess|Rook Endgame|Defense Against Rook Beside Passed Pawn|5k2/5ppp/p3r3/8/8/R4P2/6PP/6K1 w - - 0 1|Your rook is misplaced, in front of a passed pawn. Activate it and position it behind the passed pawn and you should draw.
-chess|Rook Endgame|An Active Rook|5rk1/p4ppp/1p6/3R4/8/P7/5PPP/6K1 w - - 0 1|Look to make simplifications to drawn endgames we have already covered, and keep your rook active!
-chess|Rook Endgame|Passed Pawns|8/8/5k2/1pr5/5PK1/8/8/1R6 w - - 0 1|Be careful not to let Black put their rook behind the b-pawn and start pushing it.
-chess|Rook Endgame|4 VS 3|6k1/2r4p/5pp1/1R6/4P2P/5PK1/6P1/8 w - - 0 1|Try to make a passed pawn, maneuver with the rook on all sides, and advance the kingside pawns to create weaknesses.
-chess|Rook Endgame|Minority Attack|3r2k1/1p3ppp/2p5/p2p4/3P4/P3P2P/1P3PP1/3R2K1 w - - 0 1|Use a minority attack to saddle Black with a weakness on the queenside. Then fight on the kingside.
-chess|Rook Endgame|Pawn Islands|2r4k/p5pp/2p2p2/3p4/8/1P2P3/P4PPP/2R2K2 w - - 0 1|Force the Black rook to defend weaknesses, and then open new flanks of attack and overwhelm your opponent.
+chess|Rook Endgame|Symmetrical Pawns|6k1/1r4pp/8/8/8/8/R5PP/6K1 w - - 0 1|Centralize your king to prevent your opponent from gaining advantage.
+chess|Rook Endgame|An Extra Pawn|6k1/5ppp/pr6/8/1P6/P7/5PPP/1R4K1 w - - 0 1|Activate your rook and king and seek to pressure any other weaknesses that you can create.
+chess|Rook Endgame|Outside Passed Pawn|3K4/r6p/5ppk/5P2/PR4PP/8/8/8 b - - 0 1|Playing as Black, try to draw in this game by developing active pieces.
+chess|Rook Endgame|Rook Behind Passed Pawn|5k2/6pp/5p2/r7/P7/8/R4PPP/5K2 w - - 0 1|Try to win this game by including your king.
+chess|Rook Endgame|Rook Beside Passed Pawn|5k2/6pp/r4p2/8/8/P3R3/5PPP/5K2 w - - 0 1|Make progress with your king and pawns. Consider castling queenside.
+chess|Rook Endgame|Defense Against Rook Beside Passed Pawn|5k2/5ppp/p3r3/8/8/R4P2/6PP/6K1 w - - 0 1|Try to activate your rook and position it behind the passed pawn and you should draw.
+chess|Rook Endgame|An Active Rook|5rk1/p4ppp/1p6/3R4/8/P7/5PPP/6K1 w - - 0 1|Keep your rook active to make a draw.
+chess|Rook Endgame|Passed Pawns|8/8/5k2/1pr5/5PK1/8/8/1R6 w - - 0 1|Prevent Black from placing their rook behind the b-pawn and start pushing it.
+chess|Rook Endgame|4 VS 3|6k1/2r4p/5pp1/1R6/4P2P/5PK1/6P1/8 w - - 0 1|Try to make a passed pawn, maneuver with the rook on all sides and advance the kingside pawns to create weaknesses.
+chess|Rook Endgame|Minority Attack|3r2k1/1p3ppp/2p5/p2p4/3P4/P3P2P/1P3PP1/3R2K1 w - - 0 1|Use a minority attack to saddle Black with a weakness on the queenside and then fight on the kingside.
+chess|Rook Endgame|Pawn Islands|2r4k/p5pp/2p2p2/3p4/8/1P2P3/P4PPP/2R2K2 w - - 0 1|Force the Black rook to defend weaknesses, and then open new flanks of attack to win.
 
-chess|Queen Endgame|An Extra Pawn|8/pq4kp/6p1/8/8/7P/PP1Q2P1/7K w - - 0 1|Keep your queen central to stop checks, and advance your queenside pawns patiently.
-chess|Queen Endgame|Down A Pawn|7k/pp1q2p1/7p/8/8/6P1/PQ4KP/8 w - - 0 1|Perpetual check is your best hope. Blockading strategies are not effective vs the attacking queen.
-chess|Queen Endgame|Centralization|3q2k1/5pp1/p6p/Pp6/1P5P/5PP1/6K1/1Q6 w - - 0 1|The key to queen endgames is often centralization. Improve your queen and have no fear.
+chess|Queen Endgame|An Extra Pawn|8/pq4kp/6p1/8/8/7P/PP1Q2P1/7K w - - 0 1|Keep your queen central to stop checks and advance your queenside pawns patiently.
+chess|Queen Endgame|Down A Pawn|7k/pp1q2p1/7p/8/8/6P1/PQ4KP/8 w - - 0 1|Prevent the extra pawn from promotion by perpetual check. Blockading strategies are not effective in queen endgames.
+chess|Queen Endgame|Centralization|3q2k1/5pp1/p6p/Pp6/1P5P/5PP1/6K1/1Q6 w - - 0 1|The key to queen endgames is often centralization. Improve your queen's position to handle this game.
 
-chess|Handicap|All Down|4k3/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1|This would be simple, right? Just overwhelm the engine as fast as possible.
+chess|Handicap|All Down|4k3/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1|Practice winning this game by using your material advantage to exploit opponent's weakness in pawn structure.
 chess|Handicap|Only Knight And Bishop|4kbn1/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1|Practice winning the game with a large material advantage. The best hint here is to use ALL of your pieces.
 chess|Handicap|Queen And Rooks Down|1nb1kbn1/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1|Remember the techniques: use ALL of your pieces.
 chess|Handicap|Queen, Knight And Bishop Down|r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1|Use ALL of your pieces here and recognize threats from your opponent. Make good trades if you can!

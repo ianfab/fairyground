@@ -46,3 +46,7 @@
 .wikim .cg-wrap piece._-piece {
   background-image: url('images/wallsquare/barrier.svg');
 }
+
+.wikim .cg-wrap piece.unknown {
+  background-image: url('images/fogofwar/unknown.svg');
+}

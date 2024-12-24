@@ -1,0 +1,103 @@
+#fen {
+  display: none !important;
+}
+
+#move {
+  display: none !important;
+}
+
+#setpos {
+  display: none !important;
+}
+
+#depth {
+  display: none !important;
+}
+
+#movetime {
+  display: none !important;
+}
+
+#nodes {
+  display: none !important;
+}
+
+#threads {
+  display: none !important;
+}
+
+#hash {
+  display: none !important;
+}
+
+#multipv {
+  display: none !important;
+}
+
+#go {
+  display: none !important;
+}
+
+#stop {
+  display: none !important;
+}
+
+#label-analysis {
+  display: none !important;
+}
+
+#label-boardsetup {
+  display: none !important;
+}
+
+#output2 {
+  display: none !important;
+}
+
+#currentboardfen {
+  display: none !important;
+}
+
+#label-pgn {
+  display: none !important;
+}
+
+#movecontrol {
+  display: none !important;
+}
+
+#label-advtimectrl {
+  display: none !important;
+}
+
+#label-advpgnmode {
+  display: none !important;
+}
+
+#label-enginematchmode {
+  display: none !important;
+}
+
+#whitetimemargin {
+  display: none !important;
+}
+
+#blacktimemargin {
+  display: none !important;
+}
+
+#enginecmddiv {
+  display: none !important;
+}
+
+#sannotation {
+  display: none !important;
+}
+
+#divconnectserver {
+  display: none !important;
+}
+
+#binengineinput {
+  display: none !important;
+}

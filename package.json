@@ -1,15 +1,17 @@
 {
   "scripts": {
     "serve": "serve public --no-compression",
-    "build": "rm -rf public/lib && mkdir -p public/lib && cp node_modules/fairy-stockfish-nnue.wasm/* public/lib && cp node_modules/ffish-es6/ffish.wasm public/ && browserify -p esmify src/main.js -o public/bundle.js && cp node_modules/mithril/mithril.min.js public/lib && cp src/*Feature.js public/lib && cp -f src/server.js .",
-    "buildwithcmd": "rd /s /q public\\lib & md public\\lib && copy /Y node_modules\\fairy-stockfish-nnue.wasm\\* public\\lib && copy /Y node_modules\\ffish-es6\\ffish.wasm public\\ && browserify -p esmify src/main.js -o public/bundle.js && copy /Y node_modules\\mithril\\mithril.min.js public\\lib && copy /Y src\\*Feature.js public\\lib\\ && copy /Y src\\server.js .\\",
-    "watch-build": "watchify -p esmify src/main.js -o public/bundle.js",
-    "format": "prettier --write src public/*.html",
-    "format:check": "prettier --check src public/*.html"
+    "build": "rm -rf public/lib && mkdir -p public/lib && mkdir -p public/lib/canvas && cp node_modules/fairy-stockfish-nnue.wasm/* public/lib && cp node_modules/ffish-es6/ffish.wasm public/ && uglifyjs src/js/main.js -c -m > src/js/main.min.js && browserify -p esmify src/js/main.min.js -o public/bundle.js && rm -f src/js/main.min.js && cp node_modules/mithril/mithril.min.js public/lib && cp src/js/*Feature.js public/lib && cp src/js/*.canvas.worker.js public/lib/canvas && cp -f src/js/server.js . && node src/make_index_page.js > src/html/index.html && uglifyjs public/bundle.js -c --in-situ && uglifyjs public/lib/*Feature.js -c -m --in-situ && uglifyjs public/lib/canvas/*.canvas.worker.js -c -m --in-situ && html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true --input-dir src/html --output-dir public --file-ext html && rm -f src/html/index.html && echo && echo Build finished with compression and mangling to reduce file size. && echo \"To build without compression and mangling, run \\\"npm run debug-build\\\"\".",
+    "buildwithcmd": "rd /s /q public\\lib & md public\\lib && md public\\lib\\canvas && copy /Y node_modules\\fairy-stockfish-nnue.wasm\\* public\\lib && copy /Y node_modules\\ffish-es6\\ffish.wasm public\\ && uglifyjs src/js/main.js -c -m > src\\js\\main.min.js && browserify -p esmify src/js/main.min.js -o public/bundle.js && del /f /q src\\js\\main.min.js && copy /Y node_modules\\mithril\\mithril.min.js public\\lib && copy /Y src\\js\\*Feature.js public\\lib\\ && copy /Y src\\js\\*.canvas.worker.js public\\lib\\canvas\\ && copy /Y src\\js\\server.js .\\  && node src\\make_index_page.js > src\\html\\index.html && uglifyjs public\\bundle.js -c --in-situ && uglifyjs public\\lib\\*Feature.js -c -m --in-situ && uglifyjs public\\lib\\canvas\\*.canvas.worker.js -c -m --in-situ && html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true --input-dir src\\html --output-dir public --file-ext html && del /f /q src\\html\\index.html && echo. && echo Build finished with compression and mangling to reduce file size. && echo To build without compression and mangling, run \"npm run debug-buildwithcmd\".",
+    "debug-build": "rm -rf public/lib && mkdir -p public/lib && mkdir -p public/lib/canvas && cp node_modules/fairy-stockfish-nnue.wasm/* public/lib && cp node_modules/ffish-es6/ffish.wasm public/ && browserify -p esmify src/js/main.js -o public/bundle.js && cp node_modules/mithril/mithril.min.js public/lib && cp src/js/*Feature.js public/lib && cp src/js/*.canvas.worker.js public/lib/canvas && cp -f src/js/server.js . && cp -f src/html/* public && node src/make_index_page.js > public/index.html && echo && echo Debug build finished.",
+    "debug-buildwithcmd": "rd /s /q public\\lib & md public\\lib && md public\\lib\\canvas && copy /Y node_modules\\fairy-stockfish-nnue.wasm\\* public\\lib && copy /Y node_modules\\ffish-es6\\ffish.wasm public\\ && browserify -p esmify src/js/main.js -o public/bundle.js && copy /Y node_modules\\mithril\\mithril.min.js public\\lib && copy /Y src\\js\\*Feature.js public\\lib\\ && copy /Y src\\js\\*.canvas.worker.js public\\lib\\canvas\\ && copy /Y src\\js\\server.js .\\ && copy /Y src\\html\\* public\\ && node src\\make_index_page.js > public\\index.html && echo. && echo Debug build finished.",
+    "watch-build": "watchify -p esmify src/js/main.js -o public/bundle.js",
+    "format": "prettier --write src/* src/js/*.js src/html/*.html",
+    "format:check": "prettier --check src/* src/js/*.js src/html/*.html"
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "chessgroundx": "^10.5.3",
+    "chessgroundx": "^10.6.3",
     "express": "^4.18.2",
     "fairy-stockfish-nnue.wasm": "^1.1.8",
     "ffish-es6": "^0.7.6",
@@ -20,8 +22,11 @@
   "devDependencies": {
     "browser-resolve": "^2.0.0",
     "browserify": "^17.0.0",
+    "clean-css": "^5.3.3",
     "esmify": "^2.1.1",
+    "html-minifier": "^4.0.0",
     "prettier": "^3.2.5",
+    "uglify-js": "^3.19.3",
     "vercel": "^33.5.2",
     "watchify": "^4.0.0"
   }

@@ -1,6 +1,7 @@
 # Ignore browserified bundles, which should be compiled instead
 public/**/*bundle.js
 public/ffish.wasm
+public/*.html
 public/lib
 
 # Rest of gitignore taken from:

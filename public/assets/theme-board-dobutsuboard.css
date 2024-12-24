@@ -11,6 +11,13 @@
   display: block;
 }
 
+.dobutsuboard.board3x4 .cg-wrap.micro {
+  width: calc(312px * 0.5);
+  height: calc(480px * 0.5);
+  position: relative;
+  display: block;
+}
+
 .dobutsuboard.board3x4 .cg-wrap piece {
   position: absolute;
 }

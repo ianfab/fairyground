@@ -1,3 +1,7 @@
+.purpleboard {
+  --dark-square-color: #a781b1;
+  --light-square-color: #eadfed;
+}
 .purpleboard.board1x1 cg-board {
   background-image: url('images/board/purple/purple1x1.svg');
 }

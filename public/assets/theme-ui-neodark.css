@@ -1,0 +1,500 @@
+html {
+    font-family: Calibri;
+    color: #ccc !important;
+    background: black !important;
+    scrollbar-color: #ff5d17 #000;
+}
+
+::selection {
+    background-color: #ff5d17;
+    color: #fff;
+}
+
+button:before {
+    transition-duration: 0.5s;
+    transition-property: color, background-color;
+    background-color: #ff5d17 !important;
+}
+
+button:hover:before {
+    background-color: orange !important;
+}
+
+button:active:before {
+    background-color: black !important;
+}
+
+button:disabled:before {
+    color: black !important;
+    background-color: #999 !important;
+}
+
+input {
+    outline-color: #ff5d17;
+}
+
+input[type=text] {
+    transition-duration: 0.5s;
+    transition-property: color, background-color, border-color;
+    border-radius: 10px;
+    color: #ccc;
+    background-color: #000;
+    border-left: 1px solid #aaa !important;
+    border-right: 1px solid #aaa !important;
+    border-top: 1px solid #aaa !important;
+    border-bottom: 1px solid #aaa !important;
+}
+
+input[type=text]:hover {
+    background-color: #777;
+}
+
+input[type=text]:focus {
+    background-color: #000;
+    border-left: 3px solid #ff5d17 !important;
+    border-right: 3px solid #ff5d17 !important;
+    border-top: 3px solid #ff5d17 !important;
+    border-bottom: 3px solid #ff5d17 !important;
+    outline: none;
+}
+
+input[type=text]:disabled {
+    background-color: #555;
+}
+
+input[type=number] {
+    transition-duration: 0.5s;
+    transition-property: color, background-color, border-color;
+    border-radius: 10px;
+    color: #ccc;
+    background-color: #000;
+    border-left: 1px solid #aaa !important;
+    border-right: 1px solid #aaa !important;
+    border-top: 1px solid #aaa !important;
+    border-bottom: 1px solid #aaa !important;
+}
+
+input[type=number]:hover {
+    background-color: #777;
+}
+
+input[type=number]:focus {
+    background-color: #000;
+    border-left: 3px solid #ff5d17 !important;
+    border-right: 3px solid #ff5d17 !important;
+    border-top: 3px solid #ff5d17 !important;
+    border-bottom: 3px solid #ff5d17 !important;
+    outline: none;
+}
+
+input[type=number]:disabled {
+    background-color: #555;
+}
+
+input[type=checkbox] {
+  color: white !important;
+  background-color: #000 !important;
+  transition-duration: 0.5s;
+  transition-property: color, background-color, border-color;
+}
+
+input[type="checkbox"]:after {
+    content: "\f00c";
+    font-size: 0px;
+    text-align: center;
+    line-height: 17px;
+    transition-property: font-size;
+    transition-duration: 0.25s;
+    transition-timing-function: linear;
+}
+
+input[type=checkbox]:hover {
+  color: #fff !important;
+  background-color: #aaa !important;
+}
+
+input[type=checkbox]:checked {
+  color: #fff !important;
+  background-color: #ff5d17 !important;
+  border-color: #e14400 !important;
+}
+
+input[type=checkbox]:checked:hover {
+  color: #fff !important;
+  background-color: #ff824d !important;
+  border-color: #ff824d !important;
+}
+
+input[type=checkbox]:disabled {
+  color: #000 !important;
+  background-color: #777 !important;
+  border-color: #444 !important;
+  opacity: 1 !important;
+}
+
+input[type=checkbox]:disabled:hover {
+  color: #000 !important;
+  background-color: #777 !important;
+  border-color: #444 !important;
+  opacity: 1 !important;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    height: 10px;
+    background: linear-gradient(to right, #fff 0%, #ff5d17 100%);
+    border-radius: 5px;
+    opacity: 0.7;
+    transition: opacity .2s;
+    color: black;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #777;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px 2px #999;
+}
+
+input[type=range]:hover {  
+    opacity: 1;
+}
+
+input[type=range]::-moz-range-track {  
+    height: 10px;
+    background: linear-gradient(to right, #fff 0%, #ff5d17 100%);
+    border-radius: 5px;
+}
+
+input[type=range]::-moz-range-thumb {  
+    width: 20px;
+    height: 20px;
+    background: #777;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background .2s;
+    box-shadow: 0px 0px 5px 2px #999;
+}
+
+input[type=range]:focus::-moz-range-thumb {  
+    background: #777;
+}  
+
+select {
+    color: #ccc;
+    background: linear-gradient(to bottom, #777, #555) !important;
+    background-color: rgba(150, 150, 150, 0) !important;
+    background-blend-mode: overlay;
+    border-color: #aaa;
+    border-width: 1px;
+    border-style: solid;
+    transition-duration: 0.5s;
+    transition-property: color, background-color, border-color, box-shadow;
+    outline: none;
+    border-radius: 10px;
+}
+
+select:hover {
+    background-color: rgba(150, 150, 150, 1) !important;
+}
+
+select:disabled {
+    color: #000;
+    background-color: rgba(100, 100, 100, 1) !important;
+}
+
+select:focus {
+    box-shadow: 0px 0px 3px 3px #ff5d17;
+}
+
+option {
+    padding: 5px;
+    color: #ccc;
+    background-color: black;
+    transition-duration: 0.5s;
+    transition-property: color, background, border-color;
+    outline-color: #ff5d17;
+}
+
+option:hover {
+    color: #ccc;
+    background-color: #ff5d17;
+}
+
+button {
+    color: #ccc !important;
+    background: linear-gradient(to bottom, #777, #555) !important;
+    background-color: rgba(150, 150, 150, 0) !important;
+    background-blend-mode: overlay;
+    border-color: #aaa;
+    border-width: 1px;
+    border-style: solid;
+    transition-duration: 0.5s;
+    transition-property: color, background-color, border-color, box-shadow;
+    outline: none;
+    border-radius: 10px;
+}
+
+button.operationdivbutton {
+    border-width: 0;
+}
+
+button:hover {
+    background-color: rgba(150, 150, 150, 1) !important;
+}
+
+button:active {
+    transition-duration: 0.05s;
+    background-color: rgba(0, 0, 0, 1) !important;
+}
+
+button:disabled {
+    color: #000 !important;
+    background-color: rgba(100, 100, 100, 1) !important;
+}
+
+button:focus {
+    box-shadow: 0px 0px 3px 3px #ff5d17;
+}
+
+input::-webkit-input-placeholder {
+    color: #aaa;
+}
+
+input::-moz-placeholder {
+    color: #aaa;
+}
+
+input:-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::-ms-input-placeholder {
+    color: #aaa;
+}
+
+input::placeholder {
+    color: #aaa;
+    opacity: 1;
+}
+
+spangameresult, spangameresultmini {
+    color: #ff5d17 !important;
+}
+
+table {
+    border-color: #ccc !important;
+}
+
+caption {
+    border-color: #ccc !important;
+}
+
+th {
+    border-color: #ccc !important;
+}
+
+td {
+    border-color: #ccc !important;
+}
+
+a {
+    outline-color: #ff5d17;
+    color: #ff5d17;
+    text-decoration: underline !important;
+}
+
+a:visited {
+    color: #ff5d17;
+}
+
+.timer-active {
+    box-shadow: 0px 0px 5px 5px #ff5d17;
+}
+
+.position-display-label:hover {
+    background-color: #ff5d17;
+}
+
+#pagebackground {
+    background-image: linear-gradient(to bottom, #555 0%, #222 100%);
+}
+
+#timers {
+  border-color: #fff !important;
+  background-color: rgba(0,0,0,0) !important;
+  border-radius: 10px;
+}
+
+#whitetimer {
+  background-image: linear-gradient(to bottom, #fff 0%, #f7f7f7 20%, #ccc 100%);
+  border-radius: 10px;
+}
+
+#blacktimer {
+  background-image: linear-gradient(to bottom, #666 0%, #080808 80%, #000 100%);
+  border-radius: 10px;
+}
+
+#pvinfo {
+    border-top: 4px solid #ccc !important;
+    border-left: 4px solid #ccc !important;
+    border-right: 4px solid #ccc !important;
+    border-bottom: 4px solid #ccc !important;
+    border-radius: 10px;
+    transition-duration: 0.5s;
+    transition-property: box-shadow;
+}
+
+#pvinfo:hover {
+    box-shadow: 0px 0px 5px 5px #ff5d17;
+}
+
+#pvinfo hr {
+    border: 1px solid #ccc !important;
+}
+
+evalnum:after {
+    color: #ccc !important;
+}
+
+#currentboardfen {
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 5px 5px #777 !important;
+    scrollbar-width: none;
+    border-color: #555 !important;
+    transition-duration: 0.5s;
+    transition-property: border-color, box-shadow;
+}
+
+#currentboardfen:hover {
+    box-shadow: inset 0px 0px 5px 5px #ff5d17 !important;
+    border-color: #ff5d17 !important;
+}
+
+#label-pgn {
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 5px 5px #777 !important;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    overflow-x: auto !important;
+    border-color: #555 !important;
+    transition-duration: 0.5s;
+    transition-property: border-color, box-shadow;
+}
+
+#label-pgn:hover {
+    box-shadow: inset 0px 0px 5px 5px #ff5d17 !important;
+    border-color: #ff5d17 !important;
+}
+
+#output2 {
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 5px 5px #777 !important;
+    border-color: #555 !important;
+    transition-duration: 0.5s;
+    transition-property: border-color, box-shadow;
+}
+
+#output2:hover {
+    box-shadow: inset 0px 0px 5px 5px #ff5d17 !important;
+    border-color: #ff5d17 !important;
+}
+
+#moveselectiondialog {
+    color: #ccc !important;
+    background-image: linear-gradient(to bottom, #555 0%, #222 100%);
+    border: 1px solid #ccc !important;
+    border-radius: 10px;
+}
+
+#separatormoveselectiondialog {
+    border: dashed #ff5d17 !important;
+}
+
+#separatorsearchresult {
+    border: double #ff5d17 !important;
+}
+
+#enginemanagementpopup {
+    background-color: #0000 !important;
+}
+
+#enginemanagementpopup-background {
+    background: linear-gradient(to bottom, #555 0%, #222 100%) !important;
+}
+
+#enginesetuppopup {
+    background-color: #0000 !important;
+}
+
+#enginesetuppopup-background  {
+    background: linear-gradient(to bottom, #555 0%, #222 100%) !important;
+}
+
+#enginesettingspopup {
+    background-color: #0000 !important;
+}
+
+#enginesettingspopup-background  {
+    background: linear-gradient(to bottom, #555 0%, #222 100%) !important;
+}
+
+#loadsavedgamespopup {
+    background-color: #0000 !important;
+}
+
+#loadsavedgamespopup-background  {
+    background: linear-gradient(to bottom, #555 0%, #222 100%) !important;
+}
+
+#linkdivhr {
+    border: 1px solid #ff5d17;
+}
+
+#chessground-mini-board-wrapper-div {
+    background-image: linear-gradient(to bottom, #555 0%, #222 100%);
+    border: 1px solid #ccc !important;
+    border-radius: 10px;
+}
+
+#lockminiboard:before, #lockminiboard:hover:before, #lockminiboard:active:before, #lockminiboard:disabled:before {
+    background-color: #0078d7 !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+.locked #lockminiboard:before {
+    background-color: orangered !important;
+}
+
+#pinminiboard:before, #pinminiboard:hover:before, #pinminiboard:active:before, #pinminiboard:disabled:before {
+    background-color: forestgreen !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+.pinned #pinminiboard:before {
+    background-color: rebeccapurple !important;
+}
+
+#setpositiontomainboard:before, #setpositiontomainboard:hover:before, #setpositiontomainboard:active:before, #setpositiontomainboard:disabled:before {
+    background-color: gold !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}
+
+#closeminiboard:before, #closeminiboard:hover:before, #closeminiboard:active:before, #closeminiboard:disabled:before {
+    background-color: crimson !important;
+    transition-duration: unset !important;
+    transition-property: none !important;
+    border-radius: 10px;
+}

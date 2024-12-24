@@ -1,0 +1,44 @@
+#Fairyground UI themes settings file
+#Syntax: 
+#Type 1: <UI theme ID>|<display name>
+#Type 2: <UI theme ID>|<display name>|<sub-theme duration in seconds [,...]>
+#Type 3: <UI theme ID>|<display name>|[sub-theme duration in seconds [,...]]|<canvas worker js name>,<canvas frame rate>
+#<UI theme name>: The unique ID of this theme. Fairyground will load "./assets/theme-ui-<UI theme ID>.css" to HTML stylesheet.
+#<display name>: The name of this theme, displayed in the dropdown.
+#<sub-theme duration in seconds [,...]>: The duration that each sub-theme stays before being automatically switched to next one.
+#<canvas worker js name>: The name of the canvas worker JavaScript. It is located in ./src/js/<canvas worker js name>.canvas.worker.js.
+#<canvas frame rate>: The frame rate that the canvas should be running at. Note that for built-in scripts the move speed of elements will have some difference at different frame rate.
+#DO NOT ADD ANY SPACE FOR <UI theme ID>, <sub-theme duration in seconds [,...]>, <canvas worker js name> and <canvas frame rate>
+
+#Explanation on sub-theme (Experimental feature):
+#Fairyground supports automatically changing the CSS files to support some advanced style effects like switching background among several images.
+#This is enabled when you use type 2 syntax. In this case, Fairyground will load "./assets/theme-ui-<UI theme ID>[<index>].css" to HTML stylesheet.
+#<index> starts from 0, and ends at the length of  <sub-theme duration in seconds [,...]> decreased by 1.
+#For example:
+#"test001|Test 001|2,5,7"
+#The ID of this theme is "test001" and the name displayed in the dropdown is "Test 001".
+#This will load "./assets/theme-ui-test001[0].css", "./assets/theme-ui-test001[1].css" and "./assets/theme-ui-test001[2].css".
+#Meanwhile, when "Test 001" UI theme is selected in the dropdown, these 3 CSS files will get loaded in a cycle automatically.
+#"2,5,7" means "./assets/theme-ui-test001[0].css" stays for 2 seconds, "./assets/theme-ui-test001[1].css" stays for 5 seconds, and "./assets/theme-ui-test001[2].css" stays for 7 seconds.
+
+#Explanation on canvas:
+#Fairyground supports loading animations on a HTMLCanvasElement using OffscreenCanvas mode, which means the canvas is render by a worker script in a thread other than the main thread which prevents lag in main page while rendering the canvas.
+#The main page loads the worker script and controls the canvas rendering by posting message to the worker script.
+#The creation, deletion and transferring of canvas are handled by the main page. The worker script only focuses on rendering the canvas.
+#You can view the builtin script "particles-bubbles.canvas.worker.js" and "particles-stars.canvas.worker.js" to find out how to write your own script.
+
+#Known issues:
+#1. Choosing a new UI theme when the background is cross fading causes animation error.
+#2. Only the background of the main page supports cross fade animation. PGN/EPD parser & binary engine UI backgrounds have no animation.
+
+light|Light
+dark|Dark
+neolight|Light Modern
+neodark|Dark Modern
+materiallight|Light Material
+materialdark|Dark Material
+fsf|Fairy-Stockfish
+chess|Chess Set
+landscape|Chess Landscape
+bubbles|Bubbles||particles-bubbles,30
+stars|Star Space||particles-stars,30

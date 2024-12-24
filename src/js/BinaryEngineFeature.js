@@ -493,6 +493,7 @@ const MessageSplitter = new RegExp("\x10", "");
 const AllBlankTestRegExp = new RegExp("^[ ]*$", "");
 const WhiteSpaceMatcher = new RegExp("[ ]+", "");
 const LineFeedCarriageReturnMatcher = new RegExp("(\r\n)|(\r)", "g");
+const BoardDimensionMatcher = new RegExp("board[0-9]+x[0-9]+", "");
 
 function GetCurrentVariantID() {
   return document.getElementById("dropdown-variant").value;
@@ -500,6 +501,13 @@ function GetCurrentVariantID() {
 
 window.fairyground.BinaryEngineFeature.GetCurrentVariantID =
   GetCurrentVariantID;
+
+function CurrentVariantFischerRandomEnabled() {
+  return document.getElementById("isfischerrandommode").checked;
+}
+
+window.fairyground.BinaryEngineFeature.CurrentVariantFischerRandomEnabled =
+  CurrentVariantFischerRandomEnabled;
 
 function MakeMoveOnBoard(ucimove) {
   if (typeof ucimove != "string") {
@@ -517,17 +525,15 @@ function GetBoardWidth() {
   const ClassList = document.getElementById(
     "chessground-container-div",
   ).classList;
-  let boardsize = "";
-  try {
-    ClassList.forEach((val) => {
-      if (/board[0-9]+x[0-9]+/.test(val)) {
-        throw val;
+  let i = 0;
+  for (i = 0; i < ClassList.length; i++) {
+    if (ClassList[i].startsWith("board")) {
+      if (BoardDimensionMatcher.test(ClassList[i])) {
+        return parseInt(ClassList[i].slice(5, ClassList[i].indexOf("x", 5)));
       }
-    });
-  } catch (e) {
-    boardsize = e;
+    }
   }
-  return parseInt(boardsize.replace("board", "").split("x")[0]);
+  return 8;
 }
 
 window.fairyground.BinaryEngineFeature.GetBoardWidth = GetBoardWidth;
@@ -536,17 +542,15 @@ function GetBoardHeight() {
   const ClassList = document.getElementById(
     "chessground-container-div",
   ).classList;
-  let boardsize = "";
-  try {
-    ClassList.forEach((val) => {
-      if (/board[0-9]+x[0-9]+/.test(val)) {
-        throw val;
+  let i = 0;
+  for (i = 0; i < ClassList.length; i++) {
+    if (ClassList[i].startsWith("board")) {
+      if (BoardDimensionMatcher.test(ClassList[i])) {
+        return parseInt(ClassList[i].slice(ClassList[i].indexOf("x", 5) + 1));
       }
-    });
-  } catch (e) {
-    boardsize = e;
+    }
   }
-  return parseInt(boardsize.replace("board", "").split("x")[1]);
+  return 8;
 }
 
 window.fairyground.BinaryEngineFeature.GetBoardHeight = GetBoardHeight;
@@ -1021,6 +1025,7 @@ class Engine {
     this.IsThinking = false;
     this.MoveRightCount = 0;
     this.LoadTimeOut = LoadTimeOut;
+    this.SupportsFischerRandom = false;
     this.LoadFinishCallBack = undefined;
     this.LoadFailureCallBack = undefined;
     this.IsReadyCallBack = undefined;
@@ -1149,8 +1154,10 @@ class Engine {
         this.IsLoading = false;
         this.IsLoaded = false;
         this.IsUsing = false;
+        console.error(
+          `Engine ID ${this.ID} Color ${this.Color} exited unexpectedly.`,
+        );
         if (typeof this.LoadFailureCallBack == "function") {
-          console.error("Engine exited unexpectedly.");
           this.LoadFailureCallBack("Engine exited unexpectedly.");
         }
       } else if (
@@ -1216,9 +1223,14 @@ class Engine {
                   `${this.Name} (${this.Color}) suggests current mover to resign.`,
                 );
               } else {
+                this.Move = "0000";
                 window.alert(`${this.Name} (${this.Color}) has resigned.`);
               }
             } else if (bestmoveline[1] == "win" || bestmoveline[1] == "lose") {
+              this.Move = "0000";
+              window.alert(
+                `${this.Name} (${this.Color}) has claimed a ${bestmoveline[1]}.`,
+              );
             } else {
               this.SetMoveInUCIFormat(bestmoveline[1]);
               if (this.Move == undefined) {
@@ -1263,82 +1275,6 @@ class Engine {
         if (/( upperbound )|( lowerbound )/.test(Message)) {
           return;
         }
-        /*let multipvid = 0;
-                let bestpv = 0;
-                if (Message.includes(" multipv ")) {
-                    let textparselist = Message.split(" ");
-                    multipvid = parseInt(textparselist[textparselist.indexOf("multipv") + 1]) - 1;
-                    if (multipvid + 1 > this.RecordedMultiplePrincipalVariation) {
-                        this.RecordedMultiplePrincipalVariation = multipvid + 1;
-                    }
-                }
-                let bestmove = [];
-                let ponder = [];
-                if (Message.includes(" score ") && Message.includes(" pv ")) {
-                    let textparselist = Message.split(" ");
-                    let evaltext = textparselist.at(textparselist.indexOf("score") + 1);
-                    if (evaltext == "mate") {
-                        let matenum = parseInt(
-                            textparselist.at(textparselist.indexOf("score") + 2),
-                        );
-                        this.MultiplePrincipalVariationRecord[multipvid][0] = true;
-                        this.MultiplePrincipalVariationRecord[multipvid][1] = matenum;
-                        this.EvaluationIndex[multipvid] = mateevalfactor / matenum;
-                        evaluation = this.EvaluationIndex[multipvid];
-                    } else if (evaltext == "cp") {
-                        let evalval =
-                            parseInt(textparselist.at(textparselist.indexOf("score") + 2)) / 100;
-                        this.MultiplePrincipalVariationRecord[multipvid][0] = false;
-                        this.MultiplePrincipalVariationRecord[multipvid][1] = evalval;
-                        this.EvaluationIndex[multipvid] = evalval;
-                        evaluation = this.EvaluationIndex[multipvid];
-                    } else {
-                        this.MultiplePrincipalVariationRecord[multipvid][0] = false;
-                        this.MultiplePrincipalVariationRecord[multipvid][1] = 0;
-                        this.EvaluationIndex[multipvid] = 0;
-                        console.log("Detected bad evaluation");
-                    }
-                    let moves = textparselist.slice(textparselist.indexOf("pv") + 1);
-                    if (moves.length == 0) {
-                        return;
-                    } else if (moves.length == 1) {
-                        bestmove = this.ParseMove(moves[0]);
-                    } else {
-                        bestmove = this.ParseMove(moves[0]);
-                        ponder = this.ParseMove(moves[1]);
-                    }
-                    this.MultiplePrincipalVariationRecord[multipvid][2] = bestmove;
-                    this.MultiplePrincipalVariationRecord[multipvid][3] = ponder;
-                    if (this.Protocol == "USI") {
-                        this.MultiplePrincipalVariationRecord[multipvid][4] = convertUSImovestoUCImoves(textparselist.slice(textparselist.indexOf("pv") + 1).join(" "), GetBoardWidth(), GetBoardHeight());
-                    }
-                    else if (this.Protocol == "UCCI" || this.Protocol == "UCI_CYCLONE") {
-                        this.MultiplePrincipalVariationRecord[multipvid][4] = convertUCCImovestoUCImoves(textparselist.slice(textparselist.indexOf("pv") + 1).join(" "), GetBoardWidth(), GetBoardHeight());
-                    }
-                    else {
-                        this.MultiplePrincipalVariationRecord[multipvid][4] = textparselist.slice(textparselist.indexOf("pv") + 1).join(" ");
-                    }
-                    this.MultiplePrincipalVariationRecord[multipvid][5] = parseInt(
-                        textparselist[textparselist.indexOf("depth") + 1],
-                    );
-                    this.MultiplePrincipalVariationRecord[multipvid][6] = parseInt(
-                        textparselist[textparselist.indexOf("seldepth") + 1],
-                    );
-                    this.EvaluationUpdateCallBack(this.RecordedMultiplePrincipalVariation, this.MultiplePrincipalVariationRecord, this.EvaluationIndex, parseInt(textparselist[textparselist.indexOf("nodes") + 1]), parseInt(textparselist[textparselist.indexOf("nps") + 1]));
-                }
-                else if (Message.includes("bestmove")) {
-                    let textparselist = Message.split(" ");
-                    bestpv = this.EvaluationIndex.indexOf(
-                        Math.max(...this.EvaluationIndex.slice(0, this.RecordedMultiplePrincipalVariation)),
-                    );
-                    bestmove = this.ParseMove(textparselist[1]);
-                    if (textparselist[3] != undefined) {
-                        ponder = this.ParseMove(textparselist[3]);
-                    }
-                    this.MultiplePrincipalVariationRecord[bestpv][2] = bestmove;
-                    this.MultiplePrincipalVariationRecord[bestpv][3] = ponder;
-                    this.EvaluationUpdateCallBack(this.RecordedMultiplePrincipalVariation, this.MultiplePrincipalVariationRecord, this.EvaluationIndex, NaN, NaN);
-                }*/
         if (Message.includes(" score ") && Message.includes(" pv ")) {
           let msglist = Message.trim().split(WhiteSpaceMatcher);
           let pv = msglist.slice(msglist.indexOf("pv") + 1);
@@ -1424,10 +1360,14 @@ class Engine {
         );
         this.IsLoaded = true;
         this.IsLoading = false;
-        if (this.Variants.includes(GetCurrentVariantID())) {
+        let isfischerrandom = CurrentVariantFischerRandomEnabled();
+        if (
+          this.Variants.includes(GetCurrentVariantID()) &&
+          ((isfischerrandom && this.SupportsFischerRandom) || !isfischerrandom)
+        ) {
           this.IsUsing = true;
           if (this.HasVariantsOption) {
-            this.SetVariant(GetCurrentVariantID());
+            this.SetVariant(GetCurrentVariantID(), isfischerrandom);
           }
           this.NewGame();
           let position = GetBoardPosition();
@@ -1470,72 +1410,6 @@ class Engine {
         }
       }
     }
-  }
-
-  ParseMove(MoveNotation) {
-    if (typeof MoveNotation != "string") {
-      throw TypeError;
-    }
-    let move = "";
-    if (this.Protocol == "USI") {
-      move = convertUSImovestoUCImoves(
-        MoveNotation,
-        GetBoardWidth(),
-        GetBoardHeight(),
-      );
-    } else if (this.Protocol == "UCCI" || this.Protocol == "UCI_CYCLONE") {
-      move = convertUCCImovestoUCImoves(
-        MoveNotation,
-        GetBoardWidth(),
-        GetBoardHeight(),
-      );
-    } else {
-      move = MoveNotation;
-    }
-    let gatingmove = "";
-    if (move.includes(",")) {
-      let gating = move.split(",")[1];
-      move = move.split(",")[0];
-      gatingmove =
-        gating.split(/[0-9]+/).filter(function (item) {
-          return item != null && item != undefined && item != "";
-        })[1] +
-        gating.split(/[a-z]+/).filter(function (item) {
-          return item != null && item != undefined && item != "";
-        })[1];
-    }
-    if (move.includes("@")) {
-      return [
-        move.slice(0, move.indexOf("@") + 1),
-        move.slice(move.indexOf("@") + 1),
-        "",
-        gatingmove,
-      ];
-    }
-    let additional = "";
-    if (move.at(-1) == "+") {
-      additional = "+";
-      move = move.slice(0, -1);
-    } else if (move.at(-1) == "-") {
-      additional = "-";
-      move = move.slice(0, -1);
-    } else if (/^[a-z]{1}$/.test(move.at(-1))) {
-      additional = move.at(-1);
-      move = move.slice(0, -1);
-    }
-    let files = move.split(/[0-9]+/).filter(function (item) {
-      return item != null && item != undefined && item != "";
-    });
-    let ranks = move.split(/[a-z]+/).filter(function (item) {
-      return item != null && item != undefined && item != "";
-    });
-    if (files.length != 2) {
-      throw RangeError;
-    }
-    if (ranks.length != 2) {
-      throw RangeError;
-    }
-    return [files[0] + ranks[0], files[1] + ranks[1], additional, gatingmove];
   }
 
   ParseEngineInitializationOutput(MessageBuffer) {
@@ -1592,6 +1466,9 @@ class Engine {
               ponder = false;
             }
           }
+          if (optionname == "UCI_Chess960" && optiontype == "check") {
+            this.SupportsFischerRandom = true;
+          }
         } else if (optiontype == "spin") {
           optionlist.push({
             name: optionname,
@@ -1634,7 +1511,7 @@ class Engine {
         //console.log(optionlist);
         if (variants.length == 0) {
           if (this.Protocol == "UCI") {
-            variants = ["chess", "fischerandom", ""];
+            variants = ["chess", ""];
           } else if (this.Protocol == "USI") {
             variants = ["shogi"];
           } else if (
@@ -1826,12 +1703,16 @@ class Engine {
     }
   }
 
-  SetVariant(VariantID) {
-    if (typeof VariantID != "string") {
+  SetVariant(VariantID, IsFischerRandom) {
+    if (typeof VariantID != "string" || typeof IsFischerRandom != "boolean") {
       throw TypeError();
     }
     this.RecordedMultiplePrincipalVariation = 0;
     if (this.Variants.includes(VariantID)) {
+      if (IsFischerRandom && !this.SupportsFischerRandom) {
+        this.IsUsing = false;
+        return false;
+      }
       if (this.HasVariantsOption) {
         if (this.Protocol == "UCI" || this.Protocol == "UCI_CYCLONE") {
           this.PostMessage(`setoption name UCI_Variant value ${VariantID}`);
@@ -1840,6 +1721,11 @@ class Engine {
         } else if (this.Protocol == "UCCI") {
           this.PostMessage(`setoption UCCI_Variant ${VariantID}`);
         }
+      }
+      if (this.SupportsFischerRandom) {
+        this.PostMessage(
+          `setoption name UCI_Chess960 value ${IsFischerRandom}`,
+        );
       }
       this.NewGame();
       this.PostMessage("position startpos");
@@ -2159,6 +2045,8 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   window.fairyground.BinaryEngineFeature.changing_engine_settings = true;
   let popup = document.createElement("div");
   popup.id = "enginesettingspopup";
+  let background = document.createElement("div");
+  background.id = "enginesettingspopup-background";
   let title = document.createElement("p");
   title.id = "popup-title";
   title.innerHTML =
@@ -2182,6 +2070,8 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
     subdiv.appendChild(text);
     if (value.type == "string") {
       input = document.createElement("input");
+      input.type = "text";
+      input.maxLength = 9999;
       input.value = value.default;
       subdiv.appendChild(input);
     } else if (value.type == "check") {
@@ -2231,6 +2121,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
       subdiv.appendChild(restrictiontext);
     } else if (value.type == "button") {
       input = document.createElement("button");
+      input.classList.add("ripple");
       input.onclick = function () {
         EngineClass.SetButtonOption(value.name);
       };
@@ -2262,10 +2153,20 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   });
   let actiondiv = document.createElement("div");
   actiondiv.style.display = "flex";
+  actiondiv.style.marginTop = "5px";
   let cancel = document.createElement("button");
+  cancel.classList.add("ripple");
   let canceltext = document.createTextNode("Close");
   cancel.appendChild(canceltext);
   cancel.onclick = function () {
+    document.dispatchEvent(
+      new CustomEvent("uilayoutchange", {
+        detail: { message: "enginesetuppopup-background" },
+      }),
+    );
+    while (document.getElementById("enginesettingspopup-background") != null) {
+      document.getElementById("enginesettingspopup-background").remove();
+    }
     while (document.getElementById("enginesettingspopup") != null) {
       document.getElementById("enginesettingspopup").remove();
     }
@@ -2275,6 +2176,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
     }
   };
   let save = document.createElement("button");
+  save.classList.add("ripple");
   let savetext = document.createTextNode("Apply Changes");
   save.onclick = function () {
     let Elem = null;
@@ -2313,6 +2215,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   save.appendChild(savetext);
   actiondiv.appendChild(save);
   let showcurrent = document.createElement("button");
+  showcurrent.classList.add("ripple");
   let showcurrenttext = document.createTextNode("Show Current Value");
   showcurrent.onclick = function () {
     let Elem = null;
@@ -2347,6 +2250,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   showcurrent.appendChild(showcurrenttext);
   actiondiv.appendChild(showcurrent);
   let showdefault = document.createElement("button");
+  showdefault.classList.add("ripple");
   let showdefaulttext = document.createTextNode("Show Default Value");
   showdefault.onclick = function () {
     let Elem = null;
@@ -2381,6 +2285,7 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   showdefault.appendChild(showdefaulttext);
   actiondiv.appendChild(showdefault);
   let redetectoptions = document.createElement("button");
+  redetectoptions.classList.add("ripple");
   let redetectoptionstext = document.createTextNode("Re-detect");
   redetectoptions.appendChild(redetectoptionstext);
   redetectoptions.onclick = function () {
@@ -2442,9 +2347,18 @@ function ShowEditEngineOptionsUI(EngineClass, DestructOnClose) {
   actiondiv.appendChild(redetectoptionshelp);
   popup.appendChild(actiondiv);
   popup.style.display = "block";
-  popup.style.zIndex = "1003";
+  popup.style.zIndex = "1006";
+  background.style.display = "block";
+  background.style.zIndex = "1005";
   document.body.appendChild(popup);
+  document.body.appendChild(background);
   showcurrent.click();
+  document.dispatchEvent(
+    new CustomEvent("uilayoutchange", {
+      detail: { message: "enginesettingspopup-background" },
+    }),
+  );
+  document.dispatchEvent(new Event("initializeripples"));
 }
 
 window.fairyground.BinaryEngineFeature.ShowEditEngineOptionsUI =
@@ -2478,6 +2392,8 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let isloadingengine = false;
   let popup = document.createElement("div");
   popup.id = "enginesetuppopup";
+  let background = document.createElement("div");
+  background.id = "enginesetuppopup-background";
   let title = document.createElement("p");
   title.id = "popup-title";
   title.innerHTML = "Engine Setup";
@@ -2492,6 +2408,8 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let engineidtext = document.createElement("p");
   engineidtext.innerText = "Engine Display Name (must be unique):";
   let engineid = document.createElement("input");
+  engineid.type = "text";
+  engineid.maxLength = 9999;
   engineid.style.border = "1px solid #ddd";
   engineid.style.width = "500px";
   iddiv.appendChild(engineidtext);
@@ -2503,6 +2421,8 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let enginepathtext = document.createElement("p");
   enginepathtext.innerText = "Engine Executable Path (Absolute Path):";
   let enginepath = document.createElement("input");
+  enginepath.type = "text";
+  enginepath.maxLength = 9999;
   enginepath.style.border = "1px solid #ddd";
   enginepath.style.width = "500px";
   pathdiv.appendChild(enginepathtext);
@@ -2514,6 +2434,8 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let enginewdtext = document.createElement("p");
   enginewdtext.innerText = "Engine Working Directory (Absolute Path):";
   let enginewd = document.createElement("input");
+  enginewd.type = "text";
+  enginewd.maxLength = 9999;
   enginewd.style.border = "1px solid #ddd";
   enginewd.style.width = "500px";
   enginewd.placeholder =
@@ -2562,6 +2484,7 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let engineoptionstext = document.createElement("p");
   engineoptionstext.innerText = "Engine Options:";
   let engineoptions = document.createElement("button");
+  engineoptions.classList.add("ripple");
   engineoptions.onclick = function () {
     if (isloadingengine) {
       window.alert("Engine is loading.");
@@ -2661,6 +2584,7 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   let actiondiv = document.createElement("div");
   actiondiv.style.display = "flex";
   let cancel = document.createElement("button");
+  cancel.classList.add("ripple");
   let canceltext = document.createTextNode("Cancel");
   cancel.onclick = function () {
     if (isloadingengine) {
@@ -2676,12 +2600,21 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
       newengineobj.destructor();
       newengineobj = undefined;
     }
+    document.dispatchEvent(
+      new CustomEvent("uilayoutchange", {
+        detail: { message: "enginemanagementpopup-background" },
+      }),
+    );
+    while (document.getElementById("enginesetuppopup-background") != null) {
+      document.getElementById("enginesetuppopup-background").remove();
+    }
     while (document.getElementById("enginesetuppopup") != null) {
       document.getElementById("enginesetuppopup").remove();
     }
   };
   cancel.appendChild(canceltext);
   let confirm = document.createElement("button");
+  confirm.classList.add("ripple");
   let confirmtext = document.createTextNode("");
   if (EngineClass) {
     confirmtext.textContent = "Save Changes";
@@ -2792,8 +2725,17 @@ function ShowEngineSetupUI(EngineList, EngineClass, DestructOnClose, ws) {
   actiondiv.appendChild(cancel);
   popup.appendChild(actiondiv);
   popup.style.display = "block";
-  popup.style.zIndex = "1002";
+  popup.style.zIndex = "1004";
+  background.style.display = "block";
+  background.style.zIndex = "1003";
   document.body.appendChild(popup);
+  document.body.appendChild(background);
+  document.dispatchEvent(
+    new CustomEvent("uilayoutchange", {
+      detail: { message: "enginesetuppopup-background" },
+    }),
+  );
+  document.dispatchEvent(new Event("initializeripples"));
 }
 
 window.fairyground.BinaryEngineFeature.ShowEngineSetupUI = ShowEngineSetupUI;
@@ -2814,6 +2756,8 @@ function ShowEngineManagementUI(EngineList, ws) {
   let isloadingengine = false;
   let popup = document.createElement("div");
   popup.id = "enginemanagementpopup";
+  let background = document.createElement("div");
+  background.id = "enginemanagementpopup-background";
   let title = document.createElement("p");
   title.id = "popup-title";
   title.innerHTML = "Engine Management";
@@ -2829,23 +2773,35 @@ function ShowEngineManagementUI(EngineList, ws) {
   enginelistdiv.style.display = "flex";
   enginecontroldiv.style.display = "flex";
   engineinfodiv.style.display = "flex";
+  enginelistdiv.style.marginBottom = "5px";
+  enginecontroldiv.style.marginBottom = "5px";
+  engineinfodiv.style.marginBottom = "5px";
   engineinfodiv.style.flexDirection = "column";
   let whiteengineinfo = document.createElement("p");
-  if (window.fairyground.BinaryEngineFeature.first_engine) {
+  if (
+    window.fairyground.BinaryEngineFeature.first_engine &&
+    window.fairyground.BinaryEngineFeature.first_engine.IsLoaded
+  ) {
     whiteengineinfo.innerText = `First Engine (WHITE) → ID: ${window.fairyground.BinaryEngineFeature.first_engine.ID} Name: ${window.fairyground.BinaryEngineFeature.first_engine.Name} Author: ${window.fairyground.BinaryEngineFeature.first_engine.Author}`;
   } else {
     whiteengineinfo.innerText = "First Engine (WHITE) → (Not Loaded)";
   }
   engineinfodiv.appendChild(whiteengineinfo);
   let blackengineinfo = document.createElement("p");
-  if (window.fairyground.BinaryEngineFeature.second_engine) {
+  if (
+    window.fairyground.BinaryEngineFeature.second_engine &&
+    window.fairyground.BinaryEngineFeature.second_engine.IsLoaded
+  ) {
     blackengineinfo.innerText = `Second Engine (BLACK) → ID: ${window.fairyground.BinaryEngineFeature.second_engine.ID} Name: ${window.fairyground.BinaryEngineFeature.second_engine.Name} Author: ${window.fairyground.BinaryEngineFeature.second_engine.Author}`;
   } else {
     blackengineinfo.innerText = "Second Engine (BLACK) → (Not Loaded)";
   }
   engineinfodiv.appendChild(blackengineinfo);
   let analysisengineinfo = document.createElement("p");
-  if (window.fairyground.BinaryEngineFeature.analysis_engine) {
+  if (
+    window.fairyground.BinaryEngineFeature.analysis_engine &&
+    window.fairyground.BinaryEngineFeature.analysis_engine.IsLoaded
+  ) {
     analysisengineinfo.innerText = `Analysis Engine (ANALYSIS) → ID: ${window.fairyground.BinaryEngineFeature.analysis_engine.ID} Name: ${window.fairyground.BinaryEngineFeature.analysis_engine.Name} Author: ${window.fairyground.BinaryEngineFeature.analysis_engine.Author}`;
   } else {
     analysisengineinfo.innerText = "Analysis Engine (ANALYSIS) → (Not Loaded)";
@@ -2864,6 +2820,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   enginelistdiv.appendChild(availableenginestext);
   enginelistdiv.appendChild(availableenginesdropdown);
   let addengine = document.createElement("button");
+  addengine.classList.add("ripple");
   addengine.onclick = function () {
     ShowEngineSetupUI(EngineList, undefined, true, ws);
   };
@@ -2871,6 +2828,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   addengine.appendChild(addenginetext);
   enginecontroldiv.appendChild(addengine);
   let removeengine = document.createElement("button");
+  removeengine.classList.add("ripple");
   removeengine.onclick = function () {
     if (availableenginesdropdown.selectedIndex < 0) {
       window.alert("Please select a engine to remove.");
@@ -2893,6 +2851,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   removeengine.appendChild(removeenginetext);
   enginecontroldiv.appendChild(removeengine);
   let editsettings = document.createElement("button");
+  editsettings.classList.add("ripple");
   editsettings.onclick = function () {
     if (availableenginesdropdown.selectedIndex < 0) {
       window.alert("Please select a engine.");
@@ -2931,6 +2890,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   editsettings.appendChild(editsettingstext);
   enginecontroldiv.appendChild(editsettings);
   let selectaswhite = document.createElement("button");
+  selectaswhite.classList.add("ripple");
   selectaswhite.onclick = function () {
     if (window.fairyground.BinaryEngineFeature.first_engine) {
       if (window.fairyground.BinaryEngineFeature.first_engine.IsLoading) {
@@ -2963,6 +2923,9 @@ function ShowEngineManagementUI(EngineList, ws) {
       },
       (err) => {
         whiteengineinfo.innerText = `First Engine (WHITE) → (Not Loaded) (Error: ${err})`;
+        document.getElementById("whiteengineoutput").textContent +=
+          "\n[Error] ❌ " + err + "\n\n";
+        window.alert("Engine WHITE Error: " + err);
       },
     );
   };
@@ -2970,6 +2933,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   selectaswhite.appendChild(selectaswhitetext);
   enginecontroldiv.appendChild(selectaswhite);
   let selectasblack = document.createElement("button");
+  selectasblack.classList.add("ripple");
   selectasblack.onclick = function () {
     if (window.fairyground.BinaryEngineFeature.second_engine) {
       if (window.fairyground.BinaryEngineFeature.second_engine.IsLoading) {
@@ -3002,6 +2966,9 @@ function ShowEngineManagementUI(EngineList, ws) {
       },
       (err) => {
         blackengineinfo.innerText = `Second Engine (BLACK) → (Not Loaded) (Error: ${err})`;
+        document.getElementById("blackengineoutput").textContent +=
+          "\n[Error] ❌ " + err + "\n\n";
+        window.alert("Engine BLACK Error: " + err);
       },
     );
   };
@@ -3009,6 +2976,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   selectasblack.appendChild(selectasblacktext);
   enginecontroldiv.appendChild(selectasblack);
   let selectasanalysis = document.createElement("button");
+  selectasanalysis.classList.add("ripple");
   selectasanalysis.onclick = function () {
     if (window.fairyground.BinaryEngineFeature.analysis_engine) {
       if (window.fairyground.BinaryEngineFeature.analysis_engine.IsLoading) {
@@ -3041,6 +3009,9 @@ function ShowEngineManagementUI(EngineList, ws) {
       },
       (err) => {
         analysisengineinfo.innerText = `Analysis Engine (ANALYSIS) → (Not Loaded) (Error: ${err})`;
+        document.getElementById("analysisengineoutput").textContent +=
+          "\n[Error] ❌ " + err + "\n\n";
+        window.alert("Engine ANALYSIS Error: " + err);
       },
     );
   };
@@ -3054,6 +3025,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   storagediv.style.display = "flex";
   storagediv.style.marginBottom = "5px";
   let savelist = document.createElement("button");
+  savelist.classList.add("ripple");
   let savelisttext = document.createTextNode("Save Engine List");
   savelist.appendChild(savelisttext);
   savelist.onclick = function () {
@@ -3075,6 +3047,7 @@ function ShowEngineManagementUI(EngineList, ws) {
     }
   };
   let loadlist = document.createElement("button");
+  loadlist.classList.add("ripple");
   let loadlisttext = document.createTextNode("Load Engine List");
   loadlist.appendChild(loadlisttext);
   loadlist.onclick = function () {
@@ -3101,6 +3074,7 @@ function ShowEngineManagementUI(EngineList, ws) {
     }
   };
   let savelisttofile = document.createElement("button");
+  savelisttofile.classList.add("ripple");
   let savelisttofiletext = document.createTextNode("Save Engine List To File");
   savelisttofile.appendChild(savelisttofiletext);
   savelisttofile.onclick = function () {
@@ -3111,6 +3085,7 @@ function ShowEngineManagementUI(EngineList, ws) {
     );
   };
   let loadlistfromfile = document.createElement("button");
+  loadlistfromfile.classList.add("ripple");
   let loadlistfromfiletext = document.createTextNode(
     "Load Engine List From File",
   );
@@ -3158,6 +3133,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   storagediv.appendChild(savelisttofile);
   popup.appendChild(storagediv);
   let cancel = document.createElement("button");
+  cancel.classList.add("ripple");
   let canceltext = document.createTextNode("Close");
   cancel.appendChild(canceltext);
   cancel.onclick = function () {
@@ -3175,6 +3151,7 @@ function ShowEngineManagementUI(EngineList, ws) {
       if (
         window.fairyground.BinaryEngineFeature.first_engine.SetVariant(
           document.getElementById("dropdown-variant")[SelectedIndex].value,
+          document.getElementById("isfischerrandommode").checked,
         )
       ) {
         document.getElementById("whiteunsupportedvariant").hidden = true;
@@ -3190,6 +3167,7 @@ function ShowEngineManagementUI(EngineList, ws) {
       if (
         window.fairyground.BinaryEngineFeature.second_engine.SetVariant(
           document.getElementById("dropdown-variant")[SelectedIndex].value,
+          document.getElementById("isfischerrandommode").checked,
         )
       ) {
         document.getElementById("blackunsupportedvariant").hidden = true;
@@ -3205,6 +3183,7 @@ function ShowEngineManagementUI(EngineList, ws) {
       if (
         window.fairyground.BinaryEngineFeature.analysis_engine.SetVariant(
           document.getElementById("dropdown-variant")[SelectedIndex].value,
+          document.getElementById("isfischerrandommode").checked,
         )
       ) {
         document.getElementById("analysisunsupportedvariant").hidden = true;
@@ -3213,12 +3192,21 @@ function ShowEngineManagementUI(EngineList, ws) {
       }
     }
     document.getElementById("binengineoutputinit").click();
+    document.dispatchEvent(
+      new CustomEvent("uilayoutchange", { detail: { message: null } }),
+    );
+    while (
+      document.getElementById("enginemanagementpopup-background") != null
+    ) {
+      document.getElementById("enginemanagementpopup-background").remove();
+    }
     while (document.getElementById("enginemanagementpopup") != null) {
       document.getElementById("enginemanagementpopup").remove();
     }
   };
   popup.appendChild(cancel);
   let supportedvariants = document.createElement("button");
+  supportedvariants.classList.add("ripple");
   let supportedvariantstext = document.createTextNode("Supported Variants");
   supportedvariants.appendChild(supportedvariantstext);
   supportedvariants.onclick = function () {
@@ -3234,6 +3222,7 @@ function ShowEngineManagementUI(EngineList, ws) {
   };
   popup.appendChild(supportedvariants);
   let redetectsupportedvariants = document.createElement("button");
+  redetectsupportedvariants.classList.add("ripple");
   let redetectsupportedvariantstext = document.createTextNode(
     "Re-detect Supported Variants",
   );
@@ -3379,8 +3368,17 @@ function ShowEngineManagementUI(EngineList, ws) {
   };
   popup.appendChild(redetectsupportedvariants);
   popup.style.display = "block";
-  popup.style.zIndex = "1001";
+  popup.style.zIndex = "1002";
+  background.style.display = "block";
+  background.style.zIndex = "1001";
   document.body.appendChild(popup);
+  document.body.appendChild(background);
+  document.dispatchEvent(
+    new CustomEvent("uilayoutchange", {
+      detail: { message: "enginemanagementpopup-background" },
+    }),
+  );
+  document.dispatchEvent(new Event("initializeripples"));
 }
 
 window.fairyground.BinaryEngineFeature.ShowEngineManagementUI =
