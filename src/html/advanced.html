@@ -18,8 +18,9 @@
 
 <style>
   :root {
-    --console-font: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
-      Liberation Mono, monospace;
+    --console-font:
+      ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
+      monospace;
   }
 
   *,
@@ -5713,7 +5714,6 @@
           fge.second_engine.PonderMove = "0000";
           fge.second_engine.PonderMiss = false;
         }
-        updateTimerOnMove();
         createTimer();
         const stm = $("#label-stm").innerText;
         console.log(
