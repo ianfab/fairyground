@@ -1,4 +1,4 @@
-// ffish.js test using chessgroundx
+﻿// ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
 import * as util from "chessgroundx/util";
 import * as pocketutil from "chessgroundx/pocket";
