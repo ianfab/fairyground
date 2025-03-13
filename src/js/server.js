@@ -408,7 +408,7 @@ class Engine {
     }
     this.Process.on("error", (err) => {
       console.error(
-        `[WebSocket Server] Failed to load ${this.Color} Engine (ID: ${this.ID}): `,
+        `[WebSocket Server] ${this.Color} Engine (ID: ${this.ID}) exited unexpectedly with error: `,
         err,
       );
       this.WebSocketConnection.send(
@@ -433,7 +433,7 @@ class Engine {
           );
         } else {
           console.error(
-            `[WebSocket Server] Failed to load ${this.Color} Engine (ID: ${this.ID}): `,
+            `[WebSocket Server] ${this.Color} Engine (ID: ${this.ID}) exited unexpectedly with code: `,
             code,
           );
           this.WebSocketConnection.send(
@@ -623,7 +623,7 @@ wss.on("connection", (ws, req) => {
         },
         () => {
           console.error(
-            `[WebSocket Server] Error loading engine ID: ${msg[1]} Color: ${msg[2]}.`,
+            `[WebSocket Server] Error occurred in engine ID: ${msg[1]} Color: ${msg[2]}.`,
           );
         },
       );
