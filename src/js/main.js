@@ -5036,6 +5036,7 @@ function updateChessground(showresult) {
         dests: getDests(board),
       },
     });
+    displayHiddenDroppablePiece(board);
   } else {
     if (dropdownVisualEffectPerspective.value == "alternate") {
       chessground.set({ animation: { enabled: false } });
@@ -5049,6 +5050,7 @@ function updateChessground(showresult) {
         dests: getDests(board),
       },
     });
+    displayHiddenDroppablePiece(board);
     ApplyVisualEffectToBoard(
       dropdownVisualEffect.value,
       dropdownVisualEffectPerspective.value,
@@ -5105,7 +5107,7 @@ function updateChessground(showresult) {
   }
 
   chessground.setAutoShapes([]);
-  displayHiddenDroppablePiece(board);
+
   getGameStatus(showresult);
   setTimeout(() => {
     let tmp = deletelater;
