@@ -846,6 +846,23 @@ function redrawChessground(customFEN) {
   updateInnerCoordinateColor(chessground);
 }
 
+function forceCoordinateRecalculation() {
+  // Force a layout reflow to ensure chessground coordinates are properly mapped
+  // This addresses the coordinate mapping issue that occurs after clicking "Start game"
+  const container = chessgroundContainerEl;
+  if (container) {
+    // Force layout recalculation by accessing layout properties
+    container.offsetHeight;
+    container.getBoundingClientRect();
+
+    // Trigger a small scroll to force coordinate recalculation
+    // This mimics the user scroll/zoom that fixes the issue manually
+    const currentScrollTop = window.pageYOffset;
+    window.scrollTo(0, currentScrollTop + 1);
+    window.scrollTo(0, currentScrollTop);
+  }
+}
+
 function updateInnerCoordinateColor(chessground) {
   const coordinateobj =
     chessground.state.dom.elements.container.getElementsByTagName("coords");
@@ -2613,6 +2630,12 @@ new Module().then((loadedModule) => {
       });
       updateInnerCoordinateColor(chessground);
     }
+
+    // Force coordinate recalculation to fix coordinate mapping issues
+    // This addresses the bug where coordinates get messed up after game start
+    setTimeout(() => {
+      forceCoordinateRecalculation();
+    }, 100);
   };
 
   isBoardSetup.onchange = function () {
