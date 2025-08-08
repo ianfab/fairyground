@@ -854,7 +854,7 @@ function forceCoordinateRecalculation() {
     // Force layout recalculation by accessing layout properties
     container.offsetHeight;
     container.getBoundingClientRect();
-    
+
     // Trigger a small scroll to force coordinate recalculation
     // This mimics the user scroll/zoom that fixes the issue manually
     const currentScrollTop = window.pageYOffset;
@@ -2630,7 +2630,7 @@ new Module().then((loadedModule) => {
       });
       updateInnerCoordinateColor(chessground);
     }
-    
+
     // Force coordinate recalculation to fix coordinate mapping issues
     // This addresses the bug where coordinates get messed up after game start
     setTimeout(() => {
