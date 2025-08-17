@@ -11,7 +11,6 @@ let miniboardscale = 0.5;
 let miniboardsize = boardsize * miniboardscale;
 
 let digitaccuracy = 1;
-let percentaccuracy = 5;
 
 const MAX_RANK = 10;
 const MAX_FILE = 12;
@@ -32,21 +31,6 @@ for (i = 1; i <= MAX_FILE; i++) {
 .board${i}x${j}.pockets .cg-wrap {
     width: ${(i > j ? boardsize * i / (i + 2) : boardsize * i / j * i / (i + 2)).toFixed(digitaccuracy)}px;
     height: ${(j > i ? boardsize * i / (i + 2) : boardsize * j / (i + 2)).toFixed(digitaccuracy)}px;
-}
-
-.board${i}x${j} cg-helper {
-    width: ${(piecesizepercent / i).toFixed(percentaccuracy)}%;
-    height: ${(piecesizepercent / j).toFixed(percentaccuracy)}%;
-}
-
-.board${i}x${j} cg-board square {
-    width: ${(piecesizepercent / i).toFixed(percentaccuracy)}%;
-    height: ${(piecesizepercent / j).toFixed(percentaccuracy)}%;
-}
-
-.board${i}x${j} .cg-wrap piece {
-    width: ${(piecesizepercent / i).toFixed(percentaccuracy)}%;
-    height: ${(piecesizepercent / j).toFixed(percentaccuracy)}%;
 }
 
 .board${i}x${j} .cg-wrap.micro {

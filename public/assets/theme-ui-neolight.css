@@ -239,17 +239,17 @@ button.operationdivbutton {
 }
 
 button:hover {
-    background-color: rgba(248, 248, 247, 1) !important;
+    background-color: #f8f8f7 !important;
 }
 
 button:active {
     transition-duration: 0.05s;
-    background-color: rgba(100, 100, 100, 1) !important;
+    background-color: #646464 !important;
 }
 
 button:disabled {
     color: #aaa !important;
-    background-color: rgba(240, 240, 240, 1) !important;
+    background-color: #f0f0f0 !important;
 }
 
 button:focus {
@@ -295,8 +295,63 @@ a:visited {
     box-shadow: 0px 0px 5px 5px #3584e4;
 }
 
+.position-display-label {
+    border-radius: 3px;
+    padding:1px 1px 1px 1px;
+}
+
 .position-display-label:hover {
     background-color: #3584e4;
+}
+
+#pgndiv .position-display-label.current-move {
+    background-color: #3584e4;
+}
+
+#pgn-operations {
+    gap: 10px 10px !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#pgn-operations button {
+    background-color: #0000 !important;
+    background: none !important;
+    color: #0000 !important;
+    border: none !important;
+    border-radius: 0px !important;
+    transition: none;
+}
+
+#pgn-operations button:focus {
+    box-shadow: none;
+}
+
+#pgn-operations button:before {
+    color: #2e3436 !important;
+    background: linear-gradient(to bottom, #f6f5f3, #efe8e1) !important;
+    background-color: rgba(248, 248, 247, 0) !important;
+    background-blend-mode: overlay;
+    border-color: #cdc7c2;
+    border-width: 1px;
+    border-style: solid;
+    transition-duration: 0.5s;
+    transition-property: color, background-color, border-color;
+    border-radius: 5px;
+}
+
+#pgn-operations button:hover:before {
+    background-color: #f8f8f7 !important;
+}
+
+#pgn-operations button:disabled:before {
+    background-color: #f0f0f0 !important;
+    color: #aaa !important;
+}
+
+#pgn-operations button:active:before {
+    transition-duration: 0.05s;
+    background-color: #646464 !important;
 }
 
 #pagebackground {
@@ -427,6 +482,13 @@ a:visited {
 }
 
 #chessground-mini-board-wrapper-div {
+    background-image: linear-gradient(to bottom, #fff 0%, #fff 20%, #eee 100%);
+    border: 1px solid #555 !important;
+    border-radius: 10px;
+}
+
+#imagegenerator {
+    color: black !important;
     background-image: linear-gradient(to bottom, #fff 0%, #fff 20%, #eee 100%);
     border: 1px solid #555 !important;
     border-radius: 10px;

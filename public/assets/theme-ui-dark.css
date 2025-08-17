@@ -1,11 +1,11 @@
 html {
-    color: white !important;
-    background: black !important;
+    color: #fff !important;
+    background: #000 !important;
 }
 
 input {
-    color: white;
-    background: black;
+    color: #fff;
+    background: #000;
 }
 
 input[type=text]:disabled {
@@ -17,8 +17,8 @@ input[type=number]:disabled {
 }
 
 input[type=checkbox] {
-  color: white !important;
-  background-color: black !important;
+  color: #fff !important;
+  background-color: #000 !important;
 }
 
 input[type=checkbox]:hover {
@@ -49,7 +49,7 @@ input[type=checkbox]:disabled:hover {
 }
 
 select {
-    color: white;
+    color: #fff;
     background: #555 !important;
 }
 
@@ -67,7 +67,7 @@ button {
 
     button:disabled {
         background: #999 !important;
-        color: black !important;
+        color: #000 !important;
     }
 
 input::-webkit-input-placeholder {
@@ -92,23 +92,23 @@ input::placeholder {
 }
 
 spangameresult, spangameresultmini {
-    color: white !important;
+    color: #fff !important;
 }
 
 table {
-    border-color: white !important;
+    border-color: #fff !important;
 }
 
 caption {
-    border-color: white !important;
+    border-color: #fff !important;
 }
 
 th {
-    border-color: white !important;
+    border-color: #fff !important;
 }
 
 td {
-    border-color: white !important;
+    border-color: #fff !important;
 }
 
 a {
@@ -120,8 +120,37 @@ a:visited {
 }
 
 .position-display-label:hover {
-    background-color: white !important;
-    color: black !important;
+    background-color: #fff !important;
+    color: #000 !important;
+}
+
+#pgndiv .position-display-label.current-move {
+    background-color: #fff !important;
+    color: #000 !important;
+}
+
+#pgn-operations button {
+    background-color: #0000 !important;
+    color: #0000 !important;
+}
+
+#pgn-operations button:before {
+    color: #fff !important;
+}
+
+#pgn-operations button:hover:before {
+    background-color: #fff !important;
+    color: #000 !important;
+}
+
+#pgn-operations button:disabled:before {
+    background-color: #0000 !important;
+    color: #888 !important;
+}
+
+#pgn-operations button:active:before {
+    background-color: #fff !important;
+    color: #888 !important;
 }
 
 #timers {
@@ -129,37 +158,42 @@ a:visited {
 }
 
 #pvinfo {
-    border-top: 4px solid white !important;
-    border-left: 4px solid white !important;
-    border-right: 4px solid white !important;
-    border-bottom: 4px solid white !important;
+    border-top: 4px solid #fff !important;
+    border-left: 4px solid #fff !important;
+    border-right: 4px solid #fff !important;
+    border-bottom: 4px solid #fff !important;
 }
 
 #pvinfo hr {
-    border: 1px solid white !important;
+    border: 1px solid #fff !important;
 }
 
 evalnum:after {
-    color: white !important;
+    color: #fff !important;
 }
 
 #chessground-mini-board-wrapper-div {
-    background-color: black !important;
-    border: 2px solid white !important;
+    background-color: #000 !important;
+    border: 2px solid #fff !important;
+}
+
+#imagegenerator {
+    background-color: #000;
+    border: 2px solid #ddd;
 }
 
 #enginemanagementpopup {
-  background-color: black !important;
+  background-color: #000 !important;
 }
 
 #enginesetuppopup {
-  background-color: black !important;
+  background-color: #000 !important;
 }
 
 #enginesettingspopup {
-  background-color: black !important;
+  background-color: #000 !important;
 }
 
 #loadsavedgamespopup {
-  background-color: black !important;
+  background-color: #000 !important;
 }

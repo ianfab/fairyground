@@ -281,7 +281,7 @@ button:active {
 
 button:disabled {
     color: #aaa !important;
-    background-color: rgba(240, 240, 240, 1) !important;
+    background-color: #f0f0f0 !important;
 }
 
 input::-webkit-input-placeholder {
@@ -307,6 +307,41 @@ input::placeholder {
 
 .position-display-label:hover {
     background-color: #0b57d0;
+}
+
+#pgndiv .position-display-label.current-move {
+    background-color: #0b57d0;
+}
+
+#pgn-operations {
+    gap: 10px 10px !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#pgn-operations button {
+    background-color: #0000 !important;
+    color: #0000 !important;
+    border-radius: 0px;
+    padding: 0px 0px 0px 0px !important;
+}
+
+#pgn-operations button:before {
+    color: #fff !important;
+    background-color: #0b57d0 !important;
+}
+
+#pgn-operations button:hover:before {
+    background-color: #407eff !important;
+}
+
+#pgn-operations button:disabled:before {
+    background-color: #f0f0f0 !important;
+    color: #aaa !important;
+}
+
+#pgn-operations button:active:before {
+    background-color: #a0bfff !important;
 }
 
 #timers {
@@ -431,6 +466,14 @@ input::placeholder {
 
 #chessground-mini-board-wrapper-div {
     background-color: #fff;
+    border: 1px solid #ccc !important;
+    border-radius: 10px;
+    box-shadow: 0px 0px 3px 3px #ddd;
+}
+
+#imagegenerator {
+    color: black !important;
+    background: #fff !important;
     border: 1px solid #ccc !important;
     border-radius: 10px;
     box-shadow: 0px 0px 3px 3px #ddd;

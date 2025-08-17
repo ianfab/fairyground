@@ -245,17 +245,17 @@ button.operationdivbutton {
 }
 
 button:hover {
-    background-color: rgba(150, 150, 150, 1) !important;
+    background-color: #969696 !important;
 }
 
 button:active {
     transition-duration: 0.05s;
-    background-color: rgba(0, 0, 0, 1) !important;
+    background-color: #000 !important;
 }
 
 button:disabled {
     color: #000 !important;
-    background-color: rgba(100, 100, 100, 1) !important;
+    background-color: #646464 !important;
 }
 
 button:focus {
@@ -317,8 +317,63 @@ a:visited {
     box-shadow: 0px 0px 5px 5px #ff5d17;
 }
 
+.position-display-label {
+    border-radius: 3px;
+    padding:1px 1px 1px 1px;
+}
+
 .position-display-label:hover {
     background-color: #ff5d17;
+}
+
+#pgndiv .position-display-label.current-move {
+    background-color: #ff5d17;
+}
+
+#pgn-operations {
+    gap: 10px 10px !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#pgn-operations button {
+    background-color: #0000 !important;
+    background: none !important;
+    color: #0000 !important;
+    border: none !important;
+    border-radius: 0px !important;
+    transition: none;
+}
+
+#pgn-operations button:focus {
+    box-shadow: none;
+}
+
+#pgn-operations button:before {
+    color: #ccc !important;
+    background: linear-gradient(to bottom, #777, #555) !important;
+    background-color: rgba(150, 150, 150, 0) !important;
+    background-blend-mode: overlay;
+    border-color: #aaa;
+    border-width: 1px;
+    border-style: solid;
+    transition-duration: 0.5s;
+    transition-property: color, background-color, border-color;
+    border-radius: 5px;
+}
+
+#pgn-operations button:hover:before {
+    background-color: #969696 !important;
+}
+
+#pgn-operations button:disabled:before {
+    background-color: #646464 !important;
+    color: #000 !important;
+}
+
+#pgn-operations button:active:before {
+    transition-duration: 0.05s;
+    background-color: #000 !important;
 }
 
 #pagebackground {
@@ -458,6 +513,13 @@ evalnum:after {
 }
 
 #chessground-mini-board-wrapper-div {
+    background-image: linear-gradient(to bottom, #555 0%, #222 100%);
+    border: 1px solid #ccc !important;
+    border-radius: 10px;
+}
+
+#imagegenerator {
+    color: #ccc !important;
     background-image: linear-gradient(to bottom, #555 0%, #222 100%);
     border: 1px solid #ccc !important;
     border-radius: 10px;

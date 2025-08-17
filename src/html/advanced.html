@@ -545,7 +545,6 @@
     width: 200px;
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
-    border-right: 0;
   }
 
   #movecontrol #gotomovenum:invalid {
@@ -851,6 +850,84 @@
     flex-flow: row;
     gap: 10px 10px;
     flex-wrap: wrap;
+  }
+
+  #pgndiv .text-after, #pgndiv .text-before {
+    font-style: italic;
+  }
+
+  #pgndiv .needs-attention-sign {
+    background-color: #fef6d5;
+    color: #e96725;
+    cursor: default;
+  }
+
+  #pgndiv .position-display-label.current-move {
+    text-decoration: underline;
+    background-color: #000;
+    color: #fff;
+  }
+
+  #pgndiv .position-display-label.current-move:hover {
+    text-decoration: none;
+  }
+
+  #pgndiv .position-display-label {
+    font-weight: bold;
+  }
+
+  #pgndiv .result {
+    color: #fff;
+    background-color: #f00;
+    font-weight: bold;
+  }
+
+  #pgndiv .hide-subsequent-moves-sign {
+    color: #6495ed;
+    background-color: #e0eeff;
+    cursor: pointer;
+  }
+
+  #pgn-operations {
+    display: flex;
+    flex-direction: row;
+    flex-flow: row;
+    flex-wrap: wrap;
+    gap: 0px 10px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+  }
+
+  #pgn-operations button {
+    height: 25px;
+    width: 25px;
+    background-color: #0000;
+    color: #0000;
+  }
+
+  #pgn-operations button:before {
+    height: 25px;
+    width: 25px;
+    font-size: 18px;
+    border: none;
+    background-color: #0000;
+    color: #000;
+    cursor: pointer;
+  }
+
+  #pgn-operations button:hover:before {
+    background-color: #000;
+    color: #fff;
+  }
+
+  #pgn-operations button:disabled:before {
+    background-color: #0000;
+    color: #888;
+  }
+
+  #pgn-operations button:active:before {
+    background-color: #000;
+    color: #888;
   }
 
   #output2 {
@@ -2000,6 +2077,91 @@
     height: 100px;
   }
 
+  #imagegenerator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 50vw;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    z-index: 998;
+    overflow-y: auto;
+    border: 2px solid #ddd;
+    padding: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+  }
+
+  #imagegenerator.hidden {
+    display: none;
+  }
+
+  #imagegenerator > div {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  #imagegeneratortitle {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  #imagegenerator button {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: #888;
+    color: #fff;
+    font-weight: bold;
+    margin-left: 6px;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  #imagegenerator button:hover {
+    background: #aaa;
+  }
+
+  #imagegenerator button:disabled {
+    background: #ccc;
+    color: #000;
+  }
+
+  #imagegenerator button:active {
+    background: #000;
+  }
+
+  #imagegenerator select {
+    min-width: 100px;
+    background: #eee;
+  }
+
+  #imagegenerator input[type="number"] {
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    width: 100px;
+  }
+
+  #imagegenerator input[type="number"]:invalid {
+    background: #ff9e9e;
+    border: 3px solid #f00;
+  }
+
+  #themedetectorcontainer {
+    position: absolute;
+    top: -999px;
+    left: -999px;
+    width: 100px;
+    height: 100px;
+    z-index: -1000;
+  }
+
   #setpos:before {
     content: "\f046";
   }
@@ -2040,8 +2202,12 @@
     content: "\f049";
   }
 
-  #currentposition:before {
+  #finalposition:before {
     content: "\f050";
+  }
+
+  #currentposition:before {
+    content: "\f11e";
   }
 
   #previousposition:before {
@@ -2105,6 +2271,74 @@
     content: "\f00d";
     cursor: pointer;
   }
+
+  #movetree-clear:before {
+    content: "\f1f8";
+  }
+
+  #movetree-hideshow:before {
+    content: "\f2a8";
+  }
+
+  #movetree-removevariations:before {
+    content: "\f05b";
+  }
+
+  #movetree-settomainbranch:before {
+    content: "\f176";
+  }
+
+  #movetree-setasmainline:before {
+    content: "\f02e";
+  }
+
+  #movetree-cutbranch:before {
+    content: "\f097";
+  }
+
+  #movetree-cropbranch:before {
+    content: "\f124";
+  }
+
+  #movetree-cut:before {
+    content: "\f0c4";
+  }
+
+  #movetree-crop:before {
+    content: "\f125";
+  }
+
+  #movetree-uncomment:before {
+    content: "\f12d";
+  }
+
+  #movetree-textbefore:before {
+    content: "\f03b";
+  }
+
+  #movetree-textafter:before {
+    content: "\f03c";
+  }
+
+  #movetree-symbol:before {
+    content: "\f292";
+  }
+
+  #movetree-undo:before {
+    content: "\f112";
+  }
+
+  #movetree-redo:before {
+    content: "\f064";
+  }
+
+  #movetree-save:before {
+    content: "\f0c7";
+  }
+
+  #movetree-imagesave:before {
+    content: "\f03e";
+  }
 </style>
 
 <body>
@@ -2115,9 +2349,8 @@
     //Fairyground namespace for variable/function definition transfer
     window.fairyground = { super: window };
   </script>
+  <script src="gif.js"></script>
   <script src="bundle.js" defer></script>
-
-  <!--iframe src="./themes.html" onload="this.before((this.contentDocument.body || this.contentDocument).children[0]); this.remove();"--><!--/iframe-->
 
   <!-- Javascript -->
 
@@ -3841,6 +4074,7 @@
         document.getElementById("output2").style.width =
           document.getElementById("currentboardfen").style.width =
           document.getElementById("label-pgn").style.width =
+          document.getElementById("pgn-operations").style.width =
           document.getElementById("enginecmddiv").style.width =
           document.getElementById("positioninfo").style.width =
           document.getElementById("evalinfo").style.width =
@@ -3863,6 +4097,7 @@
         document.getElementById("output2").style.width =
           document.getElementById("currentboardfen").style.width =
           document.getElementById("label-pgn").style.width =
+          document.getElementById("pgn-operations").style.width =
           document.getElementById("enginecmddiv").style.width =
           document.getElementById("positioninfo").style.width =
           document.getElementById("evalinfo").style.width =
@@ -3893,6 +4128,7 @@
       let in_browser_fsf_hash = 16;
       let random_mover_white = false;
       let random_mover_black = false;
+      let advanced_pgn_mode=false;
       let white_start_time = 0;
       let black_start_time = 0;
       let white_remaining_time = 0;
@@ -4221,8 +4457,6 @@
             }
           }
         }
-        $("#fen").value = "";
-        $("#move").value = "";
         resetTimer();
 
         setVariantStylesheet(variant);
@@ -4621,169 +4855,18 @@
         }
       };
 
-      const totalMoveNumber = () => {
-        let listlength = 0;
-        let i = 0;
-        moves_split = $("#move").value.split(" ");
-        for (i = 0; i < moves_split.length; i++) {
-          if (moves_split[i].length == 0) {
-            continue;
-          }
-          listlength++;
-        }
-        return listlength;
-      };
-
-      const displayMove = (movenum, is_force_stop, interrupt_pondering) => {
-        if (
-          $("#displayready").value.length > 0 &&
-          $("#displayready").value > 0
-        ) {
-          //$("#displayready").value = 0, displayMove() is ready
-          return;
-        }
-        $("#displayready").value = 2; //2 = displayMove() working
-        let i = 0;
-        let j = 0;
-        moves_split = $("#move").value.split(" ");
-        if (movenum == -1) {
-          if (is_force_stop) {
-            force_stop();
-          } else {
-            stop(interrupt_pondering);
-          }
-          $("#displaymoves").value = $("#move").value;
-          review_mode = false;
-          $("#isreviewmode").value = 0;
-          document.getElementById("setpositiontomainboard").disabled = false;
-        } else if (movenum > totalMoveNumber() || movenum < -1) {
-          console.log(`${movenum} is out of range for move number.`);
-          return;
-        } else {
-          if (is_force_stop) {
-            force_stop();
-          } else {
-            stop(interrupt_pondering);
-          }
-          if ($("#showmovediv").checked) {
-            $("#showmovediv").click();
-          }
-          review_mode = true;
-          $("#isreviewmode").value = 1;
-          document.getElementById("setpositiontomainboard").disabled = true;
-          $("#displaymoves").value = "";
-          for (i = 0, j = 0; j < movenum; i++, j++) {
-            if (moves_split[i].length == 0) {
-              j--;
-              continue;
-            }
-            $("#displaymoves").value = $("#displaymoves").value.concat(
-              moves_split[i],
-            );
-            if (j < movenum - 1) {
-              $("#displaymoves").value = $("#displaymoves").value.concat(" ");
-            }
-          }
-        }
-        const fen = $("#fen").value.trim();
-        const display_moves = $("#displaymoves").value.trim();
-        if (fen.length > 0) {
-          stockfish.postMessage(`position fen ${fen} moves ${display_moves}`);
-        } else {
-          stockfish.postMessage(`position startpos moves ${display_moves}`);
-        }
-        if (fge.first_engine) {
-          fge.first_engine.SetPosition(
-            fen,
-            display_moves,
-            fge.GetBoardWidth(),
-            fge.GetBoardHeight(),
-          );
-        }
-        if (fge.second_engine) {
-          fge.second_engine.SetPosition(
-            fen,
-            display_moves,
-            fge.GetBoardWidth(),
-            fge.GetBoardHeight(),
-          );
-        }
-        if (fge.analysis_engine) {
-          fge.analysis_engine.SetPosition(
-            fen,
-            display_moves,
-            fge.GetBoardWidth(),
-            fge.GetBoardHeight(),
-          );
-        }
-        //console.log(`${display_moves}`);
-        $("#displayready").value = 1; //1 = updateChessBoardToPosition() working
-      };
-
-      const displayNextMove = () => {
-        if ($("#gotomovenum").value.length <= 0) {
-          $("#gotomovenum").value = totalMoveNumber();
-        } else {
-          if ($("#gotomovenum").value < 0) {
-            $("#gotomovenum").value = 0;
-          } else if ($("#gotomovenum").value >= totalMoveNumber()) {
-            $("#gotomovenum").value = totalMoveNumber();
-          } else {
-            $("#gotomovenum").value++;
-          }
-        }
-        if ($("#advtimectrl").checked == true) {
-          $("#advtimectrl").click();
-        }
-        displayMove($("#gotomovenum").value, true, true);
-      };
-
-      const displayPreviousMove = () => {
-        if ($("#gotomovenum").value.length <= 0) {
-          $("#gotomovenum").value = totalMoveNumber();
-        } else {
-          if ($("#gotomovenum").value <= 0) {
-            $("#gotomovenum").value = 0;
-          } else if ($("#gotomovenum").value > totalMoveNumber()) {
-            $("#gotomovenum").value = totalMoveNumber();
-          } else {
-            $("#gotomovenum").value--;
-          }
-        }
-        if ($("#advtimectrl").checked == true) {
-          $("#advtimectrl").click();
-        }
-        displayMove($("#gotomovenum").value, true, true);
-      };
-
-      const displayInitialPosition = () => {
-        $("#gotomovenum").value = 0;
-        if ($("#advtimectrl").checked == true) {
-          $("#advtimectrl").click();
-        }
-        displayMove(0, true, true);
-      };
-
-      const displayCurrentPosition = () => {
-        $("#gotomovenum").value = totalMoveNumber();
-        console.log(`Current: ${!during_play}`);
-        displayMove(-1, false, false);
-      };
-
-      const displaySpecifiedPosition = () => {
-        if ($("#gotomovenum").value.length <= 0) {
-          $("#gotomovenum").value = totalMoveNumber();
-        }
-        if ($("#gotomovenum").value < 0) {
-          $("#gotomovenum").value = 0;
-        } else if ($("#gotomovenum").value > totalMoveNumber()) {
-          $("#gotomovenum").value = totalMoveNumber();
-        }
-        if ($("#advtimectrl").checked == true) {
-          $("#advtimectrl").click();
-        }
-        displayMove($("#gotomovenum").value, true, true);
-      };
+      // const totalMoveNumber = () => {
+      //   let listlength = 0;
+      //   let i = 0;
+      //   moves_split = $("#move").value.split(" ");
+      //   for (i = 0; i < moves_split.length; i++) {
+      //     if (moves_split[i].length == 0) {
+      //       continue;
+      //     }
+      //     listlength++;
+      //   }
+      //   return listlength;
+      // };
 
       const reset = () => {
         review_mode = false;
@@ -4791,46 +4874,14 @@
           board_setup_mode = false;
           triggerBoardSetupPieceIdentifier(false);
         }
-        $("#fen").value = "";
-        $("#move").value = "";
-        resetTimer();
-        stockfish.postMessage(`stop`);
-        stockfish.postMessage(`ucinewgame`);
-        if (fge.first_engine) {
-          fge.first_engine.NewGame();
-        }
-        if (fge.second_engine) {
-          fge.second_engine.NewGame();
-        }
-        if (fge.analysis_engine) {
-          fge.analysis_engine.NewGame();
-        }
-        play_move = false;
-        setFen(true, false);
-        $("#currentposition").click();
       };
 
-      const undo = () => {
-        if (review_mode || board_setup_mode) {
-          return;
-        }
-        const moves = $("#move").value;
-        $("#move").value = moves.substring(0, moves.lastIndexOf(" "));
-        stockfish.postMessage(`stop`);
-        stockfish.postMessage(`ucinewgame`);
-        if (fge.first_engine) {
-          fge.first_engine.NewGame();
-        }
-        if (fge.second_engine) {
-          fge.second_engine.NewGame();
-        }
-        if (fge.analysis_engine) {
-          fge.analysis_engine.NewGame();
-        }
-        resetTimer();
-        play_move = false;
-        setFen(true, analysis_mode);
-      };
+      // const undo = () => {
+      //   if (board_setup_mode) {
+      //     return;
+      //   }
+      //   play_move = false;
+      // };
 
       const go = (
         white_engine_ponder_and_human_black,
@@ -5670,15 +5721,21 @@
             new CustomEvent("gameend", { detail: { result: "1-0" } }),
           );
         }
-        $("#gamestatus").click();
         gameEnd();
       };
 
       const gameEnd = () => {
+        const gamestatusobj=document.getElementById("gamestatus");
         during_play = false;
+        gamestatusobj.click();
+        if (gamestatusobj.innerText=="END")
+        {
+          $("#gameresult").click();
+        }
+        gamestatusobj.innerText = "END";
         //advanced_time_control = false;
         force_stop();
-        $("#currentposition").click();
+        //$("#currentposition").click();
         $("#input").style.display = "";
         $("#input2").style.display = "";
         $("#input3").style.display = "";
@@ -5687,7 +5744,6 @@
 
       const gameAbort = () => {
         deleteTimer();
-        $("#gamestatus").innerText = "END";
         gameEnd();
       };
 
@@ -5705,7 +5761,7 @@
         setupTimer();
         $("#gamestatus").click();
         during_play = true;
-        $("#currentposition").click();
+        //$("#currentposition").click();
         if (fge.first_engine) {
           fge.first_engine.PonderMove = "0000";
           fge.first_engine.PonderMiss = false;
@@ -5723,7 +5779,7 @@
         );
         console.log("Go!");
         previous_reality_time = -1;
-        setFen(false, true);
+        document.getElementById("set").click();
       };
 
       const stop = (interrupt_pondering) => {
@@ -5759,8 +5815,8 @@
         let index = 0;
         let themename = "";
         let classes = [];
-        let DOMListValue = "";
-        const el = $("#chessground-container-div");
+        let DOMListValue;
+        const el = document.getElementById("chessground-container-div");
         const chessgroundmini = document.getElementById(
           "chessground-mini-container-div",
         );
@@ -5796,6 +5852,7 @@
         DOMListValue[1] = themename;
         chessgroundmini.classList.value = el.classList.value =
           DOMListValue.join(" ");
+        document.dispatchEvent(new CustomEvent("themechange",{detail: {piece: DOMListValue[1],board: DOMListValue[0]}}));
         console.log(`Piece theme: ${themename}`);
         updateThemeDropdowns(themename, null);
         if (board_setup_mode) {
@@ -5810,8 +5867,8 @@
         let index = 0;
         let boardthemename = "";
         let classes = [];
-        let DOMListValue = "";
-        const el = $("#chessground-container-div");
+        let DOMListValue;
+        const el = document.getElementById("chessground-container-div");
         const chessgroundmini = document.getElementById(
           "chessground-mini-container-div",
         );
@@ -5847,6 +5904,7 @@
         DOMListValue[0] = boardthemename;
         chessgroundmini.classList.value = el.classList.value =
           DOMListValue.join(" ");
+        document.dispatchEvent(new CustomEvent("themechange",{detail: {piece: DOMListValue[1],board: DOMListValue[0]}}));
         console.log(`Board theme: ${boardthemename}`);
         updateThemeDropdowns(null, boardthemename);
         //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
@@ -6068,7 +6126,7 @@
       };
 
       const scrollOutput = () => {
-        //Modern browsers will automatically create a variable for an element that has ID, with its name the same as the ID
+        //Mithril.js will automatically create a variable for an element that has ID, with its name the same as the ID
         output2.scrollTo({
           top: output2.scrollHeight,
           behavior: "smooth",
@@ -6097,7 +6155,7 @@
         div.style.justifyContent = "center";
         div.style.alignItems = "center";
         div.style.zIndex = "1000";
-        div.style.background = "rgba(0,0,0,0)";
+        div.style.background = "#0000";
         div.style.pointerEvents = "none";
         let span = document.createElement("spangameresult");
         span.innerText = $("#gameresult").value;
@@ -6288,7 +6346,7 @@
       }
 
       function changePieceSet(piece_set) {
-        const el = $("#chessground-container-div");
+        const el = document.getElementById("chessground-container-div");
         const chessgroundmini = document.getElementById(
           "chessground-mini-container-div",
         );
@@ -6296,6 +6354,7 @@
         DOMListValue[1] = piece_set;
         chessgroundmini.classList.value = el.classList.value =
           DOMListValue.join(" ");
+        document.dispatchEvent(new CustomEvent("themechange",{detail: {piece: DOMListValue[1],board: DOMListValue[0]}}));
         updateThemeDropdowns(piece_set, null);
         if (board_setup_mode) {
           triggerBoardSetupPieceIdentifier(false);
@@ -6303,7 +6362,7 @@
       }
 
       function changeBoardSet(board_set) {
-        const el = $("#chessground-container-div");
+        const el = document.getElementById("chessground-container-div");
         const chessgroundmini = document.getElementById(
           "chessground-mini-container-div",
         );
@@ -6311,6 +6370,7 @@
         DOMListValue[0] = board_set;
         chessgroundmini.classList.value = el.classList.value =
           DOMListValue.join(" ");
+        document.dispatchEvent(new CustomEvent("themechange",{detail: {piece: DOMListValue[1],board: DOMListValue[0]}}));
         updateThemeDropdowns(null, board_set);
       }
 
@@ -6617,7 +6677,7 @@
                     updateVariantDropdown();
                     changing_variant_type = false;
                   }
-                  window.setTimeout(setVariant, 10);
+                  setVariant();
                 },
               },
               [
@@ -6729,7 +6789,7 @@
                   e.redraw = false;
                   return;
                 }
-                setFen(true, false);
+                document.getElementById("setpos").click();
               },
             }),
             m("input[type=text]#move", {
@@ -6743,7 +6803,7 @@
                   e.redraw = false;
                   return;
                 }
-                setFen(true, false);
+                document.getElementById("setpos").click();
               },
             }),
             m(
@@ -6767,10 +6827,10 @@
                   if (fge.analysis_engine) {
                     fge.analysis_engine.NewGame();
                   }
+                  play_move = false;
                   window.setTimeout(() => {
                     setFen(true, false);
                   }, 10);
-                  $("#currentposition").click();
                 },
               },
               "Set",
@@ -6805,8 +6865,7 @@
               {
                 disabled: !is_ready || review_mode || board_setup_mode,
                 title: "Click to undo last move.",
-                hidden: review_mode,
-                onclick: undo,
+                //onclick: undo,
               },
               "Undo",
             ),
@@ -6969,10 +7028,8 @@
                   if (board_setup_mode) {
                     return;
                   }
+                  document.getElementById("setpos").click();
                   setTimeout(() => {
-                    if (!review_mode) {
-                      setFen(true, false);
-                    }
                     go(false, false);
                   }, 10);
                 },
@@ -7310,6 +7367,7 @@
               },
               "Binary Engine Output Event Handler Initialization (internal)",
             ),
+            m("input#pgnstring",{hidden: true},"Advanced PGN Cross Domain Handler (internal)"),
           ]),
           m("div#input3", { hidden: during_play }, [
             m("p", "Additional Features: "),
@@ -7321,7 +7379,7 @@
               },
               m("input[type=checkbox]#advtimectrl", {
                 checked: advanced_time_control,
-                disabled: analysis_mode || review_mode || board_setup_mode,
+                disabled: analysis_mode || review_mode || board_setup_mode || during_engine_match,
                 onclick: () => {
                   advanced_time_control = !advanced_time_control;
                 },
@@ -7356,7 +7414,11 @@
                   "(Experimental) When checked, a mini board is shown which displays the position at that time when you click the move in the move list (PV line or move history). Uncheck to exit this mode. Note that enabling this mode might make the page become slower, and only enable it if you need it as it's an experimental feature.",
               },
               m("input[type=checkbox]#isadvpgnmode", {
+                checked: advanced_pgn_mode,
                 disabled: !is_ready,
+                onclick: ()=>{
+                  advanced_pgn_mode=!advanced_pgn_mode;
+                },
               }),
               "Move Visualization",
             ),
@@ -8259,19 +8321,8 @@
               ]),
               m("div#movecontrol", { hidden: during_play }, [
                 m(
-                  "button#initialposition.ripple",
-                  {
-                    onclick: displayInitialPosition,
-                    disabled: !is_ready,
-                    title:
-                      "Click to display the initial position of current game.",
-                  },
-                  "Initial Position",
-                ),
-                m(
                   "button#currentposition.ripple",
                   {
-                    onclick: displayCurrentPosition,
                     disabled: !is_ready,
                     title:
                       "Click to display the latest position of current game.",
@@ -8279,9 +8330,26 @@
                   "Current Position",
                 ),
                 m(
+                  "button#initialposition.ripple",
+                  {
+                    disabled: !is_ready,
+                    title:
+                      "Click to display the initial position of current game.",
+                  },
+                  "Initial Position",
+                ),
+                m(
+                  "button#finalposition.ripple",
+                  {
+                    disabled: !is_ready,
+                    title:
+                      "Click to display the latest position of the displayed position.",
+                  },
+                  "Final Position",
+                ),
+                m(
                   "button#previousposition.ripple",
                   {
-                    onclick: displayPreviousMove,
                     disabled: !is_ready,
                     title:
                       "Click to display previous position of the displayed position.",
@@ -8291,7 +8359,6 @@
                 m(
                   "button#nextposition.ripple",
                   {
-                    onclick: displayNextMove,
                     disabled: !is_ready,
                     title:
                       "Click to display next position of the displayed position.",
@@ -8308,28 +8375,11 @@
                 m(
                   "button#specifiedposition.ripple",
                   {
-                    onclick: displaySpecifiedPosition,
                     disabled: !is_ready,
                     title:
                       "Click to display the position that the half move specified in the input box is moved.",
                   },
                   "Go to Move",
-                ),
-                m(
-                  "button#starthere.ripple",
-                  {
-                    onclick: () => {
-                      if (!review_mode) {
-                        return;
-                      }
-                      $("#move").value = $("#displaymoves").value;
-                      $("#currentposition").click();
-                    },
-                    disabled: !is_ready || !review_mode,
-                    title:
-                      "Click to set the position to the position displayed on the board. Moves after this position will be discarded.",
-                  },
-                  "Start Here",
                 ),
               ]),
               m(
@@ -8759,6 +8809,27 @@
               ]),
               m("p#currentboardfen"),
               m("p#label-pgn.ripple"),
+              m("div#pgn-operation-container",{hidden: !advanced_pgn_mode},[
+                m("div#pgn-operations",[
+                  m("button#movetree-clear",{title:"Clear Moves\nClick to clear the variation tree. Your position will be set to the initial position."}),
+                  m("button#movetree-hideshow",{title:"Show or Hide Move\nClick to hide/show subsequent moves of current move."}),
+                  m("button#movetree-removevariations",{title:"Remove Variations\nClick to remove variation moves of current move."}),
+                  m("button#movetree-settomainbranch",{title:"Promote Move\nClick to set the current move as the main branch of previous move."}),
+                  m("button#movetree-setasmainline",{title:"Promote Branch\nClick to set all the antecedent moves of current move as the main line moves."}),
+                  m("button#movetree-cutbranch",{title:"Cut Branch\nClick to remove all the moves on the branch of current move."}),
+                  m("button#movetree-cropbranch",{title:"Crop Branch\nClick to remove all the moves that are not on the branch of current move."}),
+                  m("button#movetree-cut",{title:"Cut Move\nClick to remove current move and all of its subsequent moves."}),
+                  m("button#movetree-crop",{title:"Crop Move\nClick to remove all antecedent moves of current move and set the initial position to the position before current move."}),
+                  m("button#movetree-uncomment",{title:"Uncomment Move\nClick to remove all texts and symbols of current move."}),
+                  m("button#movetree-textbefore",{title:"Add Text Before\nClick to add text before current move."}),
+                  m("button#movetree-textafter",{title:"Add Text After\nClick to add text after current move."}),
+                  m("button#movetree-symbol",{title:"Add Symbol\nClick to add symbols (e.g. !!,??,!,?) to current move."}),
+                  m("button#movetree-undo",{title:"Undo\nClick to undo last change made to the variation tree. Making new moves on the main board will clear change history."}),
+                  m("button#movetree-redo",{title:"Redo\nClick to redo last change made to the variation tree. Making new moves on the main board will clear change history."}),
+                  m("button#movetree-save",{title:"Save\nClick to save whole variation tree to a PGN file."}),
+                  m("button#movetree-imagesave",{title:"Save Board as Image...\nClick to open board image generator."}),
+                ]),
+              ]),
               m("div#output2", { onupdate: scrollOutput }, [
                 m("pre#fsfoutput", engineoutput),
                 m(
@@ -9046,7 +9117,12 @@
                 {
                   title:
                     "Click to move the position on mini board to main board for further investigation.",
+                  disabled: during_play || during_engine_match,
                   onclick: () => {
+                    if (during_play || during_engine_match)
+                    {
+                      return;
+                    }
                     const chessgroundmini =
                       document.getElementById("chessground-mini");
                     const fen = document.getElementById("fen");
@@ -9100,6 +9176,56 @@
               ]),
             ]),
           ]),
+          m("div#imagegenerator.hidden", [
+            m("p#imagegeneratortitle","Board Image Generator"),
+            m("div#filetypeselection", [
+              m("p","File type:"),
+              m("select#dropdown-filetype",{disabled:!is_ready,title: "Select image file type here. GIF format can save the whole game.",onchange:()=>{
+                const dropdown=document.getElementById("dropdown-filetype");
+                document.getElementById("frameduration").disabled=(dropdown[dropdown.selectedIndex].value!="GIF");
+                document.getElementById("imagequality").disabled=(dropdown[dropdown.selectedIndex].value=="PNG");
+              }},[
+                m("option",{value:"PNG",title:"Save as PNG image."},"Portable Network Graphics (*.png)"),
+                m("option",{value:"JPEG",title:"Save as JPEG image."},"Joint Photographic Experts Group (*.jpeg)"),
+                m("option",{value:"GIF",title:"Save as GIF image. When generating whole game, all positions will be included in one GIF file."},"Graphics Interchange Format (*.gif)"),
+              ]),
+            ]),
+            m("div#generationmode",[
+              m("p","Image generation mode:"),
+              m("select#dropdown-genmode",{title: "Select image generation mode here."},[
+                m("option",{value:"current",title:"Only generate image of displayed position."},"Displayed Position"),
+                m("option",{value:"all",title:"Generate images of all positions from initial position to displayed position.\nGIF images will save all positions as frames in one file.\nPNG/JPEG images will be saved in a ZIP archive."},"Whole Game"),
+              ]),
+            ]),
+            m("div#imageresolution",[
+              m("p","Image resolution (pixels):"),
+              m("input[type=number]#imagewidth",{min:1,placeholder:"Width",title:"The image width in pixels."}),
+              m("p","×"),
+              m("input[type=number]#imageheight",{min:1,placeholder:"Height",title:"The image height in pixels."}),
+              m(
+                "label#label-keepaspectratio",
+                {title:"When checked, the image will be generated with all squares keep 1:1 ratio according to image width. Image height is ignored in this case."},
+                m("input[type=checkbox]#keepaspectratio",{onchange: ()=>{
+                  document.getElementById("imageheight").disabled=document.getElementById("keepaspectratio").checked;
+                }}),
+                "Keep aspect ratio",
+              ),
+            ]),
+            m("div#imagequalityselection",[
+              m("p","Image quality factor (JPEG & GIF):"),
+              m("input[type=number]#imagequality",{min:0,max:1,step:0.01,title:"Choose image quality factor. Higher means larger file size with better quality and vice versa. Min: 0, Max: 1."}),
+            ]),
+            m("div#imageframedelayselection",[
+              m("p","Frame duration (milliseconds, GIF only):"),
+              m("input[type=number]#frameduration",{min:1,title:"Input the duration for each frame of GIF image. Each frame displays a move."}),
+            ]),
+            m("div#imagegeneratoractions",[
+              m("button#generateimage.ripple",{disabled: !is_ready,title:"Click to generate and download image or ZIP archive."},"Generate Image"),
+              m("button#exitimagegenerator.ripple",{disabled: !is_ready,title:"Click to close image generator."},"Close"),
+            ]),
+            m("p#imagegenerationprogress","Ready."),
+          ]),
+          m("div#themedetectorcontainer"),
         ]);
       };
 

@@ -109,6 +109,12 @@ button:disabled {
   border: 2px solid white !important;
 }
 
+#imagegenerator {
+  color: #000 !important;
+  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
+  border: 2px solid white !important;
+}
+
 #moveselectiondialog {
   color: #000 !important;
   background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;

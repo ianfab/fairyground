@@ -56,16 +56,16 @@ function RemoveSANMoveNotes(MoveList) {
 window.fairyground.SavedGamesParsingFeature.RemoveSANMoveNotes =
   RemoveSANMoveNotes;
 
-function SetPosition(FEN, UCIMoves, Variant, Is960) {
+function SetPosition(FEN, UCIMoves, Variant, Is960, PGNString) {
   if (
     typeof FEN != "string" ||
     typeof UCIMoves != "string" ||
     typeof Variant != "string" ||
-    typeof Is960 != "boolean"
+    typeof Is960 != "boolean" ||
+    typeof PGNString!="string"
   ) {
     throw TypeError();
   }
-  const varianttype = document.getElementById("dropdown-varianttype");
   const variantname = document.getElementById("dropdown-variant");
   const isfischerrandommode = document.getElementById("isfischerrandommode");
   if (variantname.value != Variant) {
@@ -79,12 +79,21 @@ function SetPosition(FEN, UCIMoves, Variant, Is960) {
     );
     return false;
   }
+  const pgnstring=document.getElementById("pgnstring");
   const fen = document.getElementById("fen");
   const move = document.getElementById("move");
   const setpos = document.getElementById("setpos");
-  fen.value = FEN.trim();
-  move.value = UCIMoves.trim();
-  setpos.click();
+  if (PGNString)
+  {
+    pgnstring.value=FEN+"\x01"+UCIMoves+"\x01"+PGNString;
+    pgnstring.click();
+  }
+  else
+  {
+    fen.value = FEN.trim();
+    move.value = UCIMoves.trim();
+    setpos.click();
+  }
   return true;
 }
 
@@ -209,7 +218,7 @@ class Game {
       typeof Result != "string" ||
       typeof GameEvent != "string" ||
       typeof Site != "string" ||
-      !Date.prototype.isPrototypeOf(GameDate) ||
+      !(GameDate instanceof Date) ||
       typeof Round != "number" ||
       typeof FirstPlayerName != "string" ||
       typeof SecondPlayerName != "string" ||
@@ -240,10 +249,10 @@ class Game {
     this.Evaluation = Evaluation;
     this.Termination = Termination;
     this.Is960 = Is960;
+    this.PGNString = "";
   }
-  destructor() {
-    delete this;
-  }
+
+  destructor() {}
 
   ToPortableGameNotation(FFishJSLibrary) {
     if (FFishJSLibrary == null) {
@@ -679,6 +688,7 @@ class PortableGameNotation {
                   IsFischerRandom,
                 ),
               );
+              this.GameList[this.GameList.length-1].PGNString=SANMoves;
             } else {
               let variantlist = this.FFishJSLibrary.variants().split(" ");
               if (variantlist.includes(Variant)) {
@@ -691,13 +701,6 @@ class PortableGameNotation {
                   `At game ${CurrentGame} (ends with line ${i}) in PGN file: Reference Error: Variant "${Variant}" is not defined.`,
                 );
                 NotLoadedGameCount++;
-                if (!variantlist.includes("chess")) {
-                  console.error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-                  window.alert(
-                    "ERROR: FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!",
-                  );
-                  throw Error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-                }
               }
             }
             Variant = "";
@@ -825,7 +828,7 @@ class PortableGameNotation {
         this.GameList.push(
           new Game(
             Variant,
-            FEN,
+            FEN == "" ? this.FFishJSLibrary.startingFen(Variant) : FEN,
             UCIMoves,
             Result,
             GameEvent,
@@ -843,6 +846,7 @@ class PortableGameNotation {
             IsFischerRandom,
           ),
         );
+        this.GameList[this.GameList.length-1].PGNString=SANMoves;
       } else {
         let variantlist = this.FFishJSLibrary.variants().split(" ");
         if (variantlist.includes(Variant)) {
@@ -855,11 +859,6 @@ class PortableGameNotation {
             `At game ${CurrentGame} (ends with line ${i}) in PGN file: Reference Error: Variant "${Variant}" is not defined.`,
           );
           NotLoadedGameCount++;
-          if (!variantlist.includes("chess")) {
-            console.error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-            window.alert("ERROR: FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-            throw Error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-          }
         }
       }
     } else if (ParserStarts) {
@@ -1107,11 +1106,6 @@ class ExtendedPositionDescription {
           console.error(
             `At line ${i + 1} of EPD file: Reference Error: Variant "${Variant}" is not defined.`,
           );
-          if (!variantlist.includes("chess")) {
-            console.error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-            window.alert("ERROR: FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-            throw Error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-          }
           NotLoadedGameCount++;
           continue;
         }
@@ -1336,6 +1330,7 @@ class GameDisplayTable {
           GameObject.UCIMoves.join(" "),
           GameObject.Variant,
           GameObject.Is960,
+          GameObject.PGNString
         )
       ) {
         document.getElementById("pgnepd-close").click();

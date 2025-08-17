@@ -168,7 +168,7 @@ button:active {
 
 button:disabled {
     color: #000 !important;
-    background-color: rgba(150, 150, 150, 1) !important;
+    background-color: #969696 !important;
 }
 
 button:focus {
@@ -254,6 +254,46 @@ coord {
 
 .position-display-label:hover {
     background-color: #bf811d;
+}
+
+#pgndiv .position-display-label.current-move {
+    background-color: #bf811d;
+}
+
+#pgn-operations {
+    gap: 10px 10px !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#pgn-operations button {
+    background-color: #0000 !important;
+    color: #0000 !important;
+    border: none !important;
+    border-radius: 0px !important;
+}
+
+#pgn-operations button:focus {
+    box-shadow: none;
+}
+
+#pgn-operations button:before {
+    background-color: #0009 !important;
+    color: #ccc !important;
+    border: 1px solid #444 !important;
+}
+
+#pgn-operations button:hover:before {
+    background-color: #d64f0066 !important;
+}
+
+#pgn-operations button:disabled:before {
+    background-color: #969696 !important;
+    color: #000 !important;
+}
+
+#pgn-operations button:active:before {
+    background-color: rgba(0, 0, 0, 0.8) !important;
 }
 
 #pagetitle {
@@ -452,6 +492,13 @@ evalnum:after {
     border-radius: 10px;
     background-color: #0009 !important;
     box-shadow: inset 1px 1px 2px #eee;
+}
+
+#imagegenerator {
+    color: #ccc !important;
+    background-color: #0009;
+    border: 1px solid #444 !important;
+    border-radius: 10px;
 }
 
 #lockminiboard:before, #lockminiboard:hover:before, #lockminiboard:active:before, #lockminiboard:disabled:before {
