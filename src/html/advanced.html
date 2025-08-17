@@ -852,7 +852,8 @@
     flex-wrap: wrap;
   }
 
-  #pgndiv .text-after, #pgndiv .text-before {
+  #pgndiv .text-after,
+  #pgndiv .text-before {
     font-style: italic;
   }
 
@@ -2081,7 +2082,7 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
     width: 50vw;
     height: 60vh;
     display: flex;
@@ -2107,7 +2108,7 @@
   }
 
   #imagegeneratortitle {
-    font-family: 'Times New Roman', Times, serif;
+    font-family: "Times New Roman", Times, serif;
     font-size: 30px;
     font-weight: bold;
     text-align: center;
@@ -4128,7 +4129,7 @@
       let in_browser_fsf_hash = 16;
       let random_mover_white = false;
       let random_mover_black = false;
-      let advanced_pgn_mode=false;
+      let advanced_pgn_mode = false;
       let white_start_time = 0;
       let black_start_time = 0;
       let white_remaining_time = 0;
@@ -5725,11 +5726,10 @@
       };
 
       const gameEnd = () => {
-        const gamestatusobj=document.getElementById("gamestatus");
+        const gamestatusobj = document.getElementById("gamestatus");
         during_play = false;
         gamestatusobj.click();
-        if (gamestatusobj.innerText=="END")
-        {
+        if (gamestatusobj.innerText == "END") {
           $("#gameresult").click();
         }
         gamestatusobj.innerText = "END";
@@ -5852,7 +5852,11 @@
         DOMListValue[1] = themename;
         chessgroundmini.classList.value = el.classList.value =
           DOMListValue.join(" ");
-        document.dispatchEvent(new CustomEvent("themechange",{detail: {piece: DOMListValue[1],board: DOMListValue[0]}}));
+        document.dispatchEvent(
+          new CustomEvent("themechange", {
+            detail: { piece: DOMListValue[1], board: DOMListValue[0] },
+          }),
+        );
         console.log(`Piece theme: ${themename}`);
         updateThemeDropdowns(themename, null);
         if (board_setup_mode) {
@@ -5904,7 +5908,11 @@
         DOMListValue[0] = boardthemename;
         chessgroundmini.classList.value = el.classList.value =
           DOMListValue.join(" ");
-        document.dispatchEvent(new CustomEvent("themechange",{detail: {piece: DOMListValue[1],board: DOMListValue[0]}}));
+        document.dispatchEvent(
+          new CustomEvent("themechange", {
+            detail: { piece: DOMListValue[1], board: DOMListValue[0] },
+          }),
+        );
         console.log(`Board theme: ${boardthemename}`);
         updateThemeDropdowns(null, boardthemename);
         //const activeIndex = classes.findIndex((c) => el.classList.contains(c));
@@ -6354,7 +6362,11 @@
         DOMListValue[1] = piece_set;
         chessgroundmini.classList.value = el.classList.value =
           DOMListValue.join(" ");
-        document.dispatchEvent(new CustomEvent("themechange",{detail: {piece: DOMListValue[1],board: DOMListValue[0]}}));
+        document.dispatchEvent(
+          new CustomEvent("themechange", {
+            detail: { piece: DOMListValue[1], board: DOMListValue[0] },
+          }),
+        );
         updateThemeDropdowns(piece_set, null);
         if (board_setup_mode) {
           triggerBoardSetupPieceIdentifier(false);
@@ -6370,7 +6382,11 @@
         DOMListValue[0] = board_set;
         chessgroundmini.classList.value = el.classList.value =
           DOMListValue.join(" ");
-        document.dispatchEvent(new CustomEvent("themechange",{detail: {piece: DOMListValue[1],board: DOMListValue[0]}}));
+        document.dispatchEvent(
+          new CustomEvent("themechange", {
+            detail: { piece: DOMListValue[1], board: DOMListValue[0] },
+          }),
+        );
         updateThemeDropdowns(null, board_set);
       }
 
@@ -7367,7 +7383,11 @@
               },
               "Binary Engine Output Event Handler Initialization (internal)",
             ),
-            m("input#pgnstring",{hidden: true},"Advanced PGN Cross Domain Handler (internal)"),
+            m(
+              "input#pgnstring",
+              { hidden: true },
+              "Advanced PGN Cross Domain Handler (internal)",
+            ),
           ]),
           m("div#input3", { hidden: during_play }, [
             m("p", "Additional Features: "),
@@ -7379,7 +7399,11 @@
               },
               m("input[type=checkbox]#advtimectrl", {
                 checked: advanced_time_control,
-                disabled: analysis_mode || review_mode || board_setup_mode || during_engine_match,
+                disabled:
+                  analysis_mode ||
+                  review_mode ||
+                  board_setup_mode ||
+                  during_engine_match,
                 onclick: () => {
                   advanced_time_control = !advanced_time_control;
                 },
@@ -7416,8 +7440,8 @@
               m("input[type=checkbox]#isadvpgnmode", {
                 checked: advanced_pgn_mode,
                 disabled: !is_ready,
-                onclick: ()=>{
-                  advanced_pgn_mode=!advanced_pgn_mode;
+                onclick: () => {
+                  advanced_pgn_mode = !advanced_pgn_mode;
                 },
               }),
               "Move Visualization",
@@ -8809,25 +8833,76 @@
               ]),
               m("p#currentboardfen"),
               m("p#label-pgn.ripple"),
-              m("div#pgn-operation-container",{hidden: !advanced_pgn_mode},[
-                m("div#pgn-operations",[
-                  m("button#movetree-clear",{title:"Clear Moves\nClick to clear the variation tree. Your position will be set to the initial position."}),
-                  m("button#movetree-hideshow",{title:"Show or Hide Move\nClick to hide/show subsequent moves of current move."}),
-                  m("button#movetree-removevariations",{title:"Remove Variations\nClick to remove variation moves of current move."}),
-                  m("button#movetree-settomainbranch",{title:"Promote Move\nClick to set the current move as the main branch of previous move."}),
-                  m("button#movetree-setasmainline",{title:"Promote Branch\nClick to set all the antecedent moves of current move as the main line moves."}),
-                  m("button#movetree-cutbranch",{title:"Cut Branch\nClick to remove all the moves on the branch of current move."}),
-                  m("button#movetree-cropbranch",{title:"Crop Branch\nClick to remove all the moves that are not on the branch of current move."}),
-                  m("button#movetree-cut",{title:"Cut Move\nClick to remove current move and all of its subsequent moves."}),
-                  m("button#movetree-crop",{title:"Crop Move\nClick to remove all antecedent moves of current move and set the initial position to the position before current move."}),
-                  m("button#movetree-uncomment",{title:"Uncomment Move\nClick to remove all texts and symbols of current move."}),
-                  m("button#movetree-textbefore",{title:"Add Text Before\nClick to add text before current move."}),
-                  m("button#movetree-textafter",{title:"Add Text After\nClick to add text after current move."}),
-                  m("button#movetree-symbol",{title:"Add Symbol\nClick to add symbols (e.g. !!,??,!,?) to current move."}),
-                  m("button#movetree-undo",{title:"Undo\nClick to undo last change made to the variation tree. Making new moves on the main board will clear change history."}),
-                  m("button#movetree-redo",{title:"Redo\nClick to redo last change made to the variation tree. Making new moves on the main board will clear change history."}),
-                  m("button#movetree-save",{title:"Save\nClick to save whole variation tree to a PGN file."}),
-                  m("button#movetree-imagesave",{title:"Save Board as Image...\nClick to open board image generator."}),
+              m("div#pgn-operation-container", { hidden: !advanced_pgn_mode }, [
+                m("div#pgn-operations", [
+                  m("button#movetree-clear", {
+                    title:
+                      "Clear Moves\nClick to clear the variation tree. Your position will be set to the initial position.",
+                  }),
+                  m("button#movetree-hideshow", {
+                    title:
+                      "Show or Hide Move\nClick to hide/show subsequent moves of current move.",
+                  }),
+                  m("button#movetree-removevariations", {
+                    title:
+                      "Remove Variations\nClick to remove variation moves of current move.",
+                  }),
+                  m("button#movetree-settomainbranch", {
+                    title:
+                      "Promote Move\nClick to set the current move as the main branch of previous move.",
+                  }),
+                  m("button#movetree-setasmainline", {
+                    title:
+                      "Promote Branch\nClick to set all the antecedent moves of current move as the main line moves.",
+                  }),
+                  m("button#movetree-cutbranch", {
+                    title:
+                      "Cut Branch\nClick to remove all the moves on the branch of current move.",
+                  }),
+                  m("button#movetree-cropbranch", {
+                    title:
+                      "Crop Branch\nClick to remove all the moves that are not on the branch of current move.",
+                  }),
+                  m("button#movetree-cut", {
+                    title:
+                      "Cut Move\nClick to remove current move and all of its subsequent moves.",
+                  }),
+                  m("button#movetree-crop", {
+                    title:
+                      "Crop Move\nClick to remove all antecedent moves of current move and set the initial position to the position before current move.",
+                  }),
+                  m("button#movetree-uncomment", {
+                    title:
+                      "Uncomment Move\nClick to remove all texts and symbols of current move.",
+                  }),
+                  m("button#movetree-textbefore", {
+                    title:
+                      "Add Text Before\nClick to add text before current move.",
+                  }),
+                  m("button#movetree-textafter", {
+                    title:
+                      "Add Text After\nClick to add text after current move.",
+                  }),
+                  m("button#movetree-symbol", {
+                    title:
+                      "Add Symbol\nClick to add symbols (e.g. !!,??,!,?) to current move.",
+                  }),
+                  m("button#movetree-undo", {
+                    title:
+                      "Undo\nClick to undo last change made to the variation tree. Making new moves on the main board will clear change history.",
+                  }),
+                  m("button#movetree-redo", {
+                    title:
+                      "Redo\nClick to redo last change made to the variation tree. Making new moves on the main board will clear change history.",
+                  }),
+                  m("button#movetree-save", {
+                    title:
+                      "Save\nClick to save whole variation tree to a PGN file.",
+                  }),
+                  m("button#movetree-imagesave", {
+                    title:
+                      "Save Board as Image...\nClick to open board image generator.",
+                  }),
                 ]),
               ]),
               m("div#output2", { onupdate: scrollOutput }, [
@@ -9119,8 +9194,7 @@
                     "Click to move the position on mini board to main board for further investigation.",
                   disabled: during_play || during_engine_match,
                   onclick: () => {
-                    if (during_play || during_engine_match)
-                    {
+                    if (during_play || during_engine_match) {
                       return;
                     }
                     const chessgroundmini =
@@ -9177,53 +9251,138 @@
             ]),
           ]),
           m("div#imagegenerator.hidden", [
-            m("p#imagegeneratortitle","Board Image Generator"),
+            m("p#imagegeneratortitle", "Board Image Generator"),
             m("div#filetypeselection", [
-              m("p","File type:"),
-              m("select#dropdown-filetype",{disabled:!is_ready,title: "Select image file type here. GIF format can save the whole game.",onchange:()=>{
-                const dropdown=document.getElementById("dropdown-filetype");
-                document.getElementById("frameduration").disabled=(dropdown[dropdown.selectedIndex].value!="GIF");
-                document.getElementById("imagequality").disabled=(dropdown[dropdown.selectedIndex].value=="PNG");
-              }},[
-                m("option",{value:"PNG",title:"Save as PNG image."},"Portable Network Graphics (*.png)"),
-                m("option",{value:"JPEG",title:"Save as JPEG image."},"Joint Photographic Experts Group (*.jpeg)"),
-                m("option",{value:"GIF",title:"Save as GIF image. When generating whole game, all positions will be included in one GIF file."},"Graphics Interchange Format (*.gif)"),
-              ]),
+              m("p", "File type:"),
+              m(
+                "select#dropdown-filetype",
+                {
+                  disabled: !is_ready,
+                  title:
+                    "Select image file type here. GIF format can save the whole game.",
+                  onchange: () => {
+                    const dropdown =
+                      document.getElementById("dropdown-filetype");
+                    document.getElementById("frameduration").disabled =
+                      dropdown[dropdown.selectedIndex].value != "GIF";
+                    document.getElementById("imagequality").disabled =
+                      dropdown[dropdown.selectedIndex].value == "PNG";
+                  },
+                },
+                [
+                  m(
+                    "option",
+                    { value: "PNG", title: "Save as PNG image." },
+                    "Portable Network Graphics (*.png)",
+                  ),
+                  m(
+                    "option",
+                    { value: "JPEG", title: "Save as JPEG image." },
+                    "Joint Photographic Experts Group (*.jpeg)",
+                  ),
+                  m(
+                    "option",
+                    {
+                      value: "GIF",
+                      title:
+                        "Save as GIF image. When generating whole game, all positions will be included in one GIF file.",
+                    },
+                    "Graphics Interchange Format (*.gif)",
+                  ),
+                ],
+              ),
             ]),
-            m("div#generationmode",[
-              m("p","Image generation mode:"),
-              m("select#dropdown-genmode",{title: "Select image generation mode here."},[
-                m("option",{value:"current",title:"Only generate image of displayed position."},"Displayed Position"),
-                m("option",{value:"all",title:"Generate images of all positions from initial position to displayed position.\nGIF images will save all positions as frames in one file.\nPNG/JPEG images will be saved in a ZIP archive."},"Whole Game"),
-              ]),
+            m("div#generationmode", [
+              m("p", "Image generation mode:"),
+              m(
+                "select#dropdown-genmode",
+                { title: "Select image generation mode here." },
+                [
+                  m(
+                    "option",
+                    {
+                      value: "current",
+                      title: "Only generate image of displayed position.",
+                    },
+                    "Displayed Position",
+                  ),
+                  m(
+                    "option",
+                    {
+                      value: "all",
+                      title:
+                        "Generate images of all positions from initial position to displayed position.\nGIF images will save all positions as frames in one file.\nPNG/JPEG images will be saved in a ZIP archive.",
+                    },
+                    "Whole Game",
+                  ),
+                ],
+              ),
             ]),
-            m("div#imageresolution",[
-              m("p","Image resolution (pixels):"),
-              m("input[type=number]#imagewidth",{min:1,placeholder:"Width",title:"The image width in pixels."}),
-              m("p","×"),
-              m("input[type=number]#imageheight",{min:1,placeholder:"Height",title:"The image height in pixels."}),
+            m("div#imageresolution", [
+              m("p", "Image resolution (pixels):"),
+              m("input[type=number]#imagewidth", {
+                min: 1,
+                placeholder: "Width",
+                title: "The image width in pixels.",
+              }),
+              m("p", "×"),
+              m("input[type=number]#imageheight", {
+                min: 1,
+                placeholder: "Height",
+                title: "The image height in pixels.",
+              }),
               m(
                 "label#label-keepaspectratio",
-                {title:"When checked, the image will be generated with all squares keep 1:1 ratio according to image width. Image height is ignored in this case."},
-                m("input[type=checkbox]#keepaspectratio",{onchange: ()=>{
-                  document.getElementById("imageheight").disabled=document.getElementById("keepaspectratio").checked;
-                }}),
+                {
+                  title:
+                    "When checked, the image will be generated with all squares keep 1:1 ratio according to image width. Image height is ignored in this case.",
+                },
+                m("input[type=checkbox]#keepaspectratio", {
+                  onchange: () => {
+                    document.getElementById("imageheight").disabled =
+                      document.getElementById("keepaspectratio").checked;
+                  },
+                }),
                 "Keep aspect ratio",
               ),
             ]),
-            m("div#imagequalityselection",[
-              m("p","Image quality factor (JPEG & GIF):"),
-              m("input[type=number]#imagequality",{min:0,max:1,step:0.01,title:"Choose image quality factor. Higher means larger file size with better quality and vice versa. Min: 0, Max: 1."}),
+            m("div#imagequalityselection", [
+              m("p", "Image quality factor (JPEG & GIF):"),
+              m("input[type=number]#imagequality", {
+                min: 0,
+                max: 1,
+                step: 0.01,
+                title:
+                  "Choose image quality factor. Higher means larger file size with better quality and vice versa. Min: 0, Max: 1.",
+              }),
             ]),
-            m("div#imageframedelayselection",[
-              m("p","Frame duration (milliseconds, GIF only):"),
-              m("input[type=number]#frameduration",{min:1,title:"Input the duration for each frame of GIF image. Each frame displays a move."}),
+            m("div#imageframedelayselection", [
+              m("p", "Frame duration (milliseconds, GIF only):"),
+              m("input[type=number]#frameduration", {
+                min: 1,
+                title:
+                  "Input the duration for each frame of GIF image. Each frame displays a move.",
+              }),
             ]),
-            m("div#imagegeneratoractions",[
-              m("button#generateimage.ripple",{disabled: !is_ready,title:"Click to generate and download image or ZIP archive."},"Generate Image"),
-              m("button#exitimagegenerator.ripple",{disabled: !is_ready,title:"Click to close image generator."},"Close"),
+            m("div#imagegeneratoractions", [
+              m(
+                "button#generateimage.ripple",
+                {
+                  disabled: !is_ready,
+                  title: "Click to generate and download image or ZIP archive.",
+                },
+                "Generate Image",
+              ),
+              m(
+                "button#exitimagegenerator.ripple",
+                {
+                  disabled: !is_ready,
+                  title: "Click to close image generator.",
+                },
+                "Close",
+              ),
             ]),
-            m("p#imagegenerationprogress","Ready."),
+            m("p#imagegenerationprogress", "Ready."),
           ]),
           m("div#themedetectorcontainer"),
         ]);

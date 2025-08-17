@@ -62,7 +62,7 @@ function SetPosition(FEN, UCIMoves, Variant, Is960, PGNString) {
     typeof UCIMoves != "string" ||
     typeof Variant != "string" ||
     typeof Is960 != "boolean" ||
-    typeof PGNString!="string"
+    typeof PGNString != "string"
   ) {
     throw TypeError();
   }
@@ -79,17 +79,14 @@ function SetPosition(FEN, UCIMoves, Variant, Is960, PGNString) {
     );
     return false;
   }
-  const pgnstring=document.getElementById("pgnstring");
+  const pgnstring = document.getElementById("pgnstring");
   const fen = document.getElementById("fen");
   const move = document.getElementById("move");
   const setpos = document.getElementById("setpos");
-  if (PGNString)
-  {
-    pgnstring.value=FEN+"\x01"+UCIMoves+"\x01"+PGNString;
+  if (PGNString) {
+    pgnstring.value = FEN + "\x01" + UCIMoves + "\x01" + PGNString;
     pgnstring.click();
-  }
-  else
-  {
+  } else {
     fen.value = FEN.trim();
     move.value = UCIMoves.trim();
     setpos.click();
@@ -688,7 +685,7 @@ class PortableGameNotation {
                   IsFischerRandom,
                 ),
               );
-              this.GameList[this.GameList.length-1].PGNString=SANMoves;
+              this.GameList[this.GameList.length - 1].PGNString = SANMoves;
             } else {
               let variantlist = this.FFishJSLibrary.variants().split(" ");
               if (variantlist.includes(Variant)) {
@@ -846,7 +843,7 @@ class PortableGameNotation {
             IsFischerRandom,
           ),
         );
-        this.GameList[this.GameList.length-1].PGNString=SANMoves;
+        this.GameList[this.GameList.length - 1].PGNString = SANMoves;
       } else {
         let variantlist = this.FFishJSLibrary.variants().split(" ");
         if (variantlist.includes(Variant)) {
@@ -1330,7 +1327,7 @@ class GameDisplayTable {
           GameObject.UCIMoves.join(" "),
           GameObject.Variant,
           GameObject.Is960,
-          GameObject.PGNString
+          GameObject.PGNString,
         )
       ) {
         document.getElementById("pgnepd-close").click();

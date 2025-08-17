@@ -1,10 +1,10 @@
 ﻿// ffish.js test using chessgroundx
 const Chessground = require("chessgroundx").Chessground;
-const ZIP=require("jszip");
+const ZIP = require("jszip");
 import * as util from "chessgroundx/util";
 import * as pocketutil from "chessgroundx/pocket";
 import * as moveutil from "./move.js";
-import * as pgnutil from "./pgn.js"
+import * as pgnutil from "./pgn.js";
 import * as imageutil from "./image.js";
 import * as themeutil from "./chessgroundtheme.js";
 
@@ -43,28 +43,32 @@ const pocketTopEl = document.getElementById("pocket-top");
 const pocketTopMiniEl = document.getElementById("pocket-top-mini");
 const pocketBottomEl = document.getElementById("pocket-bottom");
 const pocketBottomMiniEl = document.getElementById("pocket-bottom-mini");
-const imageGenerator=document.getElementById("imagegenerator");
-const chessgroundThemeDetector=document.getElementById("themedetectorcontainer");
-const dropdownImageFileType=document.getElementById("dropdown-filetype");
-const dropdownGenerationMode=document.getElementById("dropdown-genmode");
-const inputImageWidth=document.getElementById("imagewidth");
-const inputImageHeight=document.getElementById("imageheight");
-const checkboxKeepAspectRatio=document.getElementById("keepaspectratio");
-const inputImageQuality=document.getElementById("imagequality");
-const inputFrameDuration=document.getElementById("frameduration");
-const buttonGenerateImage=document.getElementById("generateimage");
-const buttonExitImageGenerator=document.getElementById("exitimagegenerator");
-const textImageGenerationProgress=document.getElementById("imagegenerationprogress");
+const imageGenerator = document.getElementById("imagegenerator");
+const chessgroundThemeDetector = document.getElementById(
+  "themedetectorcontainer",
+);
+const dropdownImageFileType = document.getElementById("dropdown-filetype");
+const dropdownGenerationMode = document.getElementById("dropdown-genmode");
+const inputImageWidth = document.getElementById("imagewidth");
+const inputImageHeight = document.getElementById("imageheight");
+const checkboxKeepAspectRatio = document.getElementById("keepaspectratio");
+const inputImageQuality = document.getElementById("imagequality");
+const inputFrameDuration = document.getElementById("frameduration");
+const buttonGenerateImage = document.getElementById("generateimage");
+const buttonExitImageGenerator = document.getElementById("exitimagegenerator");
+const textImageGenerationProgress = document.getElementById(
+  "imagegenerationprogress",
+);
 const displayMoves = document.getElementById("displaymoves");
 const displayReady = document.getElementById("displayready");
 const isReviewMode = document.getElementById("isreviewmode");
 const buttonNextPosition = document.getElementById("nextposition");
 const buttonPreviousPosition = document.getElementById("previousposition");
 const buttonInitialPosition = document.getElementById("initialposition");
-const buttonFinalPosition=document.getElementById("finalposition");
+const buttonFinalPosition = document.getElementById("finalposition");
 const buttonCurrentPosition = document.getElementById("currentposition");
 const buttonSpecifiedPosition = document.getElementById("specifiedposition");
-const inputHalfMoveNumber=document.getElementById("gotomovenum");
+const inputHalfMoveNumber = document.getElementById("gotomovenum");
 const buttonGameStart = document.getElementById("gamestart");
 const playWhite = document.getElementById("playwhite");
 const playBlack = document.getElementById("playblack");
@@ -80,23 +84,29 @@ const loadThemes = document.getElementById("loadthemes");
 const initializeThemes = document.getElementById("initializethemes");
 const isBoardSetup = document.getElementById("isboardsetup");
 const isAdvPGNMode = document.getElementById("isadvpgnmode");
-const buttonMoveTreeClear=document.getElementById("movetree-clear");
-const buttonMoveTreeHideShow=document.getElementById("movetree-hideshow");
-const buttonMoveTreeRemoveVariations=document.getElementById("movetree-removevariations");
-const buttonMoveTreeSetToMainBranch=document.getElementById("movetree-settomainbranch");
-const buttonMoveTreeSetAsMainLine=document.getElementById("movetree-setasmainline");
-const buttonMoveTreeCutBranch=document.getElementById("movetree-cutbranch");
-const buttonMoveTreeCropBranch=document.getElementById("movetree-cropbranch");
-const buttonMoveTreeCut=document.getElementById("movetree-cut");
-const buttonMoveTreeCrop=document.getElementById("movetree-crop");
-const buttonMoveTreeUncomment=document.getElementById("movetree-uncomment");
-const buttonMoveTreeTextBefore=document.getElementById("movetree-textbefore");
-const buttonMoveTreeTextAfter=document.getElementById("movetree-textafter");
-const buttonMoveTreeSymbol=document.getElementById("movetree-symbol");
-const buttonMoveTreeUndo=document.getElementById("movetree-undo");
-const buttonMoveTreeRedo=document.getElementById("movetree-redo");
-const buttonMoveTreeSave=document.getElementById("movetree-save");
-const buttonMoveTreeSaveImage=document.getElementById("movetree-imagesave");
+const buttonMoveTreeClear = document.getElementById("movetree-clear");
+const buttonMoveTreeHideShow = document.getElementById("movetree-hideshow");
+const buttonMoveTreeRemoveVariations = document.getElementById(
+  "movetree-removevariations",
+);
+const buttonMoveTreeSetToMainBranch = document.getElementById(
+  "movetree-settomainbranch",
+);
+const buttonMoveTreeSetAsMainLine = document.getElementById(
+  "movetree-setasmainline",
+);
+const buttonMoveTreeCutBranch = document.getElementById("movetree-cutbranch");
+const buttonMoveTreeCropBranch = document.getElementById("movetree-cropbranch");
+const buttonMoveTreeCut = document.getElementById("movetree-cut");
+const buttonMoveTreeCrop = document.getElementById("movetree-crop");
+const buttonMoveTreeUncomment = document.getElementById("movetree-uncomment");
+const buttonMoveTreeTextBefore = document.getElementById("movetree-textbefore");
+const buttonMoveTreeTextAfter = document.getElementById("movetree-textafter");
+const buttonMoveTreeSymbol = document.getElementById("movetree-symbol");
+const buttonMoveTreeUndo = document.getElementById("movetree-undo");
+const buttonMoveTreeRedo = document.getElementById("movetree-redo");
+const buttonMoveTreeSave = document.getElementById("movetree-save");
+const buttonMoveTreeSaveImage = document.getElementById("movetree-imagesave");
 const dropdownSetPiece = document.getElementById("dropdown-setpiece");
 const buttonClearBoard = document.getElementById("clearboard");
 const buttonInitialBoardPosition = document.getElementById("initboardpos");
@@ -134,7 +144,7 @@ const dropdownVisualEffectPerspective = document.getElementById(
   "dropdown-visualeffectperspective",
 );
 const engineOutput = document.getElementById("engineoutputline");
-const setPgnString=document.getElementById("pgnstring");
+const setPgnString = document.getElementById("pgnstring");
 const isAnalysis = document.getElementById("analysis");
 const pcheckCounts = document.getElementById("checkcounts");
 const evaluationBar = document.getElementById("evalbarprogress");
@@ -344,20 +354,24 @@ var previousclicksquare = "00";
 var multipvminiboardtimer = null;
 //var PGNDiv = generateStaticPreviewDiv(512);
 
-class MultiplePrincipalVariationEntry
-{
-  constructor(IsValid,HeaderString,Variant,Is960,FEN,UCIMoves)
-  {
-    if (typeof IsValid!="boolean" || typeof HeaderString!="string" || typeof Variant!="string" || typeof Is960!="boolean" || typeof FEN!="string" || typeof UCIMoves!="string")
-    {
+class MultiplePrincipalVariationEntry {
+  constructor(IsValid, HeaderString, Variant, Is960, FEN, UCIMoves) {
+    if (
+      typeof IsValid != "boolean" ||
+      typeof HeaderString != "string" ||
+      typeof Variant != "string" ||
+      typeof Is960 != "boolean" ||
+      typeof FEN != "string" ||
+      typeof UCIMoves != "string"
+    ) {
       throw TypeError();
     }
-    this.IsValid=IsValid;
-    this.HeaderString=HeaderString;
-    this.Variant=Variant;
-    this.Is960=Is960;
-    this.FEN=FEN;
-    this.UCIMoves=UCIMoves;
+    this.IsValid = IsValid;
+    this.HeaderString = HeaderString;
+    this.Variant = Variant;
+    this.Is960 = Is960;
+    this.FEN = FEN;
+    this.UCIMoves = UCIMoves;
   }
 
   destructor() {}
@@ -370,7 +384,9 @@ class MultiplePrincipalVariationMiniBoardHandler {
     this.StoredPrincipalVariationCount = 0;
     this.ValidPrincipalVariationCount = 0;
     this.PrincipalVariationElementList = [];
-    this.PrincipalVariationDataList = [new MultiplePrincipalVariationEntry(false,"","",false,"","")];
+    this.PrincipalVariationDataList = [
+      new MultiplePrincipalVariationEntry(false, "", "", false, "", ""),
+    ];
   }
 
   destructor() {}
@@ -417,7 +433,9 @@ class MultiplePrincipalVariationMiniBoardHandler {
         i < PrincipalVariationNumber;
         i++
       ) {
-        this.PrincipalVariationDataList.push(new MultiplePrincipalVariationEntry(false,"","",false,"",""));
+        this.PrincipalVariationDataList.push(
+          new MultiplePrincipalVariationEntry(false, "", "", false, "", ""),
+        );
       }
       this.ValidPrincipalVariationCount = PrincipalVariationNumber;
     }
@@ -453,7 +471,13 @@ class MultiplePrincipalVariationMiniBoardHandler {
     }
     let i = 0;
     let deletelater = [];
-    let selecteddata,selected,moveselem,notationindex,existingmoveelem,textelem,lineelem;
+    let selecteddata,
+      selected,
+      moveselem,
+      notationindex,
+      existingmoveelem,
+      textelem,
+      lineelem;
     if (
       this.PrincipalVariationElementList.length <
       this.ValidPrincipalVariationCount
@@ -515,7 +539,7 @@ class MultiplePrincipalVariationMiniBoardHandler {
               selecteddata.FEN,
               selecteddata.Is960,
               selecteddata.UCIMoves,
-              false
+              false,
             );
           } else {
             moveselem = document.createElement("div");
@@ -523,11 +547,11 @@ class MultiplePrincipalVariationMiniBoardHandler {
             moveselem.innerText = getNotation(
               dropdownNotationSystem[dropdownNotationSystem.selectedIndex]
                 .value,
-                selecteddata.Variant,
-                selecteddata.FEN,
-                selecteddata.Is960,
-                selecteddata.UCIMoves,
-              false
+              selecteddata.Variant,
+              selecteddata.FEN,
+              selecteddata.Is960,
+              selecteddata.UCIMoves,
+              false,
             );
             selected.appendChild(moveselem);
           }
@@ -541,7 +565,9 @@ class MultiplePrincipalVariationMiniBoardHandler {
             selecteddata.Is960,
             selecteddata.UCIMoves,
             `movediv-${i}`,
-            ffishnotationobjects[notationindex],gametree.OriginalFEN,board.moveStack()
+            ffishnotationobjects[notationindex],
+            gametree.OriginalFEN,
+            board.moveStack(),
           );
           moveselem.classList.add("multipv-miniboard-pvline-moves");
           selected.appendChild(moveselem);
@@ -556,59 +582,62 @@ class MultiplePrincipalVariationMiniBoardHandler {
   }
 }
 
-class GameTree
-{
-  constructor()
-  {
-    this.MoveTree=new moveutil.MoveTree();
-    this.OriginalFEN="";
-    this.Variant="chess";
-    this.Is960=false;
-    this.BlankSplitter=new RegExp("[ ]+");
-    this.MoveTextActionPartsMatcher=new RegExp("\\[.*?\\]","g");
-    this.CurrentMove=this.MoveTree.RootNode;
-    this.HistoryStack=[];
-    this.CurrentHistory=-1;
+class GameTree {
+  constructor() {
+    this.MoveTree = new moveutil.MoveTree();
+    this.OriginalFEN = "";
+    this.Variant = "chess";
+    this.Is960 = false;
+    this.BlankSplitter = new RegExp("[ ]+");
+    this.MoveTextActionPartsMatcher = new RegExp("\\[.*?\\]", "g");
+    this.CurrentMove = this.MoveTree.RootNode;
+    this.HistoryStack = [];
+    this.CurrentHistory = -1;
   }
 
   destructor() {}
 
-  AddHistory()
-  {
-    if (this.CurrentHistory<this.HistoryStack.length-1)
-    {
-      this.HistoryStack.splice(this.CurrentHistory+1);
+  AddHistory() {
+    if (this.CurrentHistory < this.HistoryStack.length - 1) {
+      this.HistoryStack.splice(this.CurrentHistory + 1);
     }
-    this.HistoryStack.push({fen: this.OriginalFEN, movetree: this.MoveTree.ToString(), moves: this.GetMoveListOfMove(this.CurrentMove)});
-    this.CurrentHistory=this.HistoryStack.length-1;
+    this.HistoryStack.push({
+      fen: this.OriginalFEN,
+      movetree: this.MoveTree.ToString(),
+      moves: this.GetMoveListOfMove(this.CurrentMove),
+    });
+    this.CurrentHistory = this.HistoryStack.length - 1;
   }
 
-  UpdateHistory()
-  {
-    if (this.CurrentHistory<0)
-    {
-      this.HistoryStack=[{fen: this.OriginalFEN, movetree: this.MoveTree.ToString(), moves: this.GetMoveListOfMove(this.CurrentMove)}];
-      this.CurrentHistory=0;
-    }
-    else
-    {
-      this.HistoryStack[this.CurrentHistory]={fen: this.OriginalFEN, movetree: this.MoveTree.ToString(), moves: this.GetMoveListOfMove(this.CurrentMove)};
+  UpdateHistory() {
+    if (this.CurrentHistory < 0) {
+      this.HistoryStack = [
+        {
+          fen: this.OriginalFEN,
+          movetree: this.MoveTree.ToString(),
+          moves: this.GetMoveListOfMove(this.CurrentMove),
+        },
+      ];
+      this.CurrentHistory = 0;
+    } else {
+      this.HistoryStack[this.CurrentHistory] = {
+        fen: this.OriginalFEN,
+        movetree: this.MoveTree.ToString(),
+        moves: this.GetMoveListOfMove(this.CurrentMove),
+      };
     }
   }
 
-  ClearHistory()
-  {
+  ClearHistory() {
     console.log("clear history");
-    this.HistoryStack=[];
-    this.CurrentHistory=-1;
+    this.HistoryStack = [];
+    this.CurrentHistory = -1;
   }
 
-  Undo()
-  {
-    if (this.CurrentHistory>0)
-    {
+  Undo() {
+    if (this.CurrentHistory > 0) {
       this.CurrentHistory--;
-      this.OriginalFEN=this.HistoryStack[this.CurrentHistory].fen;
+      this.OriginalFEN = this.HistoryStack[this.CurrentHistory].fen;
       this.MoveTree.FromString(this.HistoryStack[this.CurrentHistory].movetree);
       this.GoToMoveList(this.HistoryStack[this.CurrentHistory].moves);
       return true;
@@ -616,12 +645,10 @@ class GameTree
     return false;
   }
 
-  Redo()
-  {
-    if (this.CurrentHistory<this.HistoryStack.length-1)
-    {
+  Redo() {
+    if (this.CurrentHistory < this.HistoryStack.length - 1) {
       this.CurrentHistory++;
-      this.OriginalFEN=this.HistoryStack[this.CurrentHistory].fen;
+      this.OriginalFEN = this.HistoryStack[this.CurrentHistory].fen;
       this.MoveTree.FromString(this.HistoryStack[this.CurrentHistory].movetree);
       this.GoToMoveList(this.HistoryStack[this.CurrentHistory].moves);
       return true;
@@ -629,415 +656,355 @@ class GameTree
     return false;
   }
 
-  GoToMoveList(MoveList)
-  {
-    if (typeof MoveList!="string")
-    {
+  GoToMoveList(MoveList) {
+    if (typeof MoveList != "string") {
       throw TypeError();
     }
-    const trimmedmoves=MoveList.trim();
-    let node_id=-1;
-    let i=0,j=0;
-    let pointer=this.MoveTree.RootNode;
-    let movelist=trimmedmoves.split(this.BlankSplitter);
-    if (trimmedmoves.length==0)
-    {
-      this.CurrentMove=this.MoveTree.RootNode;
+    const trimmedmoves = MoveList.trim();
+    let node_id = -1;
+    let i = 0,
+      j = 0;
+    let pointer = this.MoveTree.RootNode;
+    let movelist = trimmedmoves.split(this.BlankSplitter);
+    if (trimmedmoves.length == 0) {
+      this.CurrentMove = this.MoveTree.RootNode;
       return;
     }
-    for (i=0;i<movelist.length;i++)
-    {
-      node_id=-1;
-      for (j=0;j<pointer.NextNodes.length;j++)
-      {
-        if (pointer.NextNodes[j].Move.Move==movelist[i])
-        {
-          node_id=j;
+    for (i = 0; i < movelist.length; i++) {
+      node_id = -1;
+      for (j = 0; j < pointer.NextNodes.length; j++) {
+        if (pointer.NextNodes[j].Move.Move == movelist[i]) {
+          node_id = j;
           break;
         }
       }
-      if (node_id>=0)
-      {
-        pointer=pointer.NextNodes[node_id];
-      }
-      else
-      {
+      if (node_id >= 0) {
+        pointer = pointer.NextNodes[node_id];
+      } else {
         break;
       }
     }
-    this.CurrentMove=pointer;
+    this.CurrentMove = pointer;
   }
 
-  SetCurrentMoveList(Variant,Is960,FEN,MoveList)
-  {
-    if (typeof Variant!="string" || typeof Is960!="boolean" || typeof FEN!="string" || typeof MoveList!="string")
-    {
+  SetCurrentMoveList(Variant, Is960, FEN, MoveList) {
+    if (
+      typeof Variant != "string" ||
+      typeof Is960 != "boolean" ||
+      typeof FEN != "string" ||
+      typeof MoveList != "string"
+    ) {
       throw TypeError();
     }
-    const trimmedmoves=MoveList.trim();
-    let movelist=trimmedmoves.split(this.BlankSplitter);
-    let i=0,j=0;
-    let node_id=-1;
-    let pointer=this.MoveTree.RootNode;
-    let variant=(Variant==""?"chess":Variant);
-    let fen=(FEN==""?ffish.startingFen(variant):FEN);
-    if (fen!=this.OriginalFEN || variant!=this.Variant || Is960!=this.Is960)
-    {
-      this.MoveTree.RootNode.NextNodes=[];
-      this.OriginalFEN=fen;
-      this.Variant=variant;
-      this.Is960=Is960;
+    const trimmedmoves = MoveList.trim();
+    let movelist = trimmedmoves.split(this.BlankSplitter);
+    let i = 0,
+      j = 0;
+    let node_id = -1;
+    let pointer = this.MoveTree.RootNode;
+    let variant = Variant == "" ? "chess" : Variant;
+    let fen = FEN == "" ? ffish.startingFen(variant) : FEN;
+    if (
+      fen != this.OriginalFEN ||
+      variant != this.Variant ||
+      Is960 != this.Is960
+    ) {
+      this.MoveTree.RootNode.NextNodes = [];
+      this.OriginalFEN = fen;
+      this.Variant = variant;
+      this.Is960 = Is960;
       this.ClearHistory();
     }
-    if (trimmedmoves.length==0)
-    {
-      this.CurrentMove=this.MoveTree.RootNode;
+    if (trimmedmoves.length == 0) {
+      this.CurrentMove = this.MoveTree.RootNode;
       return;
     }
-    for (i=0;i<movelist.length;i++)
-    {
-      node_id=-1;
-      for (j=0;j<pointer.NextNodes.length;j++)
-      {
-        if (pointer.NextNodes[j].Move.Move==movelist[i])
-        {
-          node_id=j;
+    for (i = 0; i < movelist.length; i++) {
+      node_id = -1;
+      for (j = 0; j < pointer.NextNodes.length; j++) {
+        if (pointer.NextNodes[j].Move.Move == movelist[i]) {
+          node_id = j;
           break;
         }
       }
-      if (node_id==-1)
-      {
-        for (j=i;j<movelist.length;j++)
-        {
-          pointer.AddVariationNode(new moveutil.MoveTreeNode(new moveutil.Move(movelist[j],0,0),undefined,[]));
-          pointer=pointer.NextNodes[pointer.NextNodes.length-1];
+      if (node_id == -1) {
+        for (j = i; j < movelist.length; j++) {
+          pointer.AddVariationNode(
+            new moveutil.MoveTreeNode(
+              new moveutil.Move(movelist[j], 0, 0),
+              undefined,
+              [],
+            ),
+          );
+          pointer = pointer.NextNodes[pointer.NextNodes.length - 1];
         }
         this.ClearHistory();
         break;
-      }
-      else
-      {
-        pointer=pointer.NextNodes[node_id];
+      } else {
+        pointer = pointer.NextNodes[node_id];
       }
     }
-    this.CurrentMove=pointer;
+    this.CurrentMove = pointer;
   }
 
-  GetMoveListOfMove(MoveNode)
-  {
-    if (!(MoveNode instanceof moveutil.MoveTreeNode))
-    {
+  GetMoveListOfMove(MoveNode) {
+    if (!(MoveNode instanceof moveutil.MoveTreeNode)) {
       throw TypeError();
     }
-    let pointer=MoveNode;
-    let moves=[];
-    while (pointer!=this.MoveTree.RootNode)
-    {
+    let pointer = MoveNode;
+    let moves = [];
+    while (pointer != this.MoveTree.RootNode) {
       moves.unshift(pointer.Move.Move);
-      pointer=pointer.PreviousNode;
+      pointer = pointer.PreviousNode;
     }
     return moves.join(" ");
   }
 
-  GetCompleteMainLineMoveListOfMove(MoveNode)
-  {
-    if (!(MoveNode instanceof moveutil.MoveTreeNode))
-    {
+  GetCompleteMainLineMoveListOfMove(MoveNode) {
+    if (!(MoveNode instanceof moveutil.MoveTreeNode)) {
       throw TypeError();
     }
-    let pointer=MoveNode;
-    let moves=[];
-    while (pointer!=this.MoveTree.RootNode)
-    {
-      if (pointer==null)
-      {
+    let pointer = MoveNode;
+    let moves = [];
+    while (pointer != this.MoveTree.RootNode) {
+      if (pointer == null) {
         return null;
       }
       moves.unshift(pointer.Move.Move);
-      pointer=pointer.PreviousNode;
+      pointer = pointer.PreviousNode;
     }
-    pointer=MoveNode;
-    while (pointer.NextNodes[0])
-    {
-      pointer=pointer.NextNodes[0];
+    pointer = MoveNode;
+    while (pointer.NextNodes[0]) {
+      pointer = pointer.NextNodes[0];
       moves.push(pointer.Move.Move);
     }
     return moves.join(" ");
   }
 
-  GetMainLineMoveList()
-  {
-    let moves=[];
-    let pointer=this.MoveTree.RootNode;
-    while (pointer.NextNodes[0])
-    {
-      pointer=pointer.NextNodes[0];
+  GetMainLineMoveList() {
+    let moves = [];
+    let pointer = this.MoveTree.RootNode;
+    while (pointer.NextNodes[0]) {
+      pointer = pointer.NextNodes[0];
       moves.push(pointer.Move.Move);
     }
     return moves.join(" ");
   }
 
-  ClearMoves()
-  {
+  ClearMoves() {
     this.UpdateHistory();
-    this.MoveTree.RootNode.NextNodes=[];
-    this.CurrentMove=this.MoveTree.RootNode;
+    this.MoveTree.RootNode.NextNodes = [];
+    this.CurrentMove = this.MoveTree.RootNode;
     this.AddHistory();
   }
 
-  SetCurrentMoveToMainBranch()
-  {
-    if (this.CurrentMove!=this.MoveTree.RootNode || this.CurrentMove.RelativePositionInParentNode>0)
-    {
+  SetCurrentMoveToMainBranch() {
+    if (
+      this.CurrentMove != this.MoveTree.RootNode ||
+      this.CurrentMove.RelativePositionInParentNode > 0
+    ) {
       this.UpdateHistory();
-      this.CurrentMove.ParentNode().SetVariationNodeToMainNode(this.CurrentMove.RelativePositionInParentNode);
+      this.CurrentMove.ParentNode().SetVariationNodeToMainNode(
+        this.CurrentMove.RelativePositionInParentNode,
+      );
       this.AddHistory();
     }
   }
 
-  SetCurrentMoveBranchAsMainLine()
-  {
-    if (this.CurrentMove!=this.MoveTree.RootNode)
-    {
-      let pointer=this.CurrentMove;
+  SetCurrentMoveBranchAsMainLine() {
+    if (this.CurrentMove != this.MoveTree.RootNode) {
+      let pointer = this.CurrentMove;
       this.UpdateHistory();
-      while (pointer.PreviousNode)
-      {
-        pointer.ParentNode().SetVariationNodeToMainNode(pointer.RelativePositionInParentNode);
-        pointer=pointer.PreviousNode;
+      while (pointer.PreviousNode) {
+        pointer
+          .ParentNode()
+          .SetVariationNodeToMainNode(pointer.RelativePositionInParentNode);
+        pointer = pointer.PreviousNode;
       }
       this.AddHistory();
     }
   }
 
-  RemoveCurrentMoveBranch()
-  {
-    let pointer=this.CurrentMove;
+  RemoveCurrentMoveBranch() {
+    let pointer = this.CurrentMove;
     this.UpdateHistory();
-    while (pointer.PreviousNode)
-    {
-      if (pointer.RelativePositionInParentNode!=0)
-      {
+    while (pointer.PreviousNode) {
+      if (pointer.RelativePositionInParentNode != 0) {
         break;
       }
-      pointer=pointer.PreviousNode;
+      pointer = pointer.PreviousNode;
     }
-    if (pointer==this.MoveTree.RootNode)
-    {
-      this.MoveTree.RootNode.NextNodes=[];
-      this.CurrentMove=this.MoveTree.RootNode;
-    }
-    else
-    {
+    if (pointer == this.MoveTree.RootNode) {
+      this.MoveTree.RootNode.NextNodes = [];
+      this.CurrentMove = this.MoveTree.RootNode;
+    } else {
       pointer.ParentNode().RemoveNode(pointer.RelativePositionInParentNode);
-      this.CurrentMove=pointer.PreviousNode;
+      this.CurrentMove = pointer.PreviousNode;
     }
     this.AddHistory();
   }
 
-  RemoveNonCurrentMoveBranch()
-  {
-    let pointer=this.CurrentMove;
+  RemoveNonCurrentMoveBranch() {
+    let pointer = this.CurrentMove;
     this.UpdateHistory();
-    while (pointer.PreviousNode)
-    {
-      pointer.ParentNode().NextNodes=[pointer];
-      pointer.RelativePositionInParentNode=0;
-      pointer=pointer.PreviousNode;
+    while (pointer.PreviousNode) {
+      pointer.ParentNode().NextNodes = [pointer];
+      pointer.RelativePositionInParentNode = 0;
+      pointer = pointer.PreviousNode;
     }
     this.AddHistory();
   }
 
-  CutCurrentMove()
-  {
+  CutCurrentMove() {
     this.UpdateHistory();
-    if (this.CurrentMove==this.MoveTree.RootNode)
-    {
-      this.MoveTree.RootNode.NextNodes=[];
-      this.CurrentMove=this.MoveTree.RootNode;
-    }
-    else
-    {
-      this.CurrentMove.ParentNode().RemoveNode(this.CurrentMove.RelativePositionInParentNode);
-      this.CurrentMove=this.CurrentMove.PreviousNode;
+    if (this.CurrentMove == this.MoveTree.RootNode) {
+      this.MoveTree.RootNode.NextNodes = [];
+      this.CurrentMove = this.MoveTree.RootNode;
+    } else {
+      this.CurrentMove.ParentNode().RemoveNode(
+        this.CurrentMove.RelativePositionInParentNode,
+      );
+      this.CurrentMove = this.CurrentMove.PreviousNode;
     }
     this.AddHistory();
   }
 
-  CropCurrentMove()
-  {
-    if (this.CurrentMove==this.MoveTree.RootNode)
-    {
+  CropCurrentMove() {
+    if (this.CurrentMove == this.MoveTree.RootNode) {
       return;
     }
-    let moves=[];
-    let pointer=this.CurrentMove.ParentNode();
-    let tmpboard=new ffish.Board(this.Variant,this.OriginalFEN,this.Is960);
+    let moves = [];
+    let pointer = this.CurrentMove.ParentNode();
+    let tmpboard = new ffish.Board(this.Variant, this.OriginalFEN, this.Is960);
     this.UpdateHistory();
-    while (pointer!=this.MoveTree.RootNode)
-    {
+    while (pointer != this.MoveTree.RootNode) {
       moves.unshift(pointer.Move.Move);
-      pointer=pointer.PreviousNode;
+      pointer = pointer.PreviousNode;
     }
-    if (moves.length>0)
-    {
+    if (moves.length > 0) {
       tmpboard.pushMoves(moves.join(" "));
     }
-    this.OriginalFEN=tmpboard.fen();
-    this.MoveTree.RootNode.NextNodes=[this.CurrentMove];
-    this.CurrentMove.PreviousNode=this.MoveTree.RootNode;
-    this.CurrentMove.RelativePositionInParentNode=0;
+    this.OriginalFEN = tmpboard.fen();
+    this.MoveTree.RootNode.NextNodes = [this.CurrentMove];
+    this.CurrentMove.PreviousNode = this.MoveTree.RootNode;
+    this.CurrentMove.RelativePositionInParentNode = 0;
     this.AddHistory();
     tmpboard.delete();
   }
 
-  RemoveVariationsOfCurrentMove()
-  {
-    if (this.CurrentMove.NextNodes.length>1)
-    {
+  RemoveVariationsOfCurrentMove() {
+    if (this.CurrentMove.NextNodes.length > 1) {
       this.UpdateHistory();
-      this.CurrentMove.NextNodes=[this.CurrentMove.NextNodes[0]];
+      this.CurrentMove.NextNodes = [this.CurrentMove.NextNodes[0]];
       this.AddHistory();
     }
   }
 
-  ShowOrHideCurrentMove()
-  {
-    if (this.CurrentMove==this.MoveTree.RootNode)
-    {
+  ShowOrHideCurrentMove() {
+    if (this.CurrentMove == this.MoveTree.RootNode) {
       return;
     }
     this.UpdateHistory();
-    this.CurrentMove.Move.HideSubsequentMoves=!this.CurrentMove.Move.HideSubsequentMoves;
+    this.CurrentMove.Move.HideSubsequentMoves =
+      !this.CurrentMove.Move.HideSubsequentMoves;
     this.AddHistory();
   }
 
-  UncommentCurrentMove()
-  {
-    if (this.CurrentMove==this.MoveTree.RootNode)
-    {
+  UncommentCurrentMove() {
+    if (this.CurrentMove == this.MoveTree.RootNode) {
       return;
     }
     this.UpdateHistory();
-    this.CurrentMove.Move.TextAfter="";
-    this.CurrentMove.Move.TextBefore="";
-    this.CurrentMove.Move.Symbol="";
+    this.CurrentMove.Move.TextAfter = "";
+    this.CurrentMove.Move.TextBefore = "";
+    this.CurrentMove.Move.Symbol = "";
     this.AddHistory();
   }
 
-  SetTextBeforeOfCurrentMove(TextBefore)
-  {
-    if (typeof TextBefore!="string")
-    {
+  SetTextBeforeOfCurrentMove(TextBefore) {
+    if (typeof TextBefore != "string") {
       throw TypeError();
     }
-    if (this.CurrentMove==this.MoveTree.RootNode)
-    {
+    if (this.CurrentMove == this.MoveTree.RootNode) {
       return;
     }
     this.UpdateHistory();
-    this.CurrentMove.Move.TextBefore=TextBefore;
+    this.CurrentMove.Move.TextBefore = TextBefore;
     this.AddHistory();
   }
 
-  SetTextAfterOfCurrentMove(TextAfter)
-  {
-    if (typeof TextAfter!="string")
-    {
+  SetTextAfterOfCurrentMove(TextAfter) {
+    if (typeof TextAfter != "string") {
       throw TypeError();
     }
-    if (this.CurrentMove==this.MoveTree.RootNode)
-    {
+    if (this.CurrentMove == this.MoveTree.RootNode) {
       return;
     }
     this.UpdateHistory();
-    this.CurrentMove.Move.TextAfter=TextAfter;
+    this.CurrentMove.Move.TextAfter = TextAfter;
     this.AddHistory();
   }
 
-  SetSymbolOfCurrentMove(MoveSymbol)
-  {
-    if (typeof MoveSymbol!="string")
-    {
+  SetSymbolOfCurrentMove(MoveSymbol) {
+    if (typeof MoveSymbol != "string") {
       throw TypeError();
     }
-    if (this.CurrentMove==this.MoveTree.RootNode)
-    {
+    if (this.CurrentMove == this.MoveTree.RootNode) {
       return;
     }
     this.UpdateHistory();
-    this.CurrentMove.Move.Symbol=MoveSymbol;
+    this.CurrentMove.Move.Symbol = MoveSymbol;
     this.AddHistory();
   }
 
-  ToString(Notation,AlwaysShowResult)
-  {
-    if (Notation==null || typeof AlwaysShowResult!="boolean")
-    {
+  ToString(Notation, AlwaysShowResult) {
+    if (Notation == null || typeof AlwaysShowResult != "boolean") {
       throw TypeError();
     }
-    let fenitems=this.OriginalFEN.split(this.BlankSplitter);
-    let initialmoverround=(fenitems[1]=="b"?1:0);
-    let initialmovenumber=parseInt(fenitems.pop());
-    this.MoveTree.SetInitialCondition(initialmovenumber,initialmoverround,2);
-    let tokens=this.MoveTree.ToPGNTokens(2);
+    let fenitems = this.OriginalFEN.split(this.BlankSplitter);
+    let initialmoverround = fenitems[1] == "b" ? 1 : 0;
+    let initialmovenumber = parseInt(fenitems.pop());
+    this.MoveTree.SetInitialCondition(initialmovenumber, initialmoverround, 2);
+    let tokens = this.MoveTree.ToPGNTokens(2);
     console.log(this.MoveTree);
-    let i=0;
-    let tmpboard=new ffish.Board(this.Variant,this.OriginalFEN,this.Is960);
-    let result="";
-    let stack=[];
-    for (i=0;i<tokens.length;i++)
-    {
-      if (tokens[i].IsSplitter)
-      {
-        if (tokens[i].Move.Move=="(")
-        {
+    let i = 0;
+    let tmpboard = new ffish.Board(this.Variant, this.OriginalFEN, this.Is960);
+    let result = "";
+    let stack = [];
+    for (i = 0; i < tokens.length; i++) {
+      if (tokens[i].IsSplitter) {
+        if (tokens[i].Move.Move == "(") {
           stack.push(tmpboard.moveStack());
           tmpboard.pop();
-          result+="( ";
-        }
-        else if (tokens[i].Move.Move==")")
-        {
+          result += "( ";
+        } else if (tokens[i].Move.Move == ")") {
           tmpboard.reset();
           tmpboard.setFen(this.OriginalFEN);
           tmpboard.pushMoves(stack.pop());
-          result+=") ";
+          result += ") ";
         }
-      }
-      else
-      {
-        if (tokens[i].Move.TextBefore)
-        {
-          result+=("{"+tokens[i].Move.TextBefore+"} ");
+      } else {
+        if (tokens[i].Move.TextBefore) {
+          result += "{" + tokens[i].Move.TextBefore + "} ";
         }
-        if (i==0 || (i>0 && tokens[i-1].Move.Move=="("))
-        {
-          if (tokens[i].Move.MoverRound==0)
-          {
-            result+=(Math.ceil(tokens[i].Move.HalfMoveNumber/2)+". ");
+        if (i == 0 || (i > 0 && tokens[i - 1].Move.Move == "(")) {
+          if (tokens[i].Move.MoverRound == 0) {
+            result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
+          } else {
+            result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + "... ";
           }
-          else
-          {
-            result+=(Math.ceil(tokens[i].Move.HalfMoveNumber/2)+"... ");
-          }
+        } else if (tokens[i].Move.MoverRound == 0) {
+          result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
         }
-        else if (tokens[i].Move.MoverRound==0)
-        {
-          result+=(Math.ceil(tokens[i].Move.HalfMoveNumber/2)+". ");
-        }
-        result+=tmpboard.sanMove(tokens[i].Move.Move,Notation);
+        result += tmpboard.sanMove(tokens[i].Move.Move, Notation);
         tmpboard.push(tokens[i].Move.Move);
-        if (tokens[i].Move.Symbol)
-        {
-          result+=(tokens[i].Move.Symbol+" ");
+        if (tokens[i].Move.Symbol) {
+          result += tokens[i].Move.Symbol + " ";
+        } else {
+          result += " ";
         }
-        else
-        {
-          result+=" ";
-        }
-        if (tokens[i].Move.TextAfter)
-        {
-          result+=("{"+tokens[i].Move.TextAfter+"} ");
+        if (tokens[i].Move.TextAfter) {
+          result += "{" + tokens[i].Move.TextAfter + "} ";
         }
       }
     }
@@ -1049,129 +1016,109 @@ class GameTree
         tmpboardresult = tmpboard.result(false);
       }
     }
-    if (AlwaysShowResult || tmpboardresult!="*")
-    {
-      result+=tmpboardresult;
+    if (AlwaysShowResult || tmpboardresult != "*") {
+      result += tmpboardresult;
     }
-    try
-    {
+    try {
       tmpboard.delete();
-    }
-    catch (err)
-    {
-      console.error("Caught",err);
+    } catch (err) {
+      console.error("Caught", err);
     }
     return result.trim();
   }
 
-  ToPGNDiv(Notation)
-  {
-    if (Notation==null)
-    {
+  ToPGNDiv(Notation) {
+    if (Notation == null) {
       throw TypeError();
     }
-    let fenitems=this.OriginalFEN.split(this.BlankSplitter);
-    let initialmoverround=(fenitems[1]=="b"?1:0);
-    let initialmovenumber=parseInt(fenitems.pop());
-    this.MoveTree.SetInitialCondition(initialmovenumber,initialmoverround,2);
-    let tokens=this.MoveTree.ToPGNTokens(2);
-    let i=0;
-    let tmpboard=new ffish.Board(this.Variant,this.OriginalFEN,this.Is960);
-    let stack=[];
-    let element=null;
-    let move=null;
-    let gameresult="";
-    let index=0,indexend=0;
-    let boardnotes="";
-    let hidesubsequentmovelevel=0;
+    let fenitems = this.OriginalFEN.split(this.BlankSplitter);
+    let initialmoverround = fenitems[1] == "b" ? 1 : 0;
+    let initialmovenumber = parseInt(fenitems.pop());
+    this.MoveTree.SetInitialCondition(initialmovenumber, initialmoverround, 2);
+    let tokens = this.MoveTree.ToPGNTokens(2);
+    let i = 0;
+    let tmpboard = new ffish.Board(this.Variant, this.OriginalFEN, this.Is960);
+    let stack = [];
+    let element = null;
+    let move = null;
+    let gameresult = "";
+    let index = 0,
+      indexend = 0;
+    let boardnotes = "";
+    let hidesubsequentmovelevel = 0;
     let movesparagraph = document.createElement("div");
     movesparagraph.id = "pgndiv";
     movesparagraph.classList.add("board-display-san");
 
-    for (i=0;i<tokens.length;i++)
-    {
-      if (tokens[i].IsSplitter)
-      {
-        if (tokens[i].Move.Move=="(")
-        {
+    for (i = 0; i < tokens.length; i++) {
+      if (tokens[i].IsSplitter) {
+        if (tokens[i].Move.Move == "(") {
           stack.push(tmpboard.moveStack());
           tmpboard.pop();
-          if (hidesubsequentmovelevel>0)
-          {
+          if (hidesubsequentmovelevel > 0) {
             hidesubsequentmovelevel++;
-          }
-          else
-          {
+          } else {
             element = document.createElement("p");
             element.innerText = "(";
             element.classList.add("splitter");
             movesparagraph.appendChild(element);
           }
-        }
-        else if (tokens[i].Move.Move==")")
-        {
+        } else if (tokens[i].Move.Move == ")") {
           tmpboard.reset();
           tmpboard.setFen(this.OriginalFEN);
           tmpboard.pushMoves(stack.pop());
-          if (hidesubsequentmovelevel>0)
-          {
+          if (hidesubsequentmovelevel > 0) {
             hidesubsequentmovelevel--;
           }
-          if (hidesubsequentmovelevel==0)
-          {
+          if (hidesubsequentmovelevel == 0) {
             element = document.createElement("p");
             element.innerText = ")";
             element.classList.add("splitter");
             movesparagraph.appendChild(element);
           }
         }
-      }
-      else
-      {
-        if (hidesubsequentmovelevel>0)
-        {
+      } else {
+        if (hidesubsequentmovelevel > 0) {
           continue;
         }
-        if (tokens[i].Move.TextBefore)
-        {
+        if (tokens[i].Move.TextBefore) {
           element = document.createElement("p");
-          element.innerText = tokens[i].Move.TextBefore.replace(this.MoveTextActionPartsMatcher,"");
+          element.innerText = tokens[i].Move.TextBefore.replace(
+            this.MoveTextActionPartsMatcher,
+            "",
+          );
           element.classList.add("text-before");
           movesparagraph.appendChild(element);
         }
-        if (i==0 || (i>0 && tokens[i-1].Move.Move=="("))
-        {
-          if (tokens[i].Move.MoverRound==0)
-          {
+        if (i == 0 || (i > 0 && tokens[i - 1].Move.Move == "(")) {
+          if (tokens[i].Move.MoverRound == 0) {
             element = document.createElement("p");
-            element.innerText = (Math.ceil(tokens[i].Move.HalfMoveNumber/2)+". ");
+            element.innerText =
+              Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
+            element.classList.add("move-number");
+            movesparagraph.appendChild(element);
+          } else {
+            element = document.createElement("p");
+            element.innerText =
+              Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + "... ";
             element.classList.add("move-number");
             movesparagraph.appendChild(element);
           }
-          else
-          {
-            element = document.createElement("p");
-            element.innerText = (Math.ceil(tokens[i].Move.HalfMoveNumber/2)+"... ");
-            element.classList.add("move-number");
-            movesparagraph.appendChild(element);
-          }
-        }
-        else if (tokens[i].Move.MoverRound==0)
-        {
+        } else if (tokens[i].Move.MoverRound == 0) {
           element = document.createElement("p");
-          element.innerText = (Math.ceil(tokens[i].Move.HalfMoveNumber/2)+". ");
+          element.innerText =
+            Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
           element.classList.add("move-number");
           movesparagraph.appendChild(element);
         }
         move = moveutil.ParseUCIMove(tokens[i].Move.Move);
         element = document.createElement("p");
-        if (tokens[i].Move.Symbol)
-        {
-          element.innerText = (tmpboard.sanMove(tokens[i].Move.Move,Notation)+tokens[i].Move.Symbol);
-        }
-        else
-        {
-          element.innerText = tmpboard.sanMove(tokens[i].Move.Move,Notation);
+        if (tokens[i].Move.Symbol) {
+          element.innerText =
+            tmpboard.sanMove(tokens[i].Move.Move, Notation) +
+            tokens[i].Move.Symbol;
+        } else {
+          element.innerText = tmpboard.sanMove(tokens[i].Move.Move, Notation);
         }
         tmpboard.push(tokens[i].Move.Move);
         gameresult = tmpboard.result();
@@ -1184,15 +1131,9 @@ class GameTree
         }
         element.classList.add("position-display-label");
         element.fenstr = tmpboard.fen();
-        if (move[0].includes("@"))
-        {
-          element.lastmove = [
-            move[0],
-            convertSquareToChessgroundXKey(move[1]),
-          ];
-        }
-        else
-        {
+        if (move[0].includes("@")) {
+          element.lastmove = [move[0], convertSquareToChessgroundXKey(move[1])];
+        } else {
           element.lastmove = [
             convertSquareToChessgroundXKey(move[0]),
             convertSquareToChessgroundXKey(move[1]),
@@ -1203,73 +1144,72 @@ class GameTree
         element.gameresult = gameresult;
         element.startingfen = this.OriginalFEN;
         element.moves = tmpboard.moveStack();
-        if (tokens[i].Node==this.CurrentMove)
-        {
+        if (tokens[i].Node == this.CurrentMove) {
           element.classList.add("current-move");
-          element.title="This is current move.";
+          element.title = "This is current move.";
         }
-        element.onclick=onMoveElementClicked;
+        element.onclick = onMoveElementClicked;
         movesparagraph.appendChild(element);
-        if (tokens[i].Move.TextAfter)
-        {
-          boardnotes="";
-          index=tokens[i].Move.TextAfter.indexOf("[%cal ");
-          if (index>=0)
-          {
-            indexend=tokens[i].Move.TextAfter.indexOf("]",index+6);
-            if (indexend>=0)
-            {
-              boardnotes+=tokens[i].Move.TextAfter.substring(index+6,indexend);
+        if (tokens[i].Move.TextAfter) {
+          boardnotes = "";
+          index = tokens[i].Move.TextAfter.indexOf("[%cal ");
+          if (index >= 0) {
+            indexend = tokens[i].Move.TextAfter.indexOf("]", index + 6);
+            if (indexend >= 0) {
+              boardnotes += tokens[i].Move.TextAfter.substring(
+                index + 6,
+                indexend,
+              );
             }
           }
-          index=tokens[i].Move.TextAfter.indexOf("[%csl ");
-          if (index>=0)
-          {
-            indexend=tokens[i].Move.TextAfter.indexOf("]",index+6);
-            if (indexend>=0)
-            {
-              boardnotes+=(","+tokens[i].Move.TextAfter.substring(index+6,indexend));
+          index = tokens[i].Move.TextAfter.indexOf("[%csl ");
+          if (index >= 0) {
+            indexend = tokens[i].Move.TextAfter.indexOf("]", index + 6);
+            if (indexend >= 0) {
+              boardnotes +=
+                "," + tokens[i].Move.TextAfter.substring(index + 6, indexend);
             }
           }
-          if (boardnotes)
-          {
-            element.boardnotes=boardnotes;
+          if (boardnotes) {
+            element.boardnotes = boardnotes;
             element = document.createElement("img");
-            element.src="./assets/images/pgn/colorring.svg";
-            element.width="20";
-            element.height="20";
-            element.title="This position has additional notes on the board. Click this move to view it on the mini board.";
+            element.src = "./assets/images/pgn/colorring.svg";
+            element.width = "20";
+            element.height = "20";
+            element.title =
+              "This position has additional notes on the board. Click this move to view it on the mini board.";
             element.classList.add("has-move-note-sign");
             movesparagraph.appendChild(element);
           }
-          if (tokens[i].Move.TextAfter.includes("[#]"))
-          {
+          if (tokens[i].Move.TextAfter.includes("[#]")) {
             element = document.createElement("p");
-            element.innerText="◀◀ Needs Attention";
-            element.title="This position needs to be carefully examined.";
+            element.innerText = "◀◀ Needs Attention";
+            element.title = "This position needs to be carefully examined.";
             element.classList.add("needs-attention-sign");
             movesparagraph.appendChild(element);
           }
 
           element = document.createElement("p");
-          element.innerText = tokens[i].Move.TextAfter.replace(this.MoveTextActionPartsMatcher,"");
+          element.innerText = tokens[i].Move.TextAfter.replace(
+            this.MoveTextActionPartsMatcher,
+            "",
+          );
           element.classList.add("text-after");
           movesparagraph.appendChild(element);
         }
-        if (tokens[i].Move.HideSubsequentMoves)
-        {
-          hidesubsequentmovelevel=1;
+        if (tokens[i].Move.HideSubsequentMoves) {
+          hidesubsequentmovelevel = 1;
           element = document.createElement("p");
-          element.innerText="...";
-          element.title="Moves after this move are not displayed. Click here to show them.";
+          element.innerText = "...";
+          element.title =
+            "Moves after this move are not displayed. Click here to show them.";
           element.classList.add("hide-subsequent-moves-sign");
-          (function(elem,move)
-          {
-            elem.onclick=()=>{
-              move.HideSubsequentMoves=false;
+          (function (elem, move) {
+            elem.onclick = () => {
+              move.HideSubsequentMoves = false;
               updatePGNDivision();
             };
-          })(element,tokens[i].Move);
+          })(element, tokens[i].Move);
           movesparagraph.appendChild(element);
         }
       }
@@ -1282,33 +1222,30 @@ class GameTree
         tmpboardresult = tmpboard.result(false);
       }
     }
-    if (tmpboardresult!="*")
-    {
+    if (tmpboardresult != "*") {
       element = document.createElement("p");
       element.innerText = tmpboardresult;
       element.classList.add("result");
       movesparagraph.appendChild(element);
     }
-    try
-    {
+    try {
       tmpboard.delete();
-    }
-    catch (err)
-    {
-      console.error("Caught",err);
+    } catch (err) {
+      console.error("Caught", err);
     }
     return movesparagraph;
   }
 }
 
 let multipvminiboardhandler = new MultiplePrincipalVariationMiniBoardHandler();
-let gametree=new GameTree();
-let themedetector=new themeutil.ChessgroundThemeDetector(chessgroundThemeDetector);
+let gametree = new GameTree();
+let themedetector = new themeutil.ChessgroundThemeDetector(
+  chessgroundThemeDetector,
+);
 
-document.addEventListener("themechange",(event)=>{
-  if (event instanceof CustomEvent)
-  {
-    themedetector.SetThemes(event.detail.piece,event.detail.board);
+document.addEventListener("themechange", (event) => {
+  if (event instanceof CustomEvent) {
+    themedetector.SetThemes(event.detail.piece, event.detail.board);
   }
 });
 
@@ -1935,61 +1872,52 @@ function onMoveElementClicked() {
     notation: chessground.state.notation,
   });
   chessground_mini.setAutoShapes([]);
-  if (this.boardnotes)
-  {
-    let notes=this.boardnotes.split(",");
-    let i=0;
-    let color="";
-    let note="";
-    let moveturns=[];
-    let moves=[];
-    let colors=[];
-    let notepositions=[];
-    let moveturn=(this.moveturn=="white");
-    for (i=0;i<notes.length;i++)
-    {
-      note=notes[i].trim();
-      if (note=="")
-      {
+  if (this.boardnotes) {
+    let notes = this.boardnotes.split(",");
+    let i = 0;
+    let color = "";
+    let note = "";
+    let moveturns = [];
+    let moves = [];
+    let colors = [];
+    let notepositions = [];
+    let moveturn = this.moveturn == "white";
+    for (i = 0; i < notes.length; i++) {
+      note = notes[i].trim();
+      if (note == "") {
         continue;
       }
-      if (note[0]=="Y")
-      {
-        color="yellow";
-      }
-      else if (note[0]=="G")
-      {
-        color="green";
-      }
-      else if (note[0]=="R")
-      {
-        color="red";
-      }
-      else if (note[0]=="B")
-      {
-        color="blue";
-      }
-      else
-      {
+      if (note[0] == "Y") {
+        color = "yellow";
+      } else if (note[0] == "G") {
+        color = "green";
+      } else if (note[0] == "R") {
+        color = "red";
+      } else if (note[0] == "B") {
+        color = "blue";
+      } else {
         continue;
       }
-      note=note.substring(1);
+      note = note.substring(1);
       moveturns.push(moveturn);
       colors.push(color);
-      notepositions.push("TopRight")
-      if (note.match(/[a-z][0-9]+/g).length==1)
-      {
-        moves.push("@"+note);
-      }
-      else
-      {
+      notepositions.push("TopRight");
+      if (note.match(/[a-z][0-9]+/g).length == 1) {
+        moves.push("@" + note);
+      } else {
         moves.push(note);
       }
     }
     //The arrows can be drawed correctly only when the board is visible, so we have to wait for the browser rendering the board.
-    window.setTimeout(()=>{
-      highlightMoveOnBoard(moveturns,chessground_mini,moves,colors,notepositions);
-    },100);
+    window.setTimeout(() => {
+      highlightMoveOnBoard(
+        moveturns,
+        chessground_mini,
+        moves,
+        colors,
+        notepositions,
+      );
+    }, 100);
   }
   chessgroundMini.startingfen = this.startingfen;
   chessgroundMini.moves = this.moves;
@@ -2015,16 +1943,10 @@ function onMoveElementClicked() {
     let finalX = offsetX;
     let finalY = offsetY + 40;
     if (chessgroundMini.pinned) {
-      if (
-        finalX + chessgroundminirect.width >
-        window.innerWidth - padding
-      ) {
+      if (finalX + chessgroundminirect.width > window.innerWidth - padding) {
         finalX -= chessgroundminirect.width;
       }
-      if (
-        finalY + chessgroundminirect.height >
-        window.innerHeight - padding
-      ) {
+      if (finalY + chessgroundminirect.height > window.innerHeight - padding) {
         finalY = window.innerHeight - chessgroundminirect.height - padding;
       }
     } else {
@@ -2044,8 +1966,7 @@ function onMoveElementClicked() {
       chessgroundMiniBoardWrapper.removeChild(elem);
       elem = document.getElementById("gameresultcontainermini");
     }
-    let operationrect =
-      chessgroundMiniBoardOperations.getBoundingClientRect();
+    let operationrect = chessgroundMiniBoardOperations.getBoundingClientRect();
     let div = document.createElement("div");
     div.id = "gameresultcontainermini";
     div.classList.add("inaccessble");
@@ -2093,7 +2014,7 @@ function parseUCIMovesToPreviewElements(
   elementid,
   sannotation,
   originalfen,
-  originalmoves
+  originalmoves,
 ) {
   let moves = ucimoves.trim().split(" ");
   let i = 0;
@@ -2151,7 +2072,11 @@ function parseUCIMovesToPreviewElements(
     moveelement.checked = getCheckSquares(tmpboard);
     moveelement.gameresult = gameresult;
     moveelement.startingfen = originalfen;
-    moveelement.moves = (originalmoves.trim()+" "+moves.slice(0,i+1).join(" ")).trim();
+    moveelement.moves = (
+      originalmoves.trim() +
+      " " +
+      moves.slice(0, i + 1).join(" ")
+    ).trim();
     /*
         
         TODO: Due to dynamic element removing and adding, sometimes clicking the element has no effect, especially when it's frequently updated.
@@ -2378,114 +2303,142 @@ function parseUCIMovesToPreviewElementsStatic(movesparagraph, variant, fen, is96
     return movesparagraph;
 }*/
 
-function GenerateBoardImage(GenerationMode,ImageWidth,ImageHeight,KeepAspectRatio,OnFinishedCallback)
-{
-  if (typeof GenerationMode!="string" || typeof ImageWidth!="number" || typeof ImageHeight!="number" || typeof KeepAspectRatio!="boolean" || typeof OnFinishedCallback!="function")
-  {
+function GenerateBoardImage(
+  GenerationMode,
+  ImageWidth,
+  ImageHeight,
+  KeepAspectRatio,
+  OnFinishedCallback,
+) {
+  if (
+    typeof GenerationMode != "string" ||
+    typeof ImageWidth != "number" ||
+    typeof ImageHeight != "number" ||
+    typeof KeepAspectRatio != "boolean" ||
+    typeof OnFinishedCallback != "function"
+  ) {
     throw TypeError();
   }
-  let dimensions=getDimensions();
-  let asseturl=themedetector.GetThemes();
-  let moves=gametree.GetMoveListOfMove(gametree.CurrentMove);
-  let tmpboard=new ffish.Board(gametree.Variant,gametree.OriginalFEN,gametree.Is960);
-  let imagewidth=ImageWidth;
-  let imageheight=ImageHeight;
-  if (GenerationMode=="current")
-  {
+  let dimensions = getDimensions();
+  let asseturl = themedetector.GetThemes();
+  let moves = gametree.GetMoveListOfMove(gametree.CurrentMove);
+  let tmpboard = new ffish.Board(
+    gametree.Variant,
+    gametree.OriginalFEN,
+    gametree.Is960,
+  );
+  let imagewidth = ImageWidth;
+  let imageheight = ImageHeight;
+  if (GenerationMode == "current") {
     tmpboard.pushMoves(moves);
-    let hiddenpieces=getHiddenDroppablePiece(tmpboard);
-    let fen=tmpboard.fen().split(" ")[0];
-    if (hiddenpieces.length>0)
-    {
-      let index=fen.indexOf("[");
-      if (index<0)
-      {
-        fen=fen+`[${hiddenpieces}]`;
-      }
-      else
-      {
-        fen=fen.substring(0,index+1)+hiddenpieces+fen.substring(index+1);
+    let hiddenpieces = getHiddenDroppablePiece(tmpboard);
+    let fen = tmpboard.fen().split(" ")[0];
+    if (hiddenpieces.length > 0) {
+      let index = fen.indexOf("[");
+      if (index < 0) {
+        fen = fen + `[${hiddenpieces}]`;
+      } else {
+        fen =
+          fen.substring(0, index + 1) + hiddenpieces + fen.substring(index + 1);
       }
     }
-    if (KeepAspectRatio)
-    {
-      if (fen.includes("["))
-      {
-        imageheight=imagewidth/dimensions.width*(dimensions.height+2);
-      }
-      else
-      {
-        imageheight=imagewidth/dimensions.width*dimensions.height;
+    if (KeepAspectRatio) {
+      if (fen.includes("[")) {
+        imageheight = (imagewidth / dimensions.width) * (dimensions.height + 2);
+      } else {
+        imageheight = (imagewidth / dimensions.width) * dimensions.height;
       }
     }
-    console.log(fen,gametree.CurrentMove,fen.includes("["),chessground.state.orientation,dimensions.width,dimensions.height,asseturl.pieces,asseturl.board,imagewidth,imageheight);
-    imageutil.GenerateBoardImage(fen,gametree.CurrentMove.Move.Move,fen.includes("["),chessground.state.orientation,dimensions.width,dimensions.height,asseturl.pieces,asseturl.board,imagewidth,imageheight,(canvas)=>{
-      if (canvas instanceof HTMLCanvasElement)
-      {
-        OnFinishedCallback([canvas]);
-      }
-    });
-  }
-  else if (GenerationMode=="all")
-  {
-    let i=0;
-    let movelist=moves.split(" ").filter((val)=>(val!=""));
-    let haspocket=false;
+    console.log(
+      fen,
+      gametree.CurrentMove,
+      fen.includes("["),
+      chessground.state.orientation,
+      dimensions.width,
+      dimensions.height,
+      asseturl.pieces,
+      asseturl.board,
+      imagewidth,
+      imageheight,
+    );
+    imageutil.GenerateBoardImage(
+      fen,
+      gametree.CurrentMove.Move.Move,
+      fen.includes("["),
+      chessground.state.orientation,
+      dimensions.width,
+      dimensions.height,
+      asseturl.pieces,
+      asseturl.board,
+      imagewidth,
+      imageheight,
+      (canvas) => {
+        if (canvas instanceof HTMLCanvasElement) {
+          OnFinishedCallback([canvas]);
+        }
+      },
+    );
+  } else if (GenerationMode == "all") {
+    let i = 0;
+    let movelist = moves.split(" ").filter((val) => val != "");
+    let haspocket = false;
     let hiddenpieces;
     let fen;
-    let fens=[];
-    let drawncanvascount=0;
-    let totalcanvascount=movelist.length+1;
-    let canvaslist=[];
-    for (i=-1;i<movelist.length;i++)
-    {
-      if (i>=0)
-      {
+    let fens = [];
+    let drawncanvascount = 0;
+    let totalcanvascount = movelist.length + 1;
+    let canvaslist = [];
+    for (i = -1; i < movelist.length; i++) {
+      if (i >= 0) {
         tmpboard.push(movelist[i]);
       }
-      hiddenpieces=getHiddenDroppablePiece(tmpboard);
-      fen=tmpboard.fen().split(" ")[0];
-      if (hiddenpieces.length>0)
-      {
-        let index=fen.indexOf("[");
-        if (index<0)
-        {
-          fen=fen+`[${hiddenpieces}]`;
-        }
-        else
-        {
-          fen=fen.substring(0,index+1)+hiddenpieces+fen.substring(index+1);
+      hiddenpieces = getHiddenDroppablePiece(tmpboard);
+      fen = tmpboard.fen().split(" ")[0];
+      if (hiddenpieces.length > 0) {
+        let index = fen.indexOf("[");
+        if (index < 0) {
+          fen = fen + `[${hiddenpieces}]`;
+        } else {
+          fen =
+            fen.substring(0, index + 1) +
+            hiddenpieces +
+            fen.substring(index + 1);
         }
       }
-      haspocket=haspocket||fen.includes("[");
+      haspocket = haspocket || fen.includes("[");
       fens.push(fen);
       canvaslist.push(null);
     }
-    if (KeepAspectRatio)
-    {
-      if (haspocket)
-      {
-        imageheight=imagewidth/dimensions.width*(dimensions.height+2);
-      }
-      else
-      {
-        imageheight=imagewidth/dimensions.width*dimensions.height;
+    if (KeepAspectRatio) {
+      if (haspocket) {
+        imageheight = (imagewidth / dimensions.width) * (dimensions.height + 2);
+      } else {
+        imageheight = (imagewidth / dimensions.width) * dimensions.height;
       }
     }
-    for (i=0;i<fens.length;i++)
-    {
-      (function(index){
-        imageutil.GenerateBoardImage(fens[index],index==0?"":movelist[index-1],haspocket,chessground.state.orientation,dimensions.width,dimensions.height,asseturl.pieces,asseturl.board,imagewidth,imageheight,(canvas)=>{
-          drawncanvascount++;
-          if (canvas instanceof HTMLCanvasElement)
-          {
-            canvaslist[index]=canvas;
-          }
-          if (drawncanvascount>=totalcanvascount)
-          {
-            OnFinishedCallback(canvaslist);
-          }
-        });
+    for (i = 0; i < fens.length; i++) {
+      (function (index) {
+        imageutil.GenerateBoardImage(
+          fens[index],
+          index == 0 ? "" : movelist[index - 1],
+          haspocket,
+          chessground.state.orientation,
+          dimensions.width,
+          dimensions.height,
+          asseturl.pieces,
+          asseturl.board,
+          imagewidth,
+          imageheight,
+          (canvas) => {
+            drawncanvascount++;
+            if (canvas instanceof HTMLCanvasElement) {
+              canvaslist[index] = canvas;
+            }
+            if (drawncanvascount >= totalcanvascount) {
+              OnFinishedCallback(canvaslist);
+            }
+          },
+        );
       })(i);
     }
   }
@@ -2694,55 +2647,59 @@ function filterMoves(
   return result;
 }
 
-function highlightMoveOnBoard(moveturns,chessground,moves,colors,notepositions) {
-  if (!(Array.isArray(moveturns)) || !(Array.isArray(moves)) || !(Array.isArray(colors)) || !(Array.isArray(notepositions)) || chessground==null) {
+function highlightMoveOnBoard(
+  moveturns,
+  chessground,
+  moves,
+  colors,
+  notepositions,
+) {
+  if (
+    !Array.isArray(moveturns) ||
+    !Array.isArray(moves) ||
+    !Array.isArray(colors) ||
+    !Array.isArray(notepositions) ||
+    chessground == null
+  ) {
     return;
   }
-  let i=0;
+  let i = 0;
   let bestmove = null;
   let autoshapes = [];
-  let color="";
-  let notecolor="";
-  let moveturn=true;
-  let noteposition="";
-  for (i=0;i<moves.length;i++)
-  {
-    bestmove=moveutil.ParseUCIMove(moves[i]);
-    if (bestmove[0]==null || bestmove[1]==null || bestmove[2]==null || bestmove[3]==null)
-    {
+  let color = "";
+  let notecolor = "";
+  let moveturn = true;
+  let noteposition = "";
+  for (i = 0; i < moves.length; i++) {
+    bestmove = moveutil.ParseUCIMove(moves[i]);
+    if (
+      bestmove[0] == null ||
+      bestmove[1] == null ||
+      bestmove[2] == null ||
+      bestmove[3] == null
+    ) {
       continue;
     }
-    color=colors[i];
-    moveturn=moveturns[i];
-    noteposition=notepositions[i];
-    if (color=="blue")
-    {
-      notecolor="#003088";
+    color = colors[i];
+    moveturn = moveturns[i];
+    noteposition = notepositions[i];
+    if (color == "blue") {
+      notecolor = "#003088";
+    } else if (color == "red") {
+      notecolor = "#882020";
+    } else if (color == "yellow") {
+      notecolor = "#e68f00";
+    } else if (color == "green") {
+      notecolor = "#15781b";
+    } else {
+      notecolor = "#000000";
     }
-    else if (color=="red")
-    {
-      notecolor="#882020";
-    }
-    else if (color=="yellow")
-    {
-      notecolor="#e68f00";
-    }
-    else if (color=="green")
-    {
-      notecolor="#15781b";
-    }
-    else
-    {
-      notecolor="#000000";
-    }
-    if (bestmove[0].startsWith("@"))
-    {
+    if (bestmove[0].startsWith("@")) {
       autoshapes.push({
         brush: color,
         orig: convertSquareToChessgroundXKey(bestmove[1]),
       });
-    }
-    else if (bestmove[0].includes("@")) {
+    } else if (bestmove[0].includes("@")) {
       autoshapes.push({
         brush: color,
         orig: convertSquareToChessgroundXKey(bestmove[1]),
@@ -2900,7 +2857,14 @@ function highlightMoveOnBoard(moveturns,chessground,moves,colors,notepositions) 
   chessground.setAutoShapes(autoshapes);
 }
 
-function getNotation(notation, variant, startfen, is960, ucimovestr, usemovetree) {
+function getNotation(
+  notation,
+  variant,
+  startfen,
+  is960,
+  ucimovestr,
+  usemovetree,
+) {
   if (
     typeof notation != "string" ||
     typeof variant != "string" ||
@@ -2926,7 +2890,7 @@ function getNotation(notation, variant, startfen, is960, ucimovestr, usemovetree
             let moveslist = ucimoves.split(/[ ]+/).reverse();
             let result = "";
             let tmpboardresult = "";
-            let notationindex=simplenotations.indexOf(notation);
+            let notationindex = simplenotations.indexOf(notation);
             if (moveslist.length == 1 && moveslist[0] == "") {
             } else {
               while (moveslist.length > 0) {
@@ -2943,21 +2907,21 @@ function getNotation(notation, variant, startfen, is960, ucimovestr, usemovetree
                 tmpboardresult = tmpboard.result(false);
               }
             }
-            if (notationindex>=0)
-            {
-              if (usemovetree)
-              {
-                result=gametree.ToString(ffishnotationobjects[notationindex],false);
-              }
-              else
-              {
+            if (notationindex >= 0) {
+              if (usemovetree) {
+                result = gametree.ToString(
+                  ffishnotationobjects[notationindex],
+                  false,
+                );
+              } else {
                 tmpboard.setFen(startfen);
                 result =
-                  tmpboard.variationSan(ucimoves, ffishnotationobjects[notationindex]) +
-                  (tmpboardresult !== "*" ? " " + tmpboardresult : "");
+                  tmpboard.variationSan(
+                    ucimoves,
+                    ffishnotationobjects[notationindex],
+                  ) + (tmpboardresult !== "*" ? " " + tmpboardresult : "");
               }
-            }
-            else if (notation == "FEN") {
+            } else if (notation == "FEN") {
               result = tmpboard.fen();
             } else if (notation == "PGN") {
               const gameresult = tmpboardresult;
@@ -3133,14 +3097,14 @@ function onPositionSet() {
   const fen = textFen.value.trim();
   const WhiteSpaceMatcher = new RegExp("[ ]+", "");
 
-  if (!fen || validateFEN(fen,false)) {
+  if (!fen || validateFEN(fen, false)) {
     if (fen) board.setFen(fen);
     else board.reset();
     const moves = textMoves.value.trim().split(WhiteSpaceMatcher);
     let move = "";
     let i = 0;
 
-    for (i=0;i<moves.length;i++) {
+    for (i = 0; i < moves.length; i++) {
       move = moves[i];
       if (move == "") {
         continue;
@@ -3180,19 +3144,18 @@ function onPositionSet() {
       }
     }
   } else {
-    const moves=gametree.GetMoveListOfMove(gametree.CurrentMove);
+    const moves = gametree.GetMoveListOfMove(gametree.CurrentMove);
     board.setFen(gametree.OriginalFEN);
     board.pushMoves(moves);
-    textFen.value=gametree.OriginalFEN;
-    textMoves.value=moves;
+    textFen.value = gametree.OriginalFEN;
+    textMoves.value = moves;
     updateChessground(true);
   }
   recordedmultipv = 1;
 }
 
 function getDimensions() {
-  if (!board)
-  {
+  if (!board) {
     return {
       width: 8,
       height: 8,
@@ -3257,8 +3220,14 @@ new Module().then((loadedModule) => {
     const oldDimensions = getDimensions();
     initBoard(dropdownVariant.value);
     const newDimensions = getDimensions();
-    chessgroundContainerEl.setAttribute("style",`--files:${newDimensions.width};--ranks:${newDimensions.height}`);
-    chessgroundMiniContainerEl.setAttribute("style",`--files:${newDimensions.width};--ranks:${newDimensions.height}`);
+    chessgroundContainerEl.setAttribute(
+      "style",
+      `--files:${newDimensions.width};--ranks:${newDimensions.height}`,
+    );
+    chessgroundMiniContainerEl.setAttribute(
+      "style",
+      `--files:${newDimensions.width};--ranks:${newDimensions.height}`,
+    );
     chessgroundContainerEl.classList.toggle(
       `board${oldDimensions["width"]}x${oldDimensions["height"]}`,
     );
@@ -3273,7 +3242,7 @@ new Module().then((loadedModule) => {
       `board${newDimensions["width"]}x${newDimensions["height"]}`,
     );
 
-    themedetector.SetBoardDimensions(newDimensions.width,newDimensions.height);
+    themedetector.SetBoardDimensions(newDimensions.width, newDimensions.height);
 
     if (ffish.capturesToHand(dropdownVariant.value)) {
       console.log("pockets");
@@ -3297,9 +3266,9 @@ new Module().then((loadedModule) => {
 
     updateInnerCoordinateColor(chessground);
 
-    window.setTimeout(()=>{
+    window.setTimeout(() => {
       buttonReset.click();
-    },10);
+    }, 10);
   };
 
   buttonFlip.onclick = function () {
@@ -3311,90 +3280,85 @@ new Module().then((loadedModule) => {
   buttonUndo.onclick = function () {
     if (board.moveStack().length === 0) return;
     board.pop();
-    const moves=textMoves.value;
-    textMoves.value=moves.substring(0,moves.lastIndexOf(" ")).trim();
+    const moves = textMoves.value;
+    textMoves.value = moves.substring(0, moves.lastIndexOf(" ")).trim();
     chessground.cancelPremove();
     buttonSetFen.click();
   };
 
-  buttonMoveTreeClear.onclick=function() {
-    if (!buttonMoveTreeClear.disabled)
-    {
+  buttonMoveTreeClear.onclick = function () {
+    if (!buttonMoveTreeClear.disabled) {
       gametree.ClearMoves();
-      textFen.value=gametree.OriginalFEN;
-      textMoves.value="";
+      textFen.value = gametree.OriginalFEN;
+      textMoves.value = "";
       buttonSetFen.click();
     }
-  }
+  };
 
-  buttonMoveTreeCrop.onclick=function() {
-    if (!buttonMoveTreeCrop.disabled)
-    {
+  buttonMoveTreeCrop.onclick = function () {
+    if (!buttonMoveTreeCrop.disabled) {
       gametree.CropCurrentMove();
-      textFen.value=gametree.OriginalFEN;
-      textMoves.value=gametree.GetMoveListOfMove(gametree.CurrentMove);
+      textFen.value = gametree.OriginalFEN;
+      textMoves.value = gametree.GetMoveListOfMove(gametree.CurrentMove);
       buttonSetFen.click();
     }
-  }
+  };
 
-  buttonMoveTreeCut.onclick=function() {
-    if (!buttonMoveTreeCut.disabled)
-    {
+  buttonMoveTreeCut.onclick = function () {
+    if (!buttonMoveTreeCut.disabled) {
       gametree.CutCurrentMove();
-      textFen.value=gametree.OriginalFEN;
-      textMoves.value=gametree.GetMoveListOfMove(gametree.CurrentMove);
+      textFen.value = gametree.OriginalFEN;
+      textMoves.value = gametree.GetMoveListOfMove(gametree.CurrentMove);
       buttonSetFen.click();
     }
-  }
+  };
 
-  buttonMoveTreeHideShow.onclick=function() {
-    if (!buttonMoveTreeHideShow.disabled)
-    {
+  buttonMoveTreeHideShow.onclick = function () {
+    if (!buttonMoveTreeHideShow.disabled) {
       gametree.ShowOrHideCurrentMove();
       updatePGNDivision();
     }
-  }
+  };
 
-  buttonMoveTreeRemoveVariations.onclick=function()
-  {
-    if (!buttonMoveTreeRemoveVariations.disabled)
-    {
+  buttonMoveTreeRemoveVariations.onclick = function () {
+    if (!buttonMoveTreeRemoveVariations.disabled) {
       gametree.RemoveVariationsOfCurrentMove();
       updatePGNDivision();
     }
-  }
+  };
 
-  buttonMoveTreeRedo.onclick=function() {
-    if (!buttonMoveTreeRedo.disabled)
-    {
+  buttonMoveTreeRedo.onclick = function () {
+    if (!buttonMoveTreeRedo.disabled) {
       gametree.Redo();
-      textFen.value=gametree.OriginalFEN;
-      textMoves.value=gametree.GetMoveListOfMove(gametree.CurrentMove);
+      textFen.value = gametree.OriginalFEN;
+      textMoves.value = gametree.GetMoveListOfMove(gametree.CurrentMove);
       buttonSetFen.click();
     }
-  }
+  };
 
-  buttonMoveTreeCutBranch.onclick=function() {
-    if (!buttonMoveTreeCutBranch.disabled)
-    {
+  buttonMoveTreeCutBranch.onclick = function () {
+    if (!buttonMoveTreeCutBranch.disabled) {
       gametree.RemoveCurrentMoveBranch();
-      textFen.value=gametree.OriginalFEN;
-      textMoves.value=gametree.GetMoveListOfMove(gametree.CurrentMove);
+      textFen.value = gametree.OriginalFEN;
+      textMoves.value = gametree.GetMoveListOfMove(gametree.CurrentMove);
       buttonSetFen.click();
     }
-  }
+  };
 
-  buttonMoveTreeCropBranch.onclick=function() {
-    if (!buttonMoveTreeCropBranch.disabled)
-    {
+  buttonMoveTreeCropBranch.onclick = function () {
+    if (!buttonMoveTreeCropBranch.disabled) {
       gametree.RemoveNonCurrentMoveBranch();
       updatePGNDivision();
     }
-  }
+  };
 
-  buttonMoveTreeSave.onclick=function() {
-    let result="";
-    let tmpboard=new ffish.Board(gametree.Variant,gametree.OriginalFEN,gametree.Is960);
+  buttonMoveTreeSave.onclick = function () {
+    let result = "";
+    let tmpboard = new ffish.Board(
+      gametree.Variant,
+      gametree.OriginalFEN,
+      gametree.Is960,
+    );
     let tmpboardresult = "";
     const today = new Date();
     const year = today.getFullYear();
@@ -3432,107 +3396,104 @@ new Module().then((loadedModule) => {
     result = `[Event "Fairy-Stockfish Playground Game"]\n[Site "${window.location.host}"]\n[Date "${year.toString() + "." + month.toString() + "." + day.toString()}"]\n`;
     result += `[Round "1"]\n[White "${whitename}"]\n[Black "${blackname}"]\n`;
     result += `[FEN "${gametree.OriginalFEN}"]\n[Result "${tmpboardresult}"]\n[Variant "${gametree.Variant}"]\n\n`;
-    result += (gametree.ToString(ffish.Notation.SAN,true)+"\n");
-    DownloadFile(result,"game.pgn","text/plain");
-  }
+    result += gametree.ToString(ffish.Notation.SAN, true) + "\n";
+    DownloadFile(result, "game.pgn", "text/plain");
+  };
 
-  buttonMoveTreeSaveImage.onclick=function() {
+  buttonMoveTreeSaveImage.onclick = function () {
     imageGenerator.classList.remove("hidden");
     themedetector.SetOrientation(chessground.state.orientation);
-    inputFrameDuration.disabled=(dropdownImageFileType[dropdownImageFileType.selectedIndex].value!="GIF");
-    inputImageQuality.disabled=(dropdownImageFileType[dropdownImageFileType.selectedIndex].value=="PNG");
-  }
+    inputFrameDuration.disabled =
+      dropdownImageFileType[dropdownImageFileType.selectedIndex].value != "GIF";
+    inputImageQuality.disabled =
+      dropdownImageFileType[dropdownImageFileType.selectedIndex].value == "PNG";
+  };
 
-  buttonMoveTreeSetAsMainLine.onclick=function() {
-    if (!buttonMoveTreeSetAsMainLine.disabled)
-    {
+  buttonMoveTreeSetAsMainLine.onclick = function () {
+    if (!buttonMoveTreeSetAsMainLine.disabled) {
       gametree.SetCurrentMoveBranchAsMainLine();
       updatePGNDivision();
     }
-  }
+  };
 
-  buttonMoveTreeSetToMainBranch.onclick=function() {
-    if (!buttonMoveTreeSetToMainBranch.disabled)
-    {
+  buttonMoveTreeSetToMainBranch.onclick = function () {
+    if (!buttonMoveTreeSetToMainBranch.disabled) {
       gametree.SetCurrentMoveToMainBranch();
       updatePGNDivision();
     }
-  }
+  };
 
-  buttonMoveTreeSymbol.onclick=function() {
-    if (!buttonMoveTreeSymbol.disabled)
-    {
-      let symbol=window.prompt("Please enter the symbol of current move to set:",gametree.CurrentMove.Move.Symbol);
-      if (symbol!=null)
-      {
-        if (symbol=="" || moveutil.Symbols.includes(symbol))
-        {
+  buttonMoveTreeSymbol.onclick = function () {
+    if (!buttonMoveTreeSymbol.disabled) {
+      let symbol = window.prompt(
+        "Please enter the symbol of current move to set:",
+        gametree.CurrentMove.Move.Symbol,
+      );
+      if (symbol != null) {
+        if (symbol == "" || moveutil.Symbols.includes(symbol)) {
           gametree.SetSymbolOfCurrentMove(symbol);
           updatePGNDivision();
-        }
-        else
-        {
-          window.alert("Invalid symbol: "+symbol+".\nValid symbols are: "+moveutil.Symbols.join(", "));
+        } else {
+          window.alert(
+            "Invalid symbol: " +
+              symbol +
+              ".\nValid symbols are: " +
+              moveutil.Symbols.join(", "),
+          );
         }
       }
     }
-  }
+  };
 
-  buttonMoveTreeTextAfter.onclick=function() {
-    if (!buttonMoveTreeTextAfter.disabled)
-    {
-      let text=window.prompt("Please enter the text after current move:",gametree.CurrentMove.Move.TextAfter);
-      if (text!=null)
-      {
-        if (text.includes("{") || text.includes("}"))
-        {
-          window.alert("Text must not contain \"{\" or \"}\".");
-        }
-        else
-        {
+  buttonMoveTreeTextAfter.onclick = function () {
+    if (!buttonMoveTreeTextAfter.disabled) {
+      let text = window.prompt(
+        "Please enter the text after current move:",
+        gametree.CurrentMove.Move.TextAfter,
+      );
+      if (text != null) {
+        if (text.includes("{") || text.includes("}")) {
+          window.alert('Text must not contain "{" or "}".');
+        } else {
           gametree.SetTextAfterOfCurrentMove(text);
           updatePGNDivision();
         }
       }
     }
-  }
+  };
 
-  buttonMoveTreeTextBefore.onclick=function() {
-    if (!buttonMoveTreeTextBefore.disabled)
-    {
-      let text=window.prompt("Please enter the text before current move:",gametree.CurrentMove.Move.TextBefore);
-      if (text!=null)
-      {
-        if (text.includes("{") || text.includes("}"))
-        {
-          window.alert("Text must not contain \"{\" or \"}\".");
-        }
-        else
-        {
+  buttonMoveTreeTextBefore.onclick = function () {
+    if (!buttonMoveTreeTextBefore.disabled) {
+      let text = window.prompt(
+        "Please enter the text before current move:",
+        gametree.CurrentMove.Move.TextBefore,
+      );
+      if (text != null) {
+        if (text.includes("{") || text.includes("}")) {
+          window.alert('Text must not contain "{" or "}".');
+        } else {
           gametree.SetTextBeforeOfCurrentMove(text);
           updatePGNDivision();
         }
       }
     }
-  }
+  };
 
-  buttonMoveTreeUncomment.onclick=function() {
-    if (!buttonMoveTreeUncomment.disabled)
-    {
+  buttonMoveTreeUncomment.onclick = function () {
+    if (!buttonMoveTreeUncomment.disabled) {
       gametree.UncommentCurrentMove();
       updatePGNDivision();
     }
-  }
+  };
 
-  buttonMoveTreeUndo.onclick=function() {
-    if (!buttonMoveTreeUndo.disabled)
-    {
+  buttonMoveTreeUndo.onclick = function () {
+    if (!buttonMoveTreeUndo.disabled) {
       gametree.Undo();
-      textFen.value=gametree.OriginalFEN;
-      textMoves.value=gametree.GetMoveListOfMove(gametree.CurrentMove);
+      textFen.value = gametree.OriginalFEN;
+      textMoves.value = gametree.GetMoveListOfMove(gametree.CurrentMove);
       buttonSetFen.click();
     }
-  }
+  };
 
   rangeVolume.oninput = function () {
     soundMove.volume = rangeVolume.value;
@@ -3551,78 +3512,72 @@ new Module().then((loadedModule) => {
 
   pSetFen.onclick = onPositionSet;
 
-  buttonSetFen.onclick=onPositionSet;
+  buttonSetFen.onclick = onPositionSet;
 
   buttonNextPosition.onclick = function () {
-    if (gametree.CurrentMove.NextNodes[0])
-    {
-      textMoves.value=gametree.GetMoveListOfMove(gametree.CurrentMove.NextNodes[0]);
+    if (gametree.CurrentMove.NextNodes[0]) {
+      textMoves.value = gametree.GetMoveListOfMove(
+        gametree.CurrentMove.NextNodes[0],
+      );
       buttonSetFen.click();
     }
   };
 
   buttonPreviousPosition.onclick = function () {
-    if (gametree.CurrentMove.PreviousNode)
-    {
-      textMoves.value=gametree.GetMoveListOfMove(gametree.CurrentMove.PreviousNode);
+    if (gametree.CurrentMove.PreviousNode) {
+      textMoves.value = gametree.GetMoveListOfMove(
+        gametree.CurrentMove.PreviousNode,
+      );
       buttonSetFen.click();
     }
   };
 
   buttonInitialPosition.onclick = function () {
-    textMoves.value="";
+    textMoves.value = "";
     buttonSetFen.click();
   };
 
   buttonFinalPosition.onclick = function () {
-    textMoves.value=gametree.GetCompleteMainLineMoveListOfMove(gametree.CurrentMove);
+    textMoves.value = gametree.GetCompleteMainLineMoveListOfMove(
+      gametree.CurrentMove,
+    );
     buttonSetFen.click();
-  }
+  };
 
   buttonCurrentPosition.onclick = function () {
-    textMoves.value=gametree.GetMainLineMoveList();
+    textMoves.value = gametree.GetMainLineMoveList();
     buttonSetFen.click();
   };
 
   buttonSpecifiedPosition.onclick = function () {
-    let level=0;
-    let pointer=gametree.CurrentMove;
-    let targetlevel=parseInt(inputHalfMoveNumber.value);
-    if (isNaN(targetlevel) || targetlevel<0)
-    {
-      targetlevel=0;
+    let level = 0;
+    let pointer = gametree.CurrentMove;
+    let targetlevel = parseInt(inputHalfMoveNumber.value);
+    if (isNaN(targetlevel) || targetlevel < 0) {
+      targetlevel = 0;
     }
-    while (pointer!=gametree.MoveTree.RootNode)
-    {
-      pointer=pointer.PreviousNode;
+    while (pointer != gametree.MoveTree.RootNode) {
+      pointer = pointer.PreviousNode;
       level++;
     }
-    pointer=gametree.CurrentMove;
-    if (level>targetlevel)
-    {
-      while (level!=targetlevel)
-      {
-        pointer=pointer.PreviousNode;
+    pointer = gametree.CurrentMove;
+    if (level > targetlevel) {
+      while (level != targetlevel) {
+        pointer = pointer.PreviousNode;
         level--;
       }
-      textMoves.value=gametree.GetMoveListOfMove(pointer);
+      textMoves.value = gametree.GetMoveListOfMove(pointer);
       buttonSetFen.click();
-    }
-    else if (level<targetlevel)
-    {
-      while (level!=targetlevel)
-      {
-        if (pointer.NextNodes[0])
-        {
-          pointer=pointer.NextNodes[0];
+    } else if (level < targetlevel) {
+      while (level != targetlevel) {
+        if (pointer.NextNodes[0]) {
+          pointer = pointer.NextNodes[0];
           level++;
-        }
-        else
-        {
+        } else {
           break;
         }
       }
-      textMoves.value=gametree.GetMoveListOfMove(pointer);
+      textMoves.value = gametree.GetMoveListOfMove(pointer);
       buttonSetFen.click();
     }
   };
@@ -3631,24 +3586,30 @@ new Module().then((loadedModule) => {
     gameStatus.innerText = getGameStatus(false);
   };
 
-  setPgnString.onclick=function() {
-    let tokens=setPgnString.value.split("\x01");
-    let result=pgnutil.ParsePGNMovesToMoveTree(tokens[2],board.variant(),board.is960(),tokens[0],ffish.Notation.SAN,ffish);
-    if (result)
-    {
-      gametree.MoveTree=result;
+  setPgnString.onclick = function () {
+    let tokens = setPgnString.value.split("\x01");
+    let result = pgnutil.ParsePGNMovesToMoveTree(
+      tokens[2],
+      board.variant(),
+      board.is960(),
+      tokens[0],
+      ffish.Notation.SAN,
+      ffish,
+    );
+    if (result) {
+      gametree.MoveTree = result;
       gametree.ClearHistory();
-      gametree.OriginalFEN=tokens[0];
+      gametree.OriginalFEN = tokens[0];
       gametree.GoToMoveList(tokens[1]);
-      textFen.value=tokens[0];
-      textMoves.value=tokens[1];
+      textFen.value = tokens[0];
+      textMoves.value = tokens[1];
       buttonSetFen.click();
+    } else {
+      window.alert(
+        "There is a problem when parsing the PGN. Press Ctrl+Shift+I to see what's going on.",
+      );
     }
-    else
-    {
-      window.alert("There is a problem when parsing the PGN. Press Ctrl+Shift+I to see what's going on.");
-    }
-  }
+  };
 
   buttonGameStart.onclick = function () {
     if (
@@ -3861,8 +3822,8 @@ new Module().then((loadedModule) => {
   };
 
   buttonReset.onclick = function () {
-    textFen.value="";
-    textMoves.value="";
+    textFen.value = "";
+    textMoves.value = "";
     dropdownPositionVariantType.selectedIndex = 0;
     dropdownPositionVariantType.onchange();
     clearMovesList();
@@ -4113,7 +4074,7 @@ new Module().then((loadedModule) => {
             board.fen(),
             board.is960(),
             multipvrecord[k][4],
-            false
+            false,
           )}\n`;
           depthlist.push(multipvrecord[k][5]);
           seldepthlist.push(multipvrecord[k][6]);
@@ -4226,17 +4187,23 @@ new Module().then((loadedModule) => {
     }
     bestmove = multipvrecord[bestpv][2];
     ponder = multipvrecord[bestpv][3];
-    if (
-      bestmove
-    ) {
-      if (
-        ponder
-      ) {
-        highlightMoveOnBoard([board.turn(),!board.turn()],chessground,[bestmove,ponder],["blue","red"],["TopRight","TopLeft"]);
-      }
-      else
-      {
-        highlightMoveOnBoard([board.turn()],chessground,[bestmove],["blue"],["TopRight"]);
+    if (bestmove) {
+      if (ponder) {
+        highlightMoveOnBoard(
+          [board.turn(), !board.turn()],
+          chessground,
+          [bestmove, ponder],
+          ["blue", "red"],
+          ["TopRight", "TopLeft"],
+        );
+      } else {
+        highlightMoveOnBoard(
+          [board.turn()],
+          chessground,
+          [bestmove],
+          ["blue"],
+          ["TopRight"],
+        );
       }
     }
   };
@@ -4319,7 +4286,7 @@ new Module().then((loadedModule) => {
       return;
     }
 
-    afterMove(move,isCapture(board, move));
+    afterMove(move, isCapture(board, move));
   };
 
   buttonhighlightmove.onclick = function () {
@@ -4330,10 +4297,16 @@ new Module().then((loadedModule) => {
       );
       return;
     }
-    highlightMoveOnBoard([board.turn()],chessground,[move],["yellow"],["TopRight"]);
+    highlightMoveOnBoard(
+      [board.turn()],
+      chessground,
+      [move],
+      ["yellow"],
+      ["TopRight"],
+    );
   };
 
-  dropdownNotationSystem.onchange = function() {
+  dropdownNotationSystem.onchange = function () {
     updatePGNDivision();
   };
 
@@ -4361,132 +4334,142 @@ new Module().then((loadedModule) => {
     updateInnerCoordinateColor(chessground);
   };
 
-  buttonGenerateImage.onclick=function() {
-    if (buttonGenerateImage.disabled)
-    {
+  buttonGenerateImage.onclick = function () {
+    if (buttonGenerateImage.disabled) {
       return;
     }
-    buttonGenerateImage.disabled=true;
-    textImageGenerationProgress.textContent="Busy.";
-    let width=parseInt(inputImageWidth.value);
-    let height=parseInt(inputImageHeight.value);
-    let quality=parseFloat(inputImageQuality.value);
-    let framedelay=parseInt(inputFrameDuration.value);
-    let mode=dropdownGenerationMode[dropdownGenerationMode.selectedIndex].value;
-    if (isNaN(width) || width<=0)
-    {
-      width=640;
+    buttonGenerateImage.disabled = true;
+    textImageGenerationProgress.textContent = "Busy.";
+    let width = parseInt(inputImageWidth.value);
+    let height = parseInt(inputImageHeight.value);
+    let quality = parseFloat(inputImageQuality.value);
+    let framedelay = parseInt(inputFrameDuration.value);
+    let mode =
+      dropdownGenerationMode[dropdownGenerationMode.selectedIndex].value;
+    if (isNaN(width) || width <= 0) {
+      width = 640;
     }
-    if (isNaN(height) || height<=0)
-    {
-      height=640;
+    if (isNaN(height) || height <= 0) {
+      height = 640;
     }
-    if (isNaN(quality) || quality<0 || quality>1)
-    {
-      quality=1;
+    if (isNaN(quality) || quality < 0 || quality > 1) {
+      quality = 1;
     }
-    if (isNaN(framedelay) || framedelay<=0)
-    {
-      framedelay=1000;
+    if (isNaN(framedelay) || framedelay <= 0) {
+      framedelay = 1000;
     }
-    GenerateBoardImage(mode,width,height,checkboxKeepAspectRatio.checked,(canvaslist)=>{
-      if (canvaslist instanceof Array)
-      {
-        let list=canvaslist.filter((val)=>(val instanceof HTMLCanvasElement));
-        let i=0;
-        const filetype=dropdownImageFileType[dropdownImageFileType.selectedIndex].value;
-        if (filetype=="JPEG" || filetype=="PNG")
-        {
-          const mimetype=(filetype=="PNG"?"image/png":"image/jpeg");
-          if (mode=="all")
-          {
-            let storedfilecount=0;
-            let totalfilecount=list.length;
-            const zipfile=new ZIP();
-            for (i=0;i<list.length;i++)
-            {
-              (function(index){
-                list[index].toBlob((blob)=>{
-                  blob.arrayBuffer().then((buf)=>{
-                    zipfile.file(`board-frame-${index}.${filetype.toLowerCase()}`,buf,{binary:true,compression:"DEFLATE"});
-                    storedfilecount++;
-                    textImageGenerationProgress.textContent=`Generating images... (Progress: ${storedfilecount}/${totalfilecount})`;
-                    if (storedfilecount>=totalfilecount)
-                    {
-                      zipfile.generateAsync({type:"blob"}).then((blob)=> {
-                        const url=URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = "board.zip";
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        buttonGenerateImage.disabled=false;
-                        textImageGenerationProgress.textContent="Ready.";
-                        setTimeout(()=>{
-                          URL.revokeObjectURL(url);
-                        },100);
+    GenerateBoardImage(
+      mode,
+      width,
+      height,
+      checkboxKeepAspectRatio.checked,
+      (canvaslist) => {
+        if (canvaslist instanceof Array) {
+          let list = canvaslist.filter(
+            (val) => val instanceof HTMLCanvasElement,
+          );
+          let i = 0;
+          const filetype =
+            dropdownImageFileType[dropdownImageFileType.selectedIndex].value;
+          if (filetype == "JPEG" || filetype == "PNG") {
+            const mimetype = filetype == "PNG" ? "image/png" : "image/jpeg";
+            if (mode == "all") {
+              let storedfilecount = 0;
+              let totalfilecount = list.length;
+              const zipfile = new ZIP();
+              for (i = 0; i < list.length; i++) {
+                (function (index) {
+                  list[index].toBlob(
+                    (blob) => {
+                      blob.arrayBuffer().then((buf) => {
+                        zipfile.file(
+                          `board-frame-${index}.${filetype.toLowerCase()}`,
+                          buf,
+                          { binary: true, compression: "DEFLATE" },
+                        );
+                        storedfilecount++;
+                        textImageGenerationProgress.textContent = `Generating images... (Progress: ${storedfilecount}/${totalfilecount})`;
+                        if (storedfilecount >= totalfilecount) {
+                          zipfile
+                            .generateAsync({ type: "blob" })
+                            .then((blob) => {
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement("a");
+                              a.href = url;
+                              a.download = "board.zip";
+                              document.body.appendChild(a);
+                              a.click();
+                              document.body.removeChild(a);
+                              buttonGenerateImage.disabled = false;
+                              textImageGenerationProgress.textContent =
+                                "Ready.";
+                              setTimeout(() => {
+                                URL.revokeObjectURL(url);
+                              }, 100);
+                            });
+                        }
                       });
-                    }
-                  });
-                },mimetype,quality);
-              })(i);
+                    },
+                    mimetype,
+                    quality,
+                  );
+                })(i);
+              }
+            } else {
+              list[0].toBlob(
+                (blob) => {
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `board.${filetype.toLowerCase()}`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  buttonGenerateImage.disabled = false;
+                  textImageGenerationProgress.textContent = "Ready.";
+                  setTimeout(() => {
+                    URL.revokeObjectURL(url);
+                  }, 100);
+                },
+                mimetype,
+                quality,
+              );
             }
-          }
-          else
-          {
-            list[0].toBlob((blob)=>{
-              const url=URL.createObjectURL(blob);
-              const a = document.createElement('a');
+          } else if (filetype == "GIF") {
+            const gif = new GIF({
+              workers: 2,
+              quality: 101 - Math.round(quality * 100),
+            });
+            for (i = 0; i < list.length; i++) {
+              gif.addFrame(list[i], { delay: framedelay });
+            }
+            gif.on("finished", function (blob) {
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
               a.href = url;
-              a.download = `board.${filetype.toLowerCase()}`;
+              a.download = "board.gif";
               document.body.appendChild(a);
               a.click();
               document.body.removeChild(a);
-              buttonGenerateImage.disabled=false;
-              textImageGenerationProgress.textContent="Ready.";
-              setTimeout(()=>{
+              buttonGenerateImage.disabled = false;
+              textImageGenerationProgress.textContent = "Ready.";
+              setTimeout(() => {
                 URL.revokeObjectURL(url);
-              },100);
-            },mimetype,quality);
+              }, 100);
+            });
+            gif.on("progress", function (percentage) {
+              textImageGenerationProgress.textContent = `Generating GIF... (Progress: ${(percentage * 100).toFixed(2)}%)`;
+            });
+            gif.render();
           }
         }
-        else if (filetype=="GIF")
-        {
-          const gif = new GIF({
-            workers: 2,
-            quality: 101-Math.round(quality*100),
-          });
-          for (i=0;i<list.length;i++)
-          {
-            gif.addFrame(list[i], {delay: framedelay});
-          }
-          gif.on('finished', function(blob) {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "board.gif";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            buttonGenerateImage.disabled=false;
-            textImageGenerationProgress.textContent="Ready.";
-            setTimeout(()=>{
-              URL.revokeObjectURL(url);
-            },100);
-          });
-          gif.on("progress",function(percentage){
-            textImageGenerationProgress.textContent=`Generating GIF... (Progress: ${(percentage*100).toFixed(2)}%)`;
-          });
-          gif.render();
-        }
-      }
-    });
-  }
+      },
+    );
+  };
 
-  buttonExitImageGenerator.onclick=function() {
+  buttonExitImageGenerator.onclick = function () {
     imageGenerator.classList.add("hidden");
-  }
+  };
 
   updateInnerCoordinateColor(chessground);
 
@@ -4628,11 +4611,7 @@ function validateFEN(FEN, showNoErrorMessage) {
   if (FEN == null) {
     return false;
   }
-  let result = ffish.validateFen(
-    FEN,
-    board.variant(),
-    board.is960(),
-  );
+  let result = ffish.validateFen(FEN, board.variant(), board.is960());
   if (result >= 0) {
     if (showNoErrorMessage) {
       window.alert("No errors found.");
@@ -4640,11 +4619,15 @@ function validateFEN(FEN, showNoErrorMessage) {
     return true;
   }
   if (result == -10) {
-    window.alert("Invalid FEN or position: Contains invalid piece characters or syntax error.");
+    window.alert(
+      "Invalid FEN or position: Contains invalid piece characters or syntax error.",
+    );
     return false;
   }
   if (result == -9) {
-    window.alert("Invalid FEN or position: King pieces are next to each other.");
+    window.alert(
+      "Invalid FEN or position: King pieces are next to each other.",
+    );
     return false;
   }
   if (result == -8) {
@@ -4656,7 +4639,9 @@ function validateFEN(FEN, showNoErrorMessage) {
     return false;
   }
   if (result == -6) {
-    window.alert("Invalid FEN or position: Invalid side to move specification.");
+    window.alert(
+      "Invalid FEN or position: Invalid side to move specification.",
+    );
     return false;
   }
   if (result == -5) {
@@ -4668,7 +4653,9 @@ function validateFEN(FEN, showNoErrorMessage) {
     return false;
   }
   if (result == -3) {
-    window.alert("Invalid FEN or position: Not each side has exactly one king piece.");
+    window.alert(
+      "Invalid FEN or position: Not each side has exactly one king piece.",
+    );
     return false;
   }
   if (result == -2) {
@@ -5053,7 +5040,7 @@ function afterChessgroundMove(orig, dest, metadata) {
         "",
       );
       if (choice == null) {
-        afterMove(null,false);
+        afterMove(null, false);
         return;
       }
       if (choice.length == 0 || choice.length > 1) {
@@ -5102,7 +5089,7 @@ function afterChessgroundMove(orig, dest, metadata) {
         "",
       );
       if (choice == null) {
-        afterMove(null,false);
+        afterMove(null, false);
         return;
       }
       if (gatesquares.includes(choice)) {
@@ -5131,21 +5118,18 @@ function afterChessgroundMove(orig, dest, metadata) {
     gating = "," + choice;
   }
 
-  let finalmove=move + promotion + gating;
+  let finalmove = move + promotion + gating;
 
   if (!board.push(finalmove)) {
     const foundmove = board.legalMoves().match(new RegExp(`${move}[^ ]+`));
-    if (foundmove)
-    {
-      finalmove=foundmove[0];
-    }
-    else
-    {
-      finalmove=null;
+    if (foundmove) {
+      finalmove = foundmove[0];
+    } else {
+      finalmove = null;
     }
   }
 
-  afterMove(finalmove,capture);
+  afterMove(finalmove, capture);
 }
 
 function afterChessgroundDrop(piece, dest, metadata) {
@@ -5217,7 +5201,7 @@ function afterChessgroundDrop(piece, dest, metadata) {
         "",
       );
       if (choice == null) {
-        afterMove(null,false);
+        afterMove(null, false);
         return;
       }
       if (choice.length == 0 || choice.length > 1) {
@@ -5252,19 +5236,17 @@ function afterChessgroundDrop(piece, dest, metadata) {
   }
 
   board.push(promotion + move);
-  afterMove(promotion + move,false);
+  afterMove(promotion + move, false);
 }
 
-function afterMove(move,capture) {
-  if (move)
-  {
-    textMoves.value =(textMoves.value+" "+move).trim();
+function afterMove(move, capture) {
+  if (move) {
+    textMoves.value = (textMoves.value + " " + move).trim();
   }
-  
+
   pSetFen.click();
 
-  if (move)
-  {
+  if (move) {
     if (capture) {
       soundCapture.currentTime = 0.0;
       soundCapture.play();
@@ -5325,7 +5307,7 @@ function getPgn(board) {
       textFen.value == "" ? ffish.startingFen(board.variant()) : textFen.value,
       board.is960(),
       textMoves.value,
-      true
+      true,
     );
   }
 }
@@ -5337,23 +5319,23 @@ function getPgnDiv(board) {
   if (notationindex < 0) {
     let note = document.createElement("div");
     note.innerText = getPgn(board);
-    buttonMoveTreeUndo.disabled=
-    buttonMoveTreeRedo.disabled=
-    buttonMoveTreeHideShow.disabled=
-    buttonMoveTreeRemoveVariations.disabled=
-    buttonMoveTreeSymbol.disabled=
-    buttonMoveTreeTextAfter.disabled=
-    buttonMoveTreeTextBefore.disabled=
-    buttonMoveTreeCrop.disabled=
-    buttonMoveTreeHideShow.disabled=
-    buttonMoveTreeSetToMainBranch.disabled=
-    buttonMoveTreeSetAsMainLine.disabled=
-    buttonMoveTreeUncomment.disabled=
-    buttonMoveTreeCut.disabled=
-    buttonMoveTreeCutBranch.disabled=
-    buttonMoveTreeCropBranch.disabled=
-    buttonMoveTreeClear.disabled=
-    true;
+    buttonMoveTreeUndo.disabled =
+      buttonMoveTreeRedo.disabled =
+      buttonMoveTreeHideShow.disabled =
+      buttonMoveTreeRemoveVariations.disabled =
+      buttonMoveTreeSymbol.disabled =
+      buttonMoveTreeTextAfter.disabled =
+      buttonMoveTreeTextBefore.disabled =
+      buttonMoveTreeCrop.disabled =
+      buttonMoveTreeHideShow.disabled =
+      buttonMoveTreeSetToMainBranch.disabled =
+      buttonMoveTreeSetAsMainLine.disabled =
+      buttonMoveTreeUncomment.disabled =
+      buttonMoveTreeCut.disabled =
+      buttonMoveTreeCutBranch.disabled =
+      buttonMoveTreeCropBranch.disabled =
+      buttonMoveTreeClear.disabled =
+        true;
     return note;
   } else {
     // let result = parseUCIMovesToPreviewElements(
@@ -5365,23 +5347,27 @@ function getPgnDiv(board) {
     //   ffishnotationobjects[notationindex],
     // );
     let result = gametree.ToPGNDiv(ffishnotationobjects[notationindex]);
-    buttonMoveTreeUndo.disabled=(gametree.CurrentHistory<=0);
-    buttonMoveTreeRedo.disabled=(gametree.CurrentHistory>=gametree.HistoryStack.length-1);
-    buttonMoveTreeHideShow.disabled=
-    buttonMoveTreeSymbol.disabled=
-    buttonMoveTreeTextAfter.disabled=
-    buttonMoveTreeTextBefore.disabled=
-    buttonMoveTreeCrop.disabled=
-    buttonMoveTreeHideShow.disabled=
-    buttonMoveTreeSetAsMainLine.disabled=
-    buttonMoveTreeUncomment.disabled=
-    buttonMoveTreeCut.disabled=
-    buttonMoveTreeCutBranch.disabled=
-    buttonMoveTreeCropBranch.disabled=
-    (gametree.CurrentMove==gametree.MoveTree.RootNode);
-    buttonMoveTreeSetToMainBranch.disabled=(gametree.CurrentMove==gametree.MoveTree.RootNode || gametree.CurrentMove.RelativePositionInParentNode==0);
-    buttonMoveTreeRemoveVariations.disabled=(gametree.CurrentMove.NextNodes.length<=1);
-    buttonMoveTreeClear.disabled=false;
+    buttonMoveTreeUndo.disabled = gametree.CurrentHistory <= 0;
+    buttonMoveTreeRedo.disabled =
+      gametree.CurrentHistory >= gametree.HistoryStack.length - 1;
+    buttonMoveTreeHideShow.disabled =
+      buttonMoveTreeSymbol.disabled =
+      buttonMoveTreeTextAfter.disabled =
+      buttonMoveTreeTextBefore.disabled =
+      buttonMoveTreeCrop.disabled =
+      buttonMoveTreeHideShow.disabled =
+      buttonMoveTreeSetAsMainLine.disabled =
+      buttonMoveTreeUncomment.disabled =
+      buttonMoveTreeCut.disabled =
+      buttonMoveTreeCutBranch.disabled =
+      buttonMoveTreeCropBranch.disabled =
+        gametree.CurrentMove == gametree.MoveTree.RootNode;
+    buttonMoveTreeSetToMainBranch.disabled =
+      gametree.CurrentMove == gametree.MoveTree.RootNode ||
+      gametree.CurrentMove.RelativePositionInParentNode == 0;
+    buttonMoveTreeRemoveVariations.disabled =
+      gametree.CurrentMove.NextNodes.length <= 1;
+    buttonMoveTreeClear.disabled = false;
     return result;
   }
 }
@@ -5467,8 +5453,7 @@ function getHiddenDroppablePiece(board) {
   let movepart = [];
   let hiddenpieces = [];
   for (i = 0; i < moves.length; i++) {
-    if (moves[i]=="")
-    {
+    if (moves[i] == "") {
       continue;
     }
     movepart = moveutil.ParseUCIMove(moves[i]);
@@ -5510,8 +5495,7 @@ function displayHiddenDroppablePiece(board) {
   let whitehiddenpieces = "";
   let blackhiddenpieces = "";
   for (i = 0; i < moves.length; i++) {
-    if (moves[i]=="")
-    {
+    if (moves[i] == "") {
       continue;
     }
     movepart = moveutil.ParseUCIMove(moves[i]);
@@ -5909,8 +5893,7 @@ function DisplayLastMoveWithVisualEffect(
   }
 }
 
-function updatePGNDivision()
-{
+function updatePGNDivision() {
   let deletelater = [];
   while (labelPgn.childNodes[0]) {
     deletelater.push(labelPgn.removeChild(labelPgn.childNodes[0]));
@@ -5927,7 +5910,6 @@ function updatePGNDivision()
 }
 
 function updateChessground(showresult) {
-  
   const boardfenval = board.fen();
   const boardfenvallist = boardfenval.split(" ");
   currentBoardFen.textContent = `Current Board FEN:  ${boardfenval}`;
@@ -5941,14 +5923,18 @@ function updateChessground(showresult) {
     pcheckCounts.hidden = true;
   }
 
-  if (showresult)
-  {
-    gametree.SetCurrentMoveList(board.variant(),board.is960(),textFen.value,textMoves.value);
+  if (showresult) {
+    gametree.SetCurrentMoveList(
+      board.variant(),
+      board.is960(),
+      textFen.value,
+      textMoves.value,
+    );
     updatePGNDivision();
   }
 
   //if (labelPgn) labelPgn.innerText = getPgn(board);
-  
+
   if (labelStm) labelStm.innerText = getColorOrUndefined(board);
 
   if (
@@ -6002,7 +5988,7 @@ function updateChessground(showresult) {
     buttonUndo.disabled = true;
   } else {
     const lastMove = moveStack.split(" ").pop();
-    const matchresult=lastMove.match(/[a-z]+[0-9]+/g);
+    const matchresult = lastMove.match(/[a-z]+[0-9]+/g);
     let lastMoveFrom = null;
     let lastMoveTo = null;
     if (lastMove.includes("@")) {
@@ -6012,7 +5998,9 @@ function updateChessground(showresult) {
       lastMoveFrom = convertSquareToChessgroundXKey(matchresult[0]);
       lastMoveTo = convertSquareToChessgroundXKey(matchresult[1]);
       if (lastMoveFrom == lastMoveTo && lastMove.includes(",")) {
-        lastMoveFrom = lastMoveTo = convertSquareToChessgroundXKey(matchresult[3]);
+        lastMoveFrom = lastMoveTo = convertSquareToChessgroundXKey(
+          matchresult[3],
+        );
       }
     }
     if (
