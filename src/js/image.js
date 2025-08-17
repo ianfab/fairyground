@@ -290,6 +290,8 @@ export function GenerateBoardImage(
   canvas.height = ImageHeight;
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, ImageWidth, ImageHeight);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
 
   //Board
   const boardimg = new Image();
@@ -415,8 +417,6 @@ export function GenerateBoardImage(
         (function (x, count, imgurl) {
           if (imgurl) {
             const pieceimg = new Image();
-            let countstr = String(count);
-            let countstroffset = ((2 * countstr.length - 1) * fontsize) / 4;
             pieceimg.onload = () => {
               ctx.fillStyle = "#888";
               ctx.fillRect(x, 0, squarepixelwidth, squarepixelheight);
@@ -430,18 +430,18 @@ export function GenerateBoardImage(
               );
               ctx.fillStyle = "#d85000";
               ctx.fillRect(
-                x + 0.666 * squarepixelwidth,
-                0.666 * squarepixelheight,
-                0.333 * squarepixelwidth,
-                0.333 * squarepixelheight,
+                x + (2 * squarepixelwidth) / 3,
+                (2 * squarepixelheight) / 3,
+                squarepixelwidth / 3,
+                squarepixelheight / 3,
               );
               ctx.fillStyle = "#fff";
               ctx.font = `${fontsize}px Arial`;
               ctx.fillText(
-                countstr,
-                x + 0.8325 * squarepixelwidth - countstroffset,
-                0.666 * squarepixelheight + fontsize,
-                0.333 * squarepixelwidth,
+                String(count),
+                x + (5 / 6) * squarepixelwidth,
+                (5 / 6) * squarepixelheight,
+                squarepixelwidth / 3,
               );
               ctx.fillStyle = "";
               ctx.font = "";
@@ -468,8 +468,6 @@ export function GenerateBoardImage(
         (function (x, count, imgurl) {
           if (imgurl) {
             const pieceimg = new Image();
-            let countstr = String(count);
-            let countstroffset = ((2 * countstr.length - 1) * fontsize) / 4;
             pieceimg.onload = () => {
               ctx.fillStyle = "#888";
               ctx.fillRect(
@@ -488,18 +486,18 @@ export function GenerateBoardImage(
               );
               ctx.fillStyle = "#d85000";
               ctx.fillRect(
-                x + 0.666 * squarepixelwidth,
-                ImageHeight - 0.333 * squarepixelheight,
-                0.333 * squarepixelwidth,
-                0.333 * squarepixelheight,
+                x + (2 * squarepixelwidth) / 3,
+                ImageHeight - squarepixelheight / 3,
+                squarepixelwidth / 3,
+                squarepixelheight / 3,
               );
               ctx.fillStyle = "#fff";
               ctx.font = `${fontsize}px Arial`;
               ctx.fillText(
-                countstr,
-                x + 0.8325 * squarepixelwidth - countstroffset,
-                ImageHeight - 0.333 * squarepixelheight + fontsize,
-                0.333 * squarepixelwidth,
+                String(count),
+                x + (5 / 6) * squarepixelwidth,
+                ImageHeight - squarepixelheight / 6,
+                squarepixelwidth / 3,
               );
               ctx.fillStyle = "";
               ctx.font = "";
@@ -527,8 +525,6 @@ export function GenerateBoardImage(
         (function (x, count, imgurl) {
           if (imgurl) {
             const pieceimg = new Image();
-            let countstr = String(count);
-            let countstroffset = ((2 * countstr.length - 1) * fontsize) / 4;
             pieceimg.onload = () => {
               ctx.fillStyle = "#888";
               ctx.fillRect(x, 0, squarepixelwidth, squarepixelheight);
@@ -542,18 +538,18 @@ export function GenerateBoardImage(
               );
               ctx.fillStyle = "#d85000";
               ctx.fillRect(
-                x + 0.666 * squarepixelwidth,
-                0.666 * squarepixelheight,
-                0.333 * squarepixelwidth,
-                0.333 * squarepixelheight,
+                x + (2 * squarepixelwidth) / 3,
+                (2 * squarepixelheight) / 3,
+                squarepixelwidth / 3,
+                squarepixelheight / 3,
               );
               ctx.fillStyle = "#fff";
               ctx.font = `${fontsize}px Arial`;
               ctx.fillText(
-                countstr,
-                x + 0.8325 * squarepixelwidth - countstroffset,
-                0.666 * squarepixelheight + fontsize,
-                0.333 * squarepixelwidth,
+                String(count),
+                x + (5 / 6) * squarepixelwidth,
+                (5 / 6) * squarepixelheight,
+                squarepixelwidth / 3,
               );
               ctx.fillStyle = "";
               ctx.font = "";
@@ -580,8 +576,6 @@ export function GenerateBoardImage(
         (function (x, count, imgurl) {
           if (imgurl) {
             const pieceimg = new Image();
-            let countstr = String(count);
-            let countstroffset = ((2 * countstr.length - 1) * fontsize) / 4;
             pieceimg.onload = () => {
               ctx.fillStyle = "#888";
               ctx.fillRect(
@@ -600,18 +594,18 @@ export function GenerateBoardImage(
               );
               ctx.fillStyle = "#d85000";
               ctx.fillRect(
-                x + 0.666 * squarepixelwidth,
-                ImageHeight - 0.333 * squarepixelheight,
-                0.333 * squarepixelwidth,
-                0.333 * squarepixelheight,
+                x + (2 * squarepixelwidth) / 3,
+                ImageHeight - squarepixelheight / 3,
+                squarepixelwidth / 3,
+                squarepixelheight / 3,
               );
               ctx.fillStyle = "#fff";
               ctx.font = `${fontsize}px Arial`;
               ctx.fillText(
-                countstr,
-                x + 0.8325 * squarepixelwidth - countstroffset,
-                ImageHeight - 0.333 * squarepixelheight + fontsize,
-                0.333 * squarepixelwidth,
+                String(count),
+                x + (5 / 6) * squarepixelwidth,
+                ImageHeight - squarepixelheight / 6,
+                squarepixelwidth / 3,
               );
               ctx.fillStyle = "";
               ctx.font = "";
