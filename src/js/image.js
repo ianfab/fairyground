@@ -200,6 +200,19 @@ function GetBoardAndPocket(FEN) {
   }
 }
 
+function ConvertSquareToCoordinate(Square, BoardHeight) {
+  if (typeof Square != "string" || typeof BoardHeight != "number") {
+    throw TypeError();
+  }
+  let x = Square.charCodeAt(0) - 97;
+  let y = BoardHeight - parseInt(Square.substring(1));
+  if (x >= 0 && x <= 25 && y >= 0) {
+    return { x: x, y: y };
+  } else {
+    return { x: -1, y: -1 };
+  }
+}
+
 function ConvertMoveToCoordinate(UCIMove, BoardHeight) {
   if (typeof UCIMove != "string" || typeof BoardHeight != "number") {
     throw TypeError();
@@ -208,23 +221,40 @@ function ConvertMoveToCoordinate(UCIMove, BoardHeight) {
   let from = move[0];
   let to = move[1];
   if (typeof from == "string" && typeof to == "string") {
-    let from_x = -1;
-    let from_y = -1;
-    let to_x = to.charCodeAt(0) - 97;
-    let to_y = BoardHeight - parseInt(to.substring(1));
-    if (!from.includes("@")) {
-      from_x = from.charCodeAt(0) - 97;
-      from_y = BoardHeight - parseInt(from.substring(1));
-    }
-    return { from_x: from_x, from_y: from_y, to_x: to_x, to_y: to_y };
+    let from_sq = ConvertSquareToCoordinate(from, BoardHeight);
+    let to_sq = ConvertSquareToCoordinate(to, BoardHeight);
+    return {
+      from_x: from_sq.x,
+      from_y: from_sq.y,
+      to_x: to_sq.x,
+      to_y: to_sq.y,
+    };
   } else {
     return { from_x: -1, from_y: -1, to_x: -1, to_y: -1 };
   }
 }
 
+function CoordinateListIncludes(CoordinateList, X, Y) {
+  if (
+    !(CoordinateList instanceof Array) ||
+    typeof X != "number" ||
+    typeof Y != "number"
+  ) {
+    throw TypeError();
+  }
+  let i = 0;
+  for (i = 0; i < CoordinateList.length; i++) {
+    if (CoordinateList[i].x == X && CoordinateList[i].y == Y) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function GenerateBoardImage(
   FEN,
   LastMove,
+  CheckedSquares,
   HasPocket,
   Orientation,
   BoardWidth,
@@ -238,6 +268,7 @@ export function GenerateBoardImage(
   if (
     typeof FEN != "string" ||
     typeof LastMove != "string" ||
+    !(CheckedSquares instanceof Array) ||
     typeof HasPocket != "boolean" ||
     typeof Orientation != "string" ||
     typeof BoardWidth != "number" ||
@@ -268,6 +299,7 @@ export function GenerateBoardImage(
     }
     return { white: whitepieces, black: blackpieces };
   }
+  let i = 0;
   let drawnelementcount = 0;
   let fenparts = GetBoardAndPocket(FEN);
   let pieces = ParseFEN(fenparts.board);
@@ -282,8 +314,14 @@ export function GenerateBoardImage(
   let squarepixelwidth = ImageWidth / displaywidth;
   let squarepixelheight = ImageHeight / displayheight;
   let noflipboard = Orientation == "white";
+  let checkedsquarescoordinate = [];
   if (pieces.length != BoardWidth * BoardHeight) {
     throw SyntaxError("Invalid FEN.");
+  }
+  for (i = 0; i < CheckedSquares.length; i++) {
+    checkedsquarescoordinate.push(
+      ConvertSquareToCoordinate(CheckedSquares[i], BoardHeight),
+    );
   }
   const canvas = document.createElement("canvas");
   canvas.width = ImageWidth;
@@ -330,6 +368,17 @@ export function GenerateBoardImage(
               ctx.fillStyle = "rgba(155, 199, 0, 0.41)";
               ctx.fillRect(x, y, squarepixelwidth, squarepixelheight);
               ctx.fillStyle = "";
+            } else if (
+              CoordinateListIncludes(checkedsquarescoordinate, index_x, index_y)
+            ) {
+              // let halflinewidth=Math.min(squarepixelwidth, squarepixelheight)/32;
+              // ctx.lineWidth=halflinewidth*2;
+              // ctx.strokeStyle="red";
+              // ctx.strokeRect(x+halflinewidth, y+halflinewidth, squarepixelwidth-2*halflinewidth, squarepixelheight-2*halflinewidth);
+              // ctx.strokeStyle="";
+              ctx.fillStyle = "#f006";
+              ctx.fillRect(x, y, squarepixelwidth, squarepixelheight);
+              ctx.fillStyle = "";
             }
             if (imgurl) {
               const pieceimg = new Image();
@@ -367,6 +416,17 @@ export function GenerateBoardImage(
               (index_x == lastmove.to_x && index_y == lastmove.to_y)
             ) {
               ctx.fillStyle = "rgba(155, 199, 0, 0.41)";
+              ctx.fillRect(x, y, squarepixelwidth, squarepixelheight);
+              ctx.fillStyle = "";
+            } else if (
+              CoordinateListIncludes(checkedsquarescoordinate, index_x, index_y)
+            ) {
+              // let halflinewidth=Math.min(squarepixelwidth, squarepixelheight)/32;
+              // ctx.lineWidth=halflinewidth*2;
+              // ctx.strokeStyle="red";
+              // ctx.strokeRect(x+halflinewidth, y+halflinewidth, squarepixelwidth-2*halflinewidth, squarepixelheight-2*halflinewidth);
+              // ctx.strokeStyle="";
+              ctx.fillStyle = "#f006";
               ctx.fillRect(x, y, squarepixelwidth, squarepixelheight);
               ctx.fillStyle = "";
             }
@@ -408,7 +468,6 @@ export function GenerateBoardImage(
 
   //Pocket
   if (HasPocket) {
-    let i = 0;
     let piecechar;
     let fontsize = Math.min(0.3 * squarepixelwidth, 0.3 * squarepixelheight);
     if (noflipboard) {

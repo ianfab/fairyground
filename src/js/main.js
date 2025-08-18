@@ -2333,6 +2333,11 @@ function GenerateBoardImage(
     tmpboard.pushMoves(moves);
     let hiddenpieces = getHiddenDroppablePiece(tmpboard);
     let fen = tmpboard.fen().split(" ")[0];
+    let checkedpieces = tmpboard.checkedPieces();
+    let checkedsquares = [];
+    if (checkedpieces) {
+      checkedsquares = checkedpieces.split(" ");
+    }
     if (hiddenpieces.length > 0) {
       let index = fen.indexOf("[");
       if (index < 0) {
@@ -2349,21 +2354,10 @@ function GenerateBoardImage(
         imageheight = (imagewidth / dimensions.width) * dimensions.height;
       }
     }
-    console.log(
-      fen,
-      gametree.CurrentMove,
-      fen.includes("["),
-      chessground.state.orientation,
-      dimensions.width,
-      dimensions.height,
-      asseturl.pieces,
-      asseturl.board,
-      imagewidth,
-      imageheight,
-    );
     imageutil.GenerateBoardImage(
       fen,
       gametree.CurrentMove.Move.Move,
+      checkedsquares,
       fen.includes("["),
       chessground.state.orientation,
       dimensions.width,
@@ -2383,8 +2377,9 @@ function GenerateBoardImage(
     let movelist = moves.split(" ").filter((val) => val != "");
     let haspocket = false;
     let hiddenpieces;
-    let fen;
+    let fen, checkedpieces;
     let fens = [];
+    let checkedsquarelist = [];
     let drawncanvascount = 0;
     let totalcanvascount = movelist.length + 1;
     let canvaslist = [];
@@ -2394,6 +2389,12 @@ function GenerateBoardImage(
       }
       hiddenpieces = getHiddenDroppablePiece(tmpboard);
       fen = tmpboard.fen().split(" ")[0];
+      checkedpieces = tmpboard.checkedPieces();
+      if (checkedpieces) {
+        checkedsquarelist.push(checkedpieces.split(" "));
+      } else {
+        checkedsquarelist.push([]);
+      }
       if (hiddenpieces.length > 0) {
         let index = fen.indexOf("[");
         if (index < 0) {
@@ -2421,6 +2422,7 @@ function GenerateBoardImage(
         imageutil.GenerateBoardImage(
           fens[index],
           index == 0 ? "" : movelist[index - 1],
+          checkedsquarelist[index],
           haspocket,
           chessground.state.orientation,
           dimensions.width,
