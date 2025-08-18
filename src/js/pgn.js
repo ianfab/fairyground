@@ -266,8 +266,9 @@ export function ParsePGNMovesToMoveTree(
       }
       pointerandmovestack = stack.pop();
       pointer = pointerandmovestack.currentnode;
+      movestack = pointerandmovestack.movestack;
       board.setFen(fen);
-      board.pushMoves(pointerandmovestack.movestack);
+      board.pushMoves(movestack);
     } else {
       if (addingvariation) {
         board.pop();
