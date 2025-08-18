@@ -2329,6 +2329,7 @@ function GenerateBoardImage(
   );
   let imagewidth = ImageWidth;
   let imageheight = ImageHeight;
+  let notation = dropdownBoardCoordinate.selectedIndex;
   if (GenerationMode == "current") {
     tmpboard.pushMoves(moves);
     let hiddenpieces = getHiddenDroppablePiece(tmpboard);
@@ -2362,6 +2363,7 @@ function GenerateBoardImage(
       chessground.state.orientation,
       dimensions.width,
       dimensions.height,
+      notation,
       asseturl.pieces,
       asseturl.board,
       imagewidth,
@@ -2427,6 +2429,7 @@ function GenerateBoardImage(
           chessground.state.orientation,
           dimensions.width,
           dimensions.height,
+          notation,
           asseturl.pieces,
           asseturl.board,
           imagewidth,

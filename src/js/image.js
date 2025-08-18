@@ -1,5 +1,114 @@
 import * as moveutil from "./move.js";
 
+const FORWARD = 0;
+const BACKWARD = 1;
+
+const ARABIC_NUMBER = 0;
+const ENGLISH_LETTER = 1;
+const CHINESE_LETTER = 2;
+const THAI_NUMBER = 3;
+const THAI_LETTER = 4;
+
+const NOTATION_CHESS = 0;
+const NOTATION_SHOGI = 1;
+const NOTATION_SHOGI_NUMBER = 2;
+const NOTATION_SHOGI_HANZI = 3;
+const NOTATION_JANGGI = 4;
+const NOTATION_XIANGQI = 5;
+const NOTATION_XIANGQI_HANZI = 6;
+const NOTATION_THAI = 7;
+
+const LETTER_ENGLISH = [
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+];
+const LETTER_THAI = [
+  "ก",
+  "ข",
+  "ค",
+  "ง",
+  "จ",
+  "ฉ",
+  "ช",
+  "ญ",
+  "ต",
+  "ถ",
+  "ท",
+  "น",
+  "ป",
+  "ผ",
+  "พ",
+  "ม",
+];
+const NUMBER_ARABIC = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+];
+const LETTER_CHINESE = [
+  "一",
+  "二",
+  "三",
+  "四",
+  "五",
+  "六",
+  "七",
+  "八",
+  "九",
+  "十",
+  "十一",
+  "十二",
+  "十三",
+  "十四",
+  "十五",
+  "十六",
+];
+const NUMBER_THAI = [
+  "๑",
+  "๒",
+  "๓",
+  "๔",
+  "๕",
+  "๖",
+  "๗",
+  "๘",
+  "๙",
+  "๑๐",
+  "๑๑",
+  "๑๒",
+  "๑๓",
+  "๑๔",
+  "๑๕",
+  "๑๖",
+];
+
 function ParseFEN(fen) {
   if (typeof fen != "string") {
     throw TypeError;
@@ -251,6 +360,226 @@ function CoordinateListIncludes(CoordinateList, X, Y) {
   return false;
 }
 
+function DrawCoordinatesOnBoard(
+  CanvasContext2D,
+  FlipBoard,
+  BoardWidth,
+  BoardHeight,
+  SquarePixelWidth,
+  SquarePixelHeight,
+  BoardStartX,
+  BoardStartY,
+  Notation,
+) {
+  if (
+    !(CanvasContext2D instanceof CanvasRenderingContext2D) ||
+    typeof FlipBoard != "boolean" ||
+    typeof BoardWidth != "number" ||
+    typeof BoardHeight != "number" ||
+    typeof SquarePixelWidth != "number" ||
+    typeof SquarePixelHeight != "number" ||
+    typeof BoardStartX != "number" ||
+    typeof BoardStartY != "number" ||
+    typeof Notation != "number"
+  ) {
+    throw TypeError();
+  }
+  let i = 0;
+  let x = 0,
+    y = 0;
+  let drawbottom = false;
+  let drawtop = false;
+  let drawside = false;
+  let bottomdirection = FORWARD;
+  let topdirection = FORWARD;
+  let sidedirection = FORWARD;
+  let bottomtext = ARABIC_NUMBER;
+  let sidetext = ARABIC_NUMBER;
+  let toptext = ARABIC_NUMBER;
+  let coordinates = NUMBER_ARABIC;
+  let fontsize = Math.min(0.2 * SquarePixelWidth, 0.2 * SquarePixelHeight);
+  if (Notation == NOTATION_CHESS) {
+    drawbottom = true;
+    drawside = true;
+    bottomdirection = FORWARD;
+    sidedirection = BACKWARD;
+    bottomtext = ENGLISH_LETTER;
+    sidetext = ARABIC_NUMBER;
+  } else if (Notation == NOTATION_SHOGI) {
+    drawtop = true;
+    drawside = true;
+    topdirection = BACKWARD;
+    sidedirection = FORWARD;
+    toptext = ARABIC_NUMBER;
+    sidetext = ENGLISH_LETTER;
+  } else if (Notation == NOTATION_SHOGI_HANZI) {
+    drawtop = true;
+    drawside = true;
+    topdirection = BACKWARD;
+    sidedirection = FORWARD;
+    toptext = ARABIC_NUMBER;
+    sidetext = CHINESE_LETTER;
+  } else if (Notation == NOTATION_SHOGI_NUMBER) {
+    drawtop = true;
+    drawside = true;
+    topdirection = BACKWARD;
+    sidedirection = FORWARD;
+    toptext = ARABIC_NUMBER;
+    sidetext = ARABIC_NUMBER;
+  } else if (Notation == NOTATION_JANGGI) {
+    drawbottom = true;
+    drawside = true;
+    bottomdirection = FORWARD;
+    sidedirection = BACKWARD;
+    bottomtext = ARABIC_NUMBER;
+    sidetext = ARABIC_NUMBER;
+  } else if (Notation == NOTATION_XIANGQI) {
+    drawtop = true;
+    drawbottom = true;
+    topdirection = FlipBoard ? BACKWARD : FORWARD;
+    bottomdirection = FlipBoard ? FORWARD : BACKWARD;
+    toptext = ARABIC_NUMBER;
+    bottomtext = ARABIC_NUMBER;
+  } else if (Notation == NOTATION_XIANGQI_HANZI) {
+    drawtop = true;
+    drawbottom = true;
+    topdirection = FlipBoard ? BACKWARD : FORWARD;
+    bottomdirection = FlipBoard ? FORWARD : BACKWARD;
+    toptext = ARABIC_NUMBER;
+    bottomtext = CHINESE_LETTER;
+  } else if (Notation == NOTATION_THAI) {
+    drawbottom = true;
+    drawside = true;
+    bottomdirection = FORWARD;
+    sidedirection = BACKWARD;
+    bottomtext = THAI_LETTER;
+    sidetext = THAI_NUMBER;
+  }
+  if (drawbottom) {
+    if (bottomtext == ARABIC_NUMBER) {
+      coordinates = NUMBER_ARABIC;
+    } else if (bottomtext == ENGLISH_LETTER) {
+      coordinates = LETTER_ENGLISH;
+    } else if (bottomtext == CHINESE_LETTER) {
+      coordinates = LETTER_CHINESE;
+    } else if (bottomtext == THAI_NUMBER) {
+      coordinates = NUMBER_THAI;
+    } else if (bottomtext == THAI_LETTER) {
+      coordinates = LETTER_THAI;
+    }
+    if (
+      (bottomdirection == FORWARD && !FlipBoard) ||
+      (bottomdirection == BACKWARD && FlipBoard)
+    ) {
+      x = BoardStartX + (7 * SquarePixelWidth) / 8;
+      y = BoardStartY + SquarePixelHeight * BoardHeight - SquarePixelHeight / 8;
+      CanvasContext2D.fillStyle = "#000";
+      CanvasContext2D.font = `${fontsize}px Arial`;
+      for (i = 0; i < BoardWidth; i++) {
+        CanvasContext2D.fillText(coordinates[i], x, y, SquarePixelWidth / 4);
+        x += SquarePixelWidth;
+      }
+      CanvasContext2D.fillStyle = "";
+      CanvasContext2D.font = "";
+    } else {
+      x = BoardStartX + BoardWidth * SquarePixelWidth - SquarePixelWidth / 8;
+      y = BoardStartY + SquarePixelHeight * BoardHeight - SquarePixelHeight / 8;
+      CanvasContext2D.fillStyle = "#000";
+      CanvasContext2D.font = `${fontsize}px Arial`;
+      for (i = 0; i < BoardWidth; i++) {
+        CanvasContext2D.fillText(coordinates[i], x, y, SquarePixelWidth / 4);
+        x -= SquarePixelWidth;
+      }
+      CanvasContext2D.fillStyle = "";
+      CanvasContext2D.font = "";
+    }
+  }
+  if (drawside) {
+    if (sidetext == ARABIC_NUMBER) {
+      coordinates = NUMBER_ARABIC;
+    } else if (sidetext == ENGLISH_LETTER) {
+      coordinates = LETTER_ENGLISH;
+    } else if (sidetext == CHINESE_LETTER) {
+      coordinates = LETTER_CHINESE;
+    } else if (sidetext == THAI_NUMBER) {
+      coordinates = NUMBER_THAI;
+    } else if (sidetext == THAI_LETTER) {
+      coordinates = LETTER_THAI;
+    }
+    if (
+      (sidedirection == FORWARD && !FlipBoard) ||
+      (sidedirection == BACKWARD && FlipBoard)
+    ) {
+      x = BoardStartX + BoardWidth * SquarePixelWidth - SquarePixelWidth / 8;
+      y = BoardStartY + SquarePixelHeight / 8;
+      CanvasContext2D.fillStyle = "#000";
+      CanvasContext2D.font = `${fontsize}px Arial`;
+      for (i = 0; i < BoardHeight; i++) {
+        CanvasContext2D.fillText(coordinates[i], x, y, SquarePixelWidth / 4);
+        y += SquarePixelHeight;
+      }
+      CanvasContext2D.fillStyle = "";
+      CanvasContext2D.font = "";
+    } else {
+      x = BoardStartX + BoardWidth * SquarePixelWidth - SquarePixelWidth / 8;
+      y =
+        BoardStartY +
+        SquarePixelHeight * BoardHeight -
+        (7 * SquarePixelHeight) / 8;
+      CanvasContext2D.fillStyle = "#000";
+      CanvasContext2D.font = `${fontsize}px Arial`;
+      for (i = 0; i < BoardHeight; i++) {
+        CanvasContext2D.fillText(coordinates[i], x, y, SquarePixelWidth / 4);
+        y -= SquarePixelHeight;
+      }
+      CanvasContext2D.fillStyle = "";
+      CanvasContext2D.font = "";
+    }
+  }
+  if (drawtop) {
+    if (toptext == ARABIC_NUMBER) {
+      coordinates = NUMBER_ARABIC;
+    } else if (toptext == ENGLISH_LETTER) {
+      coordinates = LETTER_ENGLISH;
+    } else if (toptext == CHINESE_LETTER) {
+      coordinates = LETTER_CHINESE;
+    } else if (toptext == THAI_NUMBER) {
+      coordinates = NUMBER_THAI;
+    } else if (toptext == THAI_LETTER) {
+      coordinates = LETTER_THAI;
+    }
+    if (
+      (topdirection == FORWARD && !FlipBoard) ||
+      (topdirection == BACKWARD && FlipBoard)
+    ) {
+      x = BoardStartX + SquarePixelWidth / 8;
+      y = BoardStartY + SquarePixelHeight / 8;
+      CanvasContext2D.fillStyle = "#000";
+      CanvasContext2D.font = `${fontsize}px Arial`;
+      for (i = 0; i < BoardWidth; i++) {
+        CanvasContext2D.fillText(coordinates[i], x, y, SquarePixelWidth / 4);
+        x += SquarePixelWidth;
+      }
+      CanvasContext2D.fillStyle = "";
+      CanvasContext2D.font = "";
+    } else {
+      x =
+        BoardStartX +
+        BoardWidth * SquarePixelWidth -
+        (7 * SquarePixelWidth) / 8;
+      y = BoardStartY + SquarePixelHeight / 8;
+      CanvasContext2D.fillStyle = "#000";
+      CanvasContext2D.font = `${fontsize}px Arial`;
+      for (i = 0; i < BoardWidth; i++) {
+        CanvasContext2D.fillText(coordinates[i], x, y, SquarePixelWidth / 4);
+        x -= SquarePixelWidth;
+      }
+      CanvasContext2D.fillStyle = "";
+      CanvasContext2D.font = "";
+    }
+  }
+}
+
 export function GenerateBoardImage(
   FEN,
   LastMove,
@@ -259,6 +588,7 @@ export function GenerateBoardImage(
   Orientation,
   BoardWidth,
   BoardHeight,
+  CoordinateNotation,
   PieceImageURLMap,
   BoardImageURL,
   ImageWidth,
@@ -273,6 +603,7 @@ export function GenerateBoardImage(
     typeof Orientation != "string" ||
     typeof BoardWidth != "number" ||
     typeof BoardHeight != "number" ||
+    typeof CoordinateNotation != "number" ||
     !(PieceImageURLMap instanceof Map) ||
     typeof BoardImageURL != "string" ||
     typeof ImageWidth != "number" ||
@@ -344,6 +675,19 @@ export function GenerateBoardImage(
       HasPocket ? squarepixelheight : 0,
       squarepixelwidth * BoardWidth,
       squarepixelheight * BoardHeight,
+    );
+
+    //Board Coordinates
+    DrawCoordinatesOnBoard(
+      ctx,
+      !noflipboard,
+      BoardWidth,
+      BoardHeight,
+      squarepixelwidth,
+      squarepixelheight,
+      0,
+      HasPocket ? squarepixelheight : 0,
+      CoordinateNotation,
     );
 
     //Pieces On Board
