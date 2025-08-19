@@ -4623,52 +4623,60 @@ function validateFEN(FEN, showNoErrorMessage) {
     }
     return true;
   }
+  if (result == -14) {
+    window.alert("Error: Invalid counting rule specification.");
+    return false;
+  }
+  if (result == -13) {
+    window.alert("Error: Invalid check count specification.");
+    return false;
+  }
+  if (result == -12) {
+    window.alert("Error: Pieces without promoted type are in promoted form.");
+    return false;
+  }
+  if (result == -11) {
+    window.alert("Error: Syntax error in FEN string.");
+    return false;
+  }
   if (result == -10) {
-    window.alert(
-      "Invalid FEN or position: Contains invalid piece characters or syntax error.",
-    );
+    window.alert("Error: Contains invalid piece characters or syntax error.");
     return false;
   }
   if (result == -9) {
-    window.alert(
-      "Invalid FEN or position: King pieces are next to each other.",
-    );
+    window.alert("Error: King pieces are next to each other.");
     return false;
   }
   if (result == -8) {
-    window.alert("Invalid FEN or position: Invalid line or column count.");
+    window.alert("Error: Invalid row or column count.");
     return false;
   }
   if (result == -7) {
-    window.alert("Invalid FEN or position: Invalid piece character in pocket.");
+    window.alert("Error: Invalid piece character in pocket.");
     return false;
   }
   if (result == -6) {
-    window.alert(
-      "Invalid FEN or position: Invalid side to move specification.",
-    );
+    window.alert("Error: Invalid side to move specification.");
     return false;
   }
   if (result == -5) {
-    window.alert("Invalid FEN or position: Invalid castling specification.");
+    window.alert("Error: Invalid castling specification.");
     return false;
   }
   if (result == -4) {
-    window.alert("Invalid FEN or position: Invalid en passant square.");
+    window.alert("Error: Invalid en passant square.");
     return false;
   }
   if (result == -3) {
-    window.alert(
-      "Invalid FEN or position: Not each side has exactly one king piece.",
-    );
+    window.alert("Error: Inavlid king piece count.");
     return false;
   }
   if (result == -2) {
-    window.alert("Invalid FEN or position: Invalid half move clock.");
+    window.alert("Error: Invalid half move clock.");
     return false;
   }
   if (result == -1) {
-    window.alert("Invalid FEN or position: Invalid move counter.");
+    window.alert("Error: Invalid move counter.");
     return false;
   }
 }

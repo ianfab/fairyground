@@ -649,7 +649,7 @@ class PortableGameNotation {
         if (entry[1].startsWith('"') && entry[1].endsWith('"')) {
           if (ParserStarts && ParserState == 0) {
             CurrentGame++;
-            if (Variant == "") {
+            if (Variant == "" || Variant == "standard") {
               Variant = "chess";
             } else if (Variant.endsWith("960")) {
               Variant = Variant.slice(0, -3);
@@ -807,7 +807,7 @@ class PortableGameNotation {
     }
     if (ParserStarts && ParserState == 0) {
       CurrentGame++;
-      if (Variant == "") {
+      if (Variant == "" || Variant == "standard") {
         Variant = "chess";
       } else if (Variant.endsWith("960")) {
         Variant = Variant.slice(0, -3);
@@ -1060,7 +1060,7 @@ class ExtendedPositionDescription {
         }
       }
       CurrentGame++;
-      if (Variant == "") {
+      if (Variant == "" || Variant == "standard") {
         Variant = "chess";
       } else if (Variant.endsWith("960")) {
         Variant = Variant.slice(0, -3);
