@@ -369,6 +369,8 @@ function DrawCoordinatesOnBoard(
   SquarePixelHeight,
   BoardStartX,
   BoardStartY,
+  LightSquareCoordinateColor,
+  DarkSquareCoordinateColor,
   Notation,
 ) {
   if (
@@ -380,6 +382,8 @@ function DrawCoordinatesOnBoard(
     typeof SquarePixelHeight != "number" ||
     typeof BoardStartX != "number" ||
     typeof BoardStartY != "number" ||
+    typeof LightSquareCoordinateColor != "string" ||
+    typeof DarkSquareCoordinateColor != "string" ||
     typeof Notation != "number"
   ) {
     throw TypeError();
@@ -387,6 +391,8 @@ function DrawCoordinatesOnBoard(
   let i = 0;
   let x = 0,
     y = 0;
+  let index_x = 0,
+    index_y = 0;
   let drawbottom = false;
   let drawtop = false;
   let drawside = false;
@@ -473,22 +479,54 @@ function DrawCoordinatesOnBoard(
     ) {
       x = BoardStartX + (7 * SquarePixelWidth) / 8;
       y = BoardStartY + SquarePixelHeight * BoardHeight - SquarePixelHeight / 8;
-      CanvasContext2D.fillStyle = "#000";
+      if (FlipBoard) {
+        index_x = BoardWidth;
+        index_y = BoardHeight;
+      } else {
+        index_x = 1;
+        index_y = 1;
+      }
       CanvasContext2D.font = `${fontsize}px Arial`;
       for (i = 0; i < BoardWidth; i++) {
+        if ((index_x & 1) == (index_y & 1)) {
+          CanvasContext2D.fillStyle = DarkSquareCoordinateColor;
+        } else {
+          CanvasContext2D.fillStyle = LightSquareCoordinateColor;
+        }
         CanvasContext2D.fillText(coordinates[i], x, y, SquarePixelWidth / 4);
         x += SquarePixelWidth;
+        if (FlipBoard) {
+          index_x--;
+        } else {
+          index_x++;
+        }
       }
       CanvasContext2D.fillStyle = "";
       CanvasContext2D.font = "";
     } else {
       x = BoardStartX + BoardWidth * SquarePixelWidth - SquarePixelWidth / 8;
       y = BoardStartY + SquarePixelHeight * BoardHeight - SquarePixelHeight / 8;
-      CanvasContext2D.fillStyle = "#000";
+      if (FlipBoard) {
+        index_x = 1;
+        index_y = BoardHeight;
+      } else {
+        index_x = BoardWidth;
+        index_y = 1;
+      }
       CanvasContext2D.font = `${fontsize}px Arial`;
       for (i = 0; i < BoardWidth; i++) {
+        if ((index_x & 1) == (index_y & 1)) {
+          CanvasContext2D.fillStyle = DarkSquareCoordinateColor;
+        } else {
+          CanvasContext2D.fillStyle = LightSquareCoordinateColor;
+        }
         CanvasContext2D.fillText(coordinates[i], x, y, SquarePixelWidth / 4);
         x -= SquarePixelWidth;
+        if (FlipBoard) {
+          index_x++;
+        } else {
+          index_x--;
+        }
       }
       CanvasContext2D.fillStyle = "";
       CanvasContext2D.font = "";
@@ -512,11 +550,27 @@ function DrawCoordinatesOnBoard(
     ) {
       x = BoardStartX + BoardWidth * SquarePixelWidth - SquarePixelWidth / 8;
       y = BoardStartY + SquarePixelHeight / 8;
-      CanvasContext2D.fillStyle = "#000";
+      if (FlipBoard) {
+        index_x = 1;
+        index_y = 1;
+      } else {
+        index_x = BoardWidth;
+        index_y = BoardHeight;
+      }
       CanvasContext2D.font = `${fontsize}px Arial`;
       for (i = 0; i < BoardHeight; i++) {
+        if ((index_x & 1) == (index_y & 1)) {
+          CanvasContext2D.fillStyle = DarkSquareCoordinateColor;
+        } else {
+          CanvasContext2D.fillStyle = LightSquareCoordinateColor;
+        }
         CanvasContext2D.fillText(coordinates[i], x, y, SquarePixelWidth / 4);
         y += SquarePixelHeight;
+        if (FlipBoard) {
+          index_y++;
+        } else {
+          index_y--;
+        }
       }
       CanvasContext2D.fillStyle = "";
       CanvasContext2D.font = "";
@@ -526,11 +580,27 @@ function DrawCoordinatesOnBoard(
         BoardStartY +
         SquarePixelHeight * BoardHeight -
         (7 * SquarePixelHeight) / 8;
-      CanvasContext2D.fillStyle = "#000";
+      if (FlipBoard) {
+        index_x = 1;
+        index_y = BoardHeight;
+      } else {
+        index_x = BoardWidth;
+        index_y = 1;
+      }
       CanvasContext2D.font = `${fontsize}px Arial`;
       for (i = 0; i < BoardHeight; i++) {
+        if ((index_x & 1) == (index_y & 1)) {
+          CanvasContext2D.fillStyle = DarkSquareCoordinateColor;
+        } else {
+          CanvasContext2D.fillStyle = LightSquareCoordinateColor;
+        }
         CanvasContext2D.fillText(coordinates[i], x, y, SquarePixelWidth / 4);
         y -= SquarePixelHeight;
+        if (FlipBoard) {
+          index_y--;
+        } else {
+          index_y++;
+        }
       }
       CanvasContext2D.fillStyle = "";
       CanvasContext2D.font = "";
@@ -554,11 +624,27 @@ function DrawCoordinatesOnBoard(
     ) {
       x = BoardStartX + SquarePixelWidth / 8;
       y = BoardStartY + SquarePixelHeight / 8;
-      CanvasContext2D.fillStyle = "#000";
+      if (FlipBoard) {
+        index_x = BoardWidth;
+        index_y = 1;
+      } else {
+        index_x = 1;
+        index_y = BoardHeight;
+      }
       CanvasContext2D.font = `${fontsize}px Arial`;
       for (i = 0; i < BoardWidth; i++) {
+        if ((index_x & 1) == (index_y & 1)) {
+          CanvasContext2D.fillStyle = DarkSquareCoordinateColor;
+        } else {
+          CanvasContext2D.fillStyle = LightSquareCoordinateColor;
+        }
         CanvasContext2D.fillText(coordinates[i], x, y, SquarePixelWidth / 4);
         x += SquarePixelWidth;
+        if (FlipBoard) {
+          index_x--;
+        } else {
+          index_x++;
+        }
       }
       CanvasContext2D.fillStyle = "";
       CanvasContext2D.font = "";
@@ -568,11 +654,27 @@ function DrawCoordinatesOnBoard(
         BoardWidth * SquarePixelWidth -
         (7 * SquarePixelWidth) / 8;
       y = BoardStartY + SquarePixelHeight / 8;
-      CanvasContext2D.fillStyle = "#000";
+      if (FlipBoard) {
+        index_x = 1;
+        index_y = 1;
+      } else {
+        index_x = BoardWidth;
+        index_y = BoardHeight;
+      }
       CanvasContext2D.font = `${fontsize}px Arial`;
       for (i = 0; i < BoardWidth; i++) {
+        if ((index_x & 1) == (index_y & 1)) {
+          CanvasContext2D.fillStyle = DarkSquareCoordinateColor;
+        } else {
+          CanvasContext2D.fillStyle = LightSquareCoordinateColor;
+        }
         CanvasContext2D.fillText(coordinates[i], x, y, SquarePixelWidth / 4);
         x -= SquarePixelWidth;
+        if (FlipBoard) {
+          index_x++;
+        } else {
+          index_x--;
+        }
       }
       CanvasContext2D.fillStyle = "";
       CanvasContext2D.font = "";
@@ -581,7 +683,7 @@ function DrawCoordinatesOnBoard(
 }
 
 export function GenerateBoardImage(
-  FEN,
+  StatelessFEN,
   LastMove,
   CheckedSquares,
   HasPocket,
@@ -589,6 +691,8 @@ export function GenerateBoardImage(
   BoardWidth,
   BoardHeight,
   CoordinateNotation,
+  LightSquareCoordinateColor,
+  DarkSquareCoordinateColor,
   PieceImageURLMap,
   BoardImageURL,
   ImageWidth,
@@ -596,7 +700,7 @@ export function GenerateBoardImage(
   OnFinishedCallback,
 ) {
   if (
-    typeof FEN != "string" ||
+    typeof StatelessFEN != "string" ||
     typeof LastMove != "string" ||
     !(CheckedSquares instanceof Array) ||
     typeof HasPocket != "boolean" ||
@@ -604,6 +708,8 @@ export function GenerateBoardImage(
     typeof BoardWidth != "number" ||
     typeof BoardHeight != "number" ||
     typeof CoordinateNotation != "number" ||
+    typeof LightSquareCoordinateColor != "string" ||
+    typeof DarkSquareCoordinateColor != "string" ||
     !(PieceImageURLMap instanceof Map) ||
     typeof BoardImageURL != "string" ||
     typeof ImageWidth != "number" ||
@@ -632,7 +738,7 @@ export function GenerateBoardImage(
   }
   let i = 0;
   let drawnelementcount = 0;
-  let fenparts = GetBoardAndPocket(FEN);
+  let fenparts = GetBoardAndPocket(StatelessFEN);
   let pieces = ParseFEN(fenparts.board);
   let pocket = CountCharacters(fenparts.pocket);
   let lastmove = ConvertMoveToCoordinate(LastMove, BoardHeight);
@@ -669,13 +775,28 @@ export function GenerateBoardImage(
       j = 0;
     let pieceitem;
     let piecechar;
+    let boardpixelwidth = squarepixelwidth * BoardWidth;
+    let boardpixelheight = squarepixelheight * BoardHeight;
+    if (!noflipboard) {
+      ctx.translate(
+        boardpixelwidth / 2,
+        (HasPocket ? squarepixelheight : 0) + boardpixelheight / 2,
+      );
+      ctx.rotate(Math.PI);
+      ctx.translate(
+        -boardpixelwidth / 2,
+        (HasPocket ? -squarepixelheight : 0) - boardpixelheight / 2,
+      );
+    }
     ctx.drawImage(
       boardimg,
       0,
       HasPocket ? squarepixelheight : 0,
-      squarepixelwidth * BoardWidth,
-      squarepixelheight * BoardHeight,
+      boardpixelwidth,
+      boardpixelheight,
     );
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
 
     //Board Coordinates
     DrawCoordinatesOnBoard(
@@ -687,6 +808,8 @@ export function GenerateBoardImage(
       squarepixelheight,
       0,
       HasPocket ? squarepixelheight : 0,
+      LightSquareCoordinateColor,
+      DarkSquareCoordinateColor,
       CoordinateNotation,
     );
 

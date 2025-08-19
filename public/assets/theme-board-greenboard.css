@@ -2,363 +2,363 @@
   --dark-square-color: #86a666;
   --light-square-color: #ffffdd;
 }
-.greenboard.board1x1 cg-board {
+.greenboard.board1x1 cg-board::before {
   background-image: url('images/board/green/green1x1.svg');
 }
-.greenboard.board1x2 cg-board {
+.greenboard.board1x2 cg-board::before {
   background-image: url('images/board/green/green1x2.svg');
 }
-.greenboard.board1x3 cg-board {
+.greenboard.board1x3 cg-board::before {
   background-image: url('images/board/green/green1x3.svg');
 }
-.greenboard.board1x4 cg-board {
+.greenboard.board1x4 cg-board::before {
   background-image: url('images/board/green/green1x4.svg');
 }
-.greenboard.board1x5 cg-board {
+.greenboard.board1x5 cg-board::before {
   background-image: url('images/board/green/green1x5.svg');
 }
-.greenboard.board1x6 cg-board {
+.greenboard.board1x6 cg-board::before {
   background-image: url('images/board/green/green1x6.svg');
 }
-.greenboard.board1x7 cg-board {
+.greenboard.board1x7 cg-board::before {
   background-image: url('images/board/green/green1x7.svg');
 }
-.greenboard.board1x8 cg-board {
+.greenboard.board1x8 cg-board::before {
   background-image: url('images/board/green/green1x8.svg');
 }
-.greenboard.board1x9 cg-board {
+.greenboard.board1x9 cg-board::before {
   background-image: url('images/board/green/green1x9.svg');
 }
-.greenboard.board1x10 cg-board {
+.greenboard.board1x10 cg-board::before {
   background-image: url('images/board/green/green1x10.svg');
 }
-.greenboard.board2x1 cg-board {
+.greenboard.board2x1 cg-board::before {
   background-image: url('images/board/green/green2x1.svg');
 }
-.greenboard.board2x2 cg-board {
+.greenboard.board2x2 cg-board::before {
   background-image: url('images/board/green/green2x2.svg');
 }
-.greenboard.board2x3 cg-board {
+.greenboard.board2x3 cg-board::before {
   background-image: url('images/board/green/green2x3.svg');
 }
-.greenboard.board2x4 cg-board {
+.greenboard.board2x4 cg-board::before {
   background-image: url('images/board/green/green2x4.svg');
 }
-.greenboard.board2x5 cg-board {
+.greenboard.board2x5 cg-board::before {
   background-image: url('images/board/green/green2x5.svg');
 }
-.greenboard.board2x6 cg-board {
+.greenboard.board2x6 cg-board::before {
   background-image: url('images/board/green/green2x6.svg');
 }
-.greenboard.board2x7 cg-board {
+.greenboard.board2x7 cg-board::before {
   background-image: url('images/board/green/green2x7.svg');
 }
-.greenboard.board2x8 cg-board {
+.greenboard.board2x8 cg-board::before {
   background-image: url('images/board/green/green2x8.svg');
 }
-.greenboard.board2x9 cg-board {
+.greenboard.board2x9 cg-board::before {
   background-image: url('images/board/green/green2x9.svg');
 }
-.greenboard.board2x10 cg-board {
+.greenboard.board2x10 cg-board::before {
   background-image: url('images/board/green/green2x10.svg');
 }
-.greenboard.board3x1 cg-board {
+.greenboard.board3x1 cg-board::before {
   background-image: url('images/board/green/green3x1.svg');
 }
-.greenboard.board3x2 cg-board {
+.greenboard.board3x2 cg-board::before {
   background-image: url('images/board/green/green3x2.svg');
 }
-.greenboard.board3x3 cg-board {
+.greenboard.board3x3 cg-board::before {
   background-image: url('images/board/green/green3x3.svg');
 }
-.greenboard.board3x4 cg-board {
+.greenboard.board3x4 cg-board::before {
   background-image: url('images/board/green/green3x4.svg');
 }
-.greenboard.board3x5 cg-board {
+.greenboard.board3x5 cg-board::before {
   background-image: url('images/board/green/green3x5.svg');
 }
-.greenboard.board3x6 cg-board {
+.greenboard.board3x6 cg-board::before {
   background-image: url('images/board/green/green3x6.svg');
 }
-.greenboard.board3x7 cg-board {
+.greenboard.board3x7 cg-board::before {
   background-image: url('images/board/green/green3x7.svg');
 }
-.greenboard.board3x8 cg-board {
+.greenboard.board3x8 cg-board::before {
   background-image: url('images/board/green/green3x8.svg');
 }
-.greenboard.board3x9 cg-board {
+.greenboard.board3x9 cg-board::before {
   background-image: url('images/board/green/green3x9.svg');
 }
-.greenboard.board3x10 cg-board {
+.greenboard.board3x10 cg-board::before {
   background-image: url('images/board/green/green3x10.svg');
 }
-.greenboard.board4x1 cg-board {
+.greenboard.board4x1 cg-board::before {
   background-image: url('images/board/green/green4x1.svg');
 }
-.greenboard.board4x2 cg-board {
+.greenboard.board4x2 cg-board::before {
   background-image: url('images/board/green/green4x2.svg');
 }
-.greenboard.board4x3 cg-board {
+.greenboard.board4x3 cg-board::before {
   background-image: url('images/board/green/green4x3.svg');
 }
-.greenboard.board4x4 cg-board {
+.greenboard.board4x4 cg-board::before {
   background-image: url('images/board/green/green4x4.svg');
 }
-.greenboard.board4x5 cg-board {
+.greenboard.board4x5 cg-board::before {
   background-image: url('images/board/green/green4x5.svg');
 }
-.greenboard.board4x6 cg-board {
+.greenboard.board4x6 cg-board::before {
   background-image: url('images/board/green/green4x6.svg');
 }
-.greenboard.board4x7 cg-board {
+.greenboard.board4x7 cg-board::before {
   background-image: url('images/board/green/green4x7.svg');
 }
-.greenboard.board4x8 cg-board {
+.greenboard.board4x8 cg-board::before {
   background-image: url('images/board/green/green4x8.svg');
 }
-.greenboard.board4x9 cg-board {
+.greenboard.board4x9 cg-board::before {
   background-image: url('images/board/green/green4x9.svg');
 }
-.greenboard.board4x10 cg-board {
+.greenboard.board4x10 cg-board::before {
   background-image: url('images/board/green/green4x10.svg');
 }
-.greenboard.board5x1 cg-board {
+.greenboard.board5x1 cg-board::before {
   background-image: url('images/board/green/green5x1.svg');
 }
-.greenboard.board5x2 cg-board {
+.greenboard.board5x2 cg-board::before {
   background-image: url('images/board/green/green5x2.svg');
 }
-.greenboard.board5x3 cg-board {
+.greenboard.board5x3 cg-board::before {
   background-image: url('images/board/green/green5x3.svg');
 }
-.greenboard.board5x4 cg-board {
+.greenboard.board5x4 cg-board::before {
   background-image: url('images/board/green/green5x4.svg');
 }
-.greenboard.board5x5 cg-board {
+.greenboard.board5x5 cg-board::before {
   background-image: url('images/board/green/green5x5.svg');
 }
-.greenboard.board5x6 cg-board {
+.greenboard.board5x6 cg-board::before {
   background-image: url('images/board/green/green5x6.svg');
 }
-.greenboard.board5x7 cg-board {
+.greenboard.board5x7 cg-board::before {
   background-image: url('images/board/green/green5x7.svg');
 }
-.greenboard.board5x8 cg-board {
+.greenboard.board5x8 cg-board::before {
   background-image: url('images/board/green/green5x8.svg');
 }
-.greenboard.board5x9 cg-board {
+.greenboard.board5x9 cg-board::before {
   background-image: url('images/board/green/green5x9.svg');
 }
-.greenboard.board5x10 cg-board {
+.greenboard.board5x10 cg-board::before {
   background-image: url('images/board/green/green5x10.svg');
 }
-.greenboard.board6x1 cg-board {
+.greenboard.board6x1 cg-board::before {
   background-image: url('images/board/green/green6x1.svg');
 }
-.greenboard.board6x2 cg-board {
+.greenboard.board6x2 cg-board::before {
   background-image: url('images/board/green/green6x2.svg');
 }
-.greenboard.board6x3 cg-board {
+.greenboard.board6x3 cg-board::before {
   background-image: url('images/board/green/green6x3.svg');
 }
-.greenboard.board6x4 cg-board {
+.greenboard.board6x4 cg-board::before {
   background-image: url('images/board/green/green6x4.svg');
 }
-.greenboard.board6x5 cg-board {
+.greenboard.board6x5 cg-board::before {
   background-image: url('images/board/green/green6x5.svg');
 }
-.greenboard.board6x6 cg-board {
+.greenboard.board6x6 cg-board::before {
   background-image: url('images/board/green/green6x6.svg');
 }
-.greenboard.board6x7 cg-board {
+.greenboard.board6x7 cg-board::before {
   background-image: url('images/board/green/green6x7.svg');
 }
-.greenboard.board6x8 cg-board {
+.greenboard.board6x8 cg-board::before {
   background-image: url('images/board/green/green6x8.svg');
 }
-.greenboard.board6x9 cg-board {
+.greenboard.board6x9 cg-board::before {
   background-image: url('images/board/green/green6x9.svg');
 }
-.greenboard.board6x10 cg-board {
+.greenboard.board6x10 cg-board::before {
   background-image: url('images/board/green/green6x10.svg');
 }
-.greenboard.board7x1 cg-board {
+.greenboard.board7x1 cg-board::before {
   background-image: url('images/board/green/green7x1.svg');
 }
-.greenboard.board7x2 cg-board {
+.greenboard.board7x2 cg-board::before {
   background-image: url('images/board/green/green7x2.svg');
 }
-.greenboard.board7x3 cg-board {
+.greenboard.board7x3 cg-board::before {
   background-image: url('images/board/green/green7x3.svg');
 }
-.greenboard.board7x4 cg-board {
+.greenboard.board7x4 cg-board::before {
   background-image: url('images/board/green/green7x4.svg');
 }
-.greenboard.board7x5 cg-board {
+.greenboard.board7x5 cg-board::before {
   background-image: url('images/board/green/green7x5.svg');
 }
-.greenboard.board7x6 cg-board {
+.greenboard.board7x6 cg-board::before {
   background-image: url('images/board/green/green7x6.svg');
 }
-.greenboard.board7x7 cg-board {
+.greenboard.board7x7 cg-board::before {
   background-image: url('images/board/green/green7x7.svg');
 }
-.greenboard.board7x8 cg-board {
+.greenboard.board7x8 cg-board::before {
   background-image: url('images/board/green/green7x8.svg');
 }
-.greenboard.board7x9 cg-board {
+.greenboard.board7x9 cg-board::before {
   background-image: url('images/board/green/green7x9.svg');
 }
-.greenboard.board7x10 cg-board {
+.greenboard.board7x10 cg-board::before {
   background-image: url('images/board/green/green7x10.svg');
 }
-.greenboard.board8x1 cg-board {
+.greenboard.board8x1 cg-board::before {
   background-image: url('images/board/green/green8x1.svg');
 }
-.greenboard.board8x2 cg-board {
+.greenboard.board8x2 cg-board::before {
   background-image: url('images/board/green/green8x2.svg');
 }
-.greenboard.board8x3 cg-board {
+.greenboard.board8x3 cg-board::before {
   background-image: url('images/board/green/green8x3.svg');
 }
-.greenboard.board8x4 cg-board {
+.greenboard.board8x4 cg-board::before {
   background-image: url('images/board/green/green8x4.svg');
 }
-.greenboard.board8x5 cg-board {
+.greenboard.board8x5 cg-board::before {
   background-image: url('images/board/green/green8x5.svg');
 }
-.greenboard.board8x6 cg-board {
+.greenboard.board8x6 cg-board::before {
   background-image: url('images/board/green/green8x6.svg');
 }
-.greenboard.board8x7 cg-board {
+.greenboard.board8x7 cg-board::before {
   background-image: url('images/board/green/green8x7.svg');
 }
-.greenboard.board8x8 cg-board {
+.greenboard.board8x8 cg-board::before {
   background-image: url('images/board/green/green8x8.svg');
 }
-.greenboard.board8x9 cg-board {
+.greenboard.board8x9 cg-board::before {
   background-image: url('images/board/green/green8x9.svg');
 }
-.greenboard.board8x10 cg-board {
+.greenboard.board8x10 cg-board::before {
   background-image: url('images/board/green/green8x10.svg');
 }
-.greenboard.board9x1 cg-board {
+.greenboard.board9x1 cg-board::before {
   background-image: url('images/board/green/green9x1.svg');
 }
-.greenboard.board9x2 cg-board {
+.greenboard.board9x2 cg-board::before {
   background-image: url('images/board/green/green9x2.svg');
 }
-.greenboard.board9x3 cg-board {
+.greenboard.board9x3 cg-board::before {
   background-image: url('images/board/green/green9x3.svg');
 }
-.greenboard.board9x4 cg-board {
+.greenboard.board9x4 cg-board::before {
   background-image: url('images/board/green/green9x4.svg');
 }
-.greenboard.board9x5 cg-board {
+.greenboard.board9x5 cg-board::before {
   background-image: url('images/board/green/green9x5.svg');
 }
-.greenboard.board9x6 cg-board {
+.greenboard.board9x6 cg-board::before {
   background-image: url('images/board/green/green9x6.svg');
 }
-.greenboard.board9x7 cg-board {
+.greenboard.board9x7 cg-board::before {
   background-image: url('images/board/green/green9x7.svg');
 }
-.greenboard.board9x8 cg-board {
+.greenboard.board9x8 cg-board::before {
   background-image: url('images/board/green/green9x8.svg');
 }
-.greenboard.board9x9 cg-board {
+.greenboard.board9x9 cg-board::before {
   background-image: url('images/board/green/green9x9.svg');
 }
-.greenboard.board9x10 cg-board {
+.greenboard.board9x10 cg-board::before {
   background-image: url('images/board/green/green9x10.svg');
 }
-.greenboard.board10x1 cg-board {
+.greenboard.board10x1 cg-board::before {
   background-image: url('images/board/green/green10x1.svg');
 }
-.greenboard.board10x2 cg-board {
+.greenboard.board10x2 cg-board::before {
   background-image: url('images/board/green/green10x2.svg');
 }
-.greenboard.board10x3 cg-board {
+.greenboard.board10x3 cg-board::before {
   background-image: url('images/board/green/green10x3.svg');
 }
-.greenboard.board10x4 cg-board {
+.greenboard.board10x4 cg-board::before {
   background-image: url('images/board/green/green10x4.svg');
 }
-.greenboard.board10x5 cg-board {
+.greenboard.board10x5 cg-board::before {
   background-image: url('images/board/green/green10x5.svg');
 }
-.greenboard.board10x6 cg-board {
+.greenboard.board10x6 cg-board::before {
   background-image: url('images/board/green/green10x6.svg');
 }
-.greenboard.board10x7 cg-board {
+.greenboard.board10x7 cg-board::before {
   background-image: url('images/board/green/green10x7.svg');
 }
-.greenboard.board10x8 cg-board {
+.greenboard.board10x8 cg-board::before {
   background-image: url('images/board/green/green10x8.svg');
 }
-.greenboard.board10x9 cg-board {
+.greenboard.board10x9 cg-board::before {
   background-image: url('images/board/green/green10x9.svg');
 }
-.greenboard.board10x10 cg-board {
+.greenboard.board10x10 cg-board::before {
   background-image: url('images/board/green/green10x10.svg');
 }
-.greenboard.board11x1 cg-board {
+.greenboard.board11x1 cg-board::before {
   background-image: url('images/board/green/green11x1.svg');
 }
-.greenboard.board11x2 cg-board {
+.greenboard.board11x2 cg-board::before {
   background-image: url('images/board/green/green11x2.svg');
 }
-.greenboard.board11x3 cg-board {
+.greenboard.board11x3 cg-board::before {
   background-image: url('images/board/green/green11x3.svg');
 }
-.greenboard.board11x4 cg-board {
+.greenboard.board11x4 cg-board::before {
   background-image: url('images/board/green/green11x4.svg');
 }
-.greenboard.board11x5 cg-board {
+.greenboard.board11x5 cg-board::before {
   background-image: url('images/board/green/green11x5.svg');
 }
-.greenboard.board11x6 cg-board {
+.greenboard.board11x6 cg-board::before {
   background-image: url('images/board/green/green11x6.svg');
 }
-.greenboard.board11x7 cg-board {
+.greenboard.board11x7 cg-board::before {
   background-image: url('images/board/green/green11x7.svg');
 }
-.greenboard.board11x8 cg-board {
+.greenboard.board11x8 cg-board::before {
   background-image: url('images/board/green/green11x8.svg');
 }
-.greenboard.board11x9 cg-board {
+.greenboard.board11x9 cg-board::before {
   background-image: url('images/board/green/green11x9.svg');
 }
-.greenboard.board11x10 cg-board {
+.greenboard.board11x10 cg-board::before {
   background-image: url('images/board/green/green11x10.svg');
 }
-.greenboard.board12x1 cg-board {
+.greenboard.board12x1 cg-board::before {
   background-image: url('images/board/green/green12x1.svg');
 }
-.greenboard.board12x2 cg-board {
+.greenboard.board12x2 cg-board::before {
   background-image: url('images/board/green/green12x2.svg');
 }
-.greenboard.board12x3 cg-board {
+.greenboard.board12x3 cg-board::before {
   background-image: url('images/board/green/green12x3.svg');
 }
-.greenboard.board12x4 cg-board {
+.greenboard.board12x4 cg-board::before {
   background-image: url('images/board/green/green12x4.svg');
 }
-.greenboard.board12x5 cg-board {
+.greenboard.board12x5 cg-board::before {
   background-image: url('images/board/green/green12x5.svg');
 }
-.greenboard.board12x6 cg-board {
+.greenboard.board12x6 cg-board::before {
   background-image: url('images/board/green/green12x6.svg');
 }
-.greenboard.board12x7 cg-board {
+.greenboard.board12x7 cg-board::before {
   background-image: url('images/board/green/green12x7.svg');
 }
-.greenboard.board12x8 cg-board {
+.greenboard.board12x8 cg-board::before {
   background-image: url('images/board/green/green12x8.svg');
 }
-.greenboard.board12x9 cg-board {
+.greenboard.board12x9 cg-board::before {
   background-image: url('images/board/green/green12x9.svg');
 }
-.greenboard.board12x10 cg-board {
+.greenboard.board12x10 cg-board::before {
   background-image: url('images/board/green/green12x10.svg');
 }

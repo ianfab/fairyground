@@ -125,13 +125,21 @@ export class ChessgroundThemeDetector {
     this.Container = Container;
     this.Wrapper = document.createElement("div");
     this.Wrapper.classList.value =
-      "chessground-theme-detector merida blueboard board8x8";
+      "chessground-theme-detector inner merida blueboard board8x8";
     this.ChessgroundWrapper = document.createElement("div");
     this.ChessgroundWrapper.classList.add("cg-wrap");
     this.ChessgroundWrapper.classList.add("orientation-white");
     this.Orientation = "white";
     this.Board = document.createElement("cg-board");
+    let coordinategroup = document.createElement("coords");
+    this.LightSquareInnerCoordinate = document.createElement("coord");
+    this.LightSquareInnerCoordinate.classList.add("light");
+    this.DarkSquareInnerCoordinate = document.createElement("coord");
+    this.DarkSquareInnerCoordinate.classList.add("dark");
+    coordinategroup.appendChild(this.LightSquareInnerCoordinate);
+    coordinategroup.appendChild(this.DarkSquareInnerCoordinate);
     this.ChessgroundWrapper.appendChild(this.Board);
+    this.ChessgroundWrapper.appendChild(coordinategroup);
     this.Wrapper.appendChild(this.ChessgroundWrapper);
     this.Pieces = [];
     this.BoardWidth = 8;
@@ -200,7 +208,7 @@ export class ChessgroundThemeDetector {
     }
     this.PieceTheme = PieceThemeTag;
     this.BoardTheme = BoardThemeTag;
-    this.Wrapper.classList.value = `chessground-theme-detector ${PieceThemeTag} ${BoardThemeTag} board${this.BoardWidth}x${this.BoardHeight}`;
+    this.Wrapper.classList.value = `chessground-theme-detector inner ${PieceThemeTag} ${BoardThemeTag} board${this.BoardWidth}x${this.BoardHeight}`;
   }
 
   SetBoardDimensions(BoardWidth, BoardHeight) {
@@ -209,12 +217,12 @@ export class ChessgroundThemeDetector {
     }
     this.BoardWidth = BoardWidth;
     this.BoardHeight = BoardHeight;
-    this.Wrapper.classList.value = `chessground-theme-detector ${this.PieceTheme} ${this.BoardTheme} board${BoardWidth}x${BoardHeight}`;
+    this.Wrapper.classList.value = `chessground-theme-detector inner ${this.PieceTheme} ${this.BoardTheme} board${BoardWidth}x${BoardHeight}`;
   }
 
   GetThemes() {
     let i = 0;
-    let style = window.getComputedStyle(this.Board);
+    let style = window.getComputedStyle(this.Board, "::before");
     let boardimgurl = ReplaceURLCSSFunction(style.backgroundImage);
     let pieceimgurlmap = new Map();
     for (i = 0; i < PieceCharacters.length; i++) {
@@ -225,5 +233,12 @@ export class ChessgroundThemeDetector {
       );
     }
     return { board: boardimgurl, pieces: pieceimgurlmap };
+  }
+
+  GetInnerCoordinateColor() {
+    return {
+      light: window.getComputedStyle(this.LightSquareInnerCoordinate).color,
+      dark: window.getComputedStyle(this.DarkSquareInnerCoordinate).color,
+    };
   }
 }

@@ -1636,14 +1636,14 @@ function updateInnerCoordinateColor(chessground) {
     return;
   }
   const size = getCurrentBoardSize();
-  let classes, styles, isblack;
+  let classes, styles;
+  let isblack = chessground.state.orientation == "black";
   //If the parity of rank number and the parity of file number are the same, it's a dark square. Otherwise it's a light square.
   for (i = 0; i < coordinateobj.length; i++) {
     elem = coordinateobj[i];
     if (elem instanceof HTMLElement) {
       classes = elem.classList;
       styles = window.getComputedStyle(elem);
-      isblack = classes.contains("black");
       if (classes.contains("bottom")) {
         childs = elem.childNodes;
         let startsdark = false;
@@ -2321,6 +2321,7 @@ function GenerateBoardImage(
   }
   let dimensions = getDimensions();
   let asseturl = themedetector.GetThemes();
+  let coordcolors = themedetector.GetInnerCoordinateColor();
   let moves = gametree.GetMoveListOfMove(gametree.CurrentMove);
   let tmpboard = new ffish.Board(
     gametree.Variant,
@@ -2364,6 +2365,8 @@ function GenerateBoardImage(
       dimensions.width,
       dimensions.height,
       notation,
+      coordcolors.dark,
+      coordcolors.light,
       asseturl.pieces,
       asseturl.board,
       imagewidth,
@@ -2430,6 +2433,8 @@ function GenerateBoardImage(
           dimensions.width,
           dimensions.height,
           notation,
+          coordcolors.dark,
+          coordcolors.light,
           asseturl.pieces,
           asseturl.board,
           imagewidth,

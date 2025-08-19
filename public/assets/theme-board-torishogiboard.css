@@ -1,4 +1,4 @@
-.torishogiboard.board7x7 cg-board {
+.torishogiboard.board7x7 cg-board::before {
   background-image: url('images/board/torishogi/torishogiboard.svg');
   width: 100%;
   height: 100%;
