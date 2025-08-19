@@ -4707,7 +4707,7 @@ function LoadPositionVariant(side, file) {
       if (rawText[i].length < 1 || rawText[i].charAt(0) == "#") {
         continue;
       }
-      variantsettings = rawText[i].trim().split("|");
+      variantsettings = rawText[i].trim().split("||");
       if (variantsettings.length != 5 && variantsettings.length != 6) {
         console.warn(
           `At line ${i} in paragraph of <position variant file>: Bad syntax\n`,
