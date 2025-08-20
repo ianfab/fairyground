@@ -4368,7 +4368,7 @@ new Module().then((loadedModule) => {
       height = 640;
     }
     if (isNaN(quality) || quality < 0 || quality > 1) {
-      quality = 1;
+      quality = 0.9;
     }
     if (isNaN(framedelay) || framedelay <= 0) {
       framedelay = 1000;
