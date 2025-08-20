@@ -301,6 +301,18 @@
     background-color: rgba(176, 176, 176, 0.2);
   }
 
+  #tempbackground1,
+  #tempbackground2 {
+    transition: opacity 1s ease-in-out 0s;
+    background-color: #0000;
+    opacity: 0;
+  }
+
+  #tempbackground1.show,
+  #tempbackground2.show {
+    opacity: 1;
+  }
+
   #pagetitle {
     font-size: 40px;
     font-family: "Times New Roman", Times, serif, Arial;
@@ -3251,39 +3263,6 @@
         `./assets/theme-variant-${variant}.css`;
     }
 
-    function LinearTransition(
-      start,
-      end,
-      step,
-      interval,
-      operation,
-      doneCallBack,
-    ) {
-      if (
-        typeof start != "number" ||
-        typeof end != "number" ||
-        typeof step != "number" ||
-        typeof interval != "number" ||
-        typeof operation != "function" ||
-        typeof doneCallBack != "function"
-      ) {
-        throw TypeError(
-          "FadeInOut(start:number, end:number, step:number, interval:number, operation:function(number), doneCallBack:function())",
-        );
-      }
-      let i = start;
-      const operate = () => {
-        operation(i);
-        if ((step > 0 && i >= end) || (step < 0 && i <= end)) {
-          doneCallBack();
-        } else {
-          setTimeout(operate, interval);
-        }
-        i += step;
-      };
-      setTimeout(operate, interval);
-    }
-
     const copyText = async (val) => {
       if (navigator.clipboard && navigator.permissions) {
         await navigator.clipboard.writeText(val);
@@ -3849,11 +3828,6 @@
 
     function ApplyUIThemeStyleNode(HTMLStyleElementObject) {
       if (HTMLStyleElementObject instanceof HTMLStyleElement) {
-        let chi = document.getElementsByClassName("bg-animation");
-        let i = 0;
-        for (i = 0; i < chi.length; i++) {
-          chi[i].style.display = "none";
-        }
         const pagebackground = document.getElementById("pagebackground");
         const htmlComputedStyle = window.getComputedStyle(pagebackground);
         const BGBefore = htmlComputedStyle.backgroundImage;
@@ -3873,79 +3847,44 @@
         const BGAfterPosition = htmlComputedStyleAfter.backgroundPosition;
         const BGAfterAttachment = htmlComputedStyleAfter.backgroundAttachment;
 
-        const tmpbg = document.createElement("div");
-        const tmpbg2 = document.createElement("div");
+        const tempbackground1 = document.getElementById("tempbackground1");
+        const tempbackground2 = document.getElementById("tempbackground2");
+        let tmpbg1, tmpbg2;
 
-        if (BGBefore != "none") {
-          tmpbg.className = "bg-animation";
-          tmpbg.style.backgroundImage = BGBefore;
-          tmpbg.style.backgroundSize = BGBeforeSize;
-          tmpbg.style.backgroundRepeat = BGBeforeRepeat;
-          tmpbg.style.backgroundPosition = BGBeforePosition;
-          tmpbg.style.backgroundAttachment = BGBeforeAttachment;
-          tmpbg.className = "backgroundimg";
-          tmpbg.style.opacity = "1";
-          tmpbg.style.zIndex = "-51";
-          document.body.appendChild(tmpbg);
+        if (tempbackground1.classList.contains("show")) {
+          tmpbg1 = tempbackground1;
+          tmpbg2 = tempbackground2;
+        } else {
+          tmpbg1 = tempbackground2;
+          tmpbg2 = tempbackground1;
         }
-        if (BGAfter != "none") {
-          tmpbg2.className = "bg-animation";
-          tmpbg2.style.backgroundImage = BGAfter;
-          tmpbg2.style.backgroundSize = BGAfterSize;
-          tmpbg2.style.backgroundRepeat = BGAfterRepeat;
-          tmpbg2.style.backgroundPosition = BGAfterPosition;
-          tmpbg2.style.backgroundAttachment = BGAfterAttachment;
-          tmpbg2.className = "backgroundimg";
-          tmpbg2.style.opacity = "0";
-          tmpbg2.style.zIndex = "-52";
-          document.body.appendChild(tmpbg2);
-        }
+
+        tmpbg1.style.backgroundImage = BGBefore;
+        tmpbg1.style.backgroundSize = BGBeforeSize;
+        tmpbg1.style.backgroundRepeat = BGBeforeRepeat;
+        tmpbg1.style.backgroundPosition = BGBeforePosition;
+        tmpbg1.style.backgroundAttachment = BGBeforeAttachment;
+        tmpbg1.style.zIndex = "-51";
+
+        tmpbg2.style.backgroundImage = BGAfter;
+        tmpbg2.style.backgroundSize = BGAfterSize;
+        tmpbg2.style.backgroundRepeat = BGAfterRepeat;
+        tmpbg2.style.backgroundPosition = BGAfterPosition;
+        tmpbg2.style.backgroundAttachment = BGAfterAttachment;
+        tmpbg2.style.zIndex = "-52";
+
+        tmpbg1.classList.remove("show");
+        tmpbg2.classList.add("show");
+
         if (BGBefore != "none" && BGAfter != "none") {
           pagebackground.style.opacity = "0";
-          LinearTransition(
-            1,
-            0,
-            -0.02,
-            10,
-            (val) => {
-              tmpbg.style.opacity = `${val}`;
-              tmpbg2.style.opacity = `${1 - val}`;
-            },
-            () => {
-              pagebackground.style.opacity = "1";
-              document.body.removeChild(tmpbg);
-              document.body.removeChild(tmpbg2);
-            },
-          );
         } else if (BGBefore != "none") {
-          LinearTransition(
-            1,
-            0,
-            -0.02,
-            10,
-            (val) => {
-              tmpbg.style.opacity = `${val}`;
-            },
-            () => {
-              document.body.removeChild(tmpbg);
-            },
-          );
         } else if (BGAfter != "none") {
           pagebackground.style.opacity = "0";
-          LinearTransition(
-            0,
-            1,
-            0.02,
-            10,
-            (val) => {
-              tmpbg2.style.opacity = `${val}`;
-            },
-            () => {
-              pagebackground.style.opacity = "1";
-              document.body.removeChild(tmpbg2);
-            },
-          );
         }
+        setTimeout(() => {
+          pagebackground.style.opacity = "";
+        }, 1000);
       } else {
         throw TypeError(
           "ApplyUIThemeStyleNode(HTMLStyleElementObject:HTMLStyleElement)",
@@ -9385,6 +9324,8 @@
             m("p#imagegenerationprogress", "Ready."),
           ]),
           m("div#themedetectorcontainer"),
+          m("div#tempbackground1.pagebackground"),
+          m("div#tempbackground2.pagebackground.show"),
         ]);
       };
 

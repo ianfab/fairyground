@@ -3226,7 +3226,12 @@ new Module().then((loadedModule) => {
   };
 
   dropdownVariant.onchange = function () {
-    if (!ffish.variants().includes(dropdownVariant.value)) return;
+    if (!ffish.variants().includes(dropdownVariant.value)) {
+      window.alert(
+        `Error: Selected variant "${dropdownVariant.value}" is not present in ffish.js. This means that there is a version mismatch between Fairy-Stockfish WebAssembly port and ffish.js. Please report this issue on Github Issues of this project.`,
+      );
+      return;
+    }
     const oldDimensions = getDimensions();
     initBoard(dropdownVariant.value);
     const newDimensions = getDimensions();
