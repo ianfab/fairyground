@@ -85,6 +85,9 @@ const initializeThemes = document.getElementById("initializethemes");
 const isBoardSetup = document.getElementById("isboardsetup");
 const isAdvPGNMode = document.getElementById("isadvpgnmode");
 const buttonMoveTreeClear = document.getElementById("movetree-clear");
+const buttonMoveTreeClearComments = document.getElementById(
+  "movetree-clearcomments",
+);
 const buttonMoveTreeHideShow = document.getElementById("movetree-hideshow");
 const buttonMoveTreeRemoveVariations = document.getElementById(
   "movetree-removevariations",
@@ -795,6 +798,30 @@ class GameTree {
     this.UpdateHistory();
     this.MoveTree.RootNode.NextNodes = [];
     this.CurrentMove = this.MoveTree.RootNode;
+    this.AddHistory();
+  }
+
+  ClearComments() {
+    let pointer = this.MoveTree.RootNode;
+    let stack = [];
+    let i = 0;
+    this.UpdateHistory();
+    while (true) {
+      if (i < pointer.NextNodes.length) {
+        stack.push(i);
+        pointer = pointer.NextNodes[i];
+        i = 0;
+      } else {
+        pointer.Move.TextAfter = "";
+        pointer.Move.TextBefore = "";
+        pointer.Move.Symbol = "";
+        if (stack.length == 0) {
+          break;
+        }
+        i = stack.pop() + 1;
+        pointer = pointer.PreviousNode;
+      }
+    }
     this.AddHistory();
   }
 
@@ -3310,6 +3337,13 @@ new Module().then((loadedModule) => {
     }
   };
 
+  buttonMoveTreeClearComments.onclick = function () {
+    if (!buttonMoveTreeClearComments.disabled) {
+      gametree.ClearComments();
+      updatePGNDivision();
+    }
+  };
+
   buttonMoveTreeCrop.onclick = function () {
     if (!buttonMoveTreeCrop.disabled) {
       gametree.CropCurrentMove();
@@ -5358,6 +5392,7 @@ function getPgnDiv(board) {
       buttonMoveTreeCutBranch.disabled =
       buttonMoveTreeCropBranch.disabled =
       buttonMoveTreeClear.disabled =
+      buttonMoveTreeClearComments.disabled =
         true;
     return note;
   } else {
@@ -5390,7 +5425,7 @@ function getPgnDiv(board) {
       gametree.CurrentMove.RelativePositionInParentNode == 0;
     buttonMoveTreeRemoveVariations.disabled =
       gametree.CurrentMove.NextNodes.length <= 1;
-    buttonMoveTreeClear.disabled = false;
+    buttonMoveTreeClear.disabled = buttonMoveTreeClearComments.disabled = false;
     return result;
   }
 }

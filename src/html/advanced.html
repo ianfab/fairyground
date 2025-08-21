@@ -949,6 +949,26 @@
     cursor: pointer;
   }
 
+  #pgn-operations button:after {
+    position: relative;
+    top: -25px;
+    left: 0;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: right;
+    align-items: flex-end;
+    height: 25px;
+    width: 25px;
+    font-size: 14px;
+    border: none;
+    background-color: #0000;
+    font-family: FontAwesome;
+    border: none;
+    padding: 1px;
+    z-index: 1;
+    cursor: pointer;
+  }
+
   #pgn-operations button:hover:before {
     background-color: #000;
     color: #fff;
@@ -2226,6 +2246,7 @@
     -webkit-transform: scale(-1, 1);
     -ms-transform: scale(-1, 1);
     transform: scale(-1, 1);
+    filter: none;
   }
 
   #placewall:before {
@@ -2266,6 +2287,7 @@
     -webkit-transform: rotate(90deg);
     -ms-transform: rotate(90deg);
     transform: rotate(90deg);
+    filter: none;
   }
 
   #lockminiboard:before {
@@ -2275,33 +2297,33 @@
   }
 
   .locked #lockminiboard:before {
-    background-color: orangered;
+    background-color: #ff4500;
     content: "\f023";
   }
 
   #pinminiboard:before {
-    background-color: forestgreen;
+    background-color: #228b22;
     content: "\f0f6";
     cursor: pointer;
   }
 
   .pinned #pinminiboard:before {
-    background-color: rebeccapurple;
+    background-color: #663399;
     content: "\f2d0";
   }
 
   #setpositiontomainboard:before {
-    background-color: gold;
+    background-color: #ffd700;
     content: "\f002";
     cursor: pointer;
   }
 
   #setpositiontomainboard:disabled:before {
-    color: black;
+    color: #000;
   }
 
   #closeminiboard:before {
-    background-color: crimson;
+    background-color: #dc143c;
     content: "\f00d";
     cursor: pointer;
   }
@@ -2310,12 +2332,26 @@
     content: "\f1f8";
   }
 
+  #movetree-clearcomments:before {
+    content: "\f0e5";
+  }
+
+  #movetree-clearcomments:after {
+    content: "\f00d";
+    color: #f00;
+  }
+
   #movetree-hideshow:before {
     content: "\f2a8";
   }
 
   #movetree-removevariations:before {
-    content: "\f05b";
+    content: "\f0e8";
+  }
+
+  #movetree-removevariations:after {
+    content: "\f00d";
+    color: #f00;
   }
 
   #movetree-settomainbranch:before {
@@ -2324,6 +2360,11 @@
 
   #movetree-setasmainline:before {
     content: "\f02e";
+  }
+
+  #movetree-setasmainline:after {
+    content: "\f005";
+    color: gold;
   }
 
   #movetree-cutbranch:before {
@@ -2347,11 +2388,11 @@
   }
 
   #movetree-textbefore:before {
-    content: "\f03b";
+    content: "\f032";
   }
 
   #movetree-textafter:before {
-    content: "\f03c";
+    content: "\f031";
   }
 
   #movetree-symbol:before {
@@ -2383,7 +2424,7 @@
     //Fairyground namespace for variable/function definition transfer
     window.fairyground = { super: window };
   </script>
-  <script src="gif.js"></script>
+  <script src="gif.js" defer></script>
   <script src="bundle.js" defer></script>
 
   <!-- Javascript -->
@@ -8799,6 +8840,10 @@
                     title:
                       "Clear Moves\nClick to clear the variation tree. Your position will be set to the initial position.",
                   }),
+                  m("button#movetree-clearcomments", {
+                    title:
+                      "Clear Comments\nClick to clear all comments (Text before, text after, symbols).",
+                  }),
                   m("button#movetree-hideshow", {
                     title:
                       "Show or Hide Move\nClick to hide/show subsequent moves of current move.",
@@ -8817,7 +8862,7 @@
                   }),
                   m("button#movetree-cutbranch", {
                     title:
-                      "Cut Branch\nClick to remove all the moves on the branch of current move.",
+                      "Cut Branch\nClick to remove all the moves on the variation branch of current move.",
                   }),
                   m("button#movetree-cropbranch", {
                     title:
