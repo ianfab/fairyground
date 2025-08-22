@@ -4,6 +4,7 @@ const AllPGNLineCommentMatcher = new RegExp("\\:(.*?)(\r\n|\r|\n)", "g");
 const AllWhiteSpacePlaceHolderMatcher = new RegExp("\x03", "g");
 const AllLineSplitterMatcher = new RegExp("\r\n|\r|\n", "g");
 const MoveNumberMatcher = new RegExp("(^\\d*\\.+)|(^\\d+$)", "");
+const DiscreteMoveNumberMatcher = new RegExp("^\\d+\\.+$", "");
 const WhiteSpaceMatcher = new RegExp("[ ]+", "");
 const LineSplitterReplacer = new RegExp("\\r\\n|\\r", "g");
 const SymbolLengthSorted = ["!!", "!?", "?!", "??", "!", "?"];
@@ -191,6 +192,7 @@ export function ParsePGNMovesToMoveTree(
     .replace(AllLineSplitterMatcher, " ")
     .split(WhiteSpaceMatcher);
   let content = "";
+  let aftermovenum = false;
   let stack = [];
   let pointer = tree.RootNode;
   let move = null;
@@ -203,12 +205,19 @@ export function ParsePGNMovesToMoveTree(
   let pointerandmovestack = null;
   tree.SetInitialCondition(initialmovenumber, sidetomove, 2);
   for (i = 0; i < items.length; i++) {
+    if (DiscreteMoveNumberMatcher.test(items[i])) {
+      if (aftermovenum) {
+        console.warn("A move number is next to previous one: ", content);
+      }
+      aftermovenum = true;
+      continue;
+    }
     content = items[i].replace(MoveNumberMatcher, "");
     if (content == "") {
       continue;
     }
     if (content.startsWith("{") && content.endsWith("}")) {
-      if (pointer == tree.RootNode || addingvariation) {
+      if (pointer == tree.RootNode || addingvariation || aftermovenum) {
         textbefore.push(
           content.slice(1, -1).replace(AllWhiteSpacePlaceHolderMatcher, " "),
         );
@@ -218,7 +227,7 @@ export function ParsePGNMovesToMoveTree(
           .replace(AllWhiteSpacePlaceHolderMatcher, " ");
       }
     } else if (content.startsWith("$")) {
-      if (pointer == tree.RootNode) {
+      if (pointer == tree.RootNode || addingvariation || aftermovenum) {
         console.warn("A numeric annotation glyph must be added after a move.");
         continue;
       } else if (pointer.Move.Symbol != "") {
@@ -230,7 +239,7 @@ export function ParsePGNMovesToMoveTree(
         console.warn("Illegal numeric annotation glyph: " + content);
         continue;
       }
-      if (symbolnum < 1 || symbolnum > 6) {
+      if (symbolnum < 0 || symbolnum > 139) {
         console.warn("Not supported numeric annotation glyph: " + content);
         continue;
       }
@@ -249,7 +258,7 @@ export function ParsePGNMovesToMoveTree(
         return null;
       }
     } else if (content == "(") {
-      if (pointer == tree.RootNode || addingvariation) {
+      if (pointer == tree.RootNode || addingvariation || aftermovenum) {
         console.error(
           "Error parsing PGN: A variation line must be added after a move.",
         );
@@ -263,6 +272,12 @@ export function ParsePGNMovesToMoveTree(
         console.error("Error parsing PGN: Cannot add empty variation lines.");
         board.delete();
         return null;
+      } else if (aftermovenum) {
+        console.error(
+          "Error parsing PGN: A move must exist after move number.",
+        );
+        board.delete();
+        return null;
       }
       pointerandmovestack = stack.pop();
       pointer = pointerandmovestack.currentnode;
@@ -273,6 +288,7 @@ export function ParsePGNMovesToMoveTree(
       if (addingvariation) {
         board.pop();
       }
+      aftermovenum = false;
       moveandsymbol = GetSymbolFromMove(content);
       if (!board.pushSan(moveandsymbol.move, Notation)) {
         console.error("Error parsing PGN: Illegal move: " + moveandsymbol.move);

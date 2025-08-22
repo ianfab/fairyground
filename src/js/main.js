@@ -110,6 +110,7 @@ const buttonMoveTreeUndo = document.getElementById("movetree-undo");
 const buttonMoveTreeRedo = document.getElementById("movetree-redo");
 const buttonMoveTreeSave = document.getElementById("movetree-save");
 const buttonMoveTreeSaveImage = document.getElementById("movetree-imagesave");
+const buttonMoveTreeResize = document.getElementById("movetree-resize");
 const dropdownSetPiece = document.getElementById("dropdown-setpiece");
 const buttonClearBoard = document.getElementById("clearboard");
 const buttonInitialBoardPosition = document.getElementById("initboardpos");
@@ -335,6 +336,7 @@ const chessgroundnotations = [
   "XIANGQI_HANNUM", // Arabic numbers on top, Hanzi numbers on bottom
   "THAI_ALGEBRAIC", // Thai letters on bottom, Thai numbers on side
 ];
+const MoveTextActionPartsMatcher = new RegExp("\\[.*?\\]", "g");
 let ffishnotationobjects = null;
 var PositionVariantsDirectory = new Map();
 let EmptyMap = new Map();
@@ -592,7 +594,6 @@ class GameTree {
     this.Variant = "chess";
     this.Is960 = false;
     this.BlankSplitter = new RegExp("[ ]+");
-    this.MoveTextActionPartsMatcher = new RegExp("\\[.*?\\]", "g");
     this.CurrentMove = this.MoveTree.RootNode;
     this.HistoryStack = [];
     this.CurrentHistory = -1;
@@ -1012,21 +1013,44 @@ class GameTree {
         }
       } else {
         if (tokens[i].Move.TextBefore) {
-          result += "{" + tokens[i].Move.TextBefore + "} ";
-        }
-        if (i == 0 || (i > 0 && tokens[i - 1].Move.Move == "(")) {
-          if (tokens[i].Move.MoverRound == 0) {
-            result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
+          if (i == 0 || (i > 0 && tokens[i - 1].Move.Move == "(")) {
+            result += "{" + tokens[i].Move.TextBefore + "} ";
+            if (tokens[i].Move.MoverRound == 0) {
+              result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
+            } else {
+              result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + "... ";
+            }
           } else {
-            result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + "... ";
+            if (tokens[i].Move.MoverRound == 0) {
+              result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
+            } else {
+              result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + "... ";
+            }
+            result += "{" + tokens[i].Move.TextBefore + "} ";
           }
-        } else if (tokens[i].Move.MoverRound == 0) {
-          result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
+        } else {
+          if (
+            i == 0 ||
+            (i > 0 &&
+              (tokens[i - 1].IsSplitter || tokens[i - 1].Move.TextAfter))
+          ) {
+            if (tokens[i].Move.MoverRound == 0) {
+              result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
+            } else {
+              result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + "... ";
+            }
+          } else if (tokens[i].Move.MoverRound == 0) {
+            result += Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
+          }
         }
         result += tmpboard.sanMove(tokens[i].Move.Move, Notation);
         tmpboard.push(tokens[i].Move.Move);
         if (tokens[i].Move.Symbol) {
-          result += tokens[i].Move.Symbol + " ";
+          if (tokens[i].Move.Symbol.startsWith("$")) {
+            result += " " + tokens[i].Move.Symbol + " ";
+          } else {
+            result += tokens[i].Move.Symbol + " ";
+          }
         } else {
           result += " ";
         }
@@ -1046,11 +1070,7 @@ class GameTree {
     if (AlwaysShowResult || tmpboardresult != "*") {
       result += tmpboardresult;
     }
-    try {
-      tmpboard.delete();
-    } catch (err) {
-      console.error("Caught", err);
-    }
+    tmpboard.delete();
     return result.trim();
   }
 
@@ -1073,6 +1093,9 @@ class GameTree {
       indexend = 0;
     let boardnotes = "";
     let hidesubsequentmovelevel = 0;
+    let glyph = 0;
+    let displaytextbefore = "";
+    let displaytextafter = "";
     let movesparagraph = document.createElement("div");
     movesparagraph.id = "pgndiv";
     movesparagraph.classList.add("board-display-san");
@@ -1110,14 +1133,19 @@ class GameTree {
         }
         if (tokens[i].Move.TextBefore) {
           element = document.createElement("p");
-          element.innerText = tokens[i].Move.TextBefore.replace(
-            this.MoveTextActionPartsMatcher,
-            "",
-          );
+          element.innerText = displaytextbefore = tokens[
+            i
+          ].Move.TextBefore.replace(MoveTextActionPartsMatcher, "").trim();
           element.classList.add("text-before");
           movesparagraph.appendChild(element);
+        } else {
+          displaytextbefore = "";
         }
-        if (i == 0 || (i > 0 && tokens[i - 1].Move.Move == "(")) {
+        if (
+          i == 0 ||
+          (i > 0 && (tokens[i - 1].IsSplitter || displaytextafter)) ||
+          displaytextbefore
+        ) {
           if (tokens[i].Move.MoverRound == 0) {
             element = document.createElement("p");
             element.innerText =
@@ -1141,9 +1169,23 @@ class GameTree {
         move = moveutil.ParseUCIMove(tokens[i].Move.Move);
         element = document.createElement("p");
         if (tokens[i].Move.Symbol) {
-          element.innerText =
-            tmpboard.sanMove(tokens[i].Move.Move, Notation) +
-            tokens[i].Move.Symbol;
+          if (tokens[i].Move.Symbol.startsWith("$")) {
+            glyph = parseInt(tokens[i].Move.Symbol.substring(1));
+            if (moveutil.NumericAnnotationGlyphs[glyph]) {
+              element.innerText =
+                tmpboard.sanMove(tokens[i].Move.Move, Notation) +
+                moveutil.NumericAnnotationGlyphs[glyph];
+            } else {
+              element.innerText = tmpboard.sanMove(
+                tokens[i].Move.Move,
+                Notation,
+              );
+            }
+          } else {
+            element.innerText =
+              tmpboard.sanMove(tokens[i].Move.Move, Notation) +
+              tokens[i].Move.Symbol;
+          }
         } else {
           element.innerText = tmpboard.sanMove(tokens[i].Move.Move, Notation);
         }
@@ -1217,12 +1259,13 @@ class GameTree {
           }
 
           element = document.createElement("p");
-          element.innerText = tokens[i].Move.TextAfter.replace(
-            this.MoveTextActionPartsMatcher,
-            "",
-          );
+          element.innerText = displaytextafter = tokens[
+            i
+          ].Move.TextAfter.replace(MoveTextActionPartsMatcher, "").trim();
           element.classList.add("text-after");
           movesparagraph.appendChild(element);
+        } else {
+          displaytextafter = "";
         }
         if (tokens[i].Move.HideSubsequentMoves) {
           hidesubsequentmovelevel = 1;
@@ -2990,7 +3033,7 @@ function getNotation(
               } else {
                 blackname = "Human Player";
               }
-              result = `[Event "Fairy-Stockfish Playground Match"]\n[Site "${window.location.host}"]\n[Date "${year.toString() + "." + month.toString() + "." + day.toString()}"]\n`;
+              result = `[Event "Fairy-Stockfish Playground Game"]\n[Site "${window.location.host}"]\n[Date "${year.toString() + "." + month.toString() + "." + day.toString()}"]\n`;
               result += `[Round "1"]\n[White "${whitename}"]\n[Black "${blackname}"]\n`;
               result += `[FEN "${startfen}"]\n[Result "${gameresult}"]\n[Variant "${tmpboard.variant()}"]\n\n`;
               result += tmpboard.variationSan(ucimoves, ffish.Notation.SAN);
@@ -3353,9 +3396,25 @@ new Module().then((loadedModule) => {
     }
   };
 
+  buttonMoveTreeCropBranch.onclick = function () {
+    if (!buttonMoveTreeCropBranch.disabled) {
+      gametree.RemoveNonCurrentMoveBranch();
+      updatePGNDivision();
+    }
+  };
+
   buttonMoveTreeCut.onclick = function () {
     if (!buttonMoveTreeCut.disabled) {
       gametree.CutCurrentMove();
+      textFen.value = gametree.OriginalFEN;
+      textMoves.value = gametree.GetMoveListOfMove(gametree.CurrentMove);
+      buttonSetFen.click();
+    }
+  };
+
+  buttonMoveTreeCutBranch.onclick = function () {
+    if (!buttonMoveTreeCutBranch.disabled) {
+      gametree.RemoveCurrentMoveBranch();
       textFen.value = gametree.OriginalFEN;
       textMoves.value = gametree.GetMoveListOfMove(gametree.CurrentMove);
       buttonSetFen.click();
@@ -3385,19 +3444,15 @@ new Module().then((loadedModule) => {
     }
   };
 
-  buttonMoveTreeCutBranch.onclick = function () {
-    if (!buttonMoveTreeCutBranch.disabled) {
-      gametree.RemoveCurrentMoveBranch();
-      textFen.value = gametree.OriginalFEN;
-      textMoves.value = gametree.GetMoveListOfMove(gametree.CurrentMove);
-      buttonSetFen.click();
-    }
-  };
-
-  buttonMoveTreeCropBranch.onclick = function () {
-    if (!buttonMoveTreeCropBranch.disabled) {
-      gametree.RemoveNonCurrentMoveBranch();
-      updatePGNDivision();
+  buttonMoveTreeResize.onclick = function () {
+    labelPgn.classList.toggle("larger");
+    buttonMoveTreeResize.classList.toggle("larger");
+    if (buttonMoveTreeResize.classList.contains("larger")) {
+      buttonMoveTreeResize.title =
+        "Shrink PGN Viewer\nClick to make PGN viewer smaller.";
+    } else {
+      buttonMoveTreeResize.title =
+        "Enlarge PGN Viewer\nClick to make PGN viewer larger.";
     }
   };
 
@@ -3482,12 +3537,23 @@ new Module().then((loadedModule) => {
         if (symbol == "" || moveutil.Symbols.includes(symbol)) {
           gametree.SetSymbolOfCurrentMove(symbol);
           updatePGNDivision();
+        } else if (symbol.startsWith("$")) {
+          let glyph = parseInt(symbol.slice(1));
+          if (isNaN(glyph)) {
+            window.alert("Invalid glyph: " + symbol);
+          } else if (glyph < 0 || glyph > 139) {
+            window.alert("Glyph out of range: " + symbol + ". Range is 0~139.");
+          } else {
+            gametree.SetSymbolOfCurrentMove(`$${glyph}`);
+            updatePGNDivision();
+          }
         } else {
           window.alert(
             "Invalid symbol: " +
               symbol +
               ".\nValid symbols are: " +
-              moveutil.Symbols.join(", "),
+              moveutil.Symbols.join(", ") +
+              "\nOr use numeric annation glyphs (NAG) like $1, $2, etc. (Range: 0~139)",
           );
         }
       }

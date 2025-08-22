@@ -877,6 +877,10 @@
     font-size: 16px;
   }
 
+  #label-pgn.larger {
+    height: 360px;
+  }
+
   #pgndiv {
     display: flex;
     flex-direction: row;
@@ -2413,6 +2417,14 @@
 
   #movetree-imagesave:before {
     content: "\f03e";
+  }
+
+  #movetree-resize:before {
+    content: "\f065";
+  }
+
+  #movetree-resize.larger:before {
+    content: "\f066";
   }
 </style>
 
@@ -8907,6 +8919,10 @@
                   m("button#movetree-imagesave", {
                     title:
                       "Save Board as Image...\nClick to open board image generator.",
+                  }),
+                  m("button#movetree-resize", {
+                    title:
+                      "Enlarge PGN Viewer\nClick to make PGN viewer larger.",
                   }),
                 ]),
               ]),
