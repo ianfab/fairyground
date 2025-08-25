@@ -349,13 +349,300 @@ select {
   cursor: pointer !important;
 }
 
-/* Modern Output Areas */
-#outputs {
+/* Chess-Centric Layout with JavaScript Reorganization */
+
+/* Reset main layout to be more flexible */
+main {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  max-width: none !important;
+}
+
+/* Fixed Header */
+#pageheader {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 1rem 2rem !important;
+}
+
+/* Create the new layout structure */
+#main-layout {
   display: grid !important;
-  grid-template-columns: 1fr auto !important;
-  gap: 2rem !important;
-  margin: 2rem !important;
-  align-items: start !important;
+  grid-template-columns: 300px 1fr 350px !important;
+  grid-template-areas: "sidebar board-area info-panel" !important;
+  gap: 1rem !important;
+  flex: 1 !important;
+  overflow: hidden !important;
+  padding: 1rem !important;
+  min-height: 0 !important;
+}
+
+/* Collapsible Settings Sidebar */
+#settings-sidebar {
+  grid-area: sidebar !important;
+  background: var(--background-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-lg) !important;
+  overflow-y: auto !important;
+  padding: 1rem !important;
+  transition: var(--transition) !important;
+  position: relative !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+#settings-sidebar.collapsed {
+  width: 60px !important;
+  grid-template-columns: 60px 1fr 350px !important;
+  padding: 0.5rem !important;
+}
+
+#settings-sidebar.collapsed .settings-content {
+  display: none !important;
+}
+
+#sidebar-toggle {
+  position: absolute !important;
+  top: 0.5rem !important;
+  right: 0.5rem !important;
+  z-index: 10 !important;
+  background: var(--primary-color) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1rem !important;
+  transition: var(--transition) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+#sidebar-toggle:hover {
+  background: var(--primary-dark) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Chess Board Area - Main Focus */
+#board-area {
+  grid-area: board-area !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--background-secondary) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 2rem !important;
+  overflow: auto !important;
+}
+
+/* Move #outputs to board area */
+#outputs {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  justify-content: center !important;
+}
+
+/* Chess Board Container */
+#chessground-container-div {
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 2rem !important;
+  max-width: min(80vh, 600px) !important;
+  max-height: min(80vh, 600px) !important;
+  width: auto !important;
+  height: auto !important;
+  box-shadow: var(--shadow-xl) !important;
+  border-radius: var(--radius-xl) !important;
+  background: var(--background-primary) !important;
+  border: 2px solid var(--border-color) !important;
+  transition: var(--transition) !important;
+}
+
+#chessground-container-div:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* Info Panel on Right */
+#info-panel {
+  grid-area: info-panel !important;
+  background: var(--background-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-lg) !important;
+  overflow-y: auto !important;
+  padding: 1rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1rem !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Move #info to info panel */
+#info {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Settings Sections */
+.settings-section {
+  margin-bottom: 1rem !important;
+  border-radius: var(--radius-md) !important;
+  overflow: hidden !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.settings-section-header {
+  background: var(--primary-color) !important;
+  color: white !important;
+  padding: 0.75rem 1rem !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  transition: var(--transition) !important;
+  font-size: 0.875rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.settings-section-header:hover {
+  background: var(--primary-dark) !important;
+}
+
+.settings-section-header::after {
+  content: '▼' !important;
+  transition: transform 0.3s ease !important;
+  font-size: 0.75rem !important;
+}
+
+.settings-section-header.collapsed::after {
+  transform: rotate(-90deg) !important;
+}
+
+.settings-section-content {
+  background: var(--background-secondary) !important;
+  padding: 1rem !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  transition: var(--transition) !important;
+}
+
+.settings-section-content.collapsed {
+  display: none !important;
+}
+
+/* Original elements that will be moved */
+#misc,
+#posvariantdiv,
+#input,
+#input2,
+#input3,
+#gamesettings,
+#visualeffects,
+#advancedtimesettings,
+#binengineinput,
+#enginematch,
+#boardsetupsettings,
+#boardsetupsettings2 {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Move controls below board when they exist */
+#movecontrol {
+  background: var(--background-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 1rem !important;
+  margin: 1rem 0 0 0 !important;
+  box-shadow: var(--shadow-md) !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.5rem !important;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: min(80vh, 600px) !important;
+}
+
+/* Hide links section from main flow */
+#links {
+  display: none !important;
+}
+
+/* Responsive Design */
+@media (max-width: 1400px) {
+  #main-layout {
+    grid-template-columns: 280px 1fr 320px !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  #main-layout {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 1fr auto auto !important;
+    grid-template-areas:
+      "board-area"
+      "info-panel"
+      "sidebar" !important;
+  }
+  
+  #settings-sidebar,
+  #info-panel {
+    max-height: 300px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #pageheader {
+    padding: 1rem !important;
+  }
+  
+  #pagetitle {
+    font-size: 1.75rem !important;
+  }
+  
+  #board-area {
+    padding: 1rem !important;
+  }
+  
+  #chessground-container-div {
+    padding: 1rem !important;
+    max-width: 95vw !important;
+    max-height: 95vw !important;
+  }
+  
+  #movecontrol {
+    flex-direction: column !important;
+    max-width: 95vw !important;
+  }
+  
+  #main-layout {
+    padding: 0.5rem !important;
+    gap: 0.5rem !important;
+  }
 }
 
 #output2,
@@ -735,3 +1022,6 @@ span[style*="cursor: pointer"]:hover {
   background: var(--primary-color) !important;
   color: white !important;
 }
+
+/* Script injection - this will reorganize the layout */
+/* We'll add a script tag to the page after page load */
