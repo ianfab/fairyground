@@ -1568,11 +1568,7 @@ class GameTree {
       element.classList.add("result");
       movesparagraph.appendChild(element);
     }
-    try {
-      tmpboard.delete();
-    } catch (err) {
-      console.error("Caught", err);
-    }
+    tmpboard.delete();
     return movesparagraph;
   }
 }
@@ -1591,13 +1587,10 @@ document.addEventListener("themechange", (event) => {
 
 document.addEventListener("gameend", (event) => {
   if (event instanceof CustomEvent) {
-    if (
-      event.detail.reason != "normal" &&
-      gametree.CurrentMove.NextNodes.length == 0 &&
-      gametree.MoveTree.IsMainLineNode(gametree.CurrentMove)
-    ) {
-      gametree.GameHeaders.set("Result", event.detail.result);
-      gametree.GameHeaders.set("Termination", event.detail.reason);
+    if (event.detail.reason != "normal") {
+      gametree.CurrentMove.Move.TextAfter =
+        gametree.CurrentMove.Move.TextAfter.replace(/\[%end.*?\]/g, "");
+      gametree.CurrentMove.Move.TextAfter += `[%end ${event.detail.result},${event.detail.reason}]`;
       updatePGNDivision();
     }
   }

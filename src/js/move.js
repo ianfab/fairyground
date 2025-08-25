@@ -288,7 +288,7 @@ export class Move {
     this.Move = UCIMove;
     this.MoveInformation = moveinfo;
     this.IsDropMove = moveinfo[0] == null ? false : moveinfo[0].includes("@");
-    this.Symbol = [""];
+    this.Symbol = [];
     this.TextBefore = "";
     this.TextAfter = "";
     this.HalfMoveNumber = Math.floor(HalfMoveNumber);
@@ -299,7 +299,6 @@ export class Move {
       moveinfo[1] !== null &&
       moveinfo[2] !== null &&
       moveinfo[3] !== null;
-    this.Symbol.pop();
   }
 
   static FromString(StringifiedMove) {
