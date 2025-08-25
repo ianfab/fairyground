@@ -31,7 +31,7 @@ input {
     outline-color: #3584e4;
 }
 
-input[type=text] {
+input[type=text], input[type=date], textarea {
     transition-duration: 0.5s;
     transition-property: color, background-color, border-color;
     border-radius: 10px;
@@ -41,11 +41,11 @@ input[type=text] {
     border-bottom: 1px solid #cdc7c2 !important;
 }
 
-input[type=text]:hover {
+input[type=text]:hover, input[type=date]:hover, textarea:hover {
     background-color: #ddd;
 }
 
-input[type=text]:focus {
+input[type=text]:focus, input[type=date]:focus, textarea:focus {
     background-color: #fff;
     border-left: 3px solid #3584e4 !important;
     border-right: 3px solid #3584e4 !important;
@@ -177,7 +177,7 @@ input[type=range]::-moz-range-thumb {
 
 input[type=range]:focus::-moz-range-thumb {  
     background: #777;
-}  
+}
 
 select {
     color: #2e3436;
@@ -485,7 +485,7 @@ a:visited {
     border-radius: 10px;
 }
 
-#imagegenerator {
+div.popup, #terminationsettings {
     color: black !important;
     background-image: linear-gradient(to bottom, #fff 0%, #fff 20%, #eee 100%);
     border: 1px solid #555 !important;

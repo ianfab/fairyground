@@ -56,13 +56,14 @@ function RemoveSANMoveNotes(MoveList) {
 window.fairyground.SavedGamesParsingFeature.RemoveSANMoveNotes =
   RemoveSANMoveNotes;
 
-function SetPosition(FEN, UCIMoves, Variant, Is960, PGNString) {
+function SetPosition(FEN, UCIMoves, Variant, Is960, PGNString, Headers) {
   if (
     typeof FEN != "string" ||
     typeof UCIMoves != "string" ||
     typeof Variant != "string" ||
     typeof Is960 != "boolean" ||
-    typeof PGNString != "string"
+    typeof PGNString != "string" ||
+    typeof Headers != "string"
   ) {
     throw TypeError();
   }
@@ -84,7 +85,8 @@ function SetPosition(FEN, UCIMoves, Variant, Is960, PGNString) {
   const move = document.getElementById("move");
   const setpos = document.getElementById("setpos");
   if (PGNString) {
-    pgnstring.value = FEN + "\x01" + UCIMoves + "\x01" + PGNString;
+    pgnstring.value =
+      FEN + "\x01" + UCIMoves + "\x01" + PGNString + "\x01" + Headers;
     pgnstring.click();
   } else {
     fen.value = FEN.trim();
@@ -149,9 +151,7 @@ function GetCurrentGameInformation(FFishJSLibrary) {
       }
     }
     let Termination = "Normal";
-    if (TimeoutSide != 0) {
-      Termination = "Time forfeit";
-    } else if (
+    if (
       tmpboard.result() == "*" &&
       tmpboard.result(true) == "*" &&
       tmpboard.result(false) == "*"
@@ -304,9 +304,7 @@ class Game {
       }
       let Termination = this.Termination;
       if (Termination == "") {
-        if (GameResult != gameresult) {
-          Termination = "Time forfeit";
-        } else if (GameResult == "*") {
+        if (GameResult == "*") {
           Termination = "Unterminated";
         } else {
           Termination = "Normal";
@@ -321,11 +319,15 @@ class Game {
         result += `[BlackElo "${this.SecondPlayerElo}"]\n`;
       }
       result += `[FEN "${tmpboard.fen()}"]\n[Result "${GameResult}"]\n[Variant "${this.Is960 ? this.Variant + "960" : this.Variant}"]\n[Termination "${Termination}"]\n\n`;
-      result += tmpboard.variationSan(
-        this.UCIMoves.join(" "),
-        FFishJSLibrary.Notation.SAN,
-      );
-      result += ` ${gameresult}\n\n`;
+      if (this.PGNString) {
+        result += this.PGNString;
+      } else {
+        result += tmpboard.variationSan(
+          this.UCIMoves.join(" "),
+          FFishJSLibrary.Notation.SAN,
+        );
+        result += ` ${gameresult}\n\n`;
+      }
       tmpboard.delete();
       return result;
     } else {
@@ -372,9 +374,7 @@ class Game {
       }
       let Termination = this.Termination;
       if (Termination == "") {
-        if (GameResult != tmpboard.result()) {
-          Termination = "Time forfeit";
-        } else if (GameResult == "*") {
+        if (GameResult == "*") {
           Termination = "Unterminated";
         } else {
           Termination = "Normal";
@@ -1328,6 +1328,16 @@ class GameDisplayTable {
           GameObject.Variant,
           GameObject.Is960,
           GameObject.PGNString,
+          [
+            GameObject.Event,
+            GameObject.Site,
+            GameObject.GameDate.getTime(),
+            GameObject.Round,
+            GameObject.FirstPlayerName,
+            GameObject.SecondPlayerName,
+            GameObject.Result,
+            GameObject.Termination.toLowerCase(),
+          ].join("\x02"),
         )
       ) {
         document.getElementById("pgnepd-close").click();

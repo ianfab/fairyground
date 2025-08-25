@@ -48,6 +48,15 @@ input[type=checkbox]:disabled:hover {
   opacity: 1 !important;
 }
 
+input[type="date"] {
+    color: #fff !important;
+    background-color: #000 !important;
+}
+
+textarea {
+    color: #fff !important;
+}
+
 select {
     color: #fff;
     background: #555 !important;
@@ -177,7 +186,7 @@ evalnum:after {
     border: 2px solid #fff !important;
 }
 
-#imagegenerator {
+div.popup, #terminationsettings {
     background-color: #000;
     border: 2px solid #ddd;
 }

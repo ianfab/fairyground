@@ -46,6 +46,14 @@ input[type=checkbox]:disabled:hover {
   opacity: 1 !important;
 }
 
+input[type="date"] {
+  background-color: #fff7;
+}
+
+textarea {
+  background-color: #fff7;
+}
+
 select {
   background: #eee9 !important;
 }
@@ -109,7 +117,7 @@ button:disabled {
   border: 2px solid white !important;
 }
 
-#imagegenerator {
+div.popup, #terminationsettings {
   color: #000 !important;
   background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
   border: 2px solid white !important;

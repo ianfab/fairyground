@@ -67,7 +67,7 @@ input {
     outline-color: #105ad1;
 }
 
-input[type=text] {
+input[type=text], input[type=date] {
     border-radius: 200px;
     border-left: 1px solid #0000 !important;
     border-right: 1px solid #0000 !important;
@@ -76,11 +76,11 @@ input[type=text] {
     background-color: #eceff7;
 }
 
-input[type=text]:hover {
+input[type=text]:hover, input[type=date]:hover {
     background-color: #dbdee6;
 }
 
-input[type=text]:focus {
+input[type=text]:focus, input[type=date]:focus {
     background-color: #eceff7;
     border-left: 1px solid #105ad1 !important;
     border-right: 1px solid #105ad1 !important;
@@ -213,7 +213,31 @@ input[type=range]::-moz-range-thumb {
 
 input[type=range]:focus::-moz-range-thumb {  
     background: #777;
-}  
+}
+
+textarea {
+    border-radius: 10px;
+    border-left: 1px solid #0000 !important;
+    border-right: 1px solid #0000 !important;
+    border-top: 1px solid #0000 !important;
+    border-bottom: 1px solid #0000 !important;
+    background-color: #eceff7;
+}
+
+textarea:hover {
+    background-color: #dbdee6;
+}
+
+textarea:focus {
+    background-color: #eceff7;
+    border-left: 1px solid #105ad1 !important;
+    border-right: 1px solid #105ad1 !important;
+    border-top: 1px solid #105ad1 !important;
+    border-bottom: 1px solid #105ad1 !important;
+    margin: 3px !important;
+    box-shadow: 0px 0px 0px 3px #99d3f8;
+    outline: none;
+}
 
 select {
     background-color: #fff !important;
@@ -471,7 +495,7 @@ input::placeholder {
     box-shadow: 0px 0px 3px 3px #ddd;
 }
 
-#imagegenerator {
+div.popup, #terminationsettings {
     color: black !important;
     background: #fff !important;
     border: 1px solid #ccc !important;

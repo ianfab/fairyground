@@ -8,6 +8,7 @@ const DiscreteMoveNumberMatcher = new RegExp("^\\d+\\.+$", "");
 const WhiteSpaceMatcher = new RegExp("[ ]+", "");
 const LineSplitterReplacer = new RegExp("\\r\\n|\\r", "g");
 const SymbolLengthSorted = ["!!", "!?", "?!", "??", "!", "?"];
+const AllTextLineSplitterMatcher = new RegExp("\\\\n", "g");
 
 export function ParseSinglePGN(PGNString) {
   if (typeof PGNString != "string") {
@@ -217,33 +218,44 @@ export function ParsePGNMovesToMoveTree(
       continue;
     }
     if (content.startsWith("{") && content.endsWith("}")) {
-      if (pointer == tree.RootNode || addingvariation || aftermovenum) {
+      if (addingvariation || aftermovenum) {
         textbefore.push(
-          content.slice(1, -1).replace(AllWhiteSpacePlaceHolderMatcher, " "),
+          content
+            .slice(1, -1)
+            .replace(AllWhiteSpacePlaceHolderMatcher, " ")
+            .replace(AllTextLineSplitterMatcher, "\n"),
         );
       } else {
         pointer.Move.TextAfter += content
           .slice(1, -1)
-          .replace(AllWhiteSpacePlaceHolderMatcher, " ");
+          .replace(AllWhiteSpacePlaceHolderMatcher, " ")
+          .replace(AllTextLineSplitterMatcher, "\n");
       }
     } else if (content.startsWith("$")) {
       if (pointer == tree.RootNode || addingvariation || aftermovenum) {
         console.warn("A numeric annotation glyph must be added after a move.");
-        continue;
-      } else if (pointer.Move.Symbol != "") {
-        console.warn("Symbol already defined for move: ", pointer.Move.Move);
         continue;
       }
       symbolnum = parseInt(content.slice(1));
       if (isNaN(symbolnum)) {
         console.warn("Illegal numeric annotation glyph: " + content);
         continue;
-      }
-      if (symbolnum < 0 || symbolnum > 139) {
+      } else if (
+        symbolnum < 0 ||
+        symbolnum >= movelib.NumericAnnotationGlyphs.length
+      ) {
         console.warn("Not supported numeric annotation glyph: " + content);
         continue;
+      } else if (pointer.Move.Symbol.includes(`$${symbolnum}`)) {
+        console.warn(
+          "Symbol ",
+          `$${symbolnum}`,
+          " already defined for move: ",
+          pointer.Move.Move,
+        );
+        continue;
       }
-      pointer.Move.SetSymbol(symbolnum);
+      pointer.Move.AddSymbol(symbolnum);
     } else if (
       content == "*" ||
       content == "1-0" ||
@@ -307,7 +319,7 @@ export function ParsePGNMovesToMoveTree(
         textbefore = [];
       }
       if (moveandsymbol.symbol) {
-        move.Symbol = moveandsymbol.symbol;
+        move.AddSymbolText(moveandsymbol.symbol);
       }
       if (addingvariation) {
         pointer = pointer.ParentNode();

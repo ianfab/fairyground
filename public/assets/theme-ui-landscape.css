@@ -114,7 +114,27 @@ input[type=range]::-moz-range-thumb {
 
 input[type=range]:focus::-moz-range-thumb {  
     background: #777;
-}  
+}
+
+input[type="date"] {
+    border-radius: 10px;
+    color: #ccc;
+    background-color: #0009;
+    border-left: 1px solid #444 !important;
+    border-right: 1px solid #444 !important;
+    border-top: 1px solid #444 !important;
+    border-bottom: 1px solid #444 !important;
+}
+
+textarea {
+    border-radius: 10px;
+    color: #ccc;
+    background-color: #0009;
+    border-left: 1px solid #444 !important;
+    border-right: 1px solid #444 !important;
+    border-top: 1px solid #444 !important;
+    border-bottom: 1px solid #444 !important;
+}
 
 select {
     color: #ccc;
@@ -494,7 +514,7 @@ evalnum:after {
     box-shadow: inset 1px 1px 2px #eee;
 }
 
-#imagegenerator {
+div.popup, #terminationsettings {
     color: #ccc !important;
     background-color: #0009;
     border: 1px solid #444 !important;

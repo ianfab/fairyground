@@ -322,6 +322,18 @@
     background-color: rgba(176, 176, 176, 0.2);
   }
 
+  input[type="date"] {
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #ddd;
+  }
+
+  textarea {
+    background-color: #0000;
+    border: 1px solid #ddd;
+    padding: 3px;
+  }
+
   #tempbackground1,
   #tempbackground2 {
     transition: opacity 1s ease-in-out 0s;
@@ -892,6 +904,7 @@
   #pgndiv .text-after,
   #pgndiv .text-before {
     font-style: italic;
+    white-space: pre-wrap;
   }
 
   #pgndiv .needs-attention-sign {
@@ -924,6 +937,12 @@
     color: #6495ed;
     background-color: #e0eeff;
     cursor: pointer;
+  }
+
+  #pgndiv .marked-result {
+    color: #dc362e;
+    background-color: #fcebeb;
+    cursor: default;
   }
 
   #pgn-operations {
@@ -2135,12 +2154,12 @@
     height: 100px;
   }
 
-  #imagegenerator {
+  div.popup {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 50vw;
+    width: 60vw;
     height: 60vh;
     display: flex;
     flex-direction: column;
@@ -2152,26 +2171,29 @@
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
   }
 
-  #imagegenerator.hidden {
+  div.popup.hidden {
     display: none;
   }
 
-  #imagegenerator > div {
+  div.popup > div,
+  #terminationsettings > div {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    column-gap: 10px;
     margin-top: 10px;
     margin-bottom: 10px;
   }
 
-  #imagegeneratortitle {
+  div.popup p.title {
     font-family: "Times New Roman", Times, serif;
     font-size: 30px;
     font-weight: bold;
     text-align: center;
   }
 
-  #imagegenerator button {
+  div.popup button,
+  #terminationsettings button {
     display: inline-block;
     padding: 3px 6px 3px 6px;
     background: #888;
@@ -2182,33 +2204,80 @@
     cursor: pointer;
   }
 
-  #imagegenerator button:hover {
+  div.popup button:hover,
+  #terminationsettings button:hover {
     background: #aaa;
   }
 
-  #imagegenerator button:disabled {
+  div.popup button:disabled,
+  #terminationsettings button:disabled {
     background: #ccc;
     color: #000;
   }
 
-  #imagegenerator button:active {
+  div.popup button:active,
+  #terminationsettings button:active {
     background: #000;
   }
 
-  #imagegenerator select {
+  div.popup select,
+  #terminationsettings select {
     min-width: 100px;
     background: #eee;
   }
 
-  #imagegenerator input[type="number"] {
+  div.popup input[type="number"] {
     padding: 2px 0 2px 6px;
     border: 1px solid #ddd;
     width: 100px;
   }
 
-  #imagegenerator input[type="number"]:invalid {
+  div.popup input[type="number"]:invalid {
     background: #ff9e9e;
     border: 3px solid #f00;
+  }
+
+  div.popup input[type="text"] {
+    padding: 2px 0 2px 6px;
+    border: 1px solid #ddd;
+    width: 250px;
+  }
+
+  #terminationsettings {
+    position: absolute;
+    padding: 5px;
+    width: max-content;
+    height: max-content;
+    overflow: hidden;
+    top: -10000px;
+    left: -10000px;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    z-index: 10;
+    overflow: hidden;
+    border: 2px solid #ddd;
+    padding: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+  }
+
+  #terminationsettings p {
+    text-wrap: nowrap;
+  }
+
+  #statuscommentarysymbols {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 5px;
+    grid-template-columns: 1fr 1fr;
+    justify-items: stretch;
+    align-items: start;
+  }
+
+  #pgntextinput {
+    min-height: 60%;
+    min-width: 100%;
+    max-width: 100%;
   }
 
   #themedetectorcontainer {
@@ -2409,6 +2478,18 @@
 
   #movetree-redo:before {
     content: "\f064";
+  }
+
+  #movetree-markers:before {
+    content: "\f041";
+  }
+
+  #movetree-termination:before {
+    content: "\f24e";
+  }
+
+  #movetree-headers:before {
+    content: "\f1dc";
   }
 
   #movetree-save:before {
@@ -2872,6 +2953,10 @@
       let operationdiv = document.getElementById(
         "chessground-mini-board-operation-div",
       );
+      let terminationsettingsdiv = document.getElementById(
+        "terminationsettings",
+      );
+      let pgnoperationsdiv = document.getElementById("pgn-operations");
       let startX, startY, initialX, initialY;
       chessgroundminiboardwrapper.style.cursor = "move";
       chessgroundmini.locked = false;
@@ -3006,6 +3091,12 @@
           !pvinfo.contains(event.target)
         ) {
           chessgroundmini.style.display = "none";
+        }
+        if (
+          !terminationsettingsdiv.contains(event.target) &&
+          !pgnoperationsdiv.contains(event.target)
+        ) {
+          terminationsettingsdiv.style.display = "none";
         }
       });
       chessgroundminiboardwrapper.addEventListener("mousedown", (event) => {
@@ -5725,14 +5816,18 @@
           $("#timeoutside").value = 1;
           $("#whitetime").innerHTML = "Out Of Time";
           document.dispatchEvent(
-            new CustomEvent("gameend", { detail: { result: "0-1" } }),
+            new CustomEvent("gameend", {
+              detail: { result: "0-1", reason: "time forfeit" },
+            }),
           );
         } else if (side == "BLACK") {
           black_remaining_time = 0;
           $("#timeoutside").value = 2;
           $("#blacktime").innerHTML = "Out Of Time";
           document.dispatchEvent(
-            new CustomEvent("gameend", { detail: { result: "1-0" } }),
+            new CustomEvent("gameend", {
+              detail: { result: "1-0", reason: "time forfeit" },
+            }),
           );
         }
         gameEnd();
@@ -5753,6 +5848,7 @@
         $("#input2").style.display = "";
         $("#input3").style.display = "";
         $("#posvariantdiv").style.display = "";
+        $("#pgn-operations").style.display = "";
       };
 
       const gameAbort = () => {
@@ -5769,6 +5865,7 @@
         $("#input2").style.display = "none";
         $("#input3").style.display = "none";
         $("#posvariantdiv").style.display = "none";
+        $("#pgn-operations").style.display = "none";
         //$("#movecontrol").style.display = "none";
         resetTimer();
         setupTimer();
@@ -8845,7 +8942,7 @@
                 m("p#pvinfo", ""),
               ]),
               m("p#currentboardfen"),
-              m("p#label-pgn.ripple"),
+              m("p#label-pgn"),
               m("div#pgn-operation-container", { hidden: !advanced_pgn_mode }, [
                 m("div#pgn-operations", [
                   m("button#movetree-clear", {
@@ -8894,15 +8991,23 @@
                   }),
                   m("button#movetree-textbefore", {
                     title:
-                      "Add Text Before\nClick to add text before current move.",
+                      "Set Text Before\nClick to set text before current move.",
                   }),
                   m("button#movetree-textafter", {
                     title:
-                      "Add Text After\nClick to add text after current move.",
+                      "Set Text After\nClick to set text after current move.",
                   }),
                   m("button#movetree-symbol", {
                     title:
-                      "Add Symbol\nClick to add symbols (e.g. !!,??,!,?) to current move.",
+                      "Set Symbols\nClick to set symbols (e.g. !!,??,!,?) for current move.",
+                  }),
+                  m("button#movetree-markers", {
+                    title:
+                      "Set Markers\nClick to set the markers (i.e. arrows & strokes) drawn on the main board to current move.",
+                  }),
+                  m("button#movetree-termination", {
+                    title:
+                      "Set Termination\nClick to set result and termination on current move.",
                   }),
                   m("button#movetree-undo", {
                     title:
@@ -8911,6 +9016,10 @@
                   m("button#movetree-redo", {
                     title:
                       "Redo\nClick to redo last change made to the variation tree. Making new moves on the main board will clear change history.",
+                  }),
+                  m("button#movetree-headers", {
+                    title:
+                      "Set Game Headers\nClick to set the PGN headers of this game, e.g. Event, Site, Round.",
                   }),
                   m("button#movetree-save", {
                     title:
@@ -9271,8 +9380,8 @@
               ]),
             ]),
           ]),
-          m("div#imagegenerator.hidden", [
-            m("p#imagegeneratortitle", "Board Image Generator"),
+          m("div#imagegenerator.hidden.popup", [
+            m("p#imagegeneratortitle.title", "Board Image Generator"),
             m("div#filetypeselection", [
               m("p", "File type:"),
               m(
@@ -9404,6 +9513,208 @@
               ),
             ]),
             m("p#imagegenerationprogress", "Ready."),
+          ]),
+          m("div#pgnheader.hidden.popup", [
+            m("p#pgnheadertitle.title", "PGN Headers"),
+            m("div#pgneventinput", [
+              m("p", "Event:"),
+              m("input[type=text]#pgnevent"),
+            ]),
+            m("div#pgnsiteinput", [
+              m("p", "Site:"),
+              m("input[type=text]#pgnsite"),
+            ]),
+            m("div#pgnroundinput", [
+              m("p", "Round:"),
+              m("input[type=number]#pgnround", {
+                min: 1,
+                step: 1,
+              }),
+            ]),
+            m("div#pgndateinput", [
+              m("p", "Date:"),
+              m("input[type=date]#pgndate"),
+            ]),
+            m("div#pgnwhitenameinput", [
+              m("p", "First player name:"),
+              m("input[type=text]#pgnwhitename"),
+            ]),
+            m("div#pgnblacknameinput", [
+              m("p", "Second player name:"),
+              m("input[type=text]#pgnblackname"),
+            ]),
+            m("div#pgnheadercontrol", [
+              m("button#pgnheadersave.ripple", "Save"),
+              m("button#pgnheadercancel.ripple", "Cancel"),
+            ]),
+          ]),
+          m("div#terminationsettings", [
+            m("p", "Set termination on current move:"),
+            m("div#pgnresultinput", [
+              m("p", "Result:"),
+              m("select#pgnresult", [
+                m("option", { value: "1-0" }, "1-0"),
+                m("option", { value: "0-1" }, "0-1"),
+                m("option", { value: "1/2-1/2" }, "1/2-1/2"),
+                m("option", { value: "*" }, "*"),
+              ]),
+            ]),
+            m("div#pgnterminationinput", [
+              m("p", "Termination:"),
+              m("select#pgntermination", [
+                m("option", { value: "undefined" }, "(Not set)"),
+                m("option", { value: "abandon" }, "Game abandoned"),
+                m("option", { value: "adjudication" }, "Ended by adjudication"),
+                m("option", { value: "death" }, "Player death"),
+                m(
+                  "option",
+                  { value: "emergency" },
+                  "Emergency condition happened",
+                ),
+                m("option", { value: "normal" }, "Normally ended by game rule"),
+                m("option", { value: "rules infraction" }, "Rules infraction"),
+                m(
+                  "option",
+                  { value: "time forfeit" },
+                  "Player run out of time",
+                ),
+                m(
+                  "option",
+                  { value: "unterminated" },
+                  "Ongoing, not terminated",
+                ),
+              ]),
+            ]),
+            m("button#terminationset.ripple", "Set"),
+          ]),
+          m("div#pgnsymbols.hidden.popup", [
+            m("p#pgnsymbolstitle.title", "Symbols"),
+            m("div#movecommentarysymbols", [
+              m("p", "Move commentary symbols:"),
+              m("select#movecommentarysymbolsselect", [
+                m("option", { value: "" }, "(Not set)"),
+                m("option", { value: "!" }, "[!] - Good move"),
+                m("option", { value: "?" }, "[?] - Bad move (Mistake)"),
+                m("option", { value: "!!" }, "[!!] - Brilliant move"),
+                m(
+                  "option",
+                  { value: "??" },
+                  "[??] - Disastrous move (Blunder)",
+                ),
+                m("option", { value: "!?" }, "[!?] - Interesting move"),
+                m(
+                  "option",
+                  { value: "?!" },
+                  "[?!] - Dubious move (Inaccuracy)",
+                ),
+                m("option", { value: "□" }, "[□] - Forced move"),
+                m("option", { value: "⨀" }, "[⨀] - Zugzwang"),
+              ]),
+            ]),
+            m("div#positioncommentarysymbols", [
+              m("p", "Position commentary symbols:"),
+              m("select#positioncommentarysymbolsselect", [
+                m("option", { value: "" }, "(Not set)"),
+                m("option", { value: "=" }, "[=] - This position is equal"),
+                m("option", { value: "∞" }, "[∞] - This position is unclear"),
+                m(
+                  "option",
+                  { value: "⩲" },
+                  "[⩲] - First mover is slightly better",
+                ),
+                m(
+                  "option",
+                  { value: "⩱" },
+                  "[⩱] - Second mover is slightly better",
+                ),
+                m(
+                  "option",
+                  { value: "±" },
+                  "[±] - First mover is clearly better",
+                ),
+                m(
+                  "option",
+                  { value: "∓" },
+                  "[∓] - Second mover is clearly better",
+                ),
+                m("option", { value: "+-" }, "[+-] - First mover is winning"),
+                m("option", { value: "-+" }, "[-+] - Second mover is winning"),
+                m(
+                  "option",
+                  { value: "+#" },
+                  "[+#] - First mover checkmates inevitably",
+                ),
+                m(
+                  "option",
+                  { value: "-#" },
+                  "[-#] - Second mover checkmates inevitably",
+                ),
+              ]),
+            ]),
+            m("p", "Status commentary symbols:"),
+            m("div#statuscommentarysymbols", [
+              m(
+                "label",
+                m("input[type=checkbox]#spaceadvantagesymbol"),
+                "[○] - Space advantage",
+              ),
+              m(
+                "label",
+                m("input[type=checkbox]#developmentsymbol"),
+                "[↑↑] - Development",
+              ),
+              m(
+                "label",
+                m("input[type=checkbox]#initiativesymbol"),
+                "[↑] - Initiative",
+              ),
+              m(
+                "label",
+                m("input[type=checkbox]#attacksymbol"),
+                "[→] - Attack",
+              ),
+              m(
+                "label",
+                m("input[type=checkbox]#withcompensationsymbol"),
+                "[=∞] - With material deficit compensation",
+              ),
+              m(
+                "label",
+                m("input[type=checkbox]#counterplaysymbol"),
+                "[⇆] - Counterplay",
+              ),
+              m(
+                "label",
+                m("input[type=checkbox]#timetroublesymbol"),
+                "[⨁] - Time trouble",
+              ),
+              m(
+                "label",
+                m("input[type=checkbox]#withtheideasymbol"),
+                "[∆] - With the idea",
+              ),
+              m(
+                "label",
+                m("input[type=checkbox]#noveltysymbol"),
+                "[N] - Novelty",
+              ),
+            ]),
+            m("div#pgnsymbolscontrol", [
+              m("button#pgnsymbolssave.ripple", "Save"),
+              m("button#pgnsymbolscancel.ripple", "Cancel"),
+            ]),
+          ]),
+          m("div#pgntext.hidden.popup", [
+            m("p#pgntexttitle.title", "Text"),
+            m(
+              "p",
+              'Note: Contents enclosed by square brackets, like "[%csl Ye4]", are special values used to represent additional information on this position, such as board markers, termination and evaluations. Deleting these will remove such information.',
+            ),
+            m("textarea#pgntextinput"),
+            m("div#pgntextcontrol", [
+              m("button#pgntextsave.ripple", "Save"),
+              m("button#pgntextcancel.ripple", "Cancel"),
+            ]),
           ]),
           m("div#themedetectorcontainer"),
           m("div#tempbackground1.pagebackground"),

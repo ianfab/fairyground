@@ -71,7 +71,7 @@ input {
     outline-color: #a8c7fa;
 }
 
-input[type=text] {
+input[type=text], input[type=date] {
     border-radius: 200px;
     border-left: 1px solid #0000 !important;
     border-right: 1px solid #0000 !important;
@@ -80,11 +80,11 @@ input[type=text] {
     background-color: #282828;
 }
 
-input[type=text]:hover {
+input[type=text]:hover, input[type=date]:hover {
     background-color: #555;
 }
 
-input[type=text]:focus {
+input[type=text]:focus, input[type=date]:focus {
     background-color: #000;
     border-left: 1px solid #fff !important;
     border-right: 1px solid #fff !important;
@@ -217,7 +217,32 @@ input[type=range]::-moz-range-thumb {
 
 input[type=range]:focus::-moz-range-thumb {  
     background: #777;
-}  
+}
+
+textarea {
+    border-radius: 10px;
+    border-left: 1px solid #0000 !important;
+    border-right: 1px solid #0000 !important;
+    border-top: 1px solid #0000 !important;
+    border-bottom: 1px solid #0000 !important;
+    background-color: #282828;
+    color: #fff;
+}
+
+textarea:hover {
+    background-color: #555;
+}
+
+textarea:focus {
+    background-color: #000;
+    border-left: 1px solid #fff !important;
+    border-right: 1px solid #fff !important;
+    border-top: 1px solid #fff !important;
+    border-bottom: 1px solid #fff !important;
+    margin: 3px !important;
+    box-shadow: 0px 0px 0px 3px #999;
+    outline: none;
+}
 
 select {
     color: #fff !important;
@@ -488,7 +513,7 @@ evalnum:after {
     border-radius: 10px;
 }
 
-#imagegenerator {
+div.popup, #terminationsettings {
     color: white !important;
     background: #333 !important;
     border: 1px solid #666 !important;

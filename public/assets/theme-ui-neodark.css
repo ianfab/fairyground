@@ -33,7 +33,7 @@ input {
     outline-color: #ff5d17;
 }
 
-input[type=text] {
+input[type=text], input[type=date], textarea {
     transition-duration: 0.5s;
     transition-property: color, background-color, border-color;
     border-radius: 10px;
@@ -45,11 +45,11 @@ input[type=text] {
     border-bottom: 1px solid #aaa !important;
 }
 
-input[type=text]:hover {
+input[type=text]:hover, input[type=date]:hover, textarea:hover {
     background-color: #777;
 }
 
-input[type=text]:focus {
+input[type=text]:focus, input[type=date]:focus, textarea:focus {
     background-color: #000;
     border-left: 3px solid #ff5d17 !important;
     border-right: 3px solid #ff5d17 !important;
@@ -183,7 +183,7 @@ input[type=range]::-moz-range-thumb {
 
 input[type=range]:focus::-moz-range-thumb {  
     background: #777;
-}  
+}
 
 select {
     color: #ccc;
@@ -516,7 +516,7 @@ evalnum:after {
     border-radius: 10px;
 }
 
-#imagegenerator {
+div.popup, #terminationsettings {
     color: #ccc !important;
     background-image: linear-gradient(to bottom, #555 0%, #222 100%);
     border: 1px solid #ccc !important;

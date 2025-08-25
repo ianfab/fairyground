@@ -21,8 +21,8 @@ export const NumericAnnotationGlyphs = [
   "∓",
   "+-",
   "-+",
-  "",
-  "",
+  "+#",
+  "-#",
   "⨀",
   "⨀",
   "",
@@ -33,8 +33,8 @@ export const NumericAnnotationGlyphs = [
   "",
   "",
   "",
-  "⟳",
-  "⟳",
+  "↑↑",
+  "↑↑",
   "",
   "",
   "↑",
@@ -45,8 +45,8 @@ export const NumericAnnotationGlyphs = [
   "→",
   "",
   "",
-  "",
-  "",
+  "=∞",
+  "=∞",
   "",
   "",
   "",
@@ -141,6 +141,15 @@ export const NumericAnnotationGlyphs = [
   "",
   "⨁",
   "⨁",
+  "∆",
+  "∇",
+  "⌓",
+  "<=",
+  "==",
+  "RR",
+  "N",
+  "!!!",
+  "!??",
 ];
 
 export function ParseUCIMove(ucimove) {
@@ -235,6 +244,37 @@ export function ParseUCIMove(ucimove) {
   return [files[0] + ranks[0], files[1] + ranks[1], additional, gatingmove];
 }
 
+export function ParseTextActions(Text) {
+  if (typeof Text != "string") {
+    throw TypeError();
+  }
+  let index = 0,
+    indexend = 0,
+    indexspace = 0;
+  let result = new Map();
+  while (true) {
+    index = Text.indexOf("[%", index);
+    if (index >= 0) {
+      indexend = Text.indexOf("]", index + 2);
+      if (indexend >= 0) {
+        indexspace = Text.indexOf(" ", index + 2);
+        if (indexspace >= 0) {
+          result.set(
+            Text.slice(index + 2, indexspace),
+            Text.slice(indexspace + 1, indexend),
+          );
+        }
+        index = indexend + 1;
+      } else {
+        break;
+      }
+    } else {
+      break;
+    }
+  }
+  return result;
+}
+
 export class Move {
   constructor(UCIMove, MoverRound, HalfMoveNumber) {
     if (
@@ -248,7 +288,7 @@ export class Move {
     this.Move = UCIMove;
     this.MoveInformation = moveinfo;
     this.IsDropMove = moveinfo[0] == null ? false : moveinfo[0].includes("@");
-    this.Symbol = "";
+    this.Symbol = [""];
     this.TextBefore = "";
     this.TextAfter = "";
     this.HalfMoveNumber = Math.floor(HalfMoveNumber);
@@ -259,6 +299,7 @@ export class Move {
       moveinfo[1] !== null &&
       moveinfo[2] !== null &&
       moveinfo[3] !== null;
+    this.Symbol.pop();
   }
 
   static FromString(StringifiedMove) {
@@ -272,7 +313,7 @@ export class Move {
         parseInt(tokens[4]),
         parseInt(tokens[5]),
       );
-      result.Symbol = tokens[1];
+      result.Symbol = tokens[1] == "" ? [] : tokens[1].split(",");
       result.TextBefore = tokens[2];
       result.TextAfter = tokens[3];
       result.HideSubsequentMoves = tokens[6] == "1";
@@ -345,21 +386,21 @@ export class Move {
     }
   }
 
-  SetSymbol(SymbolIndex) {
+  AddSymbol(SymbolIndex) {
     if (typeof SymbolIndex != "number") {
       throw TypeError();
     }
-    if (SymbolIndex < 0 || SymbolIndex > 139) {
+    if (SymbolIndex < 0 || SymbolIndex >= NumericAnnotationGlyphs.length) {
       throw RangeError();
     }
-    this.Symbol = `$${SymbolIndex}`;
+    this.Symbol.push(`$${SymbolIndex}`);
   }
 
-  SetSymbolText(Symbol) {
+  AddSymbolText(Symbol) {
     if (typeof Symbol != "string") {
       throw TypeError();
     }
-    this.Symbol = Symbol;
+    this.Symbol.push(`$${Symbols.indexOf(Symbol) + 1}`);
   }
 
   SetHalfNumber(HalfMoveNumber) {
@@ -421,7 +462,7 @@ export class Move {
   ToString() {
     return [
       this.Move,
-      this.Symbol,
+      this.Symbol.join(","),
       this.TextBefore,
       this.TextAfter,
       this.MoverRound,
