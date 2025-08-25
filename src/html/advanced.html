@@ -138,11 +138,47 @@
         if (sidebarCollapsed) {
           sidebar.classList.add('collapsed');
           toggleButton.innerHTML = '▶';
+          // Give more space to board area when sidebar is collapsed
+          mainLayout.style.gridTemplateColumns = '60px 1fr 320px';
         } else {
           sidebar.classList.remove('collapsed');
           toggleButton.innerHTML = '◀';
+          // Restore normal layout
+          mainLayout.style.gridTemplateColumns = '280px 1fr 320px';
         }
       });
+      
+      // Responsive handling to ensure board is always visible
+      function handleResize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        
+        if (width <= 1200) {
+          // Mobile/tablet layout - stack vertically
+          mainLayout.style.gridTemplateColumns = '1fr';
+          mainLayout.style.gridTemplateRows = 'auto auto auto';
+          mainLayout.style.gridTemplateAreas = '"board-area" "info-panel" "sidebar"';
+          mainLayout.style.height = 'auto';
+          mainLayout.style.minHeight = 'auto';
+          mainLayout.style.overflow = 'visible';
+        } else {
+          // Desktop layout
+          if (sidebarCollapsed) {
+            mainLayout.style.gridTemplateColumns = '60px 1fr 320px';
+          } else {
+            mainLayout.style.gridTemplateColumns = '280px 1fr 320px';
+          }
+          mainLayout.style.gridTemplateRows = 'auto';
+          mainLayout.style.gridTemplateAreas = '"sidebar board-area info-panel"';
+          mainLayout.style.height = 'auto';
+          mainLayout.style.minHeight = 'calc(100vh - 120px)';
+          mainLayout.style.overflow = 'visible';
+        }
+      }
+      
+      // Initial resize and add listener
+      handleResize();
+      window.addEventListener('resize', handleResize);
     }
   </script>
   <base target="_blank" />

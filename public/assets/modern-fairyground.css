@@ -355,8 +355,9 @@ select {
 main {
   display: flex !important;
   flex-direction: column !important;
-  height: 100vh !important;
-  overflow: hidden !important;
+  min-height: 100vh !important; /* Minimum height but allow expansion */
+  height: auto !important; /* CRITICAL: Let it expand as needed */
+  overflow: visible !important; /* CRITICAL: No scrolling constraints */
   padding: 0 !important;
   max-width: none !important;
 }
@@ -384,9 +385,10 @@ main {
   grid-template-areas: "sidebar board-area info-panel" !important;
   gap: 1rem !important;
   flex: 1 !important;
-  overflow: hidden !important;
+  overflow: visible !important; /* CRITICAL: Allow content to expand */
   padding: 1rem !important;
-  min-height: 0 !important;
+  min-height: calc(100vh - 120px) !important; /* Minimum height but allow expansion */
+  height: auto !important; /* CRITICAL: Let it size to content */
 }
 
 /* Settings Sidebar */
@@ -400,9 +402,11 @@ main {
   transition: var(--transition) !important;
   position: relative !important;
   box-shadow: var(--shadow-md) !important;
+  min-width: 280px !important;
 }
 
 #settings-sidebar.collapsed {
+  min-width: 60px !important;
   width: 60px !important;
   padding: 0.5rem !important;
 }
@@ -436,7 +440,7 @@ main {
   transform: scale(1.1) !important;
 }
 
-/* Chess Board Area - Main Focus */
+/* Chess Board Area - Main Focus - ENSURE PROPER SIZING */
 #board-area {
   grid-area: board-area !important;
   display: flex !important;
@@ -446,33 +450,39 @@ main {
   background: var(--background-secondary) !important;
   border-radius: var(--radius-lg) !important;
   padding: 1rem !important;
-  overflow: auto !important;
+  overflow: visible !important; /* CRITICAL: Remove scrollbars */
+  min-width: 500px !important; /* Ensure minimum width for board */
+  min-height: 500px !important; /* Ensure minimum height for board */
 }
 
-/* Move #outputs to board area - ensure it's visible */
+/* Move #outputs to board area - ensure it's visible and properly sized */
 #outputs {
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   gap: 1rem !important;
   width: 100% !important;
-  height: 100% !important;
+  height: auto !important; /* CRITICAL: Let it size naturally */
   margin: 0 !important;
   justify-content: center !important;
   position: static !important;
   visibility: visible !important;
   left: auto !important;
+  min-width: 480px !important; /* Ensure outputs container is large enough */
+  overflow: visible !important; /* CRITICAL: No scrolling */
 }
 
-/* Chess Board Container - ensure it's properly sized */
+/* Chess Board Container - ensure it's properly sized and NEVER smaller than board */
 #chessground-container-div {
   flex-shrink: 0 !important;
   margin: 0 !important;
   padding: 1.5rem !important;
-  max-width: min(70vh, 500px) !important;
-  max-height: min(70vh, 500px) !important;
   width: auto !important;
   height: auto !important;
+  min-width: 440px !important; /* Ensure container is never smaller than typical board */
+  min-height: 440px !important; /* Ensure container is never smaller than typical board */
+  max-width: min(calc(100vh - 200px), calc(100vw - 700px), 600px) !important; /* Responsive but not too small */
+  max-height: min(calc(100vh - 200px), calc(100vw - 700px), 600px) !important;
   box-shadow: var(--shadow-xl) !important;
   border-radius: var(--radius-xl) !important;
   background: var(--background-primary) !important;
@@ -481,6 +491,17 @@ main {
   position: static !important;
   visibility: visible !important;
   left: auto !important;
+  overflow: visible !important; /* CRITICAL: No scrolling in board container */
+}
+
+/* Ensure the actual chessground wrapper doesn't create scroll */
+#chessground-container-div .cg-wrap {
+  overflow: visible !important;
+}
+
+/* Ensure all chess board related elements are visible */
+#chessground-container-div * {
+  overflow: visible !important;
 }
 
 #chessground-container-div:hover {
@@ -501,6 +522,7 @@ main {
   flex-direction: column !important;
   gap: 1rem !important;
   box-shadow: var(--shadow-md) !important;
+  min-width: 320px !important;
 }
 
 /* Move #info to info panel - ensure it's visible */
@@ -578,7 +600,7 @@ main {
   gap: 0.5rem !important;
   justify-content: center !important;
   width: 100% !important;
-  max-width: min(70vh, 500px) !important;
+  max-width: min(calc(100vh - 200px), calc(100vw - 700px), 600px) !important;
   position: static !important;
   visibility: visible !important;
   left: auto !important;
@@ -592,26 +614,71 @@ main {
   display: none !important;
 }
 
-/* Responsive Design */
+/* Responsive Design - Updated to work with JavaScript */
 @media (max-width: 1400px) {
   #main-layout {
     grid-template-columns: 260px 1fr 300px !important;
+  }
+  
+  #board-area {
+    min-width: 450px !important;
+    min-height: 450px !important;
+  }
+  
+  #outputs {
+    min-width: 430px !important;
+    min-height: 430px !important;
+  }
+  
+  #chessground-container-div {
+    min-width: 400px !important;
+    min-height: 400px !important;
   }
 }
 
 @media (max-width: 1200px) {
   #main-layout {
     grid-template-columns: 1fr !important;
-    grid-template-rows: 1fr auto auto !important;
+    grid-template-rows: auto auto auto !important;
     grid-template-areas:
       "board-area"
       "info-panel"
       "sidebar" !important;
+    height: auto !important;
+    overflow: visible !important;
   }
   
-  #settings-sidebar,
+  #board-area {
+    min-width: 100% !important;
+    min-height: 400px !important;
+    order: 1 !important;
+    overflow: visible !important;
+  }
+  
   #info-panel {
-    max-height: 300px !important;
+    order: 2 !important;
+    max-height: none !important; /* Allow full expansion */
+    overflow: visible !important;
+  }
+  
+  #settings-sidebar {
+    order: 3 !important;
+    max-height: none !important; /* Allow full expansion */
+    overflow: visible !important;
+  }
+  
+  #outputs {
+    min-width: 100% !important;
+    min-height: 400px !important;
+    overflow: visible !important;
+  }
+  
+  #chessground-container-div {
+    min-width: 350px !important;
+    min-height: 350px !important;
+    max-width: min(90vw, 500px) !important;
+    max-height: min(90vw, 500px) !important;
+    overflow: visible !important;
   }
 }
 
