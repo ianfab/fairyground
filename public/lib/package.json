@@ -1,0 +1,807 @@
+{
+  "_from": "fairy-stockfish-nnue.wasm@^1.1.9",
+  "_id": "fairy-stockfish-nnue.wasm@1.1.10",
+  "_inBundle": false,
+  "_integrity": "sha512-yxeRxyfYKsDbAEKUbcc0qepH+clk0NaH1tCMcvkkX1iGBvub9UbZIFIVLhh4XysiLBatOJaSTUrzyqVkKOVx6A==",
+  "_location": "/fairy-stockfish-nnue.wasm",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "fairy-stockfish-nnue.wasm@^1.1.9",
+    "name": "fairy-stockfish-nnue.wasm",
+    "escapedName": "fairy-stockfish-nnue.wasm",
+    "rawSpec": "^1.1.9",
+    "saveSpec": null,
+    "fetchSpec": "^1.1.9"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/fairy-stockfish-nnue.wasm/-/fairy-stockfish-nnue.wasm-1.1.10.tgz",
+  "_shasum": "8292ef2b3729fa9792fc3e883257781a69fd6e3b",
+  "_spec": "fairy-stockfish-nnue.wasm@^1.1.9",
+  "_where": "/home/fabi/projects/fairyground2",
+  "author": {
+    "name": "Fabian Fichter"
+  },
+  "bundleDependencies": false,
+  "contributors": [
+    {
+      "name": "Fabian Fichter",
+      "url": "ianfab"
+    },
+    {
+      "name": "alwey"
+    },
+    {
+      "name": "Belzedar94"
+    },
+    {
+      "name": "cloudfish"
+    },
+    {
+      "name": "CouchTomato87"
+    },
+    {
+      "name": "dpldgr"
+    },
+    {
+      "name": "Fulmene"
+    },
+    {
+      "name": "gbtami"
+    },
+    {
+      "name": "gnunicode"
+    },
+    {
+      "name": "johndoknjas"
+    },
+    {
+      "name": "kz04px"
+    },
+    {
+      "name": "majormink"
+    },
+    {
+      "name": "mtaktikos"
+    },
+    {
+      "name": "QueensGambit"
+    },
+    {
+      "name": "RainRat"
+    },
+    {
+      "name": "rkb97"
+    },
+    {
+      "name": "romstad"
+    },
+    {
+      "name": "Snowmoondaphne"
+    },
+    {
+      "name": "SriMethan"
+    },
+    {
+      "name": "thearst3rd"
+    },
+    {
+      "name": "TheYoBots"
+    },
+    {
+      "name": "tttak"
+    },
+    {
+      "name": "yjf2002ghty"
+    },
+    {
+      "name": "yoav-rozin"
+    },
+    {
+      "name": "ydirson"
+    },
+    {
+      "name": "Tord Romstad",
+      "url": "romstad"
+    },
+    {
+      "name": "Marco Costalba",
+      "url": "mcostalba"
+    },
+    {
+      "name": "Joona Kiiski",
+      "url": "zamar"
+    },
+    {
+      "name": "Gary Linscott",
+      "url": "glinscott"
+    },
+    {
+      "name": "Yu Nasu",
+      "url": "ynasu87"
+    },
+    {
+      "name": "Motohiro Isozaki",
+      "url": "yaneurao"
+    },
+    {
+      "name": "Hisayori Noda",
+      "url": "nodchip"
+    },
+    {
+      "name": "Aditya",
+      "url": "absimaldata"
+    },
+    {
+      "name": "Adrian Petrescu",
+      "url": "apetresc"
+    },
+    {
+      "name": "Ajith Chandy Jose",
+      "url": "ajithcj"
+    },
+    {
+      "name": "Alain Savard",
+      "url": "Rocky640"
+    },
+    {
+      "name": "Alayan Feh",
+      "url": "Alayan-stk-2"
+    },
+    {
+      "name": "Alexander Kure"
+    },
+    {
+      "name": "Alexander Pagel",
+      "url": "Lolligerhans"
+    },
+    {
+      "name": "Alfredo Menezes",
+      "url": "lonfom169"
+    },
+    {
+      "name": "Ali AlZhrani",
+      "url": "Cooffe"
+    },
+    {
+      "name": "Andrew Grant",
+      "url": "AndyGrant"
+    },
+    {
+      "name": "Andrey Neporada",
+      "url": "nepal"
+    },
+    {
+      "name": "Andy Duplain"
+    },
+    {
+      "name": "Antoine Champion",
+      "url": "antoinechampion"
+    },
+    {
+      "name": "Aram Tumanian",
+      "url": "atumanian"
+    },
+    {
+      "name": "Arjun Temurnikar"
+    },
+    {
+      "name": "Artem Solopiy",
+      "url": "EntityFX"
+    },
+    {
+      "name": "Auguste Pop"
+    },
+    {
+      "name": "Balint Pfliegel"
+    },
+    {
+      "name": "Ben Koshy",
+      "url": "BKSpurgeon"
+    },
+    {
+      "name": "Bill Henry",
+      "url": "VoyagerOne"
+    },
+    {
+      "name": "Bojun Guo",
+      "url": "noobpwnftw, Nooby"
+    },
+    {
+      "name": "braich"
+    },
+    {
+      "name": "Brian Sheppard",
+      "url": "SapphireBrand, briansheppard-toast"
+    },
+    {
+      "name": "Bruno de Melo Costa",
+      "url": "BM123499"
+    },
+    {
+      "name": "Bryan Cross",
+      "url": "crossbr"
+    },
+    {
+      "name": "candirufish"
+    },
+    {
+      "name": "Chess13234"
+    },
+    {
+      "name": "Chris Cain",
+      "url": "ceebo"
+    },
+    {
+      "name": "Dale Weiler",
+      "url": "graphitemaster"
+    },
+    {
+      "name": "Dan Schmidt",
+      "url": "dfannius"
+    },
+    {
+      "name": "Daniel Axtens",
+      "url": "daxtens"
+    },
+    {
+      "name": "Daniel Dugovic",
+      "url": "ddugovic"
+    },
+    {
+      "name": "Dariusz Orzechowski",
+      "url": "dorzechowski"
+    },
+    {
+      "name": "David Zar"
+    },
+    {
+      "name": "Daylen Yang",
+      "url": "daylen"
+    },
+    {
+      "name": "Deshawn Mohan-Smith",
+      "url": "GoldenRare"
+    },
+    {
+      "name": "Dieter Dobbelaere",
+      "url": "ddobbelaere"
+    },
+    {
+      "name": "DiscanX"
+    },
+    {
+      "name": "Dominik Schlösser",
+      "url": "domschl"
+    },
+    {
+      "name": "double-beep"
+    },
+    {
+      "name": "Douglas Matos Gomes",
+      "url": "dsmsgms"
+    },
+    {
+      "name": "Eduardo Cáceres",
+      "url": "eduherminio"
+    },
+    {
+      "name": "Eelco de Groot",
+      "url": "KingDefender"
+    },
+    {
+      "name": "Elvin Liu",
+      "url": "solarlight2"
+    },
+    {
+      "name": "erbsenzaehler"
+    },
+    {
+      "name": "Ernesto Gatti"
+    },
+    {
+      "name": "Linmiao Xu",
+      "url": "linrock"
+    },
+    {
+      "name": "Fabian Beuke",
+      "url": "madnight"
+    },
+    {
+      "name": "Fabian Fichter",
+      "url": "ianfab"
+    },
+    {
+      "name": "Fanael Linithien",
+      "url": "Fanael"
+    },
+    {
+      "name": "fanon"
+    },
+    {
+      "name": "Fauzi Akram Dabat",
+      "url": "FauziAkram"
+    },
+    {
+      "name": "Felix Wittmann"
+    },
+    {
+      "name": "gamander"
+    },
+    {
+      "name": "Gary Heckman",
+      "url": "gheckman"
+    },
+    {
+      "name": "George Sobala",
+      "url": "gsobala"
+    },
+    {
+      "name": "gguliash"
+    },
+    {
+      "name": "Gian-Carlo Pascutto",
+      "url": "gcp"
+    },
+    {
+      "name": "Gontran Lemaire",
+      "url": "gonlem"
+    },
+    {
+      "name": "Goodkov Vasiliy Aleksandrovich",
+      "url": "goodkov"
+    },
+    {
+      "name": "Gregor Cramer"
+    },
+    {
+      "name": "GuardianRM"
+    },
+    {
+      "name": "Günther Demetz",
+      "url": "pb00067, pb00068"
+    },
+    {
+      "name": "Guy Vreuls",
+      "url": "gvreuls"
+    },
+    {
+      "name": "Henri Wiechers"
+    },
+    {
+      "name": "Hiraoka Takuya",
+      "url": "HiraokaTakuya"
+    },
+    {
+      "name": "homoSapiensSapiens"
+    },
+    {
+      "name": "Hongzhi Cheng"
+    },
+    {
+      "name": "Ivan Ivec",
+      "url": "IIvec"
+    },
+    {
+      "name": "Jacques B.",
+      "url": "Timshel"
+    },
+    {
+      "name": "Jan Ondruš",
+      "url": "hxim"
+    },
+    {
+      "name": "Jared Kish",
+      "url": "Kurtbusch"
+    },
+    {
+      "name": "Jarrod Torriero",
+      "url": "DU-jdto"
+    },
+    {
+      "name": "Jean Gauthier",
+      "url": "OuaisBla"
+    },
+    {
+      "name": "Jean-Francois Romang",
+      "url": "jromang"
+    },
+    {
+      "name": "Jekaa"
+    },
+    {
+      "name": "Jerry Donald Watson",
+      "url": "jerrydonaldwatson"
+    },
+    {
+      "name": "jjoshua2"
+    },
+    {
+      "name": "Jonathan Calovski",
+      "url": "Mysseno"
+    },
+    {
+      "name": "Jonathan Buladas Dumale",
+      "url": "SFisGOD"
+    },
+    {
+      "name": "Joost VandeVondele",
+      "url": "vondele"
+    },
+    {
+      "name": "Jörg Oster",
+      "url": "joergoster"
+    },
+    {
+      "name": "Joseph Ellis",
+      "url": "jhellis3"
+    },
+    {
+      "name": "Joseph R. Prostko"
+    },
+    {
+      "name": "Julian Willemer",
+      "url": "NightlyKing"
+    },
+    {
+      "name": "jundery"
+    },
+    {
+      "name": "Justin Blanchard",
+      "url": "UncombedCoconut"
+    },
+    {
+      "name": "Kelly Wilson"
+    },
+    {
+      "name": "Ken Takusagawa"
+    },
+    {
+      "name": "kinderchocolate"
+    },
+    {
+      "name": "Kiran Panditrao",
+      "url": "Krgp"
+    },
+    {
+      "name": "Kojirion"
+    },
+    {
+      "name": "Krystian Kuzniarek",
+      "url": "kuzkry"
+    },
+    {
+      "name": "Leonardo Ljubičić",
+      "url": "ICCF World Champion"
+    },
+    {
+      "name": "Leonid Pechenik",
+      "url": "lp--"
+    },
+    {
+      "name": "Linus Arver",
+      "url": "listx"
+    },
+    {
+      "name": "loco-loco"
+    },
+    {
+      "name": "Lub van den Berg",
+      "url": "ElbertoOne"
+    },
+    {
+      "name": "Luca Brivio",
+      "url": "lucabrivio"
+    },
+    {
+      "name": "Lucas Braesch",
+      "url": "lucasart"
+    },
+    {
+      "name": "Lyudmil Antonov",
+      "url": "lantonov"
+    },
+    {
+      "name": "Maciej Żenczykowski",
+      "url": "zenczykowski"
+    },
+    {
+      "name": "Malcolm Campbell",
+      "url": "xoto10"
+    },
+    {
+      "name": "Mark Tenzer",
+      "url": "31m059"
+    },
+    {
+      "name": "marotear"
+    },
+    {
+      "name": "Matt Ginsberg",
+      "url": "mattginsberg"
+    },
+    {
+      "name": "Matthew Lai",
+      "url": "matthewlai"
+    },
+    {
+      "name": "Matthew Sullivan",
+      "url": "Matt14916"
+    },
+    {
+      "name": "Maxim Molchanov",
+      "url": "Maxim"
+    },
+    {
+      "name": "Michael An",
+      "url": "man"
+    },
+    {
+      "name": "Michael Byrne",
+      "url": "MichaelB7"
+    },
+    {
+      "name": "Michael Chaly",
+      "url": "Vizvezdenec"
+    },
+    {
+      "name": "Michael Stembera",
+      "url": "mstembera"
+    },
+    {
+      "name": "Michael Whiteley",
+      "url": "protonspring"
+    },
+    {
+      "name": "Michel Van den Bergh",
+      "url": "vdbergh"
+    },
+    {
+      "name": "Miguel Lahoz",
+      "url": "miguel-l"
+    },
+    {
+      "name": "Mikael Bäckman",
+      "url": "mbootsector"
+    },
+    {
+      "name": "Mira"
+    },
+    {
+      "name": "Miroslav Fontán",
+      "url": "Hexik"
+    },
+    {
+      "name": "Moez Jellouli",
+      "url": "MJZ1977"
+    },
+    {
+      "name": "Mohammed Li",
+      "url": "tthsqe12"
+    },
+    {
+      "name": "Nathan Rugg",
+      "url": "nmrugg"
+    },
+    {
+      "name": "Nick Pelling",
+      "url": "nickpelling"
+    },
+    {
+      "name": "Nicklas Persson",
+      "url": "NicklasPersson"
+    },
+    {
+      "name": "Niklas Fiekas",
+      "url": "niklasf"
+    },
+    {
+      "name": "Nikolay Kostov",
+      "url": "NikolayIT"
+    },
+    {
+      "name": "Nguyen Pham",
+      "url": "nguyenpham"
+    },
+    {
+      "name": "Norman Schmidt",
+      "url": "FireFather"
+    },
+    {
+      "name": "notruck"
+    },
+    {
+      "name": "Ondrej Mosnáček",
+      "url": "WOnder93"
+    },
+    {
+      "name": "Oskar Werkelin Ahlin"
+    },
+    {
+      "name": "Pablo Vazquez"
+    },
+    {
+      "name": "Panthee"
+    },
+    {
+      "name": "Pascal Romaret"
+    },
+    {
+      "name": "Pasquale Pigazzini",
+      "url": "ppigazzini"
+    },
+    {
+      "name": "Patrick Jansen",
+      "url": "mibere"
+    },
+    {
+      "name": "pellanda"
+    },
+    {
+      "name": "Peter Zsifkovits",
+      "url": "CoffeeOne"
+    },
+    {
+      "name": "Praveen Kumar Tummala",
+      "url": "praveentml"
+    },
+    {
+      "name": "Rahul Dsilva",
+      "url": "silversolver1"
+    },
+    {
+      "name": "Ralph Stößer",
+      "url": "Ralph Stoesser"
+    },
+    {
+      "name": "Raminder Singh"
+    },
+    {
+      "name": "renouve"
+    },
+    {
+      "name": "Reuven Peleg"
+    },
+    {
+      "name": "Richard Lloyd"
+    },
+    {
+      "name": "Rodrigo Exterckötter Tjäder"
+    },
+    {
+      "name": "Ron Britvich",
+      "url": "Britvich"
+    },
+    {
+      "name": "Ronald de Man",
+      "url": "syzygy1, syzygy"
+    },
+    {
+      "name": "rqs"
+    },
+    {
+      "name": "Ryan Schmitt"
+    },
+    {
+      "name": "Ryan Takker"
+    },
+    {
+      "name": "Sami Kiminki",
+      "url": "skiminki"
+    },
+    {
+      "name": "Sebastian Buchwald",
+      "url": "UniQP"
+    },
+    {
+      "name": "Sergei Antonov",
+      "url": "saproj"
+    },
+    {
+      "name": "Sergei Ivanov",
+      "url": "svivanov72"
+    },
+    {
+      "name": "Sergio Vieri",
+      "url": "sergiovieri"
+    },
+    {
+      "name": "sf-x"
+    },
+    {
+      "name": "Shane Booth",
+      "url": "shane31"
+    },
+    {
+      "name": "Shawn Varghese",
+      "url": "xXH4CKST3RXx"
+    },
+    {
+      "name": "Siad Daboul",
+      "url": "Topologist"
+    },
+    {
+      "name": "Stefan Geschwentner",
+      "url": "locutus2"
+    },
+    {
+      "name": "Stefano Cardanobile",
+      "url": "Stefano80"
+    },
+    {
+      "name": "Steinar Gunderson",
+      "url": "sesse"
+    },
+    {
+      "name": "Stéphane Nicolet",
+      "url": "snicolet"
+    },
+    {
+      "name": "Prokop Randáček",
+      "url": "ProkopRandacek"
+    },
+    {
+      "name": "Thanar2"
+    },
+    {
+      "name": "thaspel"
+    },
+    {
+      "name": "theo77186"
+    },
+    {
+      "name": "Tom Truscott"
+    },
+    {
+      "name": "Tom Vijlbrief",
+      "url": "tomtor"
+    },
+    {
+      "name": "Tomasz Sobczyk",
+      "url": "Sopel97"
+    },
+    {
+      "name": "Torsten Franz",
+      "url": "torfranz, tfranzer"
+    },
+    {
+      "name": "Tracey Emery",
+      "url": "basepr1me"
+    },
+    {
+      "name": "tttak"
+    },
+    {
+      "name": "Unai Corzo",
+      "url": "unaiic"
+    },
+    {
+      "name": "Uri Blass",
+      "url": "uriblass"
+    },
+    {
+      "name": "Vince Negri",
+      "url": "cuddlestmonkey"
+    },
+    {
+      "name": "zz4032"
+    }
+  ],
+  "deprecated": false,
+  "description": "WebAssembly port of Fairy-Stockfish with NNUE support, optimized via WASM SIMD",
+  "files": [
+    "AUTHORS",
+    "Copying.txt",
+    "stockfish.js",
+    "stockfish.wasm",
+    "stockfish.worker.js",
+    "uci.js"
+  ],
+  "homepage": "https://github.com/ianfab/fairy-stockfish.wasm",
+  "license": "GPL-3.0",
+  "name": "fairy-stockfish-nnue.wasm",
+  "version": "1.1.10"
+}

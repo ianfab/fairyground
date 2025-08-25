@@ -1,0 +1,255 @@
+:root {
+  --main-bg-color: #f5f5f5;
+  --board-border: #8b4513;
+  --control-bg: #ffffff;
+  --control-border: #dddddd;
+  --button-bg: #4a90e2;
+  --button-hover: #357abd;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--main-bg-color);
+  color: var(--text-primary);
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: var(--control-bg);
+  border-bottom: 1px solid var(--control-border);
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.board-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chessground-container {
+  position: relative;
+  border: 3px solid var(--board-border);
+  border-radius: 8px;
+  background: #f0d9b5;
+}
+
+.board8x8 .chessground-container {
+  width: 512px;
+  height: 512px;
+}
+
+.board10x8 .chessground-container {
+  width: 640px;
+  height: 512px;
+}
+
+.board10x10 .chessground-container {
+  width: 640px;
+  height: 640px;
+}
+
+.board9x10 .chessground-container {
+  width: 576px;
+  height: 640px;
+}
+
+.controls-section {
+  width: 300px;
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  padding: 1rem;
+  height: fit-content;
+}
+
+.control-group {
+  margin-bottom: 1rem;
+}
+
+.control-group h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--control-border);
+  padding-bottom: 0.25rem;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-row.horizontal {
+  flex-direction: row;
+  align-items: center;
+}
+
+.form-row.horizontal > * {
+  flex: 1;
+}
+
+label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+select, input, textarea, button {
+  padding: 0.5rem;
+  border: 1px solid var(--control-border);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+select, input, textarea {
+  background: white;
+}
+
+button {
+  background: var(--button-bg);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background: var(--button-hover);
+}
+
+button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.button-group button {
+  flex: 1;
+  min-width: 60px;
+}
+
+.fen-input {
+  width: 100%;
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.moves-display {
+  background: #f8f9fa;
+  border: 1px solid var(--control-border);
+  border-radius: 4px;
+  padding: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.pocket {
+  display: flex;
+  justify-content: center;
+  min-height: 64px;
+  margin: 0.5rem 0;
+}
+
+.pocket.hidden {
+  display: none;
+}
+
+.status-bar {
+  background: var(--control-bg);
+  border-top: 1px solid var(--control-border);
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .main-content {
+    flex-direction: column;
+  }
+  
+  .controls-section {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-content {
+    padding: 0.5rem;
+  }
+  
+  .board8x8 .chessground-container {
+    width: 320px;
+    height: 320px;
+  }
+  
+  .board10x8 .chessground-container {
+    width: 400px;
+    height: 320px;
+  }
+  
+  .board10x10 .chessground-container {
+    width: 320px;
+    height: 320px;
+  }
+}
