@@ -13,31 +13,43 @@
   <link rel="stylesheet" href="assets/theme-default.css" />
   <link rel="stylesheet" href="assets/modern-fairyground.css" />
   <script>
-    // Layout reorganization script
+    // Simple, one-time layout reorganization
+    let layoutReorganized = false;
+    
     document.addEventListener('DOMContentLoaded', function() {
-      // Wait a bit for Mithril to finish rendering
-      setTimeout(reorganizeLayout, 100);
+      if (layoutReorganized) return;
+      
+      // Wait for Mithril to finish initial render
+      setTimeout(createLayout, 200);
     });
     
-    function reorganizeLayout() {
+    function createLayout() {
+      if (layoutReorganized) return;
+      layoutReorganized = true;
+      
       const main = document.querySelector('main');
       if (!main) return;
       
-      // Create new layout structure
+      // Create layout container
       const mainLayout = document.createElement('div');
       mainLayout.id = 'main-layout';
       
       // Create sidebar
       const sidebar = document.createElement('div');
       sidebar.id = 'settings-sidebar';
-      sidebar.innerHTML = '<div class="settings-content"></div>';
       
       // Create toggle button
       const toggleButton = document.createElement('button');
       toggleButton.id = 'sidebar-toggle';
       toggleButton.innerHTML = '◀';
       toggleButton.title = 'Toggle Settings Panel';
+      
+      // Create settings content container
+      const settingsContent = document.createElement('div');
+      settingsContent.className = 'settings-content';
+      
       sidebar.appendChild(toggleButton);
+      sidebar.appendChild(settingsContent);
       
       // Create board area
       const boardArea = document.createElement('div');
@@ -47,7 +59,7 @@
       const infoPanel = document.createElement('div');
       infoPanel.id = 'info-panel';
       
-      // Move elements to appropriate containers
+      // Move existing elements
       const outputs = document.getElementById('outputs');
       const info = document.getElementById('info');
       const movecontrol = document.getElementById('movecontrol');
@@ -64,86 +76,59 @@
         infoPanel.appendChild(info);
       }
       
-      // Group settings sections
-      const settingsElements = [
-        '#misc', '#posvariantdiv', '#input', '#input2', '#input3',
-        '#gamesettings', '#visualeffects', '#advancedtimesettings',
-        '#binengineinput', '#enginematch', '#boardsetupsettings', '#boardsetupsettings2'
+      // Create simple settings sections
+      const settingsSections = [
+        { id: 'misc', title: 'Files & Connection' },
+        { id: 'posvariantdiv', title: 'Variant Selection' },
+        { id: 'input', title: 'Position Setup' },
+        { id: 'input2', title: 'Game Controls' },
+        { id: 'input3', title: 'Analysis Options' }
       ];
       
-      const sectionTitles = {
-        'misc': 'Files & Connection',
-        'posvariantdiv': 'Variant Selection',
-        'input': 'Position Setup',
-        'input2': 'Game Controls',
-        'input3': 'Analysis Options',
-        'gamesettings': 'Game Settings',
-        'visualeffects': 'Visual Effects',
-        'advancedtimesettings': 'Time Controls',
-        'binengineinput': 'Binary Engines',
-        'enginematch': 'Engine Match',
-        'boardsetupsettings': 'Board Setup',
-        'boardsetupsettings2': 'Board Setup 2'
-      };
-      
-      const settingsContent = sidebar.querySelector('.settings-content');
-      
-      settingsElements.forEach(selector => {
-        const element = document.querySelector(selector);
-        if (element && element.parentNode) {
-          const sectionId = selector.substring(1);
-          const sectionTitle = sectionTitles[sectionId] || sectionId;
-          
+      settingsSections.forEach(section => {
+        const element = document.getElementById(section.id);
+        if (element) {
           // Create collapsible section
-          const section = document.createElement('div');
-          section.className = 'settings-section';
+          const sectionDiv = document.createElement('div');
+          sectionDiv.className = 'settings-section';
           
           const header = document.createElement('div');
           header.className = 'settings-section-header';
-          header.textContent = sectionTitle;
-          header.onclick = function() {
-            const content = this.nextElementSibling;
-            const isCollapsed = content.classList.contains('collapsed');
-            
-            if (isCollapsed) {
-              content.classList.remove('collapsed');
-              this.classList.remove('collapsed');
-            } else {
-              content.classList.add('collapsed');
-              this.classList.add('collapsed');
-            }
-          };
+          header.textContent = section.title;
           
           const content = document.createElement('div');
           content.className = 'settings-section-content';
+          
+          // Move the original element into the content
           content.appendChild(element);
           
-          section.appendChild(header);
-          section.appendChild(content);
-          settingsContent.appendChild(section);
+          // Toggle functionality
+          header.addEventListener('click', function() {
+            const isCollapsed = content.classList.contains('collapsed');
+            if (isCollapsed) {
+              content.classList.remove('collapsed');
+              header.classList.remove('collapsed');
+            } else {
+              content.classList.add('collapsed');
+              header.classList.add('collapsed');
+            }
+          });
+          
+          sectionDiv.appendChild(header);
+          sectionDiv.appendChild(content);
+          settingsContent.appendChild(sectionDiv);
         }
       });
       
-      // Remove other elements from main
-      const elementsToRemove = ['#links', '#moveselectiondialog', '#chessground-mini', '#boardsetuppieceidentifier'];
-      elementsToRemove.forEach(selector => {
-        const element = document.querySelector(selector);
-        if (element && element.parentNode === main) {
-          element.remove();
-        }
-      });
-      
-      // Assemble the new layout
+      // Assemble layout
       mainLayout.appendChild(sidebar);
       mainLayout.appendChild(boardArea);
       mainLayout.appendChild(infoPanel);
       
       // Insert after pageheader
       const pageheader = document.getElementById('pageheader');
-      if (pageheader && pageheader.nextSibling) {
-        main.insertBefore(mainLayout, pageheader.nextSibling);
-      } else if (pageheader) {
-        main.appendChild(mainLayout);
+      if (pageheader) {
+        pageheader.insertAdjacentElement('afterend', mainLayout);
       }
       
       // Setup toggle functionality
@@ -153,33 +138,11 @@
         if (sidebarCollapsed) {
           sidebar.classList.add('collapsed');
           toggleButton.innerHTML = '▶';
-          mainLayout.style.gridTemplateColumns = '60px 1fr 350px';
         } else {
           sidebar.classList.remove('collapsed');
           toggleButton.innerHTML = '◀';
-          mainLayout.style.gridTemplateColumns = '300px 1fr 350px';
         }
       });
-      
-      // Responsive adjustments
-      function handleResize() {
-        if (window.innerWidth <= 1200) {
-          mainLayout.style.gridTemplateColumns = '1fr';
-          mainLayout.style.gridTemplateRows = '1fr auto auto';
-          mainLayout.style.gridTemplateAreas = '"board-area" "info-panel" "sidebar"';
-        } else if (sidebarCollapsed) {
-          mainLayout.style.gridTemplateColumns = '60px 1fr 350px';
-          mainLayout.style.gridTemplateRows = 'auto';
-          mainLayout.style.gridTemplateAreas = '"sidebar board-area info-panel"';
-        } else {
-          mainLayout.style.gridTemplateColumns = '300px 1fr 350px';
-          mainLayout.style.gridTemplateRows = 'auto';
-          mainLayout.style.gridTemplateAreas = '"sidebar board-area info-panel"';
-        }
-      }
-      
-      window.addEventListener('resize', handleResize);
-      handleResize();
     }
   </script>
   <base target="_blank" />

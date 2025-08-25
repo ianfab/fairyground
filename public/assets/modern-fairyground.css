@@ -349,7 +349,7 @@ select {
   cursor: pointer !important;
 }
 
-/* Chess-Centric Layout with JavaScript Reorganization */
+/* Chess-Centric Layout - Simplified and Optimized */
 
 /* Reset main layout to be more flexible */
 main {
@@ -371,10 +371,16 @@ main {
   padding: 1rem 2rem !important;
 }
 
+/* Hide original elements temporarily to prevent conflicts */
+/* Sections that will be moved to sidebar are initially hidden */
+#misc, #posvariantdiv, #input, #input2, #input3 {
+  display: none;
+}
+
 /* Create the new layout structure */
 #main-layout {
   display: grid !important;
-  grid-template-columns: 300px 1fr 350px !important;
+  grid-template-columns: 280px 1fr 320px !important;
   grid-template-areas: "sidebar board-area info-panel" !important;
   gap: 1rem !important;
   flex: 1 !important;
@@ -383,7 +389,7 @@ main {
   min-height: 0 !important;
 }
 
-/* Collapsible Settings Sidebar */
+/* Settings Sidebar */
 #settings-sidebar {
   grid-area: sidebar !important;
   background: var(--background-primary) !important;
@@ -398,7 +404,6 @@ main {
 
 #settings-sidebar.collapsed {
   width: 60px !important;
-  grid-template-columns: 60px 1fr 350px !important;
   padding: 0.5rem !important;
 }
 
@@ -440,11 +445,11 @@ main {
   justify-content: center !important;
   background: var(--background-secondary) !important;
   border-radius: var(--radius-lg) !important;
-  padding: 2rem !important;
+  padding: 1rem !important;
   overflow: auto !important;
 }
 
-/* Move #outputs to board area */
+/* Move #outputs to board area - ensure it's visible */
 #outputs {
   display: flex !important;
   flex-direction: column !important;
@@ -454,15 +459,18 @@ main {
   height: 100% !important;
   margin: 0 !important;
   justify-content: center !important;
+  position: static !important;
+  visibility: visible !important;
+  left: auto !important;
 }
 
-/* Chess Board Container */
+/* Chess Board Container - ensure it's properly sized */
 #chessground-container-div {
   flex-shrink: 0 !important;
   margin: 0 !important;
-  padding: 2rem !important;
-  max-width: min(80vh, 600px) !important;
-  max-height: min(80vh, 600px) !important;
+  padding: 1.5rem !important;
+  max-width: min(70vh, 500px) !important;
+  max-height: min(70vh, 500px) !important;
   width: auto !important;
   height: auto !important;
   box-shadow: var(--shadow-xl) !important;
@@ -470,6 +478,9 @@ main {
   background: var(--background-primary) !important;
   border: 2px solid var(--border-color) !important;
   transition: var(--transition) !important;
+  position: static !important;
+  visibility: visible !important;
+  left: auto !important;
 }
 
 #chessground-container-div:hover {
@@ -492,16 +503,19 @@ main {
   box-shadow: var(--shadow-md) !important;
 }
 
-/* Move #info to info panel */
+/* Move #info to info panel - ensure it's visible */
 #info {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   padding: 0 !important;
   margin: 0 !important;
+  position: static !important;
+  visibility: visible !important;
+  left: auto !important;
 }
 
-/* Settings Sections */
+/* Settings Sections - when they're moved */
 .settings-section {
   margin-bottom: 1rem !important;
   border-radius: var(--radius-md) !important;
@@ -551,26 +565,6 @@ main {
   display: none !important;
 }
 
-/* Original elements that will be moved */
-#misc,
-#posvariantdiv,
-#input,
-#input2,
-#input3,
-#gamesettings,
-#visualeffects,
-#advancedtimesettings,
-#binengineinput,
-#enginematch,
-#boardsetupsettings,
-#boardsetupsettings2 {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
 /* Move controls below board when they exist */
 #movecontrol {
   background: var(--background-primary) !important;
@@ -584,18 +578,24 @@ main {
   gap: 0.5rem !important;
   justify-content: center !important;
   width: 100% !important;
-  max-width: min(80vh, 600px) !important;
+  max-width: min(70vh, 500px) !important;
+  position: static !important;
+  visibility: visible !important;
+  left: auto !important;
 }
 
-/* Hide links section from main flow */
-#links {
+/* Hide elements that should not be visible in main flow */
+#links,
+#moveselectiondialog,
+#chessground-mini,
+#boardsetuppieceidentifier {
   display: none !important;
 }
 
 /* Responsive Design */
 @media (max-width: 1400px) {
   #main-layout {
-    grid-template-columns: 280px 1fr 320px !important;
+    grid-template-columns: 260px 1fr 300px !important;
   }
 }
 
@@ -625,7 +625,7 @@ main {
   }
   
   #board-area {
-    padding: 1rem !important;
+    padding: 0.5rem !important;
   }
   
   #chessground-container-div {
