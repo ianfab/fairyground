@@ -2,363 +2,363 @@
   --dark-square-color: #b58863;
   --light-square-color: #f0d9b5;
 }
-.brownboard.board1x1 cg-board {
+.brownboard.board1x1 cg-board::before {
   background-image: url('images/board/brown/brown1x1.svg');
 }
-.brownboard.board1x2 cg-board {
+.brownboard.board1x2 cg-board::before {
   background-image: url('images/board/brown/brown1x2.svg');
 }
-.brownboard.board1x3 cg-board {
+.brownboard.board1x3 cg-board::before {
   background-image: url('images/board/brown/brown1x3.svg');
 }
-.brownboard.board1x4 cg-board {
+.brownboard.board1x4 cg-board::before {
   background-image: url('images/board/brown/brown1x4.svg');
 }
-.brownboard.board1x5 cg-board {
+.brownboard.board1x5 cg-board::before {
   background-image: url('images/board/brown/brown1x5.svg');
 }
-.brownboard.board1x6 cg-board {
+.brownboard.board1x6 cg-board::before {
   background-image: url('images/board/brown/brown1x6.svg');
 }
-.brownboard.board1x7 cg-board {
+.brownboard.board1x7 cg-board::before {
   background-image: url('images/board/brown/brown1x7.svg');
 }
-.brownboard.board1x8 cg-board {
+.brownboard.board1x8 cg-board::before {
   background-image: url('images/board/brown/brown1x8.svg');
 }
-.brownboard.board1x9 cg-board {
+.brownboard.board1x9 cg-board::before {
   background-image: url('images/board/brown/brown1x9.svg');
 }
-.brownboard.board1x10 cg-board {
+.brownboard.board1x10 cg-board::before {
   background-image: url('images/board/brown/brown1x10.svg');
 }
-.brownboard.board2x1 cg-board {
+.brownboard.board2x1 cg-board::before {
   background-image: url('images/board/brown/brown2x1.svg');
 }
-.brownboard.board2x2 cg-board {
+.brownboard.board2x2 cg-board::before {
   background-image: url('images/board/brown/brown2x2.svg');
 }
-.brownboard.board2x3 cg-board {
+.brownboard.board2x3 cg-board::before {
   background-image: url('images/board/brown/brown2x3.svg');
 }
-.brownboard.board2x4 cg-board {
+.brownboard.board2x4 cg-board::before {
   background-image: url('images/board/brown/brown2x4.svg');
 }
-.brownboard.board2x5 cg-board {
+.brownboard.board2x5 cg-board::before {
   background-image: url('images/board/brown/brown2x5.svg');
 }
-.brownboard.board2x6 cg-board {
+.brownboard.board2x6 cg-board::before {
   background-image: url('images/board/brown/brown2x6.svg');
 }
-.brownboard.board2x7 cg-board {
+.brownboard.board2x7 cg-board::before {
   background-image: url('images/board/brown/brown2x7.svg');
 }
-.brownboard.board2x8 cg-board {
+.brownboard.board2x8 cg-board::before {
   background-image: url('images/board/brown/brown2x8.svg');
 }
-.brownboard.board2x9 cg-board {
+.brownboard.board2x9 cg-board::before {
   background-image: url('images/board/brown/brown2x9.svg');
 }
-.brownboard.board2x10 cg-board {
+.brownboard.board2x10 cg-board::before {
   background-image: url('images/board/brown/brown2x10.svg');
 }
-.brownboard.board3x1 cg-board {
+.brownboard.board3x1 cg-board::before {
   background-image: url('images/board/brown/brown3x1.svg');
 }
-.brownboard.board3x2 cg-board {
+.brownboard.board3x2 cg-board::before {
   background-image: url('images/board/brown/brown3x2.svg');
 }
-.brownboard.board3x3 cg-board {
+.brownboard.board3x3 cg-board::before {
   background-image: url('images/board/brown/brown3x3.svg');
 }
-.brownboard.board3x4 cg-board {
+.brownboard.board3x4 cg-board::before {
   background-image: url('images/board/brown/brown3x4.svg');
 }
-.brownboard.board3x5 cg-board {
+.brownboard.board3x5 cg-board::before {
   background-image: url('images/board/brown/brown3x5.svg');
 }
-.brownboard.board3x6 cg-board {
+.brownboard.board3x6 cg-board::before {
   background-image: url('images/board/brown/brown3x6.svg');
 }
-.brownboard.board3x7 cg-board {
+.brownboard.board3x7 cg-board::before {
   background-image: url('images/board/brown/brown3x7.svg');
 }
-.brownboard.board3x8 cg-board {
+.brownboard.board3x8 cg-board::before {
   background-image: url('images/board/brown/brown3x8.svg');
 }
-.brownboard.board3x9 cg-board {
+.brownboard.board3x9 cg-board::before {
   background-image: url('images/board/brown/brown3x9.svg');
 }
-.brownboard.board3x10 cg-board {
+.brownboard.board3x10 cg-board::before {
   background-image: url('images/board/brown/brown3x10.svg');
 }
-.brownboard.board4x1 cg-board {
+.brownboard.board4x1 cg-board::before {
   background-image: url('images/board/brown/brown4x1.svg');
 }
-.brownboard.board4x2 cg-board {
+.brownboard.board4x2 cg-board::before {
   background-image: url('images/board/brown/brown4x2.svg');
 }
-.brownboard.board4x3 cg-board {
+.brownboard.board4x3 cg-board::before {
   background-image: url('images/board/brown/brown4x3.svg');
 }
-.brownboard.board4x4 cg-board {
+.brownboard.board4x4 cg-board::before {
   background-image: url('images/board/brown/brown4x4.svg');
 }
-.brownboard.board4x5 cg-board {
+.brownboard.board4x5 cg-board::before {
   background-image: url('images/board/brown/brown4x5.svg');
 }
-.brownboard.board4x6 cg-board {
+.brownboard.board4x6 cg-board::before {
   background-image: url('images/board/brown/brown4x6.svg');
 }
-.brownboard.board4x7 cg-board {
+.brownboard.board4x7 cg-board::before {
   background-image: url('images/board/brown/brown4x7.svg');
 }
-.brownboard.board4x8 cg-board {
+.brownboard.board4x8 cg-board::before {
   background-image: url('images/board/brown/brown4x8.svg');
 }
-.brownboard.board4x9 cg-board {
+.brownboard.board4x9 cg-board::before {
   background-image: url('images/board/brown/brown4x9.svg');
 }
-.brownboard.board4x10 cg-board {
+.brownboard.board4x10 cg-board::before {
   background-image: url('images/board/brown/brown4x10.svg');
 }
-.brownboard.board5x1 cg-board {
+.brownboard.board5x1 cg-board::before {
   background-image: url('images/board/brown/brown5x1.svg');
 }
-.brownboard.board5x2 cg-board {
+.brownboard.board5x2 cg-board::before {
   background-image: url('images/board/brown/brown5x2.svg');
 }
-.brownboard.board5x3 cg-board {
+.brownboard.board5x3 cg-board::before {
   background-image: url('images/board/brown/brown5x3.svg');
 }
-.brownboard.board5x4 cg-board {
+.brownboard.board5x4 cg-board::before {
   background-image: url('images/board/brown/brown5x4.svg');
 }
-.brownboard.board5x5 cg-board {
+.brownboard.board5x5 cg-board::before {
   background-image: url('images/board/brown/brown5x5.svg');
 }
-.brownboard.board5x6 cg-board {
+.brownboard.board5x6 cg-board::before {
   background-image: url('images/board/brown/brown5x6.svg');
 }
-.brownboard.board5x7 cg-board {
+.brownboard.board5x7 cg-board::before {
   background-image: url('images/board/brown/brown5x7.svg');
 }
-.brownboard.board5x8 cg-board {
+.brownboard.board5x8 cg-board::before {
   background-image: url('images/board/brown/brown5x8.svg');
 }
-.brownboard.board5x9 cg-board {
+.brownboard.board5x9 cg-board::before {
   background-image: url('images/board/brown/brown5x9.svg');
 }
-.brownboard.board5x10 cg-board {
+.brownboard.board5x10 cg-board::before {
   background-image: url('images/board/brown/brown5x10.svg');
 }
-.brownboard.board6x1 cg-board {
+.brownboard.board6x1 cg-board::before {
   background-image: url('images/board/brown/brown6x1.svg');
 }
-.brownboard.board6x2 cg-board {
+.brownboard.board6x2 cg-board::before {
   background-image: url('images/board/brown/brown6x2.svg');
 }
-.brownboard.board6x3 cg-board {
+.brownboard.board6x3 cg-board::before {
   background-image: url('images/board/brown/brown6x3.svg');
 }
-.brownboard.board6x4 cg-board {
+.brownboard.board6x4 cg-board::before {
   background-image: url('images/board/brown/brown6x4.svg');
 }
-.brownboard.board6x5 cg-board {
+.brownboard.board6x5 cg-board::before {
   background-image: url('images/board/brown/brown6x5.svg');
 }
-.brownboard.board6x6 cg-board {
+.brownboard.board6x6 cg-board::before {
   background-image: url('images/board/brown/brown6x6.svg');
 }
-.brownboard.board6x7 cg-board {
+.brownboard.board6x7 cg-board::before {
   background-image: url('images/board/brown/brown6x7.svg');
 }
-.brownboard.board6x8 cg-board {
+.brownboard.board6x8 cg-board::before {
   background-image: url('images/board/brown/brown6x8.svg');
 }
-.brownboard.board6x9 cg-board {
+.brownboard.board6x9 cg-board::before {
   background-image: url('images/board/brown/brown6x9.svg');
 }
-.brownboard.board6x10 cg-board {
+.brownboard.board6x10 cg-board::before {
   background-image: url('images/board/brown/brown6x10.svg');
 }
-.brownboard.board7x1 cg-board {
+.brownboard.board7x1 cg-board::before {
   background-image: url('images/board/brown/brown7x1.svg');
 }
-.brownboard.board7x2 cg-board {
+.brownboard.board7x2 cg-board::before {
   background-image: url('images/board/brown/brown7x2.svg');
 }
-.brownboard.board7x3 cg-board {
+.brownboard.board7x3 cg-board::before {
   background-image: url('images/board/brown/brown7x3.svg');
 }
-.brownboard.board7x4 cg-board {
+.brownboard.board7x4 cg-board::before {
   background-image: url('images/board/brown/brown7x4.svg');
 }
-.brownboard.board7x5 cg-board {
+.brownboard.board7x5 cg-board::before {
   background-image: url('images/board/brown/brown7x5.svg');
 }
-.brownboard.board7x6 cg-board {
+.brownboard.board7x6 cg-board::before {
   background-image: url('images/board/brown/brown7x6.svg');
 }
-.brownboard.board7x7 cg-board {
+.brownboard.board7x7 cg-board::before {
   background-image: url('images/board/brown/brown7x7.svg');
 }
-.brownboard.board7x8 cg-board {
+.brownboard.board7x8 cg-board::before {
   background-image: url('images/board/brown/brown7x8.svg');
 }
-.brownboard.board7x9 cg-board {
+.brownboard.board7x9 cg-board::before {
   background-image: url('images/board/brown/brown7x9.svg');
 }
-.brownboard.board7x10 cg-board {
+.brownboard.board7x10 cg-board::before {
   background-image: url('images/board/brown/brown7x10.svg');
 }
-.brownboard.board8x1 cg-board {
+.brownboard.board8x1 cg-board::before {
   background-image: url('images/board/brown/brown8x1.svg');
 }
-.brownboard.board8x2 cg-board {
+.brownboard.board8x2 cg-board::before {
   background-image: url('images/board/brown/brown8x2.svg');
 }
-.brownboard.board8x3 cg-board {
+.brownboard.board8x3 cg-board::before {
   background-image: url('images/board/brown/brown8x3.svg');
 }
-.brownboard.board8x4 cg-board {
+.brownboard.board8x4 cg-board::before {
   background-image: url('images/board/brown/brown8x4.svg');
 }
-.brownboard.board8x5 cg-board {
+.brownboard.board8x5 cg-board::before {
   background-image: url('images/board/brown/brown8x5.svg');
 }
-.brownboard.board8x6 cg-board {
+.brownboard.board8x6 cg-board::before {
   background-image: url('images/board/brown/brown8x6.svg');
 }
-.brownboard.board8x7 cg-board {
+.brownboard.board8x7 cg-board::before {
   background-image: url('images/board/brown/brown8x7.svg');
 }
-.brownboard.board8x8 cg-board {
+.brownboard.board8x8 cg-board::before {
   background-image: url('images/board/brown/brown8x8.svg');
 }
-.brownboard.board8x9 cg-board {
+.brownboard.board8x9 cg-board::before {
   background-image: url('images/board/brown/brown8x9.svg');
 }
-.brownboard.board8x10 cg-board {
+.brownboard.board8x10 cg-board::before {
   background-image: url('images/board/brown/brown8x10.svg');
 }
-.brownboard.board9x1 cg-board {
+.brownboard.board9x1 cg-board::before {
   background-image: url('images/board/brown/brown9x1.svg');
 }
-.brownboard.board9x2 cg-board {
+.brownboard.board9x2 cg-board::before {
   background-image: url('images/board/brown/brown9x2.svg');
 }
-.brownboard.board9x3 cg-board {
+.brownboard.board9x3 cg-board::before {
   background-image: url('images/board/brown/brown9x3.svg');
 }
-.brownboard.board9x4 cg-board {
+.brownboard.board9x4 cg-board::before {
   background-image: url('images/board/brown/brown9x4.svg');
 }
-.brownboard.board9x5 cg-board {
+.brownboard.board9x5 cg-board::before {
   background-image: url('images/board/brown/brown9x5.svg');
 }
-.brownboard.board9x6 cg-board {
+.brownboard.board9x6 cg-board::before {
   background-image: url('images/board/brown/brown9x6.svg');
 }
-.brownboard.board9x7 cg-board {
+.brownboard.board9x7 cg-board::before {
   background-image: url('images/board/brown/brown9x7.svg');
 }
-.brownboard.board9x8 cg-board {
+.brownboard.board9x8 cg-board::before {
   background-image: url('images/board/brown/brown9x8.svg');
 }
-.brownboard.board9x9 cg-board {
+.brownboard.board9x9 cg-board::before {
   background-image: url('images/board/brown/brown9x9.svg');
 }
-.brownboard.board9x10 cg-board {
+.brownboard.board9x10 cg-board::before {
   background-image: url('images/board/brown/brown9x10.svg');
 }
-.brownboard.board10x1 cg-board {
+.brownboard.board10x1 cg-board::before {
   background-image: url('images/board/brown/brown10x1.svg');
 }
-.brownboard.board10x2 cg-board {
+.brownboard.board10x2 cg-board::before {
   background-image: url('images/board/brown/brown10x2.svg');
 }
-.brownboard.board10x3 cg-board {
+.brownboard.board10x3 cg-board::before {
   background-image: url('images/board/brown/brown10x3.svg');
 }
-.brownboard.board10x4 cg-board {
+.brownboard.board10x4 cg-board::before {
   background-image: url('images/board/brown/brown10x4.svg');
 }
-.brownboard.board10x5 cg-board {
+.brownboard.board10x5 cg-board::before {
   background-image: url('images/board/brown/brown10x5.svg');
 }
-.brownboard.board10x6 cg-board {
+.brownboard.board10x6 cg-board::before {
   background-image: url('images/board/brown/brown10x6.svg');
 }
-.brownboard.board10x7 cg-board {
+.brownboard.board10x7 cg-board::before {
   background-image: url('images/board/brown/brown10x7.svg');
 }
-.brownboard.board10x8 cg-board {
+.brownboard.board10x8 cg-board::before {
   background-image: url('images/board/brown/brown10x8.svg');
 }
-.brownboard.board10x9 cg-board {
+.brownboard.board10x9 cg-board::before {
   background-image: url('images/board/brown/brown10x9.svg');
 }
-.brownboard.board10x10 cg-board {
+.brownboard.board10x10 cg-board::before {
   background-image: url('images/board/brown/brown10x10.svg');
 }
-.brownboard.board11x1 cg-board {
+.brownboard.board11x1 cg-board::before {
   background-image: url('images/board/brown/brown11x1.svg');
 }
-.brownboard.board11x2 cg-board {
+.brownboard.board11x2 cg-board::before {
   background-image: url('images/board/brown/brown11x2.svg');
 }
-.brownboard.board11x3 cg-board {
+.brownboard.board11x3 cg-board::before {
   background-image: url('images/board/brown/brown11x3.svg');
 }
-.brownboard.board11x4 cg-board {
+.brownboard.board11x4 cg-board::before {
   background-image: url('images/board/brown/brown11x4.svg');
 }
-.brownboard.board11x5 cg-board {
+.brownboard.board11x5 cg-board::before {
   background-image: url('images/board/brown/brown11x5.svg');
 }
-.brownboard.board11x6 cg-board {
+.brownboard.board11x6 cg-board::before {
   background-image: url('images/board/brown/brown11x6.svg');
 }
-.brownboard.board11x7 cg-board {
+.brownboard.board11x7 cg-board::before {
   background-image: url('images/board/brown/brown11x7.svg');
 }
-.brownboard.board11x8 cg-board {
+.brownboard.board11x8 cg-board::before {
   background-image: url('images/board/brown/brown11x8.svg');
 }
-.brownboard.board11x9 cg-board {
+.brownboard.board11x9 cg-board::before {
   background-image: url('images/board/brown/brown11x9.svg');
 }
-.brownboard.board11x10 cg-board {
+.brownboard.board11x10 cg-board::before {
   background-image: url('images/board/brown/brown11x10.svg');
 }
-.brownboard.board12x1 cg-board {
+.brownboard.board12x1 cg-board::before {
   background-image: url('images/board/brown/brown12x1.svg');
 }
-.brownboard.board12x2 cg-board {
+.brownboard.board12x2 cg-board::before {
   background-image: url('images/board/brown/brown12x2.svg');
 }
-.brownboard.board12x3 cg-board {
+.brownboard.board12x3 cg-board::before {
   background-image: url('images/board/brown/brown12x3.svg');
 }
-.brownboard.board12x4 cg-board {
+.brownboard.board12x4 cg-board::before {
   background-image: url('images/board/brown/brown12x4.svg');
 }
-.brownboard.board12x5 cg-board {
+.brownboard.board12x5 cg-board::before {
   background-image: url('images/board/brown/brown12x5.svg');
 }
-.brownboard.board12x6 cg-board {
+.brownboard.board12x6 cg-board::before {
   background-image: url('images/board/brown/brown12x6.svg');
 }
-.brownboard.board12x7 cg-board {
+.brownboard.board12x7 cg-board::before {
   background-image: url('images/board/brown/brown12x7.svg');
 }
-.brownboard.board12x8 cg-board {
+.brownboard.board12x8 cg-board::before {
   background-image: url('images/board/brown/brown12x8.svg');
 }
-.brownboard.board12x9 cg-board {
+.brownboard.board12x9 cg-board::before {
   background-image: url('images/board/brown/brown12x9.svg');
 }
-.brownboard.board12x10 cg-board {
+.brownboard.board12x10 cg-board::before {
   background-image: url('images/board/brown/brown12x10.svg');
 }
