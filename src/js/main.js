@@ -54,6 +54,9 @@ const inputImageHeight = document.getElementById("imageheight");
 const checkboxKeepAspectRatio = document.getElementById("keepaspectratio");
 const inputImageQuality = document.getElementById("imagequality");
 const inputFrameDuration = document.getElementById("frameduration");
+const checkboxShowPlayerInformation = document.getElementById(
+  "showplayerinformation",
+);
 const buttonGenerateImage = document.getElementById("generateimage");
 const buttonExitImageGenerator = document.getElementById("exitimagegenerator");
 const textImageGenerationProgress = document.getElementById(
@@ -391,6 +394,7 @@ const GameTerminations = [
   "rules infraction",
   "time forfeit",
   "unterminated",
+  "normal",
 ];
 const FriendlyGameTerminationNames = [
   "(Not set)",
@@ -398,10 +402,11 @@ const FriendlyGameTerminationNames = [
   "Ended by adjudication",
   "Player death",
   "Emergency condition happened",
-  "Normally ended by game rule",
+  "Player resigned or agreed draw",
   "Rules infraction",
   "Player run out of time",
   "Ongoing, not terminated",
+  "Ended by game rule",
 ];
 let ffishnotationobjects = null;
 var PositionVariantsDirectory = new Map();
@@ -1129,20 +1134,20 @@ class GameTree {
       termination = "normal";
     }
     result.push(
-      `[Event "${this.GameHeaders.get("Event") ?? "Fairy-Stockfish playground game"}"]`,
+      `[Event "${this.GameHeaders.get("Event") || "Fairy-Stockfish playground game"}"]`,
     );
     result.push(
-      `[Site "${this.GameHeaders.get("Site") ?? window.location.host}"]`,
+      `[Site "${this.GameHeaders.get("Site") || window.location.host}"]`,
     );
-    result.push(`[Round "${this.GameHeaders.get("Round") ?? "1"}"]`);
+    result.push(`[Round "${this.GameHeaders.get("Round") || "1"}"]`);
     result.push(
-      `[Date "${this.GameHeaders.get("Date") ?? String(today.getFullYear()) + "." + String(today.getMonth() + 1) + "." + String(today.getDate())}"]`,
-    );
-    result.push(
-      `[White "${this.GameHeaders.get("White") ?? FallbackWhiteName}"]`,
+      `[Date "${this.GameHeaders.get("Date") || String(today.getFullYear()) + "." + String(today.getMonth() + 1) + "." + String(today.getDate())}"]`,
     );
     result.push(
-      `[Black "${this.GameHeaders.get("Black") ?? FallbackBlackName}"]`,
+      `[White "${this.GameHeaders.get("White") || FallbackWhiteName}"]`,
+    );
+    result.push(
+      `[Black "${this.GameHeaders.get("Black") || FallbackBlackName}"]`,
     );
     result.push(`[Result "${tmpboardresult}"]`);
     result.push(`[FEN "${this.OriginalFEN}"]\n[SetUp "1"]`);
@@ -1297,7 +1302,17 @@ class GameTree {
       let result = getBoardResult(tmpboard);
       let termination = null;
       if (result != "*") {
-        termination = "normal";
+        if (lastmainlinemove.Move.TextAfter.includes("[%end ")) {
+          element = document.createElement("p");
+          element.textContent =
+            result +
+            ": " +
+            FriendlyGameTerminationNames[
+              FriendlyGameTerminationNames.length - 1
+            ];
+          element.classList.add("marked-result");
+          movesparagraph.appendChild(element);
+        }
       } else {
         index = lastmainlinemove.Move.TextAfter.indexOf("[%end ");
         if (index >= 0) {
@@ -1313,18 +1328,18 @@ class GameTree {
             ) {
               result = terminationstr[0];
               termination = terminationstr[1];
+              element = document.createElement("p");
+              element.textContent =
+                result +
+                ": " +
+                FriendlyGameTerminationNames[
+                  GameTerminations.indexOf(termination)
+                ];
+              element.classList.add("marked-result");
+              movesparagraph.appendChild(element);
             }
           }
         }
-      }
-      if (termination != null) {
-        element = document.createElement("p");
-        element.innerText =
-          result +
-          ": " +
-          FriendlyGameTerminationNames[GameTerminations.indexOf(termination)];
-        element.classList.add("marked-result");
-        movesparagraph.appendChild(element);
       }
       displaytextafter = lastmainlinemove.Move.TextAfter.replace(
         MoveTextActionPartsMatcher,
@@ -1334,7 +1349,7 @@ class GameTree {
         displaytextafter = "";
       } else {
         element = document.createElement("p");
-        element.innerText = displaytextafter;
+        element.textContent = displaytextafter;
         element.classList.add("text-after");
         if (lastmainlinemove.Move.TextAfter.includes("\n")) {
           element.style.width = "100%";
@@ -1352,7 +1367,7 @@ class GameTree {
             hidesubsequentmovelevel++;
           } else {
             element = document.createElement("p");
-            element.innerText = "(";
+            element.textContent = "(";
             element.classList.add("splitter");
             movesparagraph.appendChild(element);
           }
@@ -1365,7 +1380,7 @@ class GameTree {
           }
           if (hidesubsequentmovelevel == 0) {
             element = document.createElement("p");
-            element.innerText = ")";
+            element.textContent = ")";
             element.classList.add("splitter");
             movesparagraph.appendChild(element);
           }
@@ -1386,7 +1401,7 @@ class GameTree {
             displaytextbefore = "";
           } else {
             element = document.createElement("p");
-            element.innerText = displaytextbefore;
+            element.textContent = displaytextbefore;
             element.classList.add("text-before");
             if (tokens[i].Move.TextBefore.includes("\n")) {
               element.style.width = "100%";
@@ -1403,31 +1418,34 @@ class GameTree {
         ) {
           if (tokens[i].Move.MoverRound == 0) {
             element = document.createElement("p");
-            element.innerText =
+            element.textContent =
               Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
             element.classList.add("move-number");
             movesparagraph.appendChild(element);
           } else {
             element = document.createElement("p");
-            element.innerText =
+            element.textContent =
               Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + "... ";
             element.classList.add("move-number");
             movesparagraph.appendChild(element);
           }
         } else if (tokens[i].Move.MoverRound == 0) {
           element = document.createElement("p");
-          element.innerText =
+          element.textContent =
             Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
           element.classList.add("move-number");
           movesparagraph.appendChild(element);
         }
         move = moveutil.ParseUCIMove(tokens[i].Move.Move);
         moveelement = document.createElement("p");
-        moveelement.innerText = tmpboard.sanMove(tokens[i].Move.Move, Notation);
+        moveelement.textContent = tmpboard.sanMove(
+          tokens[i].Move.Move,
+          Notation,
+        );
         for (j = 0; j < tokens[i].Move.Symbol.length; j++) {
           glyph = parseInt(tokens[i].Move.Symbol[j].substring(1));
           if (moveutil.NumericAnnotationGlyphs[glyph]) {
-            moveelement.innerText += moveutil.NumericAnnotationGlyphs[glyph];
+            moveelement.textContent += moveutil.NumericAnnotationGlyphs[glyph];
           }
         }
         tmpboard.push(tokens[i].Move.Move);
@@ -1473,11 +1491,17 @@ class GameTree {
             movesparagraph.appendChild(element);
           }
           if (gameresult != "*") {
-            element = document.createElement("p");
-            element.innerText =
-              gameresult + ": " + FriendlyGameTerminationNames[5];
-            element.classList.add("marked-result");
-            movesparagraph.appendChild(element);
+            if (terminationstr.length == 2) {
+              element = document.createElement("p");
+              element.textContent =
+                gameresult +
+                ": " +
+                FriendlyGameTerminationNames[
+                  FriendlyGameTerminationNames.length - 1
+                ];
+              element.classList.add("marked-result");
+              movesparagraph.appendChild(element);
+            }
           } else if (terminationstr.length == 2) {
             if (
               GameResults.includes(terminationstr[0]) &&
@@ -1485,7 +1509,7 @@ class GameTree {
             ) {
               moveelement.gameresult = terminationstr[0];
               element = document.createElement("p");
-              element.innerText =
+              element.textContent =
                 terminationstr[0] +
                 ": " +
                 FriendlyGameTerminationNames[
@@ -1498,7 +1522,7 @@ class GameTree {
           }
           if (tokens[i].Move.TextAfter.includes("[#]")) {
             element = document.createElement("p");
-            element.innerText = "◀◀ Needs Attention";
+            element.textContent = "◀◀ Needs Attention";
             element.title = "This position needs to be carefully examined.";
             element.classList.add("needs-attention-sign");
             movesparagraph.appendChild(element);
@@ -1512,7 +1536,7 @@ class GameTree {
             displaytextafter = "";
           } else {
             element = document.createElement("p");
-            element.innerText = displaytextafter;
+            element.textContent = displaytextafter;
             if (tokens[i].Move.TextAfter.includes("\n")) {
               element.style.width = "100%";
             }
@@ -1525,7 +1549,7 @@ class GameTree {
         if (tokens[i].Move.HideSubsequentMoves) {
           hidesubsequentmovelevel = 1;
           element = document.createElement("p");
-          element.innerText = "...";
+          element.textContent = "...";
           element.title =
             "Moves after this move are not displayed. Click here to show them.";
           element.classList.add("hide-subsequent-moves-sign");
@@ -1564,7 +1588,7 @@ class GameTree {
     }
     if (tmpboardresult != "*") {
       element = document.createElement("p");
-      element.innerText = tmpboardresult;
+      element.textContent = tmpboardresult;
       element.classList.add("result");
       movesparagraph.appendChild(element);
     }
@@ -1699,6 +1723,41 @@ function getPieceRoles(pieceLetters) {
   return [...uniqueLetters].map((char) => char + "-piece");
 }
 
+function getRepresentativePiece() {
+  const startingfen = ffish.startingFen(board.variant());
+  const uniqueletters = [...new Set(startingfen.split(""))].join("");
+  let whitepiece = "";
+  let blackpiece = "";
+  let i = 0;
+  if (uniqueletters.includes("K")) {
+    whitepiece = "K";
+  } else {
+    for (i = 0; i < uniqueletters.length; i++) {
+      if (
+        uniqueletters.charCodeAt(i) >= 65 &&
+        uniqueletters.charCodeAt(i) <= 90
+      ) {
+        whitepiece = uniqueletters[i];
+        break;
+      }
+    }
+  }
+  if (uniqueletters.includes("k")) {
+    blackpiece = "k";
+  } else {
+    for (i = 0; i < uniqueletters.length; i++) {
+      if (
+        uniqueletters.charCodeAt(i) >= 97 &&
+        uniqueletters.charCodeAt(i) <= 122
+      ) {
+        blackpiece = uniqueletters[i];
+        break;
+      }
+    }
+  }
+  return { white: whitepiece, black: blackpiece };
+}
+
 function generateMoveNotationSVG(text, backgroundcolor, textcolor, position) {
   if (
     typeof text != "string" ||
@@ -1752,7 +1811,7 @@ function initBoard(variant) {
     const bpocket = board.pocket(BLACK); // Variants with empty hands at start (zh, shogi, etc.)
 
     if (ffish.capturesToHand(variant)) {
-      const pieceLetters = fenBoard.replace(/[0-9kK\/\[\]]/g, "");
+      const pieceLetters = fenBoard.replace(/[0-9kK\/\|\+\[\]]/g, "");
       const pieceRoles = getPieceRoles(pieceLetters);
       console.log(pieceRoles);
       pocketRoles = {
@@ -2671,6 +2730,7 @@ function GenerateBoardImage(
   let asseturl = themedetector.GetThemes();
   let coordcolors = themedetector.GetInnerCoordinateColor();
   let moves = gametree.GetMoveListOfMove(gametree.CurrentMove);
+  let representativepieces = getRepresentativePiece();
   let tmpboard = new ffish.Board(
     gametree.Variant,
     gametree.OriginalFEN,
@@ -2679,6 +2739,28 @@ function GenerateBoardImage(
   let imagewidth = ImageWidth;
   let imageheight = ImageHeight;
   let notation = dropdownBoardCoordinate.selectedIndex;
+  let whitename = "";
+  let blackname = "";
+  if (playWhite.checked) {
+    if (fge.first_engine) {
+      whitename = fge.first_engine.Name;
+    } else {
+      whitename = "In browser Fairy-Stockfish";
+    }
+  } else {
+    whitename = "Human Player";
+  }
+  if (playBlack.checked) {
+    if (fge.second_engine) {
+      blackname = fge.second_engine.Name;
+    } else {
+      blackname = "In browser Fairy-Stockfish";
+    }
+  } else {
+    blackname = "Human Player";
+  }
+  whitename = gametree.GameHeaders.get("White") || whitename;
+  blackname = gametree.GameHeaders.get("Black") || blackname;
   if (GenerationMode == "current") {
     tmpboard.pushMoves(moves);
     let hiddenpieces = getHiddenDroppablePiece(tmpboard);
@@ -2698,11 +2780,14 @@ function GenerateBoardImage(
       }
     }
     if (KeepAspectRatio) {
+      let displayheight = dimensions.height;
       if (fen.includes("[")) {
-        imageheight = (imagewidth / dimensions.width) * (dimensions.height + 2);
-      } else {
-        imageheight = (imagewidth / dimensions.width) * dimensions.height;
+        displayheight += 2;
       }
+      if (checkboxShowPlayerInformation.checked) {
+        displayheight += 2;
+      }
+      imageheight = (imagewidth / dimensions.width) * displayheight;
     }
     imageutil.GenerateBoardImage(
       fen,
@@ -2715,6 +2800,12 @@ function GenerateBoardImage(
       notation,
       coordcolors.dark,
       coordcolors.light,
+      checkboxShowPlayerInformation.checked,
+      whitename,
+      blackname,
+      representativepieces.white,
+      representativepieces.black,
+      tmpboard.turn() ? "white" : "black",
       asseturl.pieces,
       asseturl.board,
       imagewidth,
@@ -2732,6 +2823,7 @@ function GenerateBoardImage(
     let hiddenpieces;
     let fen, checkedpieces;
     let fens = [];
+    let moveturns = [];
     let checkedsquarelist = [];
     let drawncanvascount = 0;
     let totalcanvascount = movelist.length + 1;
@@ -2761,14 +2853,18 @@ function GenerateBoardImage(
       }
       haspocket = haspocket || fen.includes("[");
       fens.push(fen);
+      moveturns.push(tmpboard.turn() ? "white" : "black");
       canvaslist.push(null);
     }
     if (KeepAspectRatio) {
+      let displayheight = dimensions.height;
       if (haspocket) {
-        imageheight = (imagewidth / dimensions.width) * (dimensions.height + 2);
-      } else {
-        imageheight = (imagewidth / dimensions.width) * dimensions.height;
+        displayheight += 2;
       }
+      if (checkboxShowPlayerInformation.checked) {
+        displayheight += 2;
+      }
+      imageheight = (imagewidth / dimensions.width) * displayheight;
     }
     for (i = 0; i < fens.length; i++) {
       (function (index) {
@@ -2783,6 +2879,12 @@ function GenerateBoardImage(
           notation,
           coordcolors.dark,
           coordcolors.light,
+          checkboxShowPlayerInformation.checked,
+          whitename,
+          blackname,
+          representativepieces.white,
+          representativepieces.black,
+          moveturns[index],
           asseturl.pieces,
           asseturl.board,
           imagewidth,
@@ -3997,7 +4099,7 @@ new Module().then((loadedModule) => {
       rect = terminationSettings.getBoundingClientRect();
     }
     if (result != "*") {
-      termination = "normal";
+      termination = "end";
     } else if (gametree.CurrentMove.Move.TextAfter) {
       index = gametree.CurrentMove.Move.TextAfter.indexOf("[%end ");
       if (index >= 0) {
@@ -4018,8 +4120,12 @@ new Module().then((loadedModule) => {
       }
     }
     dropdownPGNResult.selectedIndex = GameResults.indexOf(result);
-    dropdownPGNTermination.selectedIndex =
-      GameTerminations.indexOf(termination);
+    if (termination == "end") {
+      dropdownPGNTermination.selectedIndex = dropdownPGNTermination.length - 1;
+    } else {
+      dropdownPGNTermination.selectedIndex =
+        GameTerminations.indexOf(termination);
+    }
     terminationSettings.style.left = `${buttonrect.left - mainrect.left - rect.width}px`;
     terminationSettings.style.top = `${buttonrect.bottom - mainrect.top}px`;
     terminationSettings.style.display = "";

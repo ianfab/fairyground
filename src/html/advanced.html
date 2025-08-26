@@ -9494,6 +9494,18 @@
                   "Input the duration for each frame of GIF image. Each frame displays a move.",
               }),
             ]),
+            m("div#additionalinformationselection", [
+              m("p", "Additional information:"),
+              m(
+                "label",
+                {
+                  title:
+                    "When checked, the generated image will contain side to move information and player names.",
+                },
+                m("input[type=checkbox]#showplayerinformation"),
+                "Show player information",
+              ),
+            ]),
             m("div#imagegeneratoractions", [
               m(
                 "button#generateimage.ripple",
@@ -9571,7 +9583,11 @@
                   { value: "emergency" },
                   "Emergency condition happened",
                 ),
-                m("option", { value: "normal" }, "Normally ended by game rule"),
+                m(
+                  "option",
+                  { value: "normal" },
+                  "Player resigned or agreed draw",
+                ),
                 m("option", { value: "rules infraction" }, "Rules infraction"),
                 m(
                   "option",
@@ -9582,6 +9598,11 @@
                   "option",
                   { value: "unterminated" },
                   "Ongoing, not terminated",
+                ),
+                m(
+                  "option",
+                  { value: "normal", hidden: true },
+                  "Ended by game rule",
                 ),
               ]),
             ]),

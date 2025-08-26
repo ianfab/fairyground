@@ -111,6 +111,9 @@ function ReplaceURLCSSFunction(CSSDeclaration) {
   if (typeof CSSDeclaration != "string") {
     throw TypeError();
   }
+  if (!CSSDeclaration.startsWith("url(")) {
+    return "";
+  }
   return CSSDeclaration.replace(URLCSSSyntaxMatcher, "");
 }
 

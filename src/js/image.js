@@ -109,6 +109,13 @@ const NUMBER_THAI = [
   "๑๖",
 ];
 
+function IsImageURLValid(ImageURL) {
+  if (typeof ImageURL != "string") {
+    return false;
+  }
+  return ImageURL.length > 0;
+}
+
 function ParseFEN(fen) {
   if (typeof fen != "string") {
     throw TypeError;
@@ -693,6 +700,12 @@ export function GenerateBoardImage(
   CoordinateNotation,
   LightSquareCoordinateColor,
   DarkSquareCoordinateColor,
+  ShowPlayerInformation,
+  FirstPlayerName,
+  SecondPlayerName,
+  FirstPlayerRepresentativePiece,
+  SecondPlayerRepresentativePiece,
+  SideToMove,
   PieceImageURLMap,
   BoardImageURL,
   ImageWidth,
@@ -710,6 +723,12 @@ export function GenerateBoardImage(
     typeof CoordinateNotation != "number" ||
     typeof LightSquareCoordinateColor != "string" ||
     typeof DarkSquareCoordinateColor != "string" ||
+    typeof ShowPlayerInformation != "boolean" ||
+    typeof FirstPlayerName != "string" ||
+    typeof SecondPlayerName != "string" ||
+    typeof FirstPlayerRepresentativePiece != "string" ||
+    typeof SecondPlayerRepresentativePiece != "string" ||
+    typeof SideToMove != "string" ||
     !(PieceImageURLMap instanceof Map) ||
     typeof BoardImageURL != "string" ||
     typeof ImageWidth != "number" ||
@@ -745,13 +764,23 @@ export function GenerateBoardImage(
   let whitepocket = [...pocket.white.keys()];
   let blackpocket = [...pocket.black.keys()];
   let pocketsize = Math.max(whitepocket.length, blackpocket.length);
-  let totalcount = pieces.length + whitepocket.length + blackpocket.length;
+  let totalcount =
+    pieces.length +
+    whitepocket.length +
+    blackpocket.length +
+    (ShowPlayerInformation ? 2 : 0);
   let displaywidth = Math.max(BoardWidth, pocketsize);
-  let displayheight = HasPocket ? BoardHeight + 2 : BoardHeight;
+  let displayheight =
+    BoardHeight + (HasPocket ? 2 : 0) + (ShowPlayerInformation ? 2 : 0);
   let squarepixelwidth = ImageWidth / displaywidth;
   let squarepixelheight = ImageHeight / displayheight;
   let noflipboard = Orientation == "white";
   let checkedsquarescoordinate = [];
+  let boardYoffset =
+    (HasPocket ? squarepixelheight : 0) +
+    (ShowPlayerInformation ? squarepixelheight : 0);
+  let pocketYoffset = ShowPlayerInformation ? squarepixelheight : 0;
+  let fontsize = Math.min(0.3 * squarepixelwidth, 0.3 * squarepixelheight);
   if (pieces.length != BoardWidth * BoardHeight) {
     throw SyntaxError("Invalid FEN.");
   }
@@ -778,23 +807,11 @@ export function GenerateBoardImage(
     let boardpixelwidth = squarepixelwidth * BoardWidth;
     let boardpixelheight = squarepixelheight * BoardHeight;
     if (!noflipboard) {
-      ctx.translate(
-        boardpixelwidth / 2,
-        (HasPocket ? squarepixelheight : 0) + boardpixelheight / 2,
-      );
+      ctx.translate(boardpixelwidth / 2, boardYoffset + boardpixelheight / 2);
       ctx.rotate(Math.PI);
-      ctx.translate(
-        -boardpixelwidth / 2,
-        (HasPocket ? -squarepixelheight : 0) - boardpixelheight / 2,
-      );
+      ctx.translate(-boardpixelwidth / 2, -boardYoffset - boardpixelheight / 2);
     }
-    ctx.drawImage(
-      boardimg,
-      0,
-      HasPocket ? squarepixelheight : 0,
-      boardpixelwidth,
-      boardpixelheight,
-    );
+    ctx.drawImage(boardimg, 0, boardYoffset, boardpixelwidth, boardpixelheight);
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
@@ -807,7 +824,7 @@ export function GenerateBoardImage(
       squarepixelwidth,
       squarepixelheight,
       0,
-      HasPocket ? squarepixelheight : 0,
+      boardYoffset,
       LightSquareCoordinateColor,
       DarkSquareCoordinateColor,
       CoordinateNotation,
@@ -823,7 +840,7 @@ export function GenerateBoardImage(
             piecechar = piecechar.toUpperCase();
           }
           if (pieceitem.prefix && pieceitem.prefix.includes("+")) {
-            piecechar = "p" + piecechar;
+            piecechar = "+" + piecechar;
           }
         }
         if (noflipboard) {
@@ -847,7 +864,7 @@ export function GenerateBoardImage(
               ctx.fillRect(x, y, squarepixelwidth, squarepixelheight);
               ctx.fillStyle = "";
             }
-            if (imgurl) {
+            if (IsImageURLValid(imgurl)) {
               const pieceimg = new Image();
               pieceimg.onload = () => {
                 ctx.drawImage(
@@ -871,7 +888,7 @@ export function GenerateBoardImage(
             }
           })(
             i * squarepixelwidth,
-            (HasPocket ? j + 1 : j) * squarepixelheight,
+            boardYoffset + j * squarepixelheight,
             i,
             j,
             PieceImageURLMap.get(piecechar),
@@ -897,7 +914,7 @@ export function GenerateBoardImage(
               ctx.fillRect(x, y, squarepixelwidth, squarepixelheight);
               ctx.fillStyle = "";
             }
-            if (imgurl) {
+            if (IsImageURLValid(imgurl)) {
               const pieceimg = new Image();
               pieceimg.onload = () => {
                 ctx.drawImage(
@@ -921,8 +938,7 @@ export function GenerateBoardImage(
             }
           })(
             (BoardWidth - i - 1) * squarepixelwidth,
-            (HasPocket ? BoardHeight - j : BoardHeight - j - 1) *
-              squarepixelheight,
+            boardYoffset + (BoardHeight - j - 1) * squarepixelheight,
             i,
             j,
             PieceImageURLMap.get(piecechar),
@@ -936,28 +952,32 @@ export function GenerateBoardImage(
   //Pocket
   if (HasPocket) {
     let piecechar;
-    let fontsize = Math.min(0.3 * squarepixelwidth, 0.3 * squarepixelheight);
     if (noflipboard) {
       for (i = 0; i < blackpocket.length; i++) {
         piecechar = blackpocket[i];
         (function (x, count, imgurl) {
-          if (imgurl) {
+          if (IsImageURLValid(imgurl)) {
             const pieceimg = new Image();
             pieceimg.onload = () => {
               ctx.fillStyle = "#888";
-              ctx.fillRect(x, 0, squarepixelwidth, squarepixelheight);
+              ctx.fillRect(
+                x,
+                pocketYoffset,
+                squarepixelwidth,
+                squarepixelheight,
+              );
               ctx.fillStyle = "";
               ctx.drawImage(
                 pieceimg,
                 x,
-                0,
+                pocketYoffset,
                 squarepixelwidth,
                 squarepixelheight,
               );
               ctx.fillStyle = "#d85000";
               ctx.fillRect(
                 x + (2 * squarepixelwidth) / 3,
-                (2 * squarepixelheight) / 3,
+                pocketYoffset + (2 * squarepixelheight) / 3,
                 squarepixelwidth / 3,
                 squarepixelheight / 3,
               );
@@ -966,7 +986,7 @@ export function GenerateBoardImage(
               ctx.fillText(
                 String(count),
                 x + (5 / 6) * squarepixelwidth,
-                (5 / 6) * squarepixelheight,
+                pocketYoffset + (5 / 6) * squarepixelheight,
                 squarepixelwidth / 3,
               );
               ctx.fillStyle = "";
@@ -992,13 +1012,13 @@ export function GenerateBoardImage(
       for (i = 0; i < whitepocket.length; i++) {
         piecechar = whitepocket[i];
         (function (x, count, imgurl) {
-          if (imgurl) {
+          if (IsImageURLValid(imgurl)) {
             const pieceimg = new Image();
             pieceimg.onload = () => {
               ctx.fillStyle = "#888";
               ctx.fillRect(
                 x,
-                ImageHeight - squarepixelheight,
+                ImageHeight - pocketYoffset - squarepixelheight,
                 squarepixelwidth,
                 squarepixelheight,
               );
@@ -1006,14 +1026,14 @@ export function GenerateBoardImage(
               ctx.drawImage(
                 pieceimg,
                 x,
-                ImageHeight - squarepixelheight,
+                ImageHeight - pocketYoffset - squarepixelheight,
                 squarepixelwidth,
                 squarepixelheight,
               );
               ctx.fillStyle = "#d85000";
               ctx.fillRect(
                 x + (2 * squarepixelwidth) / 3,
-                ImageHeight - squarepixelheight / 3,
+                ImageHeight - pocketYoffset - squarepixelheight / 3,
                 squarepixelwidth / 3,
                 squarepixelheight / 3,
               );
@@ -1022,7 +1042,7 @@ export function GenerateBoardImage(
               ctx.fillText(
                 String(count),
                 x + (5 / 6) * squarepixelwidth,
-                ImageHeight - squarepixelheight / 6,
+                ImageHeight - pocketYoffset - squarepixelheight / 6,
                 squarepixelwidth / 3,
               );
               ctx.fillStyle = "";
@@ -1049,23 +1069,28 @@ export function GenerateBoardImage(
       for (i = 0; i < whitepocket.length; i++) {
         piecechar = whitepocket[i];
         (function (x, count, imgurl) {
-          if (imgurl) {
+          if (IsImageURLValid(imgurl)) {
             const pieceimg = new Image();
             pieceimg.onload = () => {
               ctx.fillStyle = "#888";
-              ctx.fillRect(x, 0, squarepixelwidth, squarepixelheight);
+              ctx.fillRect(
+                x,
+                pocketYoffset,
+                squarepixelwidth,
+                squarepixelheight,
+              );
               ctx.fillStyle = "";
               ctx.drawImage(
                 pieceimg,
                 x,
-                0,
+                pocketYoffset,
                 squarepixelwidth,
                 squarepixelheight,
               );
               ctx.fillStyle = "#d85000";
               ctx.fillRect(
                 x + (2 * squarepixelwidth) / 3,
-                (2 * squarepixelheight) / 3,
+                pocketYoffset + (2 * squarepixelheight) / 3,
                 squarepixelwidth / 3,
                 squarepixelheight / 3,
               );
@@ -1074,7 +1099,7 @@ export function GenerateBoardImage(
               ctx.fillText(
                 String(count),
                 x + (5 / 6) * squarepixelwidth,
-                (5 / 6) * squarepixelheight,
+                pocketYoffset + (5 / 6) * squarepixelheight,
                 squarepixelwidth / 3,
               );
               ctx.fillStyle = "";
@@ -1100,13 +1125,13 @@ export function GenerateBoardImage(
       for (i = 0; i < blackpocket.length; i++) {
         piecechar = blackpocket[i];
         (function (x, count, imgurl) {
-          if (imgurl) {
+          if (IsImageURLValid(imgurl)) {
             const pieceimg = new Image();
             pieceimg.onload = () => {
               ctx.fillStyle = "#888";
               ctx.fillRect(
                 x,
-                ImageHeight - squarepixelheight,
+                ImageHeight - pocketYoffset - squarepixelheight,
                 squarepixelwidth,
                 squarepixelheight,
               );
@@ -1114,14 +1139,14 @@ export function GenerateBoardImage(
               ctx.drawImage(
                 pieceimg,
                 x,
-                ImageHeight - squarepixelheight,
+                ImageHeight - pocketYoffset - squarepixelheight,
                 squarepixelwidth,
                 squarepixelheight,
               );
               ctx.fillStyle = "#d85000";
               ctx.fillRect(
                 x + (2 * squarepixelwidth) / 3,
-                ImageHeight - squarepixelheight / 3,
+                ImageHeight - pocketYoffset - squarepixelheight / 3,
                 squarepixelwidth / 3,
                 squarepixelheight / 3,
               );
@@ -1130,7 +1155,7 @@ export function GenerateBoardImage(
               ctx.fillText(
                 String(count),
                 x + (5 / 6) * squarepixelwidth,
-                ImageHeight - squarepixelheight / 6,
+                ImageHeight - pocketYoffset - squarepixelheight / 6,
                 squarepixelwidth / 3,
               );
               ctx.fillStyle = "";
@@ -1152,6 +1177,126 @@ export function GenerateBoardImage(
           pocket.black.get(piecechar),
           PieceImageURLMap.get(piecechar),
         );
+      }
+    }
+  }
+
+  //Player information
+  if (ShowPlayerInformation) {
+    let namefontsize = 0.3 * squarepixelheight;
+    ctx.fillStyle = "#f0f8ff";
+    ctx.fillRect(0, 0, ImageWidth, squarepixelheight);
+    ctx.fillRect(
+      0,
+      ImageHeight - squarepixelheight,
+      ImageWidth,
+      squarepixelheight,
+    );
+    ctx.fillStyle = "#778899";
+    if (
+      (noflipboard && SideToMove == "white") ||
+      (!noflipboard && SideToMove == "black")
+    ) {
+      ctx.fillRect(
+        0,
+        ImageHeight - squarepixelheight,
+        squarepixelwidth,
+        squarepixelheight,
+      );
+    } else {
+      ctx.fillRect(0, 0, squarepixelwidth, squarepixelheight);
+    }
+    ctx.fillStyle = "#000";
+    ctx.font = `${namefontsize}px Arial`;
+    let firstplayernametextsize = ctx.measureText(FirstPlayerName);
+    let secondplayernametextsize = ctx.measureText(SecondPlayerName);
+    if (firstplayernametextsize.width > ImageWidth - squarepixelwidth) {
+      ctx.font = `${(namefontsize * (ImageWidth - squarepixelwidth)) / firstplayernametextsize.width}px Arial`;
+    }
+    if (noflipboard) {
+      ctx.fillText(
+        FirstPlayerName,
+        squarepixelwidth + 0.5 * (ImageWidth - squarepixelwidth),
+        ImageHeight - squarepixelheight / 2,
+      );
+    } else {
+      ctx.fillText(
+        FirstPlayerName,
+        squarepixelwidth + 0.5 * (ImageWidth - squarepixelwidth),
+        squarepixelheight / 2,
+      );
+    }
+    ctx.font = `${namefontsize}px Arial`;
+    if (secondplayernametextsize.width > ImageWidth - squarepixelwidth) {
+      ctx.font = `${(namefontsize * (ImageWidth - squarepixelwidth)) / secondplayernametextsize.width}px Arial`;
+    }
+    if (noflipboard) {
+      ctx.fillText(
+        SecondPlayerName,
+        squarepixelwidth + 0.5 * (ImageWidth - squarepixelwidth),
+        squarepixelheight / 2,
+      );
+    } else {
+      ctx.fillText(
+        SecondPlayerName,
+        squarepixelwidth + 0.5 * (ImageWidth - squarepixelwidth),
+        ImageHeight - squarepixelheight / 2,
+      );
+    }
+    ctx.fillStyle = "";
+    ctx.font = "";
+    let imgurl = PieceImageURLMap.get(FirstPlayerRepresentativePiece);
+    if (IsImageURLValid(imgurl)) {
+      const pieceimg = new Image();
+      pieceimg.onload = () => {
+        if (noflipboard) {
+          ctx.drawImage(
+            pieceimg,
+            0,
+            ImageHeight - squarepixelheight,
+            squarepixelwidth,
+            squarepixelheight,
+          );
+        } else {
+          ctx.drawImage(pieceimg, 0, 0, squarepixelwidth, squarepixelheight);
+        }
+        drawnelementcount++;
+        if (drawnelementcount >= totalcount) {
+          OnFinishedCallback(canvas);
+        }
+      };
+      pieceimg.src = imgurl;
+    } else {
+      drawnelementcount++;
+      if (drawnelementcount >= totalcount) {
+        OnFinishedCallback(canvas);
+      }
+    }
+    imgurl = PieceImageURLMap.get(SecondPlayerRepresentativePiece);
+    if (IsImageURLValid(imgurl)) {
+      const pieceimg = new Image();
+      pieceimg.onload = () => {
+        if (noflipboard) {
+          ctx.drawImage(pieceimg, 0, 0, squarepixelwidth, squarepixelheight);
+        } else {
+          ctx.drawImage(
+            pieceimg,
+            0,
+            ImageHeight - squarepixelheight,
+            squarepixelwidth,
+            squarepixelheight,
+          );
+        }
+        drawnelementcount++;
+        if (drawnelementcount >= totalcount) {
+          OnFinishedCallback(canvas);
+        }
+      };
+      pieceimg.src = imgurl;
+    } else {
+      drawnelementcount++;
+      if (drawnelementcount >= totalcount) {
+        OnFinishedCallback(canvas);
       }
     }
   }
