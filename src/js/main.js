@@ -547,6 +547,7 @@ class MultiplePrincipalVariationMiniBoardHandler {
     }
     let i = 0;
     let deletelater = [];
+    let movestack = gametree.GetMoveListOfMove(gametree.CurrentMove);
     let selecteddata,
       selected,
       moveselem,
@@ -643,7 +644,7 @@ class MultiplePrincipalVariationMiniBoardHandler {
             `movediv-${i}`,
             ffishnotationobjects[notationindex],
             gametree.OriginalFEN,
-            board.moveStack(),
+            movestack,
           );
           moveselem.classList.add("multipv-miniboard-pvline-moves");
           selected.appendChild(moveselem);
@@ -1176,16 +1177,19 @@ class GameTree {
     let result = [];
     let stack = [];
     let lastmainlinemove = this.MoveTree.RootNode;
+    let movestack = [];
     if (this.MoveTree.RootNode.Move.TextAfter) {
       result.push("{" + this.MoveTree.RootNode.Move.TextAfter + "}");
     }
     for (i = 0; i < tokens.length; i++) {
       if (tokens[i].IsSplitter) {
         if (tokens[i].Move.Move == "(") {
-          stack.push(tmpboard.moveStack());
+          stack.push(movestack.join(" "));
           tmpboard.pop();
+          movestack.pop();
           result.push("(");
         } else if (tokens[i].Move.Move == ")") {
+          movestack = stack[stack.length - 1].split(" ");
           tmpboard.reset();
           tmpboard.setFen(this.OriginalFEN);
           tmpboard.pushMoves(stack.pop());
@@ -1228,6 +1232,7 @@ class GameTree {
         }
         result.push(tmpboard.sanMove(tokens[i].Move.Move, Notation));
         tmpboard.push(tokens[i].Move.Move);
+        movestack.push(tokens[i].Move.Move);
         if (tokens[i].Move.Symbol.length > 0) {
           result.push(tokens[i].Move.Symbol.join(" "));
         }
@@ -1280,6 +1285,7 @@ class GameTree {
       j = 0;
     let tmpboard = new ffish.Board(this.Variant, this.OriginalFEN, this.Is960);
     let stack = [];
+    let movestack = [];
     let element = null;
     let moveelement = null;
     let move = null;
@@ -1361,8 +1367,9 @@ class GameTree {
     for (i = 0; i < tokens.length; i++) {
       if (tokens[i].IsSplitter) {
         if (tokens[i].Move.Move == "(") {
-          stack.push(tmpboard.moveStack());
+          stack.push(movestack.join(" "));
           tmpboard.pop();
+          movestack.pop();
           if (hidesubsequentmovelevel > 0) {
             hidesubsequentmovelevel++;
           } else {
@@ -1372,6 +1379,7 @@ class GameTree {
             movesparagraph.appendChild(element);
           }
         } else if (tokens[i].Move.Move == ")") {
+          movestack = stack[stack.length - 1].split(" ");
           tmpboard.reset();
           tmpboard.setFen(this.OriginalFEN);
           tmpboard.pushMoves(stack.pop());
@@ -1449,6 +1457,7 @@ class GameTree {
           }
         }
         tmpboard.push(tokens[i].Move.Move);
+        movestack.push(tokens[i].Move.Move);
         gameresult = getBoardResult(tmpboard);
         moveelement.classList.add("position-display-label");
         moveelement.fenstr = tmpboard.fen();
@@ -1467,7 +1476,7 @@ class GameTree {
         moveelement.checked = getCheckSquares(tmpboard);
         moveelement.gameresult = gameresult;
         moveelement.startingfen = this.OriginalFEN;
-        moveelement.moves = tmpboard.moveStack();
+        moveelement.moves = movestack.join(" ");
         if (tokens[i].Node == this.CurrentMove) {
           moveelement.classList.add("current-move");
           moveelement.title = "This is current move.";
@@ -4283,7 +4292,7 @@ new Module().then((loadedModule) => {
         !gametree.CurrentMove.Move.TextAfter.includes("[%end ") &&
         headers[7] != ""
       ) {
-        gametree.CurrentMove.Move.TextAfter += ` [%end ${headers[6]},${headers[7]}]`;
+        gametree.CurrentMove.Move.TextAfter += `[%end ${headers[6]},${headers[7]}]`;
       }
       textFen.value = tokens[0];
       textMoves.value = tokens[1];
