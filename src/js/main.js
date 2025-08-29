@@ -3786,6 +3786,7 @@ new Module().then((loadedModule) => {
   buttonFlip.onclick = function () {
     chessground.toggleOrientation();
     chessground_mini.toggleOrientation();
+    themedetector.SetOrientation(chessground.state.orientation);
     updateInnerCoordinateColor(chessground);
   };
 
@@ -4328,6 +4329,7 @@ new Module().then((loadedModule) => {
       });
       updateInnerCoordinateColor(chessground);
     }
+    themedetector.SetOrientation(chessground.state.orientation);
 
     // Force coordinate recalculation to fix coordinate mapping issues
     // This addresses the bug where coordinates get messed up after game start
