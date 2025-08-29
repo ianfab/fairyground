@@ -6718,12 +6718,15 @@ function DisplayLastMoveWithVisualEffect(
 
 function updatePGNDivisionTimeoutCheck() {
   if (PgnDivCalledDuringThrottle) {
-    updatePGNDivision();
+    updatePGNDivision(true);
   }
 }
 
-function updatePGNDivision() {
-  if (Date.now() - PgnDivThrottleStartTime > PgnDivThrottleDurationMs) {
+function updatePGNDivision(forceupdate = false) {
+  if (
+    forceupdate ||
+    Date.now() - PgnDivThrottleStartTime > PgnDivThrottleDurationMs
+  ) {
     let deletelater = [];
     while (labelPgn.childNodes[0]) {
       deletelater.push(labelPgn.removeChild(labelPgn.childNodes[0]));
