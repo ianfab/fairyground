@@ -415,6 +415,9 @@ let ffish = null;
 let board = null;
 let chessground = null;
 let chessground_mini = null;
+const PgnDivThrottleDurationMs = 200;
+let PgnDivThrottleStartTime = 0;
+let PgnDivCalledDuringThrottle = false;
 var i = 0;
 const WHITE = true;
 const BLACK = false;
@@ -6713,20 +6716,33 @@ function DisplayLastMoveWithVisualEffect(
   }
 }
 
+function updatePGNDivisionTimeoutCheck() {
+  if (PgnDivCalledDuringThrottle) {
+    updatePGNDivision();
+  }
+}
+
 function updatePGNDivision() {
-  let deletelater = [];
-  while (labelPgn.childNodes[0]) {
-    deletelater.push(labelPgn.removeChild(labelPgn.childNodes[0]));
-  }
-  if (isAdvPGNMode.checked) {
-    labelPgn.appendChild(getPgnDiv(board));
+  if (Date.now() - PgnDivThrottleStartTime > PgnDivThrottleDurationMs) {
+    let deletelater = [];
+    while (labelPgn.childNodes[0]) {
+      deletelater.push(labelPgn.removeChild(labelPgn.childNodes[0]));
+    }
+    if (isAdvPGNMode.checked) {
+      labelPgn.appendChild(getPgnDiv(board));
+    } else {
+      labelPgn.innerText = getPgn(board);
+    }
+    setTimeout(() => {
+      let tmp = deletelater;
+      deletelater = null;
+    }, 500);
+    PgnDivThrottleStartTime = Date.now();
+    PgnDivCalledDuringThrottle = false;
+    setTimeout(updatePGNDivisionTimeoutCheck, PgnDivThrottleDurationMs);
   } else {
-    labelPgn.innerText = getPgn(board);
+    PgnDivCalledDuringThrottle = true;
   }
-  setTimeout(() => {
-    let tmp = deletelater;
-    deletelater = null;
-  }, 500);
 }
 
 function updateChessground(showresult) {
