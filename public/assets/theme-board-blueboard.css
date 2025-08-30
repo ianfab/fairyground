@@ -2,363 +2,363 @@
   --dark-square-color: #8ca2ad;
   --light-square-color: #dee3e6;
 }
-.blueboard.board1x1 cg-board {
+.blueboard.board1x1 cg-board::before {
   background-image: url('images/board/blue/blue1x1.svg');
 }
-.blueboard.board1x2 cg-board {
+.blueboard.board1x2 cg-board::before {
   background-image: url('images/board/blue/blue1x2.svg');
 }
-.blueboard.board1x3 cg-board {
+.blueboard.board1x3 cg-board::before {
   background-image: url('images/board/blue/blue1x3.svg');
 }
-.blueboard.board1x4 cg-board {
+.blueboard.board1x4 cg-board::before {
   background-image: url('images/board/blue/blue1x4.svg');
 }
-.blueboard.board1x5 cg-board {
+.blueboard.board1x5 cg-board::before {
   background-image: url('images/board/blue/blue1x5.svg');
 }
-.blueboard.board1x6 cg-board {
+.blueboard.board1x6 cg-board::before {
   background-image: url('images/board/blue/blue1x6.svg');
 }
-.blueboard.board1x7 cg-board {
+.blueboard.board1x7 cg-board::before {
   background-image: url('images/board/blue/blue1x7.svg');
 }
-.blueboard.board1x8 cg-board {
+.blueboard.board1x8 cg-board::before {
   background-image: url('images/board/blue/blue1x8.svg');
 }
-.blueboard.board1x9 cg-board {
+.blueboard.board1x9 cg-board::before {
   background-image: url('images/board/blue/blue1x9.svg');
 }
-.blueboard.board1x10 cg-board {
+.blueboard.board1x10 cg-board::before {
   background-image: url('images/board/blue/blue1x10.svg');
 }
-.blueboard.board2x1 cg-board {
+.blueboard.board2x1 cg-board::before {
   background-image: url('images/board/blue/blue2x1.svg');
 }
-.blueboard.board2x2 cg-board {
+.blueboard.board2x2 cg-board::before {
   background-image: url('images/board/blue/blue2x2.svg');
 }
-.blueboard.board2x3 cg-board {
+.blueboard.board2x3 cg-board::before {
   background-image: url('images/board/blue/blue2x3.svg');
 }
-.blueboard.board2x4 cg-board {
+.blueboard.board2x4 cg-board::before {
   background-image: url('images/board/blue/blue2x4.svg');
 }
-.blueboard.board2x5 cg-board {
+.blueboard.board2x5 cg-board::before {
   background-image: url('images/board/blue/blue2x5.svg');
 }
-.blueboard.board2x6 cg-board {
+.blueboard.board2x6 cg-board::before {
   background-image: url('images/board/blue/blue2x6.svg');
 }
-.blueboard.board2x7 cg-board {
+.blueboard.board2x7 cg-board::before {
   background-image: url('images/board/blue/blue2x7.svg');
 }
-.blueboard.board2x8 cg-board {
+.blueboard.board2x8 cg-board::before {
   background-image: url('images/board/blue/blue2x8.svg');
 }
-.blueboard.board2x9 cg-board {
+.blueboard.board2x9 cg-board::before {
   background-image: url('images/board/blue/blue2x9.svg');
 }
-.blueboard.board2x10 cg-board {
+.blueboard.board2x10 cg-board::before {
   background-image: url('images/board/blue/blue2x10.svg');
 }
-.blueboard.board3x1 cg-board {
+.blueboard.board3x1 cg-board::before {
   background-image: url('images/board/blue/blue3x1.svg');
 }
-.blueboard.board3x2 cg-board {
+.blueboard.board3x2 cg-board::before {
   background-image: url('images/board/blue/blue3x2.svg');
 }
-.blueboard.board3x3 cg-board {
+.blueboard.board3x3 cg-board::before {
   background-image: url('images/board/blue/blue3x3.svg');
 }
-.blueboard.board3x4 cg-board {
+.blueboard.board3x4 cg-board::before {
   background-image: url('images/board/blue/blue3x4.svg');
 }
-.blueboard.board3x5 cg-board {
+.blueboard.board3x5 cg-board::before {
   background-image: url('images/board/blue/blue3x5.svg');
 }
-.blueboard.board3x6 cg-board {
+.blueboard.board3x6 cg-board::before {
   background-image: url('images/board/blue/blue3x6.svg');
 }
-.blueboard.board3x7 cg-board {
+.blueboard.board3x7 cg-board::before {
   background-image: url('images/board/blue/blue3x7.svg');
 }
-.blueboard.board3x8 cg-board {
+.blueboard.board3x8 cg-board::before {
   background-image: url('images/board/blue/blue3x8.svg');
 }
-.blueboard.board3x9 cg-board {
+.blueboard.board3x9 cg-board::before {
   background-image: url('images/board/blue/blue3x9.svg');
 }
-.blueboard.board3x10 cg-board {
+.blueboard.board3x10 cg-board::before {
   background-image: url('images/board/blue/blue3x10.svg');
 }
-.blueboard.board4x1 cg-board {
+.blueboard.board4x1 cg-board::before {
   background-image: url('images/board/blue/blue4x1.svg');
 }
-.blueboard.board4x2 cg-board {
+.blueboard.board4x2 cg-board::before {
   background-image: url('images/board/blue/blue4x2.svg');
 }
-.blueboard.board4x3 cg-board {
+.blueboard.board4x3 cg-board::before {
   background-image: url('images/board/blue/blue4x3.svg');
 }
-.blueboard.board4x4 cg-board {
+.blueboard.board4x4 cg-board::before {
   background-image: url('images/board/blue/blue4x4.svg');
 }
-.blueboard.board4x5 cg-board {
+.blueboard.board4x5 cg-board::before {
   background-image: url('images/board/blue/blue4x5.svg');
 }
-.blueboard.board4x6 cg-board {
+.blueboard.board4x6 cg-board::before {
   background-image: url('images/board/blue/blue4x6.svg');
 }
-.blueboard.board4x7 cg-board {
+.blueboard.board4x7 cg-board::before {
   background-image: url('images/board/blue/blue4x7.svg');
 }
-.blueboard.board4x8 cg-board {
+.blueboard.board4x8 cg-board::before {
   background-image: url('images/board/blue/blue4x8.svg');
 }
-.blueboard.board4x9 cg-board {
+.blueboard.board4x9 cg-board::before {
   background-image: url('images/board/blue/blue4x9.svg');
 }
-.blueboard.board4x10 cg-board {
+.blueboard.board4x10 cg-board::before {
   background-image: url('images/board/blue/blue4x10.svg');
 }
-.blueboard.board5x1 cg-board {
+.blueboard.board5x1 cg-board::before {
   background-image: url('images/board/blue/blue5x1.svg');
 }
-.blueboard.board5x2 cg-board {
+.blueboard.board5x2 cg-board::before {
   background-image: url('images/board/blue/blue5x2.svg');
 }
-.blueboard.board5x3 cg-board {
+.blueboard.board5x3 cg-board::before {
   background-image: url('images/board/blue/blue5x3.svg');
 }
-.blueboard.board5x4 cg-board {
+.blueboard.board5x4 cg-board::before {
   background-image: url('images/board/blue/blue5x4.svg');
 }
-.blueboard.board5x5 cg-board {
+.blueboard.board5x5 cg-board::before {
   background-image: url('images/board/blue/blue5x5.svg');
 }
-.blueboard.board5x6 cg-board {
+.blueboard.board5x6 cg-board::before {
   background-image: url('images/board/blue/blue5x6.svg');
 }
-.blueboard.board5x7 cg-board {
+.blueboard.board5x7 cg-board::before {
   background-image: url('images/board/blue/blue5x7.svg');
 }
-.blueboard.board5x8 cg-board {
+.blueboard.board5x8 cg-board::before {
   background-image: url('images/board/blue/blue5x8.svg');
 }
-.blueboard.board5x9 cg-board {
+.blueboard.board5x9 cg-board::before {
   background-image: url('images/board/blue/blue5x9.svg');
 }
-.blueboard.board5x10 cg-board {
+.blueboard.board5x10 cg-board::before {
   background-image: url('images/board/blue/blue5x10.svg');
 }
-.blueboard.board6x1 cg-board {
+.blueboard.board6x1 cg-board::before {
   background-image: url('images/board/blue/blue6x1.svg');
 }
-.blueboard.board6x2 cg-board {
+.blueboard.board6x2 cg-board::before {
   background-image: url('images/board/blue/blue6x2.svg');
 }
-.blueboard.board6x3 cg-board {
+.blueboard.board6x3 cg-board::before {
   background-image: url('images/board/blue/blue6x3.svg');
 }
-.blueboard.board6x4 cg-board {
+.blueboard.board6x4 cg-board::before {
   background-image: url('images/board/blue/blue6x4.svg');
 }
-.blueboard.board6x5 cg-board {
+.blueboard.board6x5 cg-board::before {
   background-image: url('images/board/blue/blue6x5.svg');
 }
-.blueboard.board6x6 cg-board {
+.blueboard.board6x6 cg-board::before {
   background-image: url('images/board/blue/blue6x6.svg');
 }
-.blueboard.board6x7 cg-board {
+.blueboard.board6x7 cg-board::before {
   background-image: url('images/board/blue/blue6x7.svg');
 }
-.blueboard.board6x8 cg-board {
+.blueboard.board6x8 cg-board::before {
   background-image: url('images/board/blue/blue6x8.svg');
 }
-.blueboard.board6x9 cg-board {
+.blueboard.board6x9 cg-board::before {
   background-image: url('images/board/blue/blue6x9.svg');
 }
-.blueboard.board6x10 cg-board {
+.blueboard.board6x10 cg-board::before {
   background-image: url('images/board/blue/blue6x10.svg');
 }
-.blueboard.board7x1 cg-board {
+.blueboard.board7x1 cg-board::before {
   background-image: url('images/board/blue/blue7x1.svg');
 }
-.blueboard.board7x2 cg-board {
+.blueboard.board7x2 cg-board::before {
   background-image: url('images/board/blue/blue7x2.svg');
 }
-.blueboard.board7x3 cg-board {
+.blueboard.board7x3 cg-board::before {
   background-image: url('images/board/blue/blue7x3.svg');
 }
-.blueboard.board7x4 cg-board {
+.blueboard.board7x4 cg-board::before {
   background-image: url('images/board/blue/blue7x4.svg');
 }
-.blueboard.board7x5 cg-board {
+.blueboard.board7x5 cg-board::before {
   background-image: url('images/board/blue/blue7x5.svg');
 }
-.blueboard.board7x6 cg-board {
+.blueboard.board7x6 cg-board::before {
   background-image: url('images/board/blue/blue7x6.svg');
 }
-.blueboard.board7x7 cg-board {
+.blueboard.board7x7 cg-board::before {
   background-image: url('images/board/blue/blue7x7.svg');
 }
-.blueboard.board7x8 cg-board {
+.blueboard.board7x8 cg-board::before {
   background-image: url('images/board/blue/blue7x8.svg');
 }
-.blueboard.board7x9 cg-board {
+.blueboard.board7x9 cg-board::before {
   background-image: url('images/board/blue/blue7x9.svg');
 }
-.blueboard.board7x10 cg-board {
+.blueboard.board7x10 cg-board::before {
   background-image: url('images/board/blue/blue7x10.svg');
 }
-.blueboard.board8x1 cg-board {
+.blueboard.board8x1 cg-board::before {
   background-image: url('images/board/blue/blue8x1.svg');
 }
-.blueboard.board8x2 cg-board {
+.blueboard.board8x2 cg-board::before {
   background-image: url('images/board/blue/blue8x2.svg');
 }
-.blueboard.board8x3 cg-board {
+.blueboard.board8x3 cg-board::before {
   background-image: url('images/board/blue/blue8x3.svg');
 }
-.blueboard.board8x4 cg-board {
+.blueboard.board8x4 cg-board::before {
   background-image: url('images/board/blue/blue8x4.svg');
 }
-.blueboard.board8x5 cg-board {
+.blueboard.board8x5 cg-board::before {
   background-image: url('images/board/blue/blue8x5.svg');
 }
-.blueboard.board8x6 cg-board {
+.blueboard.board8x6 cg-board::before {
   background-image: url('images/board/blue/blue8x6.svg');
 }
-.blueboard.board8x7 cg-board {
+.blueboard.board8x7 cg-board::before {
   background-image: url('images/board/blue/blue8x7.svg');
 }
-.blueboard.board8x8 cg-board {
+.blueboard.board8x8 cg-board::before {
   background-image: url('images/board/blue/blue8x8.svg');
 }
-.blueboard.board8x9 cg-board {
+.blueboard.board8x9 cg-board::before {
   background-image: url('images/board/blue/blue8x9.svg');
 }
-.blueboard.board8x10 cg-board {
+.blueboard.board8x10 cg-board::before {
   background-image: url('images/board/blue/blue8x10.svg');
 }
-.blueboard.board9x1 cg-board {
+.blueboard.board9x1 cg-board::before {
   background-image: url('images/board/blue/blue9x1.svg');
 }
-.blueboard.board9x2 cg-board {
+.blueboard.board9x2 cg-board::before {
   background-image: url('images/board/blue/blue9x2.svg');
 }
-.blueboard.board9x3 cg-board {
+.blueboard.board9x3 cg-board::before {
   background-image: url('images/board/blue/blue9x3.svg');
 }
-.blueboard.board9x4 cg-board {
+.blueboard.board9x4 cg-board::before {
   background-image: url('images/board/blue/blue9x4.svg');
 }
-.blueboard.board9x5 cg-board {
+.blueboard.board9x5 cg-board::before {
   background-image: url('images/board/blue/blue9x5.svg');
 }
-.blueboard.board9x6 cg-board {
+.blueboard.board9x6 cg-board::before {
   background-image: url('images/board/blue/blue9x6.svg');
 }
-.blueboard.board9x7 cg-board {
+.blueboard.board9x7 cg-board::before {
   background-image: url('images/board/blue/blue9x7.svg');
 }
-.blueboard.board9x8 cg-board {
+.blueboard.board9x8 cg-board::before {
   background-image: url('images/board/blue/blue9x8.svg');
 }
-.blueboard.board9x9 cg-board {
+.blueboard.board9x9 cg-board::before {
   background-image: url('images/board/blue/blue9x9.svg');
 }
-.blueboard.board9x10 cg-board {
+.blueboard.board9x10 cg-board::before {
   background-image: url('images/board/blue/blue9x10.svg');
 }
-.blueboard.board10x1 cg-board {
+.blueboard.board10x1 cg-board::before {
   background-image: url('images/board/blue/blue10x1.svg');
 }
-.blueboard.board10x2 cg-board {
+.blueboard.board10x2 cg-board::before {
   background-image: url('images/board/blue/blue10x2.svg');
 }
-.blueboard.board10x3 cg-board {
+.blueboard.board10x3 cg-board::before {
   background-image: url('images/board/blue/blue10x3.svg');
 }
-.blueboard.board10x4 cg-board {
+.blueboard.board10x4 cg-board::before {
   background-image: url('images/board/blue/blue10x4.svg');
 }
-.blueboard.board10x5 cg-board {
+.blueboard.board10x5 cg-board::before {
   background-image: url('images/board/blue/blue10x5.svg');
 }
-.blueboard.board10x6 cg-board {
+.blueboard.board10x6 cg-board::before {
   background-image: url('images/board/blue/blue10x6.svg');
 }
-.blueboard.board10x7 cg-board {
+.blueboard.board10x7 cg-board::before {
   background-image: url('images/board/blue/blue10x7.svg');
 }
-.blueboard.board10x8 cg-board {
+.blueboard.board10x8 cg-board::before {
   background-image: url('images/board/blue/blue10x8.svg');
 }
-.blueboard.board10x9 cg-board {
+.blueboard.board10x9 cg-board::before {
   background-image: url('images/board/blue/blue10x9.svg');
 }
-.blueboard.board10x10 cg-board {
+.blueboard.board10x10 cg-board::before {
   background-image: url('images/board/blue/blue10x10.svg');
 }
-.blueboard.board11x1 cg-board {
+.blueboard.board11x1 cg-board::before {
   background-image: url('images/board/blue/blue11x1.svg');
 }
-.blueboard.board11x2 cg-board {
+.blueboard.board11x2 cg-board::before {
   background-image: url('images/board/blue/blue11x2.svg');
 }
-.blueboard.board11x3 cg-board {
+.blueboard.board11x3 cg-board::before {
   background-image: url('images/board/blue/blue11x3.svg');
 }
-.blueboard.board11x4 cg-board {
+.blueboard.board11x4 cg-board::before {
   background-image: url('images/board/blue/blue11x4.svg');
 }
-.blueboard.board11x5 cg-board {
+.blueboard.board11x5 cg-board::before {
   background-image: url('images/board/blue/blue11x5.svg');
 }
-.blueboard.board11x6 cg-board {
+.blueboard.board11x6 cg-board::before {
   background-image: url('images/board/blue/blue11x6.svg');
 }
-.blueboard.board11x7 cg-board {
+.blueboard.board11x7 cg-board::before {
   background-image: url('images/board/blue/blue11x7.svg');
 }
-.blueboard.board11x8 cg-board {
+.blueboard.board11x8 cg-board::before {
   background-image: url('images/board/blue/blue11x8.svg');
 }
-.blueboard.board11x9 cg-board {
+.blueboard.board11x9 cg-board::before {
   background-image: url('images/board/blue/blue11x9.svg');
 }
-.blueboard.board11x10 cg-board {
+.blueboard.board11x10 cg-board::before {
   background-image: url('images/board/blue/blue11x10.svg');
 }
-.blueboard.board12x1 cg-board {
+.blueboard.board12x1 cg-board::before {
   background-image: url('images/board/blue/blue12x1.svg');
 }
-.blueboard.board12x2 cg-board {
+.blueboard.board12x2 cg-board::before {
   background-image: url('images/board/blue/blue12x2.svg');
 }
-.blueboard.board12x3 cg-board {
+.blueboard.board12x3 cg-board::before {
   background-image: url('images/board/blue/blue12x3.svg');
 }
-.blueboard.board12x4 cg-board {
+.blueboard.board12x4 cg-board::before {
   background-image: url('images/board/blue/blue12x4.svg');
 }
-.blueboard.board12x5 cg-board {
+.blueboard.board12x5 cg-board::before {
   background-image: url('images/board/blue/blue12x5.svg');
 }
-.blueboard.board12x6 cg-board {
+.blueboard.board12x6 cg-board::before {
   background-image: url('images/board/blue/blue12x6.svg');
 }
-.blueboard.board12x7 cg-board {
+.blueboard.board12x7 cg-board::before {
   background-image: url('images/board/blue/blue12x7.svg');
 }
-.blueboard.board12x8 cg-board {
+.blueboard.board12x8 cg-board::before {
   background-image: url('images/board/blue/blue12x8.svg');
 }
-.blueboard.board12x9 cg-board {
+.blueboard.board12x9 cg-board::before {
   background-image: url('images/board/blue/blue12x9.svg');
 }
-.blueboard.board12x10 cg-board {
+.blueboard.board12x10 cg-board::before {
   background-image: url('images/board/blue/blue12x10.svg');
 }

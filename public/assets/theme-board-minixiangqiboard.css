@@ -1,3 +1,3 @@
-.minixiangqiboard.board7x7 cg-board {
+.minixiangqiboard.board7x7 cg-board::before {
   background-image: url('images/board/minixiangqi/minixiangqi.svg');
 }

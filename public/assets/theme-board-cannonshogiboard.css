@@ -1,4 +1,4 @@
-.cannonshogiboard.board9x9 cg-board {
+.cannonshogiboard.board9x9 cg-board::before {
   background-image: url('images/board/cannonshogi/cannonshogiboard.svg');
   width: 100%;
   height: 100%;
