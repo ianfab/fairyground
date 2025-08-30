@@ -1456,7 +1456,7 @@ class GameTree {
         for (j = 0; j < tokens[i].Move.Symbol.length; j++) {
           glyph = parseInt(tokens[i].Move.Symbol[j].substring(1));
           if (moveutil.NumericAnnotationGlyphs[glyph]) {
-            moveelement.textContent += moveutil.NumericAnnotationGlyphs[glyph];
+            moveelement.textContent += ((j==0?"":" ")+moveutil.NumericAnnotationGlyphs[glyph]);
           }
         }
         tmpboard.push(tokens[i].Move.Move);
@@ -4060,7 +4060,7 @@ new Module().then((loadedModule) => {
             checkboxAttackSymbol.checked = true;
             break;
           }
-          case "=∞": {
+          case "=/∞": {
             checkboxWithCompensationSymbol.checked = true;
             break;
           }
@@ -5244,7 +5244,7 @@ new Module().then((loadedModule) => {
       result.push("→");
     }
     if (checkboxWithCompensationSymbol.checked) {
-      result.push("=∞");
+      result.push("=/∞");
     }
     if (checkboxCounterplaySymbol.checked) {
       result.push("⇆");

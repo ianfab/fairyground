@@ -9661,16 +9661,6 @@
                 ),
                 m("option", { value: "+-" }, "[+-] - First mover is winning"),
                 m("option", { value: "-+" }, "[-+] - Second mover is winning"),
-                m(
-                  "option",
-                  { value: "+#" },
-                  "[+#] - First mover checkmates inevitably",
-                ),
-                m(
-                  "option",
-                  { value: "-#" },
-                  "[-#] - Second mover checkmates inevitably",
-                ),
               ]),
             ]),
             m("p", "Status commentary symbols:"),
@@ -9683,22 +9673,22 @@
               m(
                 "label",
                 m("input[type=checkbox]#developmentsymbol"),
-                "[↑↑] - Development",
+                "[↑↑] - Development lead",
               ),
               m(
                 "label",
                 m("input[type=checkbox]#initiativesymbol"),
-                "[↑] - Initiative",
+                "[↑] - With initiative",
               ),
               m(
                 "label",
                 m("input[type=checkbox]#attacksymbol"),
-                "[→] - Attack",
+                "[→] - With an attack",
               ),
               m(
                 "label",
                 m("input[type=checkbox]#withcompensationsymbol"),
-                "[=∞] - With material deficit compensation",
+                "[=/∞] - With compensation for material deficit",
               ),
               m(
                 "label",
