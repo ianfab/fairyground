@@ -1379,6 +1379,9 @@ class GameTree {
             element = document.createElement("p");
             element.textContent = "(";
             element.classList.add("splitter");
+            if (stack.length == 1) {
+              element.classList.add("mainline");
+            }
             movesparagraph.appendChild(element);
           }
         } else if (tokens[i].Move.Move == ")") {
@@ -1393,6 +1396,9 @@ class GameTree {
             element = document.createElement("p");
             element.textContent = ")";
             element.classList.add("splitter");
+            if (stack.length == 0) {
+              element.classList.add("mainline");
+            }
             movesparagraph.appendChild(element);
           }
         }
@@ -1430,20 +1436,20 @@ class GameTree {
           if (tokens[i].Move.MoverRound == 0) {
             element = document.createElement("p");
             element.textContent =
-              Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
+              Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ".";
             element.classList.add("move-number");
             movesparagraph.appendChild(element);
           } else {
             element = document.createElement("p");
             element.textContent =
-              Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + "... ";
+              Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + "...";
             element.classList.add("move-number");
             movesparagraph.appendChild(element);
           }
         } else if (tokens[i].Move.MoverRound == 0) {
           element = document.createElement("p");
           element.textContent =
-            Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ". ";
+            Math.ceil(tokens[i].Move.HalfMoveNumber / 2) + ".";
           element.classList.add("move-number");
           movesparagraph.appendChild(element);
         }
@@ -1456,7 +1462,8 @@ class GameTree {
         for (j = 0; j < tokens[i].Move.Symbol.length; j++) {
           glyph = parseInt(tokens[i].Move.Symbol[j].substring(1));
           if (moveutil.NumericAnnotationGlyphs[glyph]) {
-            moveelement.textContent += ((j==0?"":" ")+moveutil.NumericAnnotationGlyphs[glyph]);
+            moveelement.textContent +=
+              (j == 0 ? "" : " ") + moveutil.NumericAnnotationGlyphs[glyph];
           }
         }
         tmpboard.push(tokens[i].Move.Move);
