@@ -2,6 +2,7 @@
 public/**/*bundle.js
 public/ffish.wasm
 public/*.html
+public/*.js
 public/lib
 
 # Rest of gitignore taken from:

@@ -56,16 +56,17 @@ function RemoveSANMoveNotes(MoveList) {
 window.fairyground.SavedGamesParsingFeature.RemoveSANMoveNotes =
   RemoveSANMoveNotes;
 
-function SetPosition(FEN, UCIMoves, Variant, Is960) {
+function SetPosition(FEN, UCIMoves, Variant, Is960, PGNString, Headers) {
   if (
     typeof FEN != "string" ||
     typeof UCIMoves != "string" ||
     typeof Variant != "string" ||
-    typeof Is960 != "boolean"
+    typeof Is960 != "boolean" ||
+    typeof PGNString != "string" ||
+    typeof Headers != "string"
   ) {
     throw TypeError();
   }
-  const varianttype = document.getElementById("dropdown-varianttype");
   const variantname = document.getElementById("dropdown-variant");
   const isfischerrandommode = document.getElementById("isfischerrandommode");
   if (variantname.value != Variant) {
@@ -79,12 +80,19 @@ function SetPosition(FEN, UCIMoves, Variant, Is960) {
     );
     return false;
   }
+  const pgnstring = document.getElementById("pgnstring");
   const fen = document.getElementById("fen");
   const move = document.getElementById("move");
   const setpos = document.getElementById("setpos");
-  fen.value = FEN.trim();
-  move.value = UCIMoves.trim();
-  setpos.click();
+  if (PGNString) {
+    pgnstring.value =
+      FEN + "\x01" + UCIMoves + "\x01" + PGNString + "\x01" + Headers;
+    pgnstring.click();
+  } else {
+    fen.value = FEN.trim();
+    move.value = UCIMoves.trim();
+    setpos.click();
+  }
   return true;
 }
 
@@ -143,9 +151,7 @@ function GetCurrentGameInformation(FFishJSLibrary) {
       }
     }
     let Termination = "Normal";
-    if (TimeoutSide != 0) {
-      Termination = "Time forfeit";
-    } else if (
+    if (
       tmpboard.result() == "*" &&
       tmpboard.result(true) == "*" &&
       tmpboard.result(false) == "*"
@@ -209,7 +215,7 @@ class Game {
       typeof Result != "string" ||
       typeof GameEvent != "string" ||
       typeof Site != "string" ||
-      !Date.prototype.isPrototypeOf(GameDate) ||
+      !(GameDate instanceof Date) ||
       typeof Round != "number" ||
       typeof FirstPlayerName != "string" ||
       typeof SecondPlayerName != "string" ||
@@ -240,10 +246,10 @@ class Game {
     this.Evaluation = Evaluation;
     this.Termination = Termination;
     this.Is960 = Is960;
+    this.PGNString = "";
   }
-  destructor() {
-    delete this;
-  }
+
+  destructor() {}
 
   ToPortableGameNotation(FFishJSLibrary) {
     if (FFishJSLibrary == null) {
@@ -298,9 +304,7 @@ class Game {
       }
       let Termination = this.Termination;
       if (Termination == "") {
-        if (GameResult != gameresult) {
-          Termination = "Time forfeit";
-        } else if (GameResult == "*") {
+        if (GameResult == "*") {
           Termination = "Unterminated";
         } else {
           Termination = "Normal";
@@ -315,11 +319,15 @@ class Game {
         result += `[BlackElo "${this.SecondPlayerElo}"]\n`;
       }
       result += `[FEN "${tmpboard.fen()}"]\n[Result "${GameResult}"]\n[Variant "${this.Is960 ? this.Variant + "960" : this.Variant}"]\n[Termination "${Termination}"]\n\n`;
-      result += tmpboard.variationSan(
-        this.UCIMoves.join(" "),
-        FFishJSLibrary.Notation.SAN,
-      );
-      result += ` ${gameresult}\n\n`;
+      if (this.PGNString) {
+        result += this.PGNString;
+      } else {
+        result += tmpboard.variationSan(
+          this.UCIMoves.join(" "),
+          FFishJSLibrary.Notation.SAN,
+        );
+        result += ` ${gameresult}\n\n`;
+      }
       tmpboard.delete();
       return result;
     } else {
@@ -366,9 +374,7 @@ class Game {
       }
       let Termination = this.Termination;
       if (Termination == "") {
-        if (GameResult != tmpboard.result()) {
-          Termination = "Time forfeit";
-        } else if (GameResult == "*") {
+        if (GameResult == "*") {
           Termination = "Unterminated";
         } else {
           Termination = "Normal";
@@ -643,7 +649,7 @@ class PortableGameNotation {
         if (entry[1].startsWith('"') && entry[1].endsWith('"')) {
           if (ParserStarts && ParserState == 0) {
             CurrentGame++;
-            if (Variant == "") {
+            if (Variant == "" || Variant == "standard") {
               Variant = "chess";
             } else if (Variant.endsWith("960")) {
               Variant = Variant.slice(0, -3);
@@ -679,6 +685,7 @@ class PortableGameNotation {
                   IsFischerRandom,
                 ),
               );
+              this.GameList[this.GameList.length - 1].PGNString = SANMoves;
             } else {
               let variantlist = this.FFishJSLibrary.variants().split(" ");
               if (variantlist.includes(Variant)) {
@@ -691,13 +698,6 @@ class PortableGameNotation {
                   `At game ${CurrentGame} (ends with line ${i}) in PGN file: Reference Error: Variant "${Variant}" is not defined.`,
                 );
                 NotLoadedGameCount++;
-                if (!variantlist.includes("chess")) {
-                  console.error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-                  window.alert(
-                    "ERROR: FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!",
-                  );
-                  throw Error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-                }
               }
             }
             Variant = "";
@@ -807,7 +807,7 @@ class PortableGameNotation {
     }
     if (ParserStarts && ParserState == 0) {
       CurrentGame++;
-      if (Variant == "") {
+      if (Variant == "" || Variant == "standard") {
         Variant = "chess";
       } else if (Variant.endsWith("960")) {
         Variant = Variant.slice(0, -3);
@@ -825,7 +825,7 @@ class PortableGameNotation {
         this.GameList.push(
           new Game(
             Variant,
-            FEN,
+            FEN == "" ? this.FFishJSLibrary.startingFen(Variant) : FEN,
             UCIMoves,
             Result,
             GameEvent,
@@ -843,6 +843,7 @@ class PortableGameNotation {
             IsFischerRandom,
           ),
         );
+        this.GameList[this.GameList.length - 1].PGNString = SANMoves;
       } else {
         let variantlist = this.FFishJSLibrary.variants().split(" ");
         if (variantlist.includes(Variant)) {
@@ -855,11 +856,6 @@ class PortableGameNotation {
             `At game ${CurrentGame} (ends with line ${i}) in PGN file: Reference Error: Variant "${Variant}" is not defined.`,
           );
           NotLoadedGameCount++;
-          if (!variantlist.includes("chess")) {
-            console.error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-            window.alert("ERROR: FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-            throw Error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-          }
         }
       }
     } else if (ParserStarts) {
@@ -1064,7 +1060,7 @@ class ExtendedPositionDescription {
         }
       }
       CurrentGame++;
-      if (Variant == "") {
+      if (Variant == "" || Variant == "standard") {
         Variant = "chess";
       } else if (Variant.endsWith("960")) {
         Variant = Variant.slice(0, -3);
@@ -1107,11 +1103,6 @@ class ExtendedPositionDescription {
           console.error(
             `At line ${i + 1} of EPD file: Reference Error: Variant "${Variant}" is not defined.`,
           );
-          if (!variantlist.includes("chess")) {
-            console.error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-            window.alert("ERROR: FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-            throw Error("FFISH.JS CRASH!!! RELOAD PAGE TO FIX THIS!!!");
-          }
           NotLoadedGameCount++;
           continue;
         }
@@ -1336,6 +1327,17 @@ class GameDisplayTable {
           GameObject.UCIMoves.join(" "),
           GameObject.Variant,
           GameObject.Is960,
+          GameObject.PGNString,
+          [
+            GameObject.Event,
+            GameObject.Site,
+            GameObject.GameDate.getTime(),
+            GameObject.Round,
+            GameObject.FirstPlayerName,
+            GameObject.SecondPlayerName,
+            GameObject.Result,
+            GameObject.Termination.toLowerCase(),
+          ].join("\x02"),
         )
       ) {
         document.getElementById("pgnepd-close").click();

@@ -1,3 +1,3 @@
-.makrukboard.board8x8 cg-board {
+.makrukboard.board8x8 cg-board::before {
   background-image: url('images/board/makruk/makruk.svg');
 }
