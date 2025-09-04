@@ -2193,9 +2193,13 @@ function onSelectSquare(key) {
   // Handle gating (e.g., duck move) selection by click
   if (gatingPending && gatingContext && typeof key === "string") {
     // If user clicked on a valid gating destination, finalize the move
-    if (gatingContext.destToChoiceMap && gatingContext.destToChoiceMap.has(key)) {
+    if (
+      gatingContext.destToChoiceMap &&
+      gatingContext.destToChoiceMap.has(key)
+    ) {
       const gatingChoice = gatingContext.destToChoiceMap.get(key);
-      let gating = gatingChoice === "=" || gatingChoice == null ? "" : "," + gatingChoice;
+      let gating =
+        gatingChoice === "=" || gatingChoice == null ? "" : "," + gatingChoice;
       let finalmove = gatingContext.baseMove + gatingContext.promotion + gating;
       if (!board.push(finalmove)) {
         const foundmove = board
@@ -2211,7 +2215,10 @@ function onSelectSquare(key) {
       // Restore UI selection behavior
       chessground.unselect();
       chessground.set({
-        selectable: { enabled: gatingContext.prevSelectableEnabled ?? clickClickMove.checked },
+        selectable: {
+          enabled:
+            gatingContext.prevSelectableEnabled ?? clickClickMove.checked,
+        },
         movable: { dests: EmptyMap },
       });
       chessground.setAutoShapes([]);
