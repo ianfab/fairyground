@@ -431,6 +431,9 @@ var previousclicktime = Date.now();
 var hasdoubleclicked = false;
 var previousclicksquare = "00";
 var multipvminiboardtimer = null;
+// Gating (e.g., duck move) click selection state
+var gatingPending = false;
+var gatingContext = null;
 //var PGNDiv = generateStaticPreviewDiv(512);
 
 class MultiplePrincipalVariationEntry {
@@ -2187,6 +2190,40 @@ function updateInnerCoordinateColor(chessground) {
 }
 
 function onSelectSquare(key) {
+  // Handle gating (e.g., duck move) selection by click
+  if (gatingPending && gatingContext && typeof key === "string") {
+    // If user clicked on a valid gating destination, finalize the move
+    if (gatingContext.destToChoiceMap && gatingContext.destToChoiceMap.has(key)) {
+      const gatingChoice = gatingContext.destToChoiceMap.get(key);
+      let gating = gatingChoice === "=" || gatingChoice == null ? "" : "," + gatingChoice;
+      let finalmove = gatingContext.baseMove + gatingContext.promotion + gating;
+      if (!board.push(finalmove)) {
+        const foundmove = board
+          .legalMoves()
+          .match(new RegExp(`${gatingContext.baseMove}[^ ]+`));
+        if (foundmove) {
+          finalmove = foundmove[0];
+        } else {
+          finalmove = null;
+        }
+      }
+      const didCapture = gatingContext.capture === true;
+      // Restore UI selection behavior
+      chessground.unselect();
+      chessground.set({
+        selectable: { enabled: gatingContext.prevSelectableEnabled ?? clickClickMove.checked },
+        movable: { dests: EmptyMap },
+      });
+      chessground.setAutoShapes([]);
+      gatingPending = false;
+      gatingContext = null;
+      afterMove(finalmove, didCapture);
+      return;
+    }
+    // During gating, ignore other clicks
+    return;
+  }
+
   console.log("key:", key);
   console.log(chessground.state);
   if (isBoardSetup.checked) {
@@ -5902,31 +5939,43 @@ function afterChessgroundMove(orig, dest, metadata) {
   choice = null;
 
   if (possiblegatings.length > 1) {
-    //if there are more than one option
-    let i = 0;
-    let gatesquares = [];
-    for (i = 0; i < possiblegatings.length; i++) {
-      gatesquares.push(possiblegatings[i].match(/[a-z]+[0-9]+/g)[1]);
+    // Click-to-place gating with translucent dots for legal targets
+    let fromKey = null;
+    const destToChoiceMap = new Map();
+    for (let gi = 0; gi < possiblegatings.length; gi++) {
+      const g = possiblegatings[gi];
+      if (g === "=") continue; // skip explicit "no gate"
+      const coords = g.match(/[a-z]+[0-9]+/g);
+      if (!coords || coords.length < 2) continue;
+      if (!fromKey) fromKey = convertSquareToChessgroundXKey(coords[0]);
+      const destKey = convertSquareToChessgroundXKey(coords[1]);
+      destToChoiceMap.set(destKey, g);
     }
-    while (true) {
-      choice = prompt(
-        `There are multiple chioces that you can gate a wall square. They are\n${gatesquares}\n, where = means do not gate, letters with numbers mean destination square (e.g. e5 means you gate a wall square to e5). Now please enter your choice: `,
-        "",
-      );
-      if (choice == null) {
-        afterMove(null, false);
-        return;
-      }
-      if (gatesquares.includes(choice)) {
-        break;
-      } else {
-        alert(
-          `Bad input: ${choice} . You should enter one option among ${gatesquares}.`,
-        );
-        continue;
-      }
+    if (!fromKey || destToChoiceMap.size === 0) {
+      afterMove(null, false);
+      return;
     }
-    choice = possiblegatings[gatesquares.indexOf(choice)];
+    // Build a temporary dests map for green dots
+    const gatingDests = new Map();
+    gatingDests.set(fromKey, Array.from(destToChoiceMap.keys()));
+    gatingPending = true;
+    gatingContext = {
+      baseMove: move,
+      promotion: promotion,
+      capture: capture,
+      fromKey: fromKey,
+      destToChoiceMap: destToChoiceMap,
+      prevSelectableEnabled: chessground.state.selectable.enabled,
+    };
+    // Show standard CG dots from the duck's square, disable click-move to avoid triggering moves
+    chessground.set({
+      movable: { color: "both", dests: gatingDests },
+      selectable: { enabled: false },
+    });
+    chessground.selectSquare(fromKey, true);
+    chessground.setAutoShapes([]);
+    // Defer finalization until user clicks a destination square
+    return;
   } else if (possiblegatings.length == 1) {
     //if there is only one option
     choice = possiblegatings[0];
