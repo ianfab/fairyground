@@ -12,3 +12,4 @@ The main libraries it uses are:
 * The website is hosted with vercel. Do not change anything about the deployment configuration unless absolutely required or directly requested.
 * Do not include other chess or chess variant libraries not based on Fairy-Stockfish, since they will not have the same feature set.
 * Only stage and commit files that were added or changed intentionally in scope of the current task.
+* At the end of a task make sure that any changes unrelated to the task and temporary debugging code are reverted.
