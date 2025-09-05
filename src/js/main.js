@@ -434,6 +434,13 @@ var multipvminiboardtimer = null;
 // Gating (e.g., duck move) click selection state
 var gatingPending = false;
 var gatingContext = null;
+// Spacebar best-move globals
+var lastPVPosSig = "";
+var lastPVBestMove = "";
+var lastPVTime = 0;
+var spacebarDebounce = false;
+
+// (Spacebar best-move feature removed per request)
 //var PGNDiv = generateStaticPreviewDiv(512);
 
 class MultiplePrincipalVariationEntry {
@@ -1911,6 +1918,86 @@ function initBoard(variant) {
     opacity: 1,
     lineWidth: 10,
   };
+
+  // Spacebar to play current best engine move (analysis mode) using UI commit path
+  document.addEventListener("keydown", function (ev) {
+    const tag =
+      ev.target && ev.target.tagName ? ev.target.tagName.toLowerCase() : "";
+    const isEditable =
+      tag === "input" ||
+      tag === "textarea" ||
+      (ev.target && ev.target.isContentEditable === true);
+    if (isEditable) return;
+    if (ev.altKey || ev.ctrlKey || ev.metaKey) return;
+    if (ev.repeat) return;
+
+    if (
+      (ev.code === "Space" || ev.key === " ") &&
+      isAnalysis &&
+      isAnalysis.checked
+    ) {
+      ev.preventDefault();
+      if (gatingPending) return;
+      if (spacebarDebounce) return;
+
+      // Require a fresh PV for the current position
+      const currentSig = `${textFen.value.trim()}|${textMoves.value.trim()}|${getColor(board)}`;
+      if (
+        !lastPVBestMove ||
+        lastPVBestMove === "0000" ||
+        lastPVPosSig !== currentSig ||
+        Date.now() - lastPVTime > 4000
+      ) {
+        return;
+      }
+
+      try {
+        if (
+          window.fairyground &&
+          window.fairyground.BinaryEngineFeature &&
+          typeof window.fairyground.BinaryEngineFeature.MakeMoveOnBoard ===
+            "function"
+        ) {
+          spacebarDebounce = true;
+          window.fairyground.BinaryEngineFeature.MakeMoveOnBoard(
+            lastPVBestMove,
+          );
+          setTimeout(function () {
+            spacebarDebounce = false;
+          }, 300);
+          return;
+        }
+      } catch (e) {}
+
+      // Fallback
+      try {
+        spacebarDebounce = true;
+        textMoves.value = (textMoves.value + " " + lastPVBestMove).trim();
+        pSetFen.click();
+        setTimeout(function () {
+          spacebarDebounce = false;
+        }, 300);
+      } catch (e) {}
+    }
+  });
+
+  // Spacebar to play current best engine move (analysis mode)
+  document.addEventListener("keydown", function (ev) {
+    // Ignore when typing into inputs/textareas or with modifiers
+    const tag =
+      ev.target && ev.target.tagName ? ev.target.tagName.toLowerCase() : "";
+    const isEditable =
+      tag === "input" ||
+      tag === "textarea" ||
+      (ev.target && ev.target.isContentEditable === true);
+    if (isEditable) return;
+    if (ev.altKey || ev.ctrlKey || ev.metaKey) return;
+
+    if (ev.code === "Space" || ev.key === " ") {
+      ev.preventDefault();
+      playBestEngineMoveNow();
+    }
+  });
 
   if (pocketRoles === undefined) {
     pocketTopEl.classList.add("no-inital-pocket-piece");
@@ -4937,6 +5024,12 @@ new Module().then((loadedModule) => {
     bestmove = multipvrecord[bestpv][2];
     ponder = multipvrecord[bestpv][3];
     if (bestmove) {
+      // Record latest PV best move and position signature for Spacebar action
+      try {
+        lastPVBestMove = bestmove;
+        lastPVPosSig = `${textFen.value.trim()}|${textMoves.value.trim()}|${getColor(board)}`;
+        lastPVTime = Date.now();
+      } catch (e) {}
       if (ponder) {
         highlightMoveOnBoard(
           [board.turn(), !board.turn()],
