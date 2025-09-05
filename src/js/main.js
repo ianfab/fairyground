@@ -4266,7 +4266,9 @@ new Module().then((loadedModule) => {
   };
 
   buttonInitialPosition.onclick = function () {
+    // Go to the root of the current game tree, not the absolute beginning
     textMoves.value = "";
+    gametree.CurrentMove = gametree.MoveTree.RootNode;
     buttonSetFen.click();
   };
 
@@ -4278,7 +4280,8 @@ new Module().then((loadedModule) => {
   };
 
   buttonCurrentPosition.onclick = function () {
-    textMoves.value = gametree.GetMainLineMoveList();
+    // Return to the current move in the current game context
+    textMoves.value = gametree.GetMoveListOfMove(gametree.CurrentMove);
     buttonSetFen.click();
   };
 
