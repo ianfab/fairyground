@@ -6981,13 +6981,6 @@
                 disabled: !is_ready || review_mode,
                 title:
                   "Click to clear the moves and set the position to initial position.",
-                onclick: () => {
-                  if (review_mode) {
-                    return;
-                  }
-                  document.getElementById("move").value = "";
-                  document.getElementById("setpos").click();
-                },
               },
               "Restart",
             ),
