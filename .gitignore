@@ -7,6 +7,7 @@ public/lib
 
 # Ignore server.js copied by npm tasks
 /server.js
+/EngineList.txt
 
 # Rest of gitignore taken from:
 # https://github.com/github/gitignore/blob/master/Node.gitignore

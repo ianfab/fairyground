@@ -12,6 +12,7 @@ const divMain = document.getElementsByTagName("main")[0];
 const variantsIni = document.getElementById("variants-ini");
 const dropdownVariant = document.getElementById("dropdown-variant");
 const buttonReset = document.getElementById("reset");
+const buttonRestart = document.getElementById("restart");
 const buttonFlip = document.getElementById("button-flip");
 const buttonUndo = document.getElementById("undo");
 const rangeVolume = document.getElementById("range-volume");
@@ -4573,9 +4574,18 @@ new Module().then((loadedModule) => {
   buttonReset.onclick = function () {
     textFen.value = "";
     textMoves.value = "";
+    gametree.ClearMoves();
+    gametree.ClearHistory();
     dropdownPositionVariantType.selectedIndex = 0;
     dropdownPositionVariantType.onchange();
     clearMovesList();
+  };
+
+  buttonRestart.onclick = function () {
+    textMoves.value = "";
+    gametree.ClearMoves();
+    gametree.ClearHistory();
+    buttonSetFen.click();
   };
 
   buttonPassMove.onclick = function () {
