@@ -6,9 +6,15 @@ You can see it deployed at: [https://fairyground.vercel.app/](https://fairygroun
 
 ## Usage
 
-The following steps (_**Installation**_ and _**Run Application**_) show the process to install a development environment.
+To get a one-click-to-run version, you can download the executables in the [Latest Build Actions](https://github.com/ianfab/fairyground/actions/workflows/ci.yml?query=event%3Apush+event%3Aworkflow_dispatch) section. (Requires logging in to GitHub)
 
-If you want a one-click-to-run version, you can download the executables in the [Latest Build Actions](https://github.com/ianfab/fairyground/actions/workflows/ci.yml?query=event%3Apush+event%3Aworkflow_dispatch) section. (Requires logging in to GitHub)
+The artifacts may be expired if the latest build happened long ago. In this case please raise an issue to tell maintainers of this repository to re-run build actions.
+
+## Usage (Developers)
+
+_**Installation**_ and _**Run Application**_ show the process to install a development environment.
+
+_**Build with custom Fairy-Stockfish**_ shows the process on how to use Fairy-Stockfish with your code changes in fairyground.
 
 ### ◎ Installation
 
@@ -71,6 +77,34 @@ node server.js
 3. Then, browse to http://localhost:5000 (Static website) or http://localhost:5015 (Enable binary engine loading feature)
 
 Enjoy!
+
+### ◎ Build with custom Fairy-Stockfish
+
+If you want to use fairyground to test your experimental Fairy-Stockfish build, please follow these steps:
+
+1. Download and make changes to Fairy-Stockfish repository (https://github.com/fairy-stockfish/Fairy-Stockfish/).
+
+2. Download and make corresponding changes to Fairy-Stockfish WebAssembly repository (https://github.com/fairy-stockfish/fairy-stockfish.wasm/).
+
+3. Build ffish.js and Fairy-Stockfish WebAssembly. See following guides to know how to build them:
+
+- **ffish.js**: https://github.com/fairy-stockfish/Fairy-Stockfish/tree/master/tests/js#compile-in-docker
+- **Fairy-Stockfish WebAssembly**: https://github.com/fairy-stockfish/fairy-stockfish.wasm/tree/nnue/src/emscripten#buildrun-in-docker
+
+4. Go to fairyground root directory (The directory containing this README), run `npm install`.
+
+5. Go to `<fairyground root directory>\node_modules`, locate `ffish_es6` and `fairy-stockfish-nnue.wasm` directory.
+
+6. Perform following file replacement actions:
+
+- Replace all things in `ffish_es6` with all things in `<your downloaded Fairy-Stockfish repository>\tests\js` (ffish.js build output)
+- Replace all things in `fairy-stockfish-nnue.wasm` with all things in `<your downloaded Fairy-Stockfish WebAssembly repository>\src\emscripten\public` (Fairy-Stockfish WebAssembly build output)
+
+7. Go to fairyground root directory (The directory containing this README), run `npm run build` (Linux/macOS) or `npm run buildwithcmd` (Windows).
+
+8. Run `node server.js`, and then go to [http://localhost:5015/public/advanced.html](http://localhost:5015/public/advanced.html).
+
+9. The page displayed now is using your version of Fairy-Stockfish, and you can begin your test.
 
 ## Supported Browsers
 
