@@ -82,16 +82,16 @@ Enjoy!
 
 If you want to use fairyground to test your experimental Fairy-Stockfish build, please follow these steps:
 
-1. Download and make changes to Fairy-Stockfish repository (https://github.com/fairy-stockfish/Fairy-Stockfish/).
+1. Download (If you haven't) and make changes to Fairy-Stockfish repository (https://github.com/fairy-stockfish/Fairy-Stockfish/).
 
-2. Download and make corresponding changes to Fairy-Stockfish WebAssembly repository (https://github.com/fairy-stockfish/fairy-stockfish.wasm/).
+2. Download (If you haven't) and make corresponding changes to Fairy-Stockfish WebAssembly repository (https://github.com/fairy-stockfish/fairy-stockfish.wasm/).
 
 3. Build ffish.js and Fairy-Stockfish WebAssembly. See following guides to know how to build them:
 
 - **ffish.js**: https://github.com/fairy-stockfish/Fairy-Stockfish/tree/master/tests/js#compile-in-docker
 - **Fairy-Stockfish WebAssembly**: https://github.com/fairy-stockfish/fairy-stockfish.wasm/tree/nnue/src/emscripten#buildrun-in-docker
 
-4. Go to fairyground root directory (The directory containing this README), run `npm install`.
+4. Go to fairyground root directory (The directory containing this README), run `npm install` (If you have already executed `npm install`, you can skip this step).
 
 5. Go to `<fairyground root directory>\node_modules`, locate `ffish_es6` and `fairy-stockfish-nnue.wasm` directory.
 
@@ -100,9 +100,9 @@ If you want to use fairyground to test your experimental Fairy-Stockfish build, 
 - Replace all things in `ffish_es6` with all things in `<your downloaded Fairy-Stockfish repository>\tests\js` (ffish.js build output)
 - Replace all things in `fairy-stockfish-nnue.wasm` with all things in `<your downloaded Fairy-Stockfish WebAssembly repository>\src\emscripten\public` (Fairy-Stockfish WebAssembly build output)
 
-7. Go to fairyground root directory (The directory containing this README), run `npm run build` (Linux/macOS) or `npm run buildwithcmd` (Windows).
+7. Go to fairyground root directory (The directory containing this README), open your console and run `npm run build` (Linux/macOS) or `npm run buildwithcmd` (Windows).
 
-8. Run `node server.js`, and then go to [http://localhost:5015/public/advanced.html](http://localhost:5015/public/advanced.html).
+8. Run `node server.js` in the console, and then go to [http://localhost:5015/public/advanced.html](http://localhost:5015/public/advanced.html).
 
 9. The page displayed now is using your version of Fairy-Stockfish, and you can begin your test.
 
