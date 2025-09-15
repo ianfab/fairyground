@@ -3843,10 +3843,10 @@ new Module().then((loadedModule) => {
   };
 
   buttonUndo.onclick = function () {
-    if (board.moveStack().length === 0) return;
-    board.pop();
-    const moves = textMoves.value;
-    textMoves.value = moves.substring(0, moves.lastIndexOf(" ")).trim();
+    gametree.CutCurrentMove();
+    gametree.ClearHistory();
+    textFen.value = gametree.OriginalFEN;
+    textMoves.value = gametree.GetMoveListOfMove(gametree.CurrentMove);
     chessground.cancelPremove();
     buttonSetFen.click();
   };
