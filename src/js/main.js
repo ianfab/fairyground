@@ -1919,7 +1919,7 @@ function initBoard(variant) {
     lineWidth: 10,
   };
 
-  // Spacebar to play current best engine move (analysis mode) using UI commit path
+  // Spacebar to play current best engine move (analysis mode)
   document.addEventListener("keydown", function (ev) {
     const tag =
       ev.target && ev.target.tagName ? ev.target.tagName.toLowerCase() : "";
@@ -1951,51 +1951,12 @@ function initBoard(variant) {
         return;
       }
 
-      try {
-        if (
-          window.fairyground &&
-          window.fairyground.BinaryEngineFeature &&
-          typeof window.fairyground.BinaryEngineFeature.MakeMoveOnBoard ===
-            "function"
-        ) {
-          spacebarDebounce = true;
-          window.fairyground.BinaryEngineFeature.MakeMoveOnBoard(
-            lastPVBestMove,
-          );
-          setTimeout(function () {
-            spacebarDebounce = false;
-          }, 300);
-          return;
-        }
-      } catch (e) {}
-
-      // Fallback
-      try {
-        spacebarDebounce = true;
-        textMoves.value = (textMoves.value + " " + lastPVBestMove).trim();
-        pSetFen.click();
-        setTimeout(function () {
-          spacebarDebounce = false;
-        }, 300);
-      } catch (e) {}
-    }
-  });
-
-  // Spacebar to play current best engine move (analysis mode)
-  document.addEventListener("keydown", function (ev) {
-    // Ignore when typing into inputs/textareas or with modifiers
-    const tag =
-      ev.target && ev.target.tagName ? ev.target.tagName.toLowerCase() : "";
-    const isEditable =
-      tag === "input" ||
-      tag === "textarea" ||
-      (ev.target && ev.target.isContentEditable === true);
-    if (isEditable) return;
-    if (ev.altKey || ev.ctrlKey || ev.metaKey) return;
-
-    if (ev.code === "Space" || ev.key === " ") {
-      ev.preventDefault();
-      playBestEngineMoveNow();
+      spacebarDebounce = true;
+      textMoves.value = (textMoves.value + " " + lastPVBestMove).trim();
+      pSetFen.click();
+      setTimeout(function () {
+        spacebarDebounce = false;
+      }, 300);
     }
   });
 
@@ -5025,11 +4986,9 @@ new Module().then((loadedModule) => {
     ponder = multipvrecord[bestpv][3];
     if (bestmove) {
       // Record latest PV best move and position signature for Spacebar action
-      try {
-        lastPVBestMove = bestmove;
-        lastPVPosSig = `${textFen.value.trim()}|${textMoves.value.trim()}|${getColor(board)}`;
-        lastPVTime = Date.now();
-      } catch (e) {}
+      lastPVBestMove = bestmove;
+      lastPVPosSig = `${textFen.value.trim()}|${textMoves.value.trim()}|${getColor(board)}`;
+      lastPVTime = Date.now();
       if (ponder) {
         highlightMoveOnBoard(
           [board.turn(), !board.turn()],
