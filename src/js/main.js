@@ -5914,10 +5914,21 @@ function afterChessgroundMove(orig, dest, metadata) {
   } else if (possiblepromotions.length > 1) {
     //if there are more than one option
     while (true) {
+      // Pause timer before showing dialog
+      if (window.fairyground && window.fairyground.pauseTimer) {
+        window.fairyground.pauseTimer();
+      }
+
       choice = prompt(
         `There are multiple chioces that you can keep/promote/demote your moved piece. They are\n${possiblepromotions}\n, where + means promote, - means demote, = means keep, letters mean target pawn promotion piece (e.g. q means pawn can promote to q piece which means queen in most times). Now please enter your choice: `,
         "",
       );
+
+      // Resume timer after dialog closes
+      if (window.fairyground && window.fairyground.resumeTimer) {
+        window.fairyground.resumeTimer();
+      }
+
       if (choice == null) {
         afterMove(null, false);
         return;
@@ -6087,10 +6098,21 @@ function afterChessgroundDrop(piece, dest, metadata) {
   } else if (possiblepromotions.length > 1) {
     //if there are more than one option
     while (true) {
+      // Pause timer before showing dialog
+      if (window.fairyground && window.fairyground.pauseTimer) {
+        window.fairyground.pauseTimer();
+      }
+
       choice = prompt(
         `There are multiple chioces that you can keep/promote your dropped piece. They are\n${possiblepromotions}\n, where + means promote, = means keep. Now please enter your choice: `,
         "",
       );
+
+      // Resume timer after dialog closes
+      if (window.fairyground && window.fairyground.resumeTimer) {
+        window.fairyground.resumeTimer();
+      }
+
       if (choice == null) {
         afterMove(null, false);
         return;
