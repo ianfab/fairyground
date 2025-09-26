@@ -5814,6 +5814,27 @@
         clearInterval(timer);
       };
 
+      const pauseTimer = () => {
+        if (timer) {
+          console.log("Timer paused!");
+          clearInterval(timer);
+          timer = null;
+        }
+      };
+
+      const resumeTimer = () => {
+        if (!timer && during_play) {
+          console.log("Timer resumed!");
+          timer = setInterval(() => {
+            updateTimer();
+          }, timer_interval);
+        }
+      };
+
+      // Expose timer control functions to main.js
+      window.fairyground.pauseTimer = pauseTimer;
+      window.fairyground.resumeTimer = resumeTimer;
+
       const timeIsUpFor = (side) => {
         force_stop();
         if (side == "WHITE") {
