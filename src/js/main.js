@@ -435,6 +435,8 @@ var multipvminiboardtimer = null;
 // Gating (e.g., duck move) click selection state
 var gatingPending = false;
 var gatingContext = null;
+// Timer event correction after popup dialogs
+var timerElapsePreviousPlayer = false;
 // Spacebar best-move globals
 var lastPVPosSig = "";
 var lastPVBestMove = "";
@@ -4365,7 +4367,16 @@ new Module().then((loadedModule) => {
   };
 
   gameStatus.onclick = function () {
-    gameStatus.innerText = getGameStatus(false);
+    let result = getGameStatus(false);
+    if (timerElapsePreviousPlayer) {
+      if (result == "PLAYING_WHITE") {
+        result = "PLAYING_BLACK";
+      } else if (result == "PLAYING_BLACK") {
+        result = "PLAYING_WHITE";
+      }
+    }
+    timerElapsePreviousPlayer = false;
+    gameStatus.innerText = result;
   };
 
   setPgnString.onclick = function () {
@@ -4430,6 +4441,7 @@ new Module().then((loadedModule) => {
       updateInnerCoordinateColor(chessground);
     }
     themedetector.SetOrientation(chessground.state.orientation);
+    timerElapsePreviousPlayer = false;
 
     // Force coordinate recalculation to fix coordinate mapping issues
     // This addresses the bug where coordinates get messed up after game start
@@ -6185,6 +6197,7 @@ function afterChessgroundDrop(piece, dest, metadata) {
 function afterMove(move, capture) {
   if (move) {
     textMoves.value = (textMoves.value + " " + move).trim();
+    timerElapsePreviousPlayer = true;
   }
 
   pSetFen.click();
