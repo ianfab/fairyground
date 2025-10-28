@@ -19,7 +19,7 @@ updates:
     schedule:
       interval: "weekly"
     allow:
-      - dependency-name: "fairy-stockfish.wasm"
+      - dependency-name: "fairy-stockfish-nnue.wasm"
       - dependency-name: "ffish-es6"
     groups:
       fairy-stockfish:
@@ -36,7 +36,7 @@ updates:
     schedule:
       interval: "monthly"
     ignore:
-      - dependency-name: "fairy-stockfish.wasm"
+      - dependency-name: "fairy-stockfish-nnue.wasm"
       - dependency-name: "ffish-es6"
     groups:
       npm-dependencies:
@@ -45,3 +45,4 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+
