@@ -5,6 +5,10 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    groups:
+      "*":
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "github-actions"
@@ -17,6 +21,10 @@ updates:
     allow:
       - dependency-name: "fairy-stockfish.wasm"
       - dependency-name: "ffish-es6"
+    groups:
+      "*":
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "npm"
@@ -30,6 +38,10 @@ updates:
     ignore:
       - dependency-name: "fairy-stockfish.wasm"
       - dependency-name: "ffish-es6"
+    groups:
+      "*":
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "npm"
