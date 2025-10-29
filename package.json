@@ -11,14 +11,14 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "chessgroundx": "^10.6.3",
-    "express": "^4.18.2",
+    "chessgroundx": "^10.7.3",
+    "express": "^5.1.0",
     "fairy-stockfish-nnue.wasm": "1.1.9",
     "ffish-es6": "0.7.7",
     "gif.js": "^0.2.0",
     "jszip": "^3.10.1",
-    "mithril": "^2.2.2",
-    "serve": "^14.2.1",
+    "mithril": "^2.3.7",
+    "serve": "^14.2.5",
     "ws": "^8.16.0"
   },
   "devDependencies": {
@@ -29,7 +29,7 @@
     "html-minifier": "^4.0.0",
     "prettier": "^3.2.5",
     "uglify-js": "^3.19.3",
-    "vercel": "^33.5.2",
+    "vercel": "^48.6.7",
     "watchify": "^4.0.0"
   }
 }
