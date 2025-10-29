@@ -1,0 +1,48 @@
+version: 2
+updates:
+  # GitHub Actions - monthly updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  # Fairy-Stockfish related npm packages - weekly updates
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-name: "fairy-stockfish-nnue.wasm"
+      - dependency-name: "ffish-es6"
+    groups:
+      fairy-stockfish:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "fairy-stockfish"
+
+  # All other npm packages - monthly updates
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "fairy-stockfish-nnue.wasm"
+      - dependency-name: "ffish-es6"
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "npm"
+
