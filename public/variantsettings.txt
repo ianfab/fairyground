@@ -6,6 +6,9 @@
 #The wiki page will be shown when users click <Variant INFO> button and click <Yes> or <OK>.
 #This can also be accessed from <Variant INFO> button.
 
+# NoaChess: Custom 6×6 variant with unique pieces
+noachess|Chess Variants|NoaChess|6×6 chess variant with unique piece movements. Pawns promote to Generals.|
+
 # Chess Variants: Variants based on Chess and do not introduce fairy pieces
 chess|Chess Variants|Chess|Chess, unmodified, as it's played by FIDE standards.|https://en.wikipedia.org/wiki/Chess
 fischerandom|Chess Variants|Fischer Random|Chess960. Pieces at the 1st/8th rank can be placed randomly but the bishops must be on squares of different colors and the king must be between the rooks. Special castling rules are applied.|https://en.wikipedia.org/wiki/Fischer_random_chess

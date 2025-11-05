@@ -75,6 +75,8 @@
 *|meridaletters,cburnettletters,lettertiles,letters,blindfold,userdefined|
 |merida,cburnett|blueboard,greenboard,brownboard,purpleboard,cobaltboard
 
+noachess||brownboard
+
 seirawan|seirawan|
 shouse|@seirawan|
 duck|duck|

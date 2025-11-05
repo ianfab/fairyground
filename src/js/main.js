@@ -3791,6 +3791,18 @@ new Module().then((loadedModule) => {
   ffish = loadedModule;
   console.log("ffish.js initialized!");
   window.ffishlib = loadedModule; //Used in dev tools for debugging purposes and transfer to <script>
+
+  // Load NoaChess variant
+  fetch('./noachess.ini')
+    .then(response => response.text())
+    .then(ini => {
+      ffish.loadVariantConfig(ini);
+      console.log("NoaChess variant loaded successfully!");
+    })
+    .catch(error => {
+      console.error("Failed to load NoaChess variant:", error);
+    });
+
   initBoard(dropdownVariant.value);
   soundMove.volume = rangeVolume.value;
   soundCapture.volume = rangeVolume.value;

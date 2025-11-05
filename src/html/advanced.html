@@ -1,7 +1,7 @@
 ﻿<!doctype html>
 <head>
   <meta charset="utf-8" />
-  <title>Fairy-Stockfish playground</title>
+  <title>NoaChess</title>
   <!-- By curl https://data-url-maker-hiro18181.netlify.app/api/url/https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg -->
   <link
     rel="icon"
@@ -7100,6 +7100,8 @@
               disabled: !is_ready || analysis_mode,
               min: 1,
               max: 255,
+              value: 12,
+              readonly: true,
             }),
             m("input[type=number]#movetime", {
               placeholder: "Movetime",
