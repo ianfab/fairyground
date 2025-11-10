@@ -13,8 +13,8 @@
   "dependencies": {
     "chessgroundx": "^10.7.3",
     "express": "^5.1.0",
-    "fairy-stockfish-nnue.wasm": "1.1.9",
-    "ffish-es6": "0.7.7",
+    "fairy-stockfish-nnue.wasm": "1.1.10",
+    "ffish-es6": "0.7.8",
     "gif.js": "^0.2.0",
     "jszip": "^3.10.1",
     "mithril": "^2.3.7",
