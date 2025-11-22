@@ -505,7 +505,7 @@
                 } catch (err) {
                   console.error("Error selecting variant in dropdown:", err);
                 }
-              }, 500); // Wait 500ms for variant to be loaded
+              }, 1000); // Wait 1000ms for variant to be loaded
             }
 
             uploadStatus.className = "success";
@@ -847,7 +847,7 @@ checkCounting = true
                 } catch (err) {
                   console.error("Error selecting variant:", err);
                 }
-              }, 500);
+              }, 1000);
             }
 
             console.log("=== Transfer complete ===");
@@ -913,10 +913,28 @@ checkCounting = true
       var sannotation = doc.getElementById("sannotation");
       var divconnectserver = doc.getElementById("divconnectserver");
 
-      // Add style to hide binengineinput
+      // Add style to hide binengineinput and reorder elements
       var style = document.createElement("style");
       style.type = "text/css";
-      style.appendChild(document.createTextNode("#binengineinput { display: none !important; }"));
+      style.appendChild(document.createTextNode(`
+        #binengineinput { display: none !important; }
+
+        /* Reorder main sections - put board at top */
+        main {
+          display: flex !important;
+          flex-direction: column !important;
+        }
+
+        #outputs { order: 1; }
+        #posvariantdiv { order: 2; }
+        #input { order: 3; }
+        #input2 { order: 4; }
+        #input3 { order: 5; }
+        #visualeffects { order: 6; }
+        #gamesettings { order: 7; }
+        #boardsetupsettings { order: 8; }
+        #links { order: 100; }
+      `));
       doc.head.appendChild(style);
 
       // Add custom title
