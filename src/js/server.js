@@ -11,12 +11,83 @@ const OutputDirectory = "/public";
 
 let port = 5015;
 
+// Load environment variables
+require('dotenv').config();
+
+// Add JSON body parser for API requests
+app.use(express.json());
+
 console.log("============================================");
 console.log("             SECURITY WARNING");
 console.log("============================================");
 console.log(
   "This backend does not check the input from the frontend. The client user can enter anything as the command, which can pose threat to your server security. Therefore you should only allow trusted users to connect.\n\n",
 );
+
+// Claude API proxy endpoint
+app.post("/api/claude", async (req, res) => {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+
+  // Validate API key
+  if (!apiKey) {
+    console.error("[API] Missing ANTHROPIC_API_KEY in environment");
+    return res.status(500).json({
+      success: false,
+      error: "API key not configured on server"
+    });
+  }
+
+  // Validate request body
+  const { message, systemPrompt } = req.body;
+  if (!message || typeof message !== 'string') {
+    return res.status(400).json({
+      success: false,
+      error: "Invalid request: 'message' is required"
+    });
+  }
+
+  console.log("[API] Processing Claude API request");
+
+  try {
+    const apiResponse = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-5-20250929",
+        max_tokens: 4096,
+        system: systemPrompt || "",
+        messages: [{ role: "user", content: message }],
+      }),
+    });
+
+    const responseData = await apiResponse.json();
+
+    if (!apiResponse.ok) {
+      console.error("[API] Claude API error:", responseData);
+      return res.status(apiResponse.status).json({
+        success: false,
+        error: responseData.error?.message || "Claude API request failed"
+      });
+    }
+
+    console.log("[API] Claude API request successful");
+    return res.status(200).json({
+      success: true,
+      data: responseData
+    });
+
+  } catch (error) {
+    console.error("[API] Unexpected error:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error"
+    });
+  }
+});
 
 function GenerateErrorPage(
   status,
