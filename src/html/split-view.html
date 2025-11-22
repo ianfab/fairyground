@@ -665,7 +665,16 @@ checkCounting = true
       chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
     }
 
+    /**
+     * Extract .ini configuration from Claude's response
+     * @param {string} response - The response text
+     * @returns {string|null} - The extracted .ini config or null
+     */
     function extractIniConfig(response) {
+      if (!response || typeof response !== 'string') {
+        return null;
+      }
+
       // Extract .ini configuration from code blocks
       var codeBlockMatch = response.match(/```(?:ini)?\n([\s\S]*?)\n```/);
       if (codeBlockMatch) {
@@ -681,27 +690,98 @@ checkCounting = true
       return null;
     }
 
+    // API Configuration
+    const API_CONFIG = {
+      baseURL: window.location.origin,
+      endpoint: "/api/claude",
+      timeout: 30000, // 30 seconds
+    };
+
+    // System prompt for variant generation
+    const SYSTEM_PROMPT =
+      "You are an expert at creating chess variant configurations for Fairy-Stockfish. " +
+      "When a user describes a chess variant they want to play, you generate the complete .ini configuration file for it.\n\n" +
+      "IMPORTANT RULES:\n" +
+      "1. Always wrap the configuration in a code block\n" +
+      "2. The variant name should be descriptive and match what the user requested\n" +
+      "3. Include all necessary piece definitions, board dimensions, and rules\n" +
+      "4. Use inheritance from standard chess when possible (e.g., [variantname:chess])\n" +
+      "5. Test your logic carefully - make sure rules don't contradict\n" +
+      "6. Include comments to explain custom rules\n\n" +
+      "Here is the complete specification for Fairy-Stockfish variant configurations:\n\n" +
+      FAIRY_STOCKFISH_SPEC +
+      "\n\nGenerate a complete, working .ini configuration file based on the user's request.";
+
+    /**
+     * Call Claude API to generate variant configuration
+     * @param {string} userMessage - The user's request
+     * @returns {Promise<string>} - The assistant's response text
+     * @throws {Error} - If the API call fails
+     */
     async function callClaudeAPI(userMessage) {
-      var systemPrompt = "You are an expert at creating chess variant configurations for Fairy-Stockfish. When a user describes a chess variant they want to play, you generate the complete .ini configuration file for it.\n\nIMPORTANT RULES:\n1. Always wrap the configuration in a code block\n2. The variant name should be descriptive and match what the user requested\n3. Include all necessary piece definitions, board dimensions, and rules\n4. Use inheritance from standard chess when possible (e.g., [variantname:chess])\n5. Test your logic carefully - make sure rules don't contradict\n6. Include comments to explain custom rules\n\nHere is the complete specification for Fairy-Stockfish variant configurations:\n\n" + FAIRY_STOCKFISH_SPEC + "\n\nGenerate a complete, working .ini configuration file based on the user's request.";
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
 
-      var response = await fetch("http://localhost:5015/api/claude", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: userMessage,
-          systemPrompt: systemPrompt,
-        }),
-      });
+      try {
+        const response = await fetch(API_CONFIG.baseURL + API_CONFIG.endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: userMessage,
+            systemPrompt: SYSTEM_PROMPT,
+          }),
+          signal: controller.signal,
+        });
 
-      if (!response.ok) {
-        var error = await response.json();
-        throw new Error(error.error?.message || "API request failed");
+        clearTimeout(timeoutId);
+
+        // Parse response
+        const result = await response.json();
+
+        console.log("API Response:", result); // Debug log
+
+        // Handle error responses
+        if (!result.success) {
+          throw new Error(result.error || "Unknown API error");
+        }
+
+        // Validate response structure
+        if (!result.data) {
+          throw new Error("Invalid response format: missing data field");
+        }
+
+        if (!result.data.content || !Array.isArray(result.data.content)) {
+          throw new Error("Invalid response format: missing or invalid content array");
+        }
+
+        if (result.data.content.length === 0) {
+          throw new Error("Invalid response format: empty content array");
+        }
+
+        // Extract text from first content block
+        const firstContent = result.data.content[0];
+        if (!firstContent) {
+          throw new Error("Invalid response format: first content is null/undefined");
+        }
+
+        if (!firstContent.text) {
+          throw new Error("Invalid response format: no text in first content block");
+        }
+
+        return firstContent.text;
+
+      } catch (error) {
+        clearTimeout(timeoutId);
+
+        if (error.name === "AbortError") {
+          throw new Error("Request timed out after " + (API_CONFIG.timeout / 1000) + " seconds");
+        }
+
+        console.error("API call error:", error); // Debug log
+        throw error;
       }
-
-      var data = await response.json();
-      return data.content[0].text;
     }
 
     chatSendBtn.addEventListener("click", async function() {
