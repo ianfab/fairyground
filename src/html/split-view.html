@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Split View - Fairy-Stockfish</title>
+  <link rel="icon" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+CiAgPGcgc3R5bGU9Im9wYWNpdHk6MTsgZmlsbDpub25lOyBmaWxsLW9wYWNpdHk6MTsgZmlsbC1ydWxlOmV2ZW5vZGQ7IHN0cm9rZTojMDAwMDAwOyBzdHJva2Utd2lkdGg6MS41OyBzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDsgc3Ryb2tlLWRhc2hhcnJheTpub25lOyBzdHJva2Utb3BhY2l0eToxOyI+CiAgICA8cGF0aAogICAgICBkPSJNIDIyLDEwIEMgMzIuNSwxMSAzOC41LDE4IDM4LDM5IEwgMTUsMzkgQyAxNSwzMCAyNSwzMi41IDIzLDE4IgogICAgICBzdHlsZT0iZmlsbDojMDAwMDAwOyBzdHJva2U6IzAwMDAwMDsiIC8+CiAgICA8cGF0aAogICAgICBkPSJNIDI0LDE4IEMgMjQuMzgsMjAuOTEgMTguNDUsMjUuMzcgMTYsMjcgQyAxMywyOSAxMy4xOCwzMS4zNCAxMSwzMSBDIDkuOTU4LDMwLjA2IDEyLjQxLDI3Ljk2IDExLDI4IEMgMTAsMjggMTEuMTksMjkuMjMgMTAsMzAgQyA5LDMwIDUuOTk3LDMxIDYsMjYgQyA2LDI0IDEyLDE0IDEyLDE0IEMgMTIsMTQgMTMuODksMTIuMSAxNCwxMC41IEMgMTMuMjcsOS41MDYgMTMuNSw4LjUgMTMuNSw3LjUgQyAxNC41LDYuNSAxNi41LDEwIDE2LjUsMTAgTCAxOC41LDEwIEMgMTguNSwxMCAxOS4yOCw4LjAwOCAyMSw3IEMgMjIsNyAyMiwxMCAyMiwxMCIKICAgICAgc3R5bGU9ImZpbGw6IzAwMDAwMDsgc3Ryb2tlOiMwMDAwMDA7IiAvPgogICAgPHBhdGgKICAgICAgZD0iTSA5LjUgMjUuNSBBIDAuNSAwLjUgMCAxIDEgOC41LDI1LjUgQSAwLjUgMC41IDAgMSAxIDkuNSAyNS41IHoiCiAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7IHN0cm9rZTojZmZmZmZmOyIgLz4KICAgIDxwYXRoCiAgICAgIGQ9Ik0gMTUgMTUuNSBBIDAuNSAxLjUgMCAxIDEgIDE0LDE1LjUgQSAwLjUgMS41IDAgMSAxICAxNSAxNS41IHoiCiAgICAgIHRyYW5zZm9ybT0ibWF0cml4KDAuODY2LDAuNSwtMC41LDAuODY2LDkuNjkzLC01LjE3MykiCiAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7IHN0cm9rZTojZmZmZmZmOyIgLz4KICAgIDxwYXRoCiAgICAgIGQ9Ik0gMjQuNTUsMTAuNCBMIDI0LjEsMTEuODUgTCAyNC42LDEyIEMgMjcuNzUsMTMgMzAuMjUsMTQuNDkgMzIuNSwxOC43NSBDIDM0Ljc1LDIzLjAxIDM1Ljc1LDI5LjA2IDM1LjI1LDM5IEwgMzUuMiwzOS41IEwgMzcuNDUsMzkuNSBMIDM3LjUsMzkgQyAzOCwyOC45NCAzNi42MiwyMi4xNSAzNC4yNSwxNy42NiBDIDMxLjg4LDEzLjE3IDI4LjQ2LDExLjAyIDI1LjA2LDEwLjUgTCAyNC41NSwxMC40IHogIgogICAgICBzdHlsZT0iZmlsbDojZmZmZmZmOyBzdHJva2U6bm9uZTsiIC8+CiAgPC9nPgo8L3N2Zz4K">
+  <script src="https://cdn.jsdelivr.net/npm/split.js@1.6.5/dist/split.min.js"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    #container {
+      display: flex;
+      height: 100vh;
+      width: 100%;
+    }
+
+    #left-panel {
+      background: #f5f5f5;
+      overflow: auto;
+      padding: 20px;
+    }
+
+    #right-panel {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Left panel content styling */
+    .upload-section {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .upload-section h2 {
+      margin: 0 0 15px 0;
+      font-size: 20px;
+      color: #333;
+    }
+
+    .chat-section {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 300px);
+      min-height: 400px;
+    }
+
+    .chat-section h2 {
+      margin: 0 0 15px 0;
+      font-size: 20px;
+      color: #333;
+    }
+
+    #chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      background: #fafafa;
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chat-message {
+      padding: 10px 15px;
+      border-radius: 8px;
+      max-width: 85%;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .chat-message.user {
+      background: #e3f2fd;
+      align-self: flex-end;
+      text-align: right;
+    }
+
+    .chat-message.assistant {
+      background: #f5f5f5;
+      align-self: flex-start;
+      border-left: 3px solid #4CAF50;
+    }
+
+    .chat-message.error {
+      background: #ffebee;
+      color: #c62828;
+      align-self: flex-start;
+    }
+
+    .chat-message.system {
+      background: #fff3e0;
+      color: #e65100;
+      align-self: center;
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    #chat-input-section {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    #chat-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      resize: vertical;
+      min-height: 60px;
+      max-height: 150px;
+    }
+
+    #chat-send-btn {
+      padding: 10px 20px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      align-self: flex-end;
+    }
+
+    #chat-send-btn:hover {
+      background: #1976D2;
+    }
+
+    #chat-send-btn:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+
+    #upload-llm-btn {
+      width: 100%;
+      padding: 12px;
+      background: #FF9800;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    #upload-llm-btn:hover:not(:disabled) {
+      background: #F57C00;
+    }
+
+    #upload-llm-btn:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .file-input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .file-input-wrapper label {
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      padding: 10px;
+      border: 2px dashed #ccc;
+      border-radius: 4px;
+      background: #fafafa;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .file-input-wrapper input[type="file"]:hover {
+      border-color: #999;
+      background: #f0f0f0;
+    }
+
+    .file-input-wrapper button {
+      padding: 12px 24px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .file-input-wrapper button:hover:not(:disabled) {
+      background: #45a049;
+    }
+
+    .file-input-wrapper button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+
+    #upload-status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      display: none;
+    }
+
+    #upload-status.success {
+      display: block;
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #a5d6a7;
+    }
+
+    #upload-status.error {
+      display: block;
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ef9a9a;
+    }
+
+    /* Split.js gutter styling */
+    .gutter {
+      background-color: #e0e0e0;
+      background-repeat: no-repeat;
+      background-position: 50%;
+      transition: background-color 0.2s;
+    }
+
+    .gutter:hover {
+      background-color: #c0c0c0;
+    }
+
+    .gutter.gutter-horizontal {
+      cursor: col-resize;
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+    }
+
+    #advanced-iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="left-panel">
+      <div class="chat-section">
+        <h2>AI Variant Generator</h2>
+        <div id="chat-messages">
+          <div class="chat-message assistant">
+            Hello! Describe a chess variant you'd like to create, and I'll generate the Fairy-Stockfish configuration for you.
+          </div>
+        </div>
+        <div id="chat-input-section">
+          <textarea id="chat-input" placeholder="E.g., 'Create a variant where pawns can move 3 steps forward on their first move'"></textarea>
+          <button id="chat-send-btn">Send</button>
+        </div>
+        <button id="upload-llm-btn" disabled>Upload LLM Suggestion</button>
+      </div>
+
+      <div class="upload-section">
+        <h2>Or Manually Upload Configuration</h2>
+        <div class="file-input-wrapper">
+          <label for="variant-file-input">Select variants.ini file:</label>
+          <input type="file" id="variant-file-input" accept=".ini,.txt">
+          <button id="submit-variant-btn" disabled>Upload to Game</button>
+        </div>
+        <div id="upload-status"></div>
+      </div>
+    </div>
+    <div id="right-panel">
+      <iframe id="advanced-iframe" src="./advanced.html" frameborder="0"></iframe>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Split.js for resizable panels
+    Split(['#left-panel', '#right-panel'], {
+      sizes: [50, 50],
+      minSize: [200, 400],
+      gutterSize: 10,
+      cursor: 'col-resize',
+      snapOffset: 0
+    });
+
+    // Handle variant file upload from left panel
+    var variantFileInput = document.getElementById("variant-file-input");
+    var submitBtn = document.getElementById("submit-variant-btn");
+    var uploadStatus = document.getElementById("upload-status");
+    var frame = document.getElementById("advanced-iframe");
+    var selectedFile = null;
+
+    // Enable submit button when file is selected
+    variantFileInput.addEventListener("change", function(e) {
+      selectedFile = e.target.files[0];
+      submitBtn.disabled = !selectedFile;
+      uploadStatus.className = "";
+      uploadStatus.style.display = "none";
+      if (selectedFile) {
+        console.log("File selected:", selectedFile.name);
+      }
+    });
+
+    // Transfer file when submit button is clicked
+    submitBtn.addEventListener("click", function() {
+      if (!selectedFile) {
+        console.log("No file selected");
+        return;
+      }
+
+      console.log("=== Starting file transfer ===");
+      console.log("Selected file:", selectedFile.name, "Size:", selectedFile.size);
+
+      uploadStatus.className = "";
+      uploadStatus.style.display = "none";
+
+      // Read file content to extract variant name
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var iniContent = e.target.result;
+        console.log("File content loaded, length:", iniContent.length);
+
+        // Extract variant name using regex: [variantname:parentvariant]
+        var variantNameMatch = iniContent.match(/^\[([^:\]]+)/m);
+        var variantName = variantNameMatch ? variantNameMatch[1].toLowerCase() : null;
+        console.log("Parsed variant name:", variantName);
+
+        var transferFile = function() {
+          console.log("Transfer function called");
+          try {
+            console.log("Accessing iframe contentWindow...");
+            var iframeWindow = frame.contentWindow;
+            console.log("iframeWindow:", iframeWindow ? "exists" : "null");
+
+            console.log("Accessing iframe document...");
+            var iframeDoc = iframeWindow.document;
+            console.log("iframeDoc:", iframeDoc ? "exists" : "null");
+            console.log("iframeDoc readyState:", iframeDoc.readyState);
+
+            console.log("Looking for variants-ini element...");
+            var iframeVariantInput = iframeDoc.getElementById("variants-ini");
+            console.log("iframeVariantInput:", iframeVariantInput ? "found" : "NOT FOUND");
+
+            if (!iframeVariantInput) {
+              console.error("ERROR: variants-ini element not found in iframe");
+              console.log("Available elements with 'variant' in id:");
+              var allElements = iframeDoc.querySelectorAll("[id*='variant']");
+              allElements.forEach(function(el) {
+                console.log("  -", el.id);
+              });
+              uploadStatus.className = "error";
+              uploadStatus.textContent = "Error: variants-ini input not found in iframe";
+              return;
+            }
+
+            console.log("Creating DataTransfer object...");
+            var dataTransfer = new DataTransfer();
+            dataTransfer.items.add(selectedFile);
+            console.log("DataTransfer files count:", dataTransfer.files.length);
+
+            console.log("Setting files on iframe input...");
+            iframeVariantInput.files = dataTransfer.files;
+            console.log("Files set. Input files count:", iframeVariantInput.files.length);
+
+            console.log("Dispatching change event...");
+            var event = new Event("change", { bubbles: true });
+            iframeVariantInput.dispatchEvent(event);
+            console.log("Change event dispatched");
+
+            // Wait for variant to be loaded, then select it in dropdown
+            if (variantName) {
+              console.log("Waiting for variant to be loaded into dropdown...");
+              setTimeout(function() {
+                try {
+                  console.log("Looking for dropdown-variant element...");
+                  var dropdown = iframeDoc.getElementById("dropdown-variant");
+                  if (!dropdown) {
+                    console.error("dropdown-variant not found");
+                    return;
+                  }
+
+                  console.log("Dropdown found. Total options:", dropdown.options.length);
+                  console.log("Looking for variant:", variantName);
+
+                  // Find and select the variant
+                  var found = false;
+                  for (var i = 0; i < dropdown.options.length; i++) {
+                    var optionValue = dropdown.options[i].value.toLowerCase();
+                    console.log("  Option", i, ":", dropdown.options[i].value);
+                    if (optionValue === variantName) {
+                      console.log("Found matching variant at index", i);
+                      dropdown.selectedIndex = i;
+
+                      // Trigger change event to notify the iframe
+                      var changeEvent = new Event("change", { bubbles: true });
+                      dropdown.dispatchEvent(changeEvent);
+                      console.log("Variant selected and change event dispatched");
+
+                      // Wait a bit for the variant to load, then click Start Game
+                      setTimeout(function() {
+                        console.log("Looking for gamestart button...");
+                        var gamestartBtn = iframeDoc.getElementById("gamestart");
+                        if (gamestartBtn) {
+                          console.log("gamestart button found, clicking...");
+                          gamestartBtn.click();
+                          console.log("Game started!");
+                        } else {
+                          console.error("gamestart button not found");
+                        }
+                      }, 300);
+
+                      found = true;
+                      break;
+                    }
+                  }
+
+                  if (!found) {
+                    console.warn("Variant '" + variantName + "' not found in dropdown");
+                  }
+                } catch (err) {
+                  console.error("Error selecting variant in dropdown:", err);
+                }
+              }, 500); // Wait 500ms for variant to be loaded
+            }
+
+            uploadStatus.className = "success";
+            uploadStatus.textContent = "✓ File uploaded successfully: " + selectedFile.name +
+                                       (variantName ? " (Variant: " + variantName + ")" : "");
+            console.log("=== Transfer complete ===");
+          } catch (err) {
+            console.error("ERROR during transfer:", err);
+            console.error("Error stack:", err.stack);
+            uploadStatus.className = "error";
+            uploadStatus.textContent = "Error: " + err.message;
+          }
+        };
+
+        // Check if iframe is ready
+        console.log("Checking iframe ready state...");
+        if (frame.contentWindow && frame.contentWindow.document.readyState === "complete") {
+          console.log("Iframe already loaded, transferring now");
+          transferFile();
+        } else {
+          console.log("Iframe not ready, waiting for load event");
+          frame.addEventListener("load", function() {
+            console.log("Iframe load event fired");
+            transferFile();
+          }, { once: true });
+        }
+      };
+
+      reader.onerror = function() {
+        console.error("Error reading file");
+        uploadStatus.className = "error";
+        uploadStatus.textContent = "Error reading file";
+      };
+
+      console.log("Reading file as text...");
+      reader.readAsText(selectedFile);
+    });
+
+    // ===== Chat and LLM functionality =====
+
+    const FAIRY_STOCKFISH_SPEC = `
+### Variant configuration:
+The variant name needs to be specified as a section in square brackets,
+followed by its rule configurations as key-value pairs as described below.
+
+### Inheritance
+If a variant is similar to a previously defined variant, inheritance can be used to simplify the definition.
+To inherit from the configuration of an existing variant, specify the parent variant after the child variant name
+separated by a colon, e.g., [gothic:capablanca]. When inheritance is used, only the differences to the parent variant
+need to be defined. When no inheritance is used, the default template applies, which is basically standard chess but
+without any predefined pieces.
+
+### Piece types
+Firstly, the piece types for a variant need to be defined. For that, specify the letter used for each piece type, e.g.: pawn = p
+
+Available predefined piece types (with Betza notation):
+- pawn (fmWfceF), knight (N), bishop (B), rook (R), queen (Q), fers (F), alfil (A), fersAlfil (FA)
+- silver (FfW), aiwok (RNF), bers (RF), archbishop (BN), chancellor (RN), amazon (QN)
+- knibis (mNcB), biskni (mBcN), kniroo (mNcR), rookni (mRcN)
+- shogiPawn (fW), lance (fR), shogiKnight (fN), gold (WfF), dragonHorse (BW)
+- clobber (cW), breakthrough (fmWfF), immobile ()
+- cannon (mRcpR), janggiCannon (pR), soldier (fsW), horse (nN), elephant (nA), janggiElephant (nZ)
+- banner (RcpRnN), wazir (W), commoner (K), centaur (KN), king (K)
+
+### Custom pieces
+Custom pieces can be defined using slots: customPiece1, customPiece2, ..., customPiece25
+Example: customPiece1 = p:mfWcfF (pawn without double steps)
+
+Custom king: king = k:KN (king moves like centaur)
+
+Betza notation supported features:
+- All base moves/atoms (W, F, etc.)
+- All directional modifiers (f, b, etc.)
+- Limited and unlimited distance sliders/riders for W/R, F/B, and N directions
+- Hoppers and grasshoppers: pR, pB, gR, gB
+- Lame leapers (n) for N, A, Z, D directions: nN, nA, nZ, nD
+
+### Piece values
+Override piece values: pieceValueMg = p:150 n:800, pieceValueEg = p:200 n:900
+Reference: rook has pieceValueMg = r:1276, pieceValueEg = r:1380
+
+### Option types
+[bool] true/false, [Rank] 1-10, [File] 1-12 or a-i, [int] 0,1,...
+[PieceType] single piece letter, [PieceSet] multiple piece letters (e.g., nbrq)
+[Bitboard] list of squares (e.g., d4 e4 d5 e5). Use * as wildcard (e.g., *1 = first rank)
+[Value] win/loss/draw
+
+### Key Rule Options (defaults in parentheses):
+# Board
+maxRank (8), maxFile (8), chess960 (false), startFen (standard chess position)
+
+# Pieces
+pawn = p, knight = n, bishop = b, rook = r, queen = q, king = k
+
+# Promotion
+promotionRegionWhite (*8), promotionRegionBlack (*1)
+promotionPieceTypes (nbrq), mandatoryPawnPromotion (true)
+promotedPieceType (e.g., p:g s:g for shogi), pieceDemotion (false)
+
+# Castling
+castling (true), castlingKingsideFile (g), castlingQueensideFile (c)
+castlingKingPiece (k), castlingRookPieces (r)
+
+# Pawn moves
+doubleStep (true), doubleStepRegionWhite (*2), doubleStepRegionBlack (*7)
+tripleStepRegionWhite (-), tripleStepRegionBlack (-)
+enPassantRegion (AllSquares)
+
+# Drops
+pieceDrops (false), capturesToHand (false), dropLoop (false)
+firstRankPawnDrops (false), promotionZonePawnDrops (false)
+dropNoDoubled (-), sittuyinRookDrop (false)
+
+# Special rules
+blastOnCapture (false), blastImmuneTypes (none)
+mustCapture (false), checking (true), dropChecks (true)
+gating (false), seirawanGating (false), wallingRule (none)
+pass (false), passOnStalemate (false)
+
+# Win conditions
+stalemateValue (draw), checkmateValue (loss)
+extinctionValue (none), extinctionPieceTypes ()
+checkCounting (false), connectN (0), flagPiece (*), flagRegion ()
+materialCounting (none), countingRule (none)
+
+# Draw rules
+nMoveRule (50), nFoldRule (3), nFoldValue (draw)
+perpetualCheckIllegal (false), chasingRule (none)
+
+### Common Examples:
+[atomic:chess]
+blastOnCapture = true
+
+[crazyhouse:chess]
+pieceDrops = true
+capturesToHand = true
+
+[horde:chess]
+startFen = rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1
+
+[3check:chess]
+checkCounting = true
+`;
+
+    const chatMessagesEl = document.getElementById("chat-messages");
+    const chatInputEl = document.getElementById("chat-input");
+    const chatSendBtn = document.getElementById("chat-send-btn");
+    const uploadLLMBtn = document.getElementById("upload-llm-btn");
+
+    let latestIniConfig = null;
+
+    function addChatMessage(content, type = "assistant") {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = "chat-message " + type;
+      messageDiv.textContent = content;
+      chatMessagesEl.appendChild(messageDiv);
+      chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+    }
+
+    function extractIniConfig(response) {
+      // Extract .ini configuration from code blocks
+      var codeBlockMatch = response.match(/```(?:ini)?\n([\s\S]*?)\n```/);
+      if (codeBlockMatch) {
+        return codeBlockMatch[1].trim();
+      }
+
+      // If no code block, look for [variant-name] pattern
+      var iniMatch = response.match(/\[[\w-]+(?::[\w-]+)?\][\s\S]*/);
+      if (iniMatch) {
+        return iniMatch[0].trim();
+      }
+
+      return null;
+    }
+
+    async function callClaudeAPI(userMessage) {
+      var systemPrompt = "You are an expert at creating chess variant configurations for Fairy-Stockfish. When a user describes a chess variant they want to play, you generate the complete .ini configuration file for it.\n\nIMPORTANT RULES:\n1. Always wrap the configuration in a code block\n2. The variant name should be descriptive and match what the user requested\n3. Include all necessary piece definitions, board dimensions, and rules\n4. Use inheritance from standard chess when possible (e.g., [variantname:chess])\n5. Test your logic carefully - make sure rules don't contradict\n6. Include comments to explain custom rules\n\nHere is the complete specification for Fairy-Stockfish variant configurations:\n\n" + FAIRY_STOCKFISH_SPEC + "\n\nGenerate a complete, working .ini configuration file based on the user's request.";
+
+      var response = await fetch("http://localhost:5015/api/claude", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          systemPrompt: systemPrompt,
+        }),
+      });
+
+      if (!response.ok) {
+        var error = await response.json();
+        throw new Error(error.error?.message || "API request failed");
+      }
+
+      var data = await response.json();
+      return data.content[0].text;
+    }
+
+    chatSendBtn.addEventListener("click", async function() {
+      var userMessage = chatInputEl.value.trim();
+      if (!userMessage) return;
+
+      // Add user message to chat
+      addChatMessage(userMessage, "user");
+      chatInputEl.value = "";
+      chatSendBtn.disabled = true;
+
+      try {
+        // Add loading message
+        addChatMessage("Thinking...", "system");
+
+        // Call Claude API
+        var response = await callClaudeAPI(userMessage);
+
+        // Remove loading message
+        var lastMessage = chatMessagesEl.lastChild;
+        if (lastMessage && lastMessage.classList.contains("system")) {
+          chatMessagesEl.removeChild(lastMessage);
+        }
+
+        // Add assistant response
+        addChatMessage(response, "assistant");
+
+        // Extract .ini config if present
+        var iniConfig = extractIniConfig(response);
+        if (iniConfig) {
+          latestIniConfig = iniConfig;
+          uploadLLMBtn.disabled = false;
+          console.log("Extracted .ini config:", iniConfig);
+          addChatMessage("✓ Configuration extracted. Click 'Upload LLM Suggestion' to use it!", "system");
+        }
+      } catch (err) {
+        console.error("Chat error:", err);
+        // Remove loading message
+        var lastMessage = chatMessagesEl.lastChild;
+        if (lastMessage && lastMessage.classList.contains("system")) {
+          chatMessagesEl.removeChild(lastMessage);
+        }
+        addChatMessage("Error: " + err.message, "error");
+      } finally {
+        chatSendBtn.disabled = false;
+      }
+    });
+
+    // Allow Enter key to send (Shift+Enter for newline)
+    chatInputEl.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        chatSendBtn.click();
+      }
+    });
+
+    // Upload LLM suggestion button
+    uploadLLMBtn.addEventListener("click", function() {
+      if (!latestIniConfig) {
+        console.error("No .ini config to upload");
+        return;
+      }
+
+      console.log("=== Uploading LLM-generated config ===");
+
+      // Create a File object from the text content
+      var blob = new Blob([latestIniConfig], { type: "text/plain" });
+      var file = new File([blob], "llm-generated-variant.ini", { type: "text/plain" });
+
+      console.log("Created file from LLM config, size:", file.size);
+
+      // Read file content to extract variant name
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var iniContent = e.target.result;
+        console.log("File content loaded, length:", iniContent.length);
+
+        // Extract variant name using regex
+        var variantNameMatch = iniContent.match(/^\[([^:\]]+)/m);
+        var variantName = variantNameMatch ? variantNameMatch[1].toLowerCase() : null;
+        console.log("Parsed variant name:", variantName);
+
+        var transferFile = function() {
+          console.log("Transfer function called");
+          try {
+            var iframeWindow = frame.contentWindow;
+            var iframeDoc = iframeWindow.document;
+
+            var iframeVariantInput = iframeDoc.getElementById("variants-ini");
+            if (!iframeVariantInput) {
+              console.error("ERROR: variants-ini element not found in iframe");
+              addChatMessage("Error: Could not upload to game", "error");
+              return;
+            }
+
+            // Create DataTransfer and set file
+            var dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            iframeVariantInput.files = dataTransfer.files;
+
+            // Trigger change event
+            var event = new Event("change", { bubbles: true });
+            iframeVariantInput.dispatchEvent(event);
+            console.log("Change event dispatched");
+
+            // Wait for variant to be loaded, then select it
+            if (variantName) {
+              setTimeout(function() {
+                try {
+                  var dropdown = iframeDoc.getElementById("dropdown-variant");
+                  if (!dropdown) {
+                    console.error("dropdown-variant not found");
+                    return;
+                  }
+
+                  console.log("Looking for variant:", variantName);
+                  var found = false;
+                  for (var i = 0; i < dropdown.options.length; i++) {
+                    if (dropdown.options[i].value.toLowerCase() === variantName) {
+                      console.log("Found matching variant at index", i);
+                      dropdown.selectedIndex = i;
+                      dropdown.dispatchEvent(new Event("change", { bubbles: true }));
+
+                      // Click gamestart button
+                      setTimeout(function() {
+                        var gamestartBtn = iframeDoc.getElementById("gamestart");
+                        if (gamestartBtn) {
+                          gamestartBtn.click();
+                          console.log("Game started!");
+                          addChatMessage("✓ Variant uploaded and game started!", "system");
+                        }
+                      }, 300);
+
+                      found = true;
+                      break;
+                    }
+                  }
+
+                  if (!found) {
+                    console.warn("Variant not found in dropdown");
+                    addChatMessage("Variant uploaded but not auto-selected", "system");
+                  }
+                } catch (err) {
+                  console.error("Error selecting variant:", err);
+                }
+              }, 500);
+            }
+
+            console.log("=== Transfer complete ===");
+          } catch (err) {
+            console.error("ERROR during transfer:", err);
+            addChatMessage("Error uploading: " + err.message, "error");
+          }
+        };
+
+        // Check if iframe is ready
+        if (frame.contentWindow && frame.contentWindow.document.readyState === "complete") {
+          transferFile();
+        } else {
+          frame.addEventListener("load", transferFile, { once: true });
+        }
+      };
+
+      reader.onerror = function() {
+        console.error("Error reading generated config");
+        addChatMessage("Error reading configuration", "error");
+      };
+
+      reader.readAsText(file);
+    });
+
+    // Hide components in the advanced.html iframe (same as index.old.html)
+
+    frame.contentWindow.onload = function() {
+      var doc = frame.contentWindow.document;
+
+      // Get elements to hide
+      var pagetitle = doc.getElementById("pagetitle");
+      var fen = doc.getElementById("fen");
+      var move = doc.getElementById("move");
+      var setpos = doc.getElementById("setpos");
+      var depth = doc.getElementById("depth");
+      var movetime = doc.getElementById("movetime");
+      var nodes = doc.getElementById("nodes");
+      var threads = doc.getElementById("threads");
+      var hash = doc.getElementById("hash");
+      var multipv = doc.getElementById("multipv");
+      var go = doc.getElementById("go");
+      var stop = doc.getElementById("stop");
+      var labelAnalysis = doc.getElementById("label-analysis");
+      var labelBoardsetup = doc.getElementById("label-boardsetup");
+      var output2 = doc.getElementById("output2");
+      var currentboardfen = doc.getElementById("currentboardfen");
+      var labelPgn = doc.getElementById("label-pgn");
+      var movecontrol = doc.getElementById("movecontrol");
+      var advtimectrl = doc.getElementById("advtimectrl");
+      var labelAdvtimectrl = doc.getElementById("label-advtimectrl");
+      var playblack = doc.getElementById("playblack");
+      var whitetimemargin = doc.getElementById("whitetimemargin");
+      var blacktimemargin = doc.getElementById("blacktimemargin");
+      var dropdownWhitetimemode = doc.getElementById("dropdown-whitetimemode");
+      var dropdownBlacktimemode = doc.getElementById("dropdown-blacktimemode");
+      var whitestarttime = doc.getElementById("whitestarttime");
+      var blackstarttime = doc.getElementById("blackstarttime");
+      var whitetimegain = doc.getElementById("whitetimegain");
+      var blacktimegain = doc.getElementById("blacktimegain");
+      var enginecmddiv = doc.getElementById("enginecmddiv");
+      var sannotation = doc.getElementById("sannotation");
+      var divconnectserver = doc.getElementById("divconnectserver");
+
+      // Add style to hide binengineinput
+      var style = document.createElement("style");
+      style.type = "text/css";
+      style.appendChild(document.createTextNode("#binengineinput { display: none !important; }"));
+      doc.head.appendChild(style);
+
+      // Update page title
+      if (pagetitle) pagetitle.innerHTML = "Play against Fairy-Stockfish";
+
+      // Hide elements
+      if (fen) fen.style.display = "none";
+      if (move) move.style.display = "none";
+      if (setpos) setpos.style.display = "none";
+      if (depth) depth.style.display = "none";
+      if (movetime) movetime.style.display = "none";
+      if (nodes) nodes.style.display = "none";
+      if (threads) threads.style.display = "none";
+      if (hash) hash.style.display = "none";
+      if (multipv) multipv.style.display = "none";
+      if (go) go.style.display = "none";
+      if (stop) stop.style.display = "none";
+      if (labelAnalysis) labelAnalysis.style.display = "none";
+      if (labelBoardsetup) labelBoardsetup.style.display = "none";
+      if (output2) output2.style.display = "none";
+      if (currentboardfen) currentboardfen.style.display = "none";
+      if (labelPgn) labelPgn.style.display = "none";
+      if (movecontrol) movecontrol.style.display = "none";
+      if (labelAdvtimectrl) labelAdvtimectrl.style.display = "none";
+      if (whitetimemargin) whitetimemargin.style.display = "none";
+      if (blacktimemargin) blacktimemargin.style.display = "none";
+      if (enginecmddiv) enginecmddiv.style.display = "none";
+      if (sannotation) sannotation.style.display = "none";
+      if (divconnectserver) divconnectserver.style.display = "none";
+
+      // Configure time settings
+      if (advtimectrl && advtimectrl.checked == false) {
+        advtimectrl.click();
+      }
+      if (playblack && playblack.checked == false) {
+        playblack.click();
+      }
+
+      if (dropdownWhitetimemode) {
+        dropdownWhitetimemode.selectedIndex = 1;
+        dropdownWhitetimemode.dispatchEvent(new Event("change"));
+      }
+      if (dropdownBlacktimemode) {
+        dropdownBlacktimemode.selectedIndex = 1;
+        dropdownBlacktimemode.dispatchEvent(new Event("change"));
+      }
+
+      // Enable time inputs
+      if (whitestarttime) whitestarttime.disabled = false;
+      if (blackstarttime) blackstarttime.disabled = false;
+      if (whitetimegain) whitetimegain.disabled = false;
+      if (blacktimegain) blacktimegain.disabled = false;
+    };
+  </script>
+</body>
+</html>
