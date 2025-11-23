@@ -16,9 +16,11 @@ export async function POST(request: Request) {
       // Set default metadata for new users
       try {
         await propelauth.updateUserMetadata(user.user_id, {
-          plan: "free",
-          gamesCreated: 0,
-          signupDate: new Date().toISOString(),
+          metadata: {
+            plan: "free",
+            gamesCreated: 0,
+            signupDate: new Date().toISOString(),
+          }
         });
         
         console.log("User metadata set successfully for:", user.email);
