@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { Game } from "@/lib/types";
+import { getUser } from "@propelauth/nextjs/server/app-router";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { name, description, code } = body;
+
+    // Get the authenticated user
+    const user = await getUser();
+    const creatorId = user?.userId || null;
+    const creatorEmail = user?.email || null;
 
     if (!name || !code) {
       return NextResponse.json(
@@ -41,8 +47,8 @@ export async function POST(request: Request) {
     }
 
     const { rows } = await query<Game>`
-      INSERT INTO games (name, description, code)
-      VALUES (${name}, ${description}, ${code})
+      INSERT INTO games (name, description, code, creator_id, creator_email)
+      VALUES (${name}, ${description}, ${code}, ${creatorId}, ${creatorEmail})
       RETURNING *
     `;
 

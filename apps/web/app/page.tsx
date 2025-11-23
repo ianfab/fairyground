@@ -111,8 +111,8 @@ export default async function Home() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {games.map((game) => (
-                <a 
-                  key={game.id} 
+                <a
+                  key={game.id}
                   href={`http://localhost:3001/game/${game.name}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -120,6 +120,9 @@ export default async function Home() {
                 >
                   <h3 className="text-xl font-bold mb-2 group-hover:text-purple-400 transition-colors">{game.name}</h3>
                   <p className="text-gray-400 text-sm line-clamp-2">{game.description || "No description"}</p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    By {game.creator_email || "Anonymous"}
+                  </p>
                   <p className="text-xs text-purple-500 mt-4">Play on localhost:3001 →</p>
                 </a>
               ))}
