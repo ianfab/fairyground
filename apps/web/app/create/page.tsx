@@ -1,11 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { GAME_TEMPLATES, GameTemplate } from "@/lib/game-templates";
 import { getGameUrl } from "@/lib/config";
 import { AlertCircle, X } from "lucide-react";
 import { useAuthInfo, useRedirectFunctions } from "@propelauth/react";
+import dynamic from 'next/dynamic';
+
+const Editor = dynamic(
+  () => import('@monaco-editor/react'),
+  { ssr: false }
+);
 
 export default function CreateGame() {
   const router = useRouter();
@@ -43,6 +49,18 @@ export default function CreateGame() {
   const [loading, setLoading] = useState(false);
   const [generatingCode, setGeneratingCode] = useState(false);
   const [generatedCode, setGeneratedCode] = useState("");
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Debounced code change handler
+  const handleCodeChange = useCallback((value: string | undefined) => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      setGeneratedCode(value || "");
+    }, 150); // 150ms debounce
+  }, []);
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [gamesCreated, setGamesCreated] = useState(0);
@@ -474,10 +492,24 @@ export default function CreateGame() {
       {/* Right Pane: Code Preview */}
       <div className="w-1/2 flex flex-col bg-gray-900/50 p-6 overflow-hidden">
         <h2 className="text-xl font-bold mb-4 text-gray-400">Generated Code</h2>
-        <div className="flex-1 bg-black border border-gray-800 rounded overflow-auto">
-          <pre className="p-4 text-xs font-mono text-green-400">
-            {generatedCode || "// Code will appear here after generation..."}
-          </pre>
+        <div className="flex-1 bg-black border border-gray-800 rounded overflow-hidden">
+          <Editor
+            height="100%"
+            defaultLanguage="javascript"
+            value={generatedCode || "// Code will appear here after generation..."}
+            onChange={handleCodeChange}
+            theme="vs-dark"
+            options={{
+              fontSize: 13,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              wordWrap: "on",
+              automaticLayout: true,
+              tabSize: 2,
+              insertSpaces: true,
+              readOnly: false,
+            }}
+          />
         </div>
       </div>
     </div>

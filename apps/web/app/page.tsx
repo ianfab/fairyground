@@ -112,20 +112,39 @@ export default async function Home() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {games.map((game) => (
-                <a
+                <div
                   key={game.id}
-                  href={getGameUrl(game.name)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group block p-6 rounded-xl border border-gray-800 bg-gray-900/30 hover:border-purple-500/50 hover:bg-gray-900/50 transition-all"
+                  className="p-6 rounded-xl border border-gray-800 bg-gray-900/30 hover:border-purple-500/50 transition-all"
                 >
-                  <h3 className="text-xl font-bold mb-2 group-hover:text-purple-400 transition-colors">{game.name}</h3>
-                  <p className="text-gray-400 text-sm line-clamp-2">{game.description || "No description"}</p>
-                  <p className="text-xs text-gray-500 mt-2">
-                    By {game.creator_email || "Anonymous"}
-                  </p>
-                  <p className="text-xs text-purple-500 mt-4">Play now →</p>
-                </a>
+                  <a
+                    href={getGameUrl(game.name)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <h3 className="text-xl font-bold mb-2 hover:text-purple-400 transition-colors">{game.name}</h3>
+                    <p className="text-gray-400 text-sm line-clamp-2">{game.description || "No description"}</p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      By {game.creator_email || "Anonymous"}
+                    </p>
+                  </a>
+                  <div className="flex gap-3 mt-4">
+                    <a
+                      href={getGameUrl(game.name)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-purple-500 hover:text-purple-400"
+                    >
+                      Play →
+                    </a>
+                    <a
+                      href={`/sandbox/${game.name}`}
+                      className="text-xs text-blue-500 hover:text-blue-400"
+                    >
+                      Edit game
+                    </a>
+                  </div>
+                </div>
               ))}
             </div>
           )}

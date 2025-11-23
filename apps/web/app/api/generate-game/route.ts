@@ -5,27 +5,58 @@ import Anthropic from "@anthropic-ai/sdk";
 
 export async function POST(request: Request) {
   try {
-    const { template, description, name, model } = await request.json();
+    const { template, description, name, model, existingCode } = await request.json();
 
-    if (!template || !description) {
+    if (!description) {
       return NextResponse.json(
-        { error: "Template and description are required" },
+        { error: "Description is required" },
         { status: 400 }
       );
     }
 
-    const templateConfig = GAME_TEMPLATES[template as keyof typeof GAME_TEMPLATES];
-    if (!templateConfig) {
-      return NextResponse.json(
-        { error: "Invalid template" },
-        { status: 400 }
-      );
+    // Check if this is an edit request (has existingCode but no template)
+    const isEditMode = existingCode && !template;
+
+    let templateConfig;
+    if (!isEditMode) {
+      if (!template) {
+        return NextResponse.json(
+          { error: "Template is required for new games" },
+          { status: 400 }
+        );
+      }
+      templateConfig = GAME_TEMPLATES[template as keyof typeof GAME_TEMPLATES];
+      if (!templateConfig) {
+        return NextResponse.json(
+          { error: "Invalid template" },
+          { status: 400 }
+        );
+      }
     }
 
     // Determine which model to use (default: gpt-4o)
     const selectedModel = model || "gpt-4o";
 
-    const systemPrompt = `You are a game developer. Generate complete, working game code.
+    // Different prompts for edit mode vs new game mode
+    const systemPrompt = isEditMode
+      ? `You are a game developer assistant. Modify the existing game code based on the user's request.
+
+IMPORTANT:
+1. Keep the same structure (initGameClient and serverLogic)
+2. Make ONLY the changes requested by the user
+3. Preserve existing functionality unless specifically asked to change it
+4. Return ONLY the complete modified code, no explanations
+5. The code must be valid JavaScript
+
+Existing code:
+\`\`\`javascript
+${existingCode}
+\`\`\`
+
+User request: ${description}
+
+Return the complete modified code:`
+      : `You are a game developer. Generate complete, working game code.
 
 CRITICAL: Follow this EXACT structure:
 
@@ -88,10 +119,10 @@ When to use tick:
 ✗ Turn-based games (chess, tic-tac-toe)
 ✗ Simple event-driven games (clicker games)
 
-${templateConfig.prompt}
+${templateConfig?.prompt || ''}
 
 Base template:
-${templateConfig.baseCode}`;
+${templateConfig?.baseCode || ''}`;
 
     let rawResponse: string;
 
@@ -116,7 +147,7 @@ ${templateConfig.baseCode}`;
 
       rawResponse = message.content[0].type === "text"
         ? message.content[0].text
-        : templateConfig.baseCode;
+        : (isEditMode ? existingCode : templateConfig?.baseCode || '');
 
     } else {
       // Use OpenAI (GPT-4o, etc.)
@@ -139,7 +170,7 @@ ${templateConfig.baseCode}`;
         temperature: 0.7,
       });
 
-      rawResponse = completion.choices[0].message.content || templateConfig.baseCode;
+      rawResponse = completion.choices[0].message.content || (isEditMode ? existingCode : templateConfig?.baseCode || '');
     }
 
     // Extract code from markdown code blocks

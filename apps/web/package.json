@@ -10,8 +10,11 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.70.1",
+    "@monaco-editor/react": "^4.7.0",
     "@propelauth/nextjs": "^0.3.16",
     "@propelauth/react": "^2.0.32",
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "@uiw/react-textarea-code-editor": "^3.1.1",
     "dotenv": "^17.2.3",
     "lucide-react": "^0.554.0",
     "next": "16.0.3",
@@ -19,6 +22,7 @@
     "pg": "^8.16.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-syntax-highlighter": "^16.1.0",
     "socket.io-client": "^4.8.1",
     "sql-template-strings": "^2.2.2",
     "uuid": "^13.0.0"
