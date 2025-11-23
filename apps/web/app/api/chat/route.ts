@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
+import { moderateMessage } from "@/lib/chat-moderation";
 
 interface ChatMessage {
   id: string;
@@ -42,6 +43,15 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Message is required" },
         { status: 400 }
+      );
+    }
+
+    // Moderate message content
+    const moderation = moderateMessage(message);
+    if (!moderation.allowed) {
+      return NextResponse.json(
+        { error: moderation.reason || "Message contains prohibited language" },
+        { status: 403 }
       );
     }
 
