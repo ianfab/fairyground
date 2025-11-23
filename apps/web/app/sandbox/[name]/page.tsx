@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Send, AlertCircle, Save, Play } from "lucide-react";
 import Editor from "@monaco-editor/react";
-import Navbar from "@/components/Navbar";
 import { useAuthInfo } from "@propelauth/react";
 import { Game } from "@/lib/types";
 
@@ -213,7 +212,6 @@ export default function SandboxPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
-      <Navbar />
       {/* Header */}
       <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
         <div className="max-w-[1800px] mx-auto px-6 py-4 flex items-center justify-between">

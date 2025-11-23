@@ -55,10 +55,21 @@ export function GameCard({
     };
   }, [gameName]);
 
+  // Convert Tailwind gradient to inline style for Safari compatibility
+  const gradientMap: Record<string, string> = {
+    'from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700': 'linear-gradient(to bottom right, rgb(217, 119, 6), rgb(234, 88, 12))',
+    'from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700': 'linear-gradient(to bottom right, rgb(147, 51, 234), rgb(37, 99, 235))',
+    'from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700': 'linear-gradient(to bottom right, rgb(22, 163, 74), rgb(13, 148, 136))',
+    'from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700': 'linear-gradient(to bottom right, rgb(220, 38, 38), rgb(219, 39, 119))',
+    'from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700': 'linear-gradient(to bottom right, rgb(219, 39, 119), rgb(225, 29, 72))',
+    'from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700': 'linear-gradient(to bottom right, rgb(234, 88, 12), rgb(220, 38, 38))',
+  };
+
   return (
     <a
       href={`/play/${gameName}`}
-      className={`group block p-6 rounded-xl bg-gradient-to-br ${gradient} transition-all relative`}
+      className="group block p-6 rounded-xl transition-all relative text-white"
+      style={{ background: gradientMap[gradient] || gradient }}
     >
       {/* Subtle stats in top-right corner */}
       {!loading && (

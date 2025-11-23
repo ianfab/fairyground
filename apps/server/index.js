@@ -23,6 +23,26 @@ const io = new Server(httpServer, {
 });
 const PORT = process.env.PORT || 3001;
 const rooms = new Map();
+const MAX_CHAT_HISTORY = 100;
+
+// Load chat history from database on startup
+let chatHistory = [];
+async function loadChatHistory() {
+    try {
+        const { rows } = await query`
+            SELECT id, username, message, timestamp
+            FROM chat_messages
+            ORDER BY timestamp DESC
+            LIMIT ${MAX_CHAT_HISTORY}
+        `;
+        chatHistory = rows.reverse(); // Reverse to get chronological order
+        console.log(`Loaded ${chatHistory.length} chat messages from database`);
+    } catch (error) {
+        console.error("Error loading chat history:", error);
+        chatHistory = [];
+    }
+}
+loadChatHistory();
 // Game loop ticker - runs periodically for games that have a tick action
 const TICK_RATE = 16; // ~60 FPS
 function startGameLoop(room) {
@@ -94,6 +114,7 @@ async function serveGameClient(gameName, roomName, res) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${game.name}</title>
+  <link rel="icon" href="http://localhost:3000/splorkguy.png" type="image/png">
   <style>
     * {
       margin: 0;
@@ -197,9 +218,50 @@ async function serveGameClient(gameName, roomName, res) {
       color: #fff;
       font-weight: bold;
     }
+    /* Navbar styles */
+    #navbar {
+      background: rgba(0, 0, 0, 0.95);
+      border-bottom: 1px solid #333;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+    }
+    #navbar a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 20px;
+    }
+    #navbar a:hover {
+      color: #ddd;
+    }
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
+  <!-- Navbar -->
+  <div id="navbar">
+    <a href="http://localhost:3000">splork.io</a>
+    <div class="nav-links">
+      <a href="http://localhost:3000">Home</a>
+      <a href="http://localhost:3000/create">Create</a>
+      <a href="http://localhost:3000/profile">Profile</a>
+      <a href="http://localhost:3000" target="_blank" style="background: #7c3aed; padding: 6px 12px; border-radius: 6px; font-size: 13px;">💬 Chat</a>
+    </div>
+  </div>
+
   <div id="room-setup"${prefilledRoom ? ' class="hidden"' : ''}>
     <h1>${game.name}</h1>
     <p style="color: #888; margin: 10px 0;">${game.description || 'Multiplayer Game'}</p>
@@ -457,6 +519,10 @@ app.get('/api/games', async (req, res) => {
 // Socket.io game logic
 io.on("connection", (socket) => {
     console.log("User connected:", socket.id);
+
+    // Send chat history to newly connected user
+    socket.emit("chat-history", chatHistory);
+
     socket.on("join_room", async ({ gameName, roomName }) => {
         const roomId = `${gameName}/${roomName}`;
         console.log(`User ${socket.id} attempting to join room: ${roomId}`);
@@ -613,6 +679,40 @@ io.on("connection", (socket) => {
             console.warn(`Unknown action: ${action}. Available: ${Object.keys(room.logic.moves).join(', ')}`);
         }
     });
+
+    // Chat handlers
+    socket.on("send-chat-message", async ({ username, message }) => {
+        const chatMessage = {
+            id: `${Date.now()}-${socket.id}`,
+            username: username || "Anonymous",
+            message: message,
+            timestamp: new Date()
+        };
+
+        try {
+            // Save to database
+            await query`
+                INSERT INTO chat_messages (id, username, message, timestamp)
+                VALUES (${chatMessage.id}, ${chatMessage.username}, ${chatMessage.message}, ${chatMessage.timestamp})
+            `;
+
+            // Add to in-memory history
+            chatHistory.push(chatMessage);
+
+            // Keep only last MAX_CHAT_HISTORY messages in memory
+            if (chatHistory.length > MAX_CHAT_HISTORY) {
+                chatHistory.shift();
+            }
+
+            // Broadcast to all connected clients
+            io.emit("chat-message", chatMessage);
+            console.log(`Chat message from ${chatMessage.username}: ${message}`);
+        } catch (error) {
+            console.error("Error saving chat message:", error);
+            socket.emit("error", "Failed to send message");
+        }
+    });
+
     socket.on("disconnect", () => {
         console.log("User disconnected:", socket.id);
         // Remove player from all rooms

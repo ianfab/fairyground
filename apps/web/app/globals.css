@@ -24,3 +24,22 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Safari support for gradient text */
+.bg-clip-text {
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Ensure Safari properly renders gradients */
+.bg-gradient-to-r,
+.bg-gradient-to-br {
+  background-image: linear-gradient(var(--tw-gradient-stops));
+}
+
+/* Force Safari to show text with gradient background */
+.text-transparent {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}

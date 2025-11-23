@@ -8,7 +8,6 @@ import { AlertCircle, X } from "lucide-react";
 import { useAuthInfo, useRedirectFunctions } from "@propelauth/react";
 import dynamic from 'next/dynamic';
 import { SnakeGameWhileWaiting } from "@/app/components/SnakeGameWhileWaiting";
-import Navbar from "@/components/Navbar";
 
 const Editor = dynamic(
   () => import('@monaco-editor/react'),
@@ -310,7 +309,6 @@ export default function CreateGame() {
   if (!selectedTemplate) {
     return (
       <div className="min-h-screen bg-black text-white font-sans">
-        <Navbar />
         <div className="p-8">
           {showAuthModal && <AuthModal />}
         
@@ -407,7 +405,6 @@ export default function CreateGame() {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans">
-      <Navbar />
       <div className="flex h-[calc(100vh-64px)] overflow-hidden">
         {showAuthModal && <AuthModal />}
 
@@ -465,8 +462,9 @@ export default function CreateGame() {
             onChange={(e) => setSelectedModel(e.target.value)}
             className="w-full bg-gray-900 border border-gray-800 rounded p-3 focus:border-purple-500 focus:outline-none"
           >
+            <option value="claude-sonnet-4-5-20250929">Claude Sonnet 4.5 (Anthropic) - Default</option>
             <option value="gpt-4o">GPT-4o (OpenAI)</option>
-            <option value="claude-sonnet-4-5-20250929">Claude Sonnet 4.5 (Anthropic)</option>
+            <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (Google)</option>
           </select>
         </div>
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { GAME_TEMPLATES } from "@/lib/game-templates";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function POST(request: Request) {
   try {
@@ -148,6 +149,25 @@ ${templateConfig?.baseCode || ''}`;
       rawResponse = message.content[0].type === "text"
         ? message.content[0].text
         : (isEditMode ? existingCode : templateConfig?.baseCode || '');
+
+    } else if (selectedModel.startsWith("gemini")) {
+      // Use Gemini (Google)
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+      const model = genAI.getGenerativeModel({ model: selectedModel });
+
+      const result = await model.generateContent({
+        contents: [{
+          role: "user",
+          parts: [{ text: systemPrompt + "\n\nUser request:\n" + description }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 16000,
+        },
+      });
+
+      const response = result.response;
+      rawResponse = response.text() || (isEditMode ? existingCode : templateConfig?.baseCode || '');
 
     } else {
       // Use OpenAI (GPT-4o, etc.)

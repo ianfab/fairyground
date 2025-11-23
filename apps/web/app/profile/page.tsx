@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuthInfo, useRedirectFunctions } from "@propelauth/react";
-import Navbar from "@/components/Navbar";
 import { useEffect, useState } from "react";
 import { Game } from "@/lib/types";
 import { User } from "lucide-react";
@@ -65,7 +64,6 @@ export default function ProfilePage() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-black text-white">
-        <Navbar />
         <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
           <div className="text-xl text-gray-400">Loading...</div>
         </div>
@@ -76,7 +74,6 @@ export default function ProfilePage() {
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-black text-white">
-        <Navbar />
         <div className="max-w-4xl mx-auto px-4 py-20">
           <div className="text-center">
             <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -108,7 +105,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <Navbar />
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* User Info Section */}
         <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-gray-800 rounded-xl p-8 mb-8">
