@@ -1,7 +1,304 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = {
+export default {
     name: "chess",
     description: "Classic Chess - drag pieces to move",
-    code: "\nfunction initGameClient(container, socket, roomId, emitAction) {\n  // Load required libraries\n  const loadScript = (src) => {\n    return new Promise((resolve, reject) => {\n      const script = document.createElement('script');\n      script.src = src;\n      script.onload = resolve;\n      script.onerror = reject;\n      document.head.appendChild(script);\n    });\n  };\n\n  const loadCSS = (href) => {\n    const link = document.createElement('link');\n    link.rel = 'stylesheet';\n    link.href = href;\n    document.head.appendChild(link);\n  };\n\n  // Load chessboard.js CSS\n  loadCSS('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css');\n\n  const boardContainer = document.createElement('div');\n  boardContainer.id = 'chess-board';\n  boardContainer.style.cssText = 'width: 400px; margin: 40px auto;';\n  container.appendChild(boardContainer);\n\n  const statusDiv = document.createElement('div');\n  statusDiv.id = 'chess-status';\n  statusDiv.style.cssText = 'text-align: center; margin-top: 20px; font-size: 18px; color: #fff;';\n  container.appendChild(statusDiv);\n\n  const waitingDiv = document.createElement('div');\n  waitingDiv.id = 'waiting-message';\n  waitingDiv.style.cssText = 'text-align: center; margin-top: 20px; font-size: 16px; color: #888;';\n  waitingDiv.textContent = 'Loading chess libraries...';\n  container.appendChild(waitingDiv);\n\n  let board = null;\n  let game = null;\n  let myColor = null;\n\n  // Initialize libraries and board once loaded\n  Promise.all([\n    loadScript('https://code.jquery.com/jquery-3.7.1.min.js'),\n    loadScript('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js'),\n    loadScript('https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js')\n  ]).then(() => {\n    waitingDiv.textContent = 'Waiting for opponent...';\n\n    // Initialize chess.js\n    game = new Chess();\n\n    function onDragStart(source, piece, position, orientation) {\n      // Do not pick up pieces if the game is over\n      if (game.game_over()) return false;\n\n      // Only allow moves if player has a color assigned\n      if (!myColor || myColor === 'spectator') return false;\n\n      // Only pick up pieces for the side to move\n      if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||\n          (game.turn() === 'b' && piece.search(/^w/) !== -1)) {\n        return false;\n      }\n\n      // Only allow player to move their own pieces\n      if ((myColor === 'white' && piece.search(/^b/) !== -1) ||\n          (myColor === 'black' && piece.search(/^w/) !== -1)) {\n        return false;\n      }\n    }\n\n    function onDrop(source, target) {\n      // See if the move is legal\n      const move = game.move({\n        from: source,\n        to: target,\n        promotion: 'q' // Always promote to queen for simplicity\n      });\n\n      // Illegal move\n      if (move === null) return 'snapback';\n\n      // Send move to server\n      emitAction('move', { from: source, to: target, promotion: 'q' });\n    }\n\n    function onSnapEnd() {\n      // Update board position after piece snap\n      // This handles castling, en passant, pawn promotion\n      board.position(game.fen());\n    }\n\n    function updateStatus(playerColors) {\n      let status = '';\n      const moveColor = game.turn() === 'w' ? 'White' : 'Black';\n      const myPlayerColor = playerColors ? playerColors[socket.id] : null;\n\n      // Checkmate?\n      if (game.in_checkmate()) {\n        const winner = game.turn() === 'w' ? 'Black' : 'White';\n        status = 'Game over, ' + winner + ' wins by checkmate!';\n      }\n      // Draw?\n      else if (game.in_draw()) {\n        status = 'Game over, drawn position';\n      }\n      // Stalemate?\n      else if (game.in_stalemate()) {\n        status = 'Game over, stalemate';\n      }\n      // Threefold repetition?\n      else if (game.in_threefold_repetition()) {\n        status = 'Game over, draw by threefold repetition';\n      }\n      // Insufficient material?\n      else if (game.insufficient_material()) {\n        status = 'Game over, draw by insufficient material';\n      }\n      // Game still on\n      else {\n        status = moveColor + ' to move';\n\n        if (myPlayerColor === 'spectator') {\n          status += ' (You are spectating)';\n        } else if (myPlayerColor) {\n          status += ' (You are ' + myPlayerColor + ')';\n        }\n\n        // Check?\n        if (game.in_check()) {\n          status += ' - ' + moveColor + ' is in check!';\n        }\n      }\n\n      statusDiv.textContent = status;\n    }\n\n    const config = {\n      draggable: true,\n      position: 'start',\n      onDragStart: onDragStart,\n      onDrop: onDrop,\n      onSnapEnd: onSnapEnd,\n      pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'\n    };\n\n    board = Chessboard('chess-board', config);\n    updateStatus({});\n\n    // Handle state updates\n    gameInstance.onStateUpdate = (state) => {\n      console.log('Chess onStateUpdate called with:', state);\n\n      if (!state || !state.board) {\n        console.error('Invalid state received:', state);\n        return;\n      }\n\n      try {\n        // Load position into chess.js\n        game.load(state.board);\n\n        // Update board display\n        board.position(state.board);\n\n        const playerCount = state.playerColors ? Object.keys(state.playerColors).length : 0;\n\n        if (playerCount < 2) {\n          waitingDiv.style.display = 'block';\n          waitingDiv.textContent = 'Waiting for opponent...';\n        } else {\n          waitingDiv.style.display = 'none';\n        }\n\n        if (state.playerColors && state.playerColors[socket.id]) {\n          const newColor = state.playerColors[socket.id];\n\n          if (newColor === 'spectator') {\n            myColor = 'spectator';\n          } else if (!myColor || myColor !== newColor) {\n            myColor = newColor;\n\n            // Flip board for black player\n            const orientation = myColor === 'black' ? 'black' : 'white';\n            board.orientation(orientation);\n          }\n        }\n\n        updateStatus(state.playerColors);\n      } catch (e) {\n        console.error('Error updating state:', e, e.stack);\n      }\n    };\n  }).catch(err => {\n    console.error('Failed to load chess libraries:', err);\n    waitingDiv.textContent = 'Error loading game. Please refresh.';\n  });\n\n  // Create game instance (will be populated once libraries load)\n  const gameInstance = {\n    onStateUpdate: (state) => {\n      // This will be replaced once libraries are loaded\n      console.log('Waiting for libraries to load...');\n    }\n  };\n\n  console.log('Chess game instance created');\n  return gameInstance;\n}\n\n// Server-side logic using chess.js for validation\n// Note: Chess class is provided by the server sandbox context\nconst serverLogic = {\n  initialState: {\n    board: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',\n    players: {},\n    playerColors: {},\n    moveHistory: []\n  },\n  moves: {\n    playerJoined: (state, payload, playerId) => {\n      const existingPlayerCount = Object.keys(state.playerColors).length;\n\n      if (existingPlayerCount === 0) {\n        state.playerColors[playerId] = Math.random() < 0.5 ? 'white' : 'black';\n      } else if (existingPlayerCount === 1) {\n        const firstPlayerColor = Object.values(state.playerColors)[0];\n        state.playerColors[playerId] = firstPlayerColor === 'white' ? 'black' : 'white';\n      } else {\n        state.playerColors[playerId] = 'spectator';\n      }\n\n      console.log('Player', playerId, 'assigned color:', state.playerColors[playerId]);\n    },\n\n    move: (state, payload, playerId) => {\n      const playerColor = state.playerColors[playerId];\n\n      if (playerColor === 'spectator') {\n        console.log('Spectator attempted to move');\n        return;\n      }\n\n      // Initialize chess.js with current board state\n      const game = new Chess(state.board);\n\n      // Check if it's the player's turn\n      const currentTurn = game.turn(); // 'w' or 'b'\n      const turnColor = currentTurn === 'w' ? 'white' : 'black';\n\n      if (playerColor !== turnColor) {\n        console.log('Not player turn:', playerColor, 'vs', turnColor);\n        return;\n      }\n\n      // Attempt the move\n      try {\n        const move = game.move({\n          from: payload.from,\n          to: payload.to,\n          promotion: payload.promotion || 'q'\n        });\n\n        if (move === null) {\n          console.log('Illegal move attempted:', payload);\n          return;\n        }\n\n        console.log('Legal move executed:', move);\n\n        // Update state with new FEN\n        state.board = game.fen();\n\n        // Add to move history\n        state.moveHistory.push({\n          from: payload.from,\n          to: payload.to,\n          promotion: payload.promotion,\n          san: move.san,\n          player: playerId,\n          timestamp: Date.now()\n        });\n\n        console.log('New board state:', state.board);\n        console.log('Game over:', game.game_over());\n        console.log('In check:', game.in_check());\n        console.log('In checkmate:', game.in_checkmate());\n        console.log('In draw:', game.in_draw());\n\n      } catch (e) {\n        console.error('Error executing move:', e);\n      }\n    }\n  }\n}\n"
+    code: `
+function initGameClient(container, socket, roomId, emitAction) {
+  // Load required libraries
+  const loadScript = (src) => {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  };
+
+  const loadCSS = (href) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+  };
+
+  // Load chessboard.js CSS
+  loadCSS('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css');
+
+  const boardContainer = document.createElement('div');
+  boardContainer.id = 'chess-board';
+  boardContainer.style.cssText = 'width: 400px; margin: 40px auto;';
+  container.appendChild(boardContainer);
+
+  const statusDiv = document.createElement('div');
+  statusDiv.id = 'chess-status';
+  statusDiv.style.cssText = 'text-align: center; margin-top: 20px; font-size: 18px; color: #fff;';
+  container.appendChild(statusDiv);
+
+  const waitingDiv = document.createElement('div');
+  waitingDiv.id = 'waiting-message';
+  waitingDiv.style.cssText = 'text-align: center; margin-top: 20px; font-size: 16px; color: #888;';
+  waitingDiv.textContent = 'Loading chess libraries...';
+  container.appendChild(waitingDiv);
+
+  let board = null;
+  let game = null;
+  let myColor = null;
+
+  // Initialize libraries and board once loaded
+  Promise.all([
+    loadScript('https://code.jquery.com/jquery-3.7.1.min.js'),
+    loadScript('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js'),
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js')
+  ]).then(() => {
+    waitingDiv.textContent = 'Waiting for opponent...';
+
+    // Initialize chess.js
+    game = new Chess();
+
+    function onDragStart(source, piece, position, orientation) {
+      // Do not pick up pieces if the game is over
+      if (game.game_over()) return false;
+
+      // Only allow moves if player has a color assigned
+      if (!myColor || myColor === 'spectator') return false;
+
+      // Only pick up pieces for the side to move
+      if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+          (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+        return false;
+      }
+
+      // Only allow player to move their own pieces
+      if ((myColor === 'white' && piece.search(/^b/) !== -1) ||
+          (myColor === 'black' && piece.search(/^w/) !== -1)) {
+        return false;
+      }
+    }
+
+    function onDrop(source, target) {
+      // See if the move is legal
+      const move = game.move({
+        from: source,
+        to: target,
+        promotion: 'q' // Always promote to queen for simplicity
+      });
+
+      // Illegal move
+      if (move === null) return 'snapback';
+
+      // Send move to server
+      emitAction('move', { from: source, to: target, promotion: 'q' });
+    }
+
+    function onSnapEnd() {
+      // Update board position after piece snap
+      // This handles castling, en passant, pawn promotion
+      board.position(game.fen());
+    }
+
+    function updateStatus(playerColors) {
+      let status = '';
+      const moveColor = game.turn() === 'w' ? 'White' : 'Black';
+      const myPlayerColor = playerColors ? playerColors[socket.id] : null;
+
+      // Checkmate?
+      if (game.in_checkmate()) {
+        const winner = game.turn() === 'w' ? 'Black' : 'White';
+        status = 'Game over, ' + winner + ' wins by checkmate!';
+      }
+      // Draw?
+      else if (game.in_draw()) {
+        status = 'Game over, drawn position';
+      }
+      // Stalemate?
+      else if (game.in_stalemate()) {
+        status = 'Game over, stalemate';
+      }
+      // Threefold repetition?
+      else if (game.in_threefold_repetition()) {
+        status = 'Game over, draw by threefold repetition';
+      }
+      // Insufficient material?
+      else if (game.insufficient_material()) {
+        status = 'Game over, draw by insufficient material';
+      }
+      // Game still on
+      else {
+        status = moveColor + ' to move';
+
+        if (myPlayerColor === 'spectator') {
+          status += ' (You are spectating)';
+        } else if (myPlayerColor) {
+          status += ' (You are ' + myPlayerColor + ')';
+        }
+
+        // Check?
+        if (game.in_check()) {
+          status += ' - ' + moveColor + ' is in check!';
+        }
+      }
+
+      statusDiv.textContent = status;
+    }
+
+    const config = {
+      draggable: true,
+      position: 'start',
+      onDragStart: onDragStart,
+      onDrop: onDrop,
+      onSnapEnd: onSnapEnd,
+      pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+    };
+
+    board = Chessboard('chess-board', config);
+    updateStatus({});
+
+    // Handle state updates
+    gameInstance.onStateUpdate = (state) => {
+      console.log('Chess onStateUpdate called with:', state);
+
+      if (!state || !state.board) {
+        console.error('Invalid state received:', state);
+        return;
+      }
+
+      try {
+        // Load position into chess.js
+        game.load(state.board);
+
+        // Update board display
+        board.position(state.board);
+
+        const playerCount = state.playerColors ? Object.keys(state.playerColors).length : 0;
+
+        if (playerCount < 2) {
+          waitingDiv.style.display = 'block';
+          waitingDiv.textContent = 'Waiting for opponent...';
+        } else {
+          waitingDiv.style.display = 'none';
+        }
+
+        if (state.playerColors && state.playerColors[socket.id]) {
+          const newColor = state.playerColors[socket.id];
+
+          if (newColor === 'spectator') {
+            myColor = 'spectator';
+          } else if (!myColor || myColor !== newColor) {
+            myColor = newColor;
+
+            // Flip board for black player
+            const orientation = myColor === 'black' ? 'black' : 'white';
+            board.orientation(orientation);
+          }
+        }
+
+        updateStatus(state.playerColors);
+      } catch (e) {
+        console.error('Error updating state:', e, e.stack);
+      }
+    };
+  }).catch(err => {
+    console.error('Failed to load chess libraries:', err);
+    waitingDiv.textContent = 'Error loading game. Please refresh.';
+  });
+
+  // Create game instance (will be populated once libraries load)
+  const gameInstance = {
+    onStateUpdate: (state) => {
+      // This will be replaced once libraries are loaded
+      console.log('Waiting for libraries to load...');
+    }
+  };
+
+  console.log('Chess game instance created');
+  return gameInstance;
+}
+
+// Server-side logic using chess.js for validation
+// Note: Chess class is provided by the server sandbox context
+const serverLogic = {
+  initialState: {
+    board: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    players: {},
+    playerColors: {},
+    moveHistory: []
+  },
+  moves: {
+    playerJoined: (state, payload, playerId) => {
+      const existingPlayerCount = Object.keys(state.playerColors).length;
+
+      if (existingPlayerCount === 0) {
+        state.playerColors[playerId] = Math.random() < 0.5 ? 'white' : 'black';
+      } else if (existingPlayerCount === 1) {
+        const firstPlayerColor = Object.values(state.playerColors)[0];
+        state.playerColors[playerId] = firstPlayerColor === 'white' ? 'black' : 'white';
+      } else {
+        state.playerColors[playerId] = 'spectator';
+      }
+
+      console.log('Player', playerId, 'assigned color:', state.playerColors[playerId]);
+    },
+
+    move: (state, payload, playerId) => {
+      const playerColor = state.playerColors[playerId];
+
+      if (playerColor === 'spectator') {
+        console.log('Spectator attempted to move');
+        return;
+      }
+
+      // Initialize chess.js with current board state
+      const game = new Chess(state.board);
+
+      // Check if it's the player's turn
+      const currentTurn = game.turn(); // 'w' or 'b'
+      const turnColor = currentTurn === 'w' ? 'white' : 'black';
+
+      if (playerColor !== turnColor) {
+        console.log('Not player turn:', playerColor, 'vs', turnColor);
+        return;
+      }
+
+      // Attempt the move
+      try {
+        const move = game.move({
+          from: payload.from,
+          to: payload.to,
+          promotion: payload.promotion || 'q'
+        });
+
+        if (move === null) {
+          console.log('Illegal move attempted:', payload);
+          return;
+        }
+
+        console.log('Legal move executed:', move);
+
+        // Update state with new FEN
+        state.board = game.fen();
+
+        // Add to move history
+        state.moveHistory.push({
+          from: payload.from,
+          to: payload.to,
+          promotion: payload.promotion,
+          san: move.san,
+          player: playerId,
+          timestamp: Date.now()
+        });
+
+        console.log('New board state:', state.board);
+        console.log('Game over:', game.game_over());
+        console.log('In check:', game.in_check());
+        console.log('In checkmate:', game.in_checkmate());
+        console.log('In draw:', game.in_draw());
+
+      } catch (e) {
+        console.error('Error executing move:', e);
+      }
+    }
+  }
+}
+`
 };
+//# sourceMappingURL=chess.js.map

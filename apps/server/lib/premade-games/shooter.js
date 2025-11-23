@@ -1,7 +1,509 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = {
+export default {
     name: "shooter",
     description: "First-Person 3D Shooter - WASD to move, mouse to look, click to shoot",
-    code: "\nfunction initGameClient(container, socket, roomId, emitAction) {\n  // Load Three.js from CDN\n  const loadScript = (src) => {\n    return new Promise((resolve, reject) => {\n      const script = document.createElement('script');\n      script.src = src;\n      script.onload = resolve;\n      script.onerror = reject;\n      document.head.appendChild(script);\n    });\n  };\n\n  const gameContainer = document.createElement('div');\n  gameContainer.style.cssText = 'width: 100%; height: 100vh; position: relative; overflow: hidden;';\n  container.appendChild(gameContainer);\n\n  const statusDiv = document.createElement('div');\n  statusDiv.style.cssText = 'position: absolute; top: 20px; left: 20px; color: #fff; font-size: 18px; z-index: 100; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-family: monospace;';\n  gameContainer.appendChild(statusDiv);\n\n  const crosshair = document.createElement('div');\n  crosshair.style.cssText = 'position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin: -10px 0 0 -10px; border: 2px solid #fff; border-radius: 50%; pointer-events: none; z-index: 100;';\n  gameContainer.appendChild(crosshair);\n\n  const loadingDiv = document.createElement('div');\n  loadingDiv.textContent = 'Loading Three.js...';\n  loadingDiv.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 24px; z-index: 101;';\n  gameContainer.appendChild(loadingDiv);\n\n  let THREE, scene, camera, renderer;\n  let myPlayerId = null;\n  let keys = {};\n  let mouseMovement = { x: 0, y: 0 };\n  let playerMeshes = {};\n  let bulletMeshes = {};\n\n  loadScript('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js').then(() => {\n    loadingDiv.style.display = 'none';\n    THREE = window.THREE;\n\n    // Setup scene\n    scene = new THREE.Scene();\n    scene.background = new THREE.Color(0x87ceeb);\n    scene.fog = new THREE.Fog(0x87ceeb, 0, 200);\n\n    // Setup camera\n    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);\n    camera.position.set(0, 5, 0);\n\n    // Setup renderer\n    renderer = new THREE.WebGLRenderer({ antialias: true });\n    renderer.setSize(window.innerWidth, window.innerHeight);\n    renderer.shadowMap.enabled = true;\n    gameContainer.insertBefore(renderer.domElement, statusDiv);\n\n    // Add lights\n    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);\n    scene.add(ambientLight);\n\n    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);\n    dirLight.position.set(50, 100, 50);\n    dirLight.castShadow = true;\n    dirLight.shadow.camera.left = -100;\n    dirLight.shadow.camera.right = 100;\n    dirLight.shadow.camera.top = 100;\n    dirLight.shadow.camera.bottom = -100;\n    scene.add(dirLight);\n\n    // Add ground\n    const groundGeometry = new THREE.PlaneGeometry(200, 200);\n    const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x7cfc00 });\n    const ground = new THREE.Mesh(groundGeometry, groundMaterial);\n    ground.rotation.x = -Math.PI / 2;\n    ground.receiveShadow = true;\n    scene.add(ground);\n\n    // Add grid helper\n    const gridHelper = new THREE.GridHelper(200, 40, 0x000000, 0x000000);\n    gridHelper.material.opacity = 0.2;\n    gridHelper.material.transparent = true;\n    scene.add(gridHelper);\n\n    // Input handling\n    document.addEventListener('keydown', (e) => {\n      keys[e.code] = true;\n      if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space'].includes(e.code)) {\n        e.preventDefault();\n      }\n    });\n\n    document.addEventListener('keyup', (e) => {\n      keys[e.code] = false;\n    });\n\n    document.addEventListener('mousemove', (e) => {\n      if (document.pointerLockElement === renderer.domElement) {\n        mouseMovement.x = e.movementX || 0;\n        mouseMovement.y = e.movementY || 0;\n      }\n    });\n\n    // Request pointer lock on click\n    renderer.domElement.addEventListener('click', () => {\n      if (document.pointerLockElement !== renderer.domElement) {\n        renderer.domElement.requestPointerLock();\n      } else {\n        emitAction('shoot', {});\n      }\n    });\n\n    // Show instructions when not locked\n    const instructionsDiv = document.createElement('div');\n    instructionsDiv.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 24px; z-index: 102; text-align: center; background: rgba(0,0,0,0.8); padding: 40px; border-radius: 10px; pointer-events: none;';\n    instructionsDiv.innerHTML = 'Click to start<br><span style=\"font-size: 16px; color: #aaa;\">WASD to move, Mouse to look, Click to shoot</span>';\n    gameContainer.appendChild(instructionsDiv);\n\n    document.addEventListener('pointerlockchange', () => {\n      if (document.pointerLockElement === renderer.domElement) {\n        instructionsDiv.style.display = 'none';\n      } else {\n        instructionsDiv.style.display = 'block';\n      }\n    });\n\n    // Game loop\n    function animate() {\n      requestAnimationFrame(animate);\n\n      // Send player input to server\n      if (myPlayerId) {\n        const movement = {\n          forward: keys['KeyW'] ? 1 : 0,\n          backward: keys['KeyS'] ? 1 : 0,\n          left: keys['KeyA'] ? 1 : 0,\n          right: keys['KeyD'] ? 1 : 0,\n          rotX: mouseMovement.x,\n          rotY: mouseMovement.y\n        };\n        mouseMovement.x = 0;\n        mouseMovement.y = 0;\n\n        if (movement.forward || movement.backward || movement.left || movement.right || movement.rotX || movement.rotY) {\n          emitAction('move', movement);\n        }\n      }\n\n      renderer.render(scene, camera);\n    }\n    animate();\n\n    // Handle window resize\n    window.addEventListener('resize', () => {\n      camera.aspect = window.innerWidth / window.innerHeight;\n      camera.updateProjectionMatrix();\n      renderer.setSize(window.innerWidth, window.innerHeight);\n    });\n  }).catch(err => {\n    loadingDiv.textContent = 'Error loading game. Please refresh.';\n    console.error('Failed to load Three.js:', err);\n  });\n\n  return {\n    onStateUpdate: (state) => {\n      if (!THREE || !scene) return;\n\n      myPlayerId = socket.id;\n\n      // Update players\n      if (state.players) {\n        Object.entries(state.players).forEach(([id, player]) => {\n          // Don't render the local player's mesh in first person\n          if (id === myPlayerId) {\n            // Update camera for first-person view\n            const eyeHeight = 1.6;\n            camera.position.set(player.x, eyeHeight, player.z);\n\n            // Set camera rotation based on player rotation\n            camera.rotation.order = 'YXZ';\n            camera.rotation.y = player.rotation;\n            camera.rotation.x = player.pitch || 0;\n\n            // Remove local player mesh if it exists\n            if (playerMeshes[id]) {\n              scene.remove(playerMeshes[id]);\n              delete playerMeshes[id];\n            }\n          } else {\n            // Render other players\n            if (!playerMeshes[id]) {\n              // Create player mesh (cube)\n              const geometry = new THREE.BoxGeometry(1, 2, 1);\n              const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });\n              const mesh = new THREE.Mesh(geometry, material);\n              mesh.castShadow = true;\n              mesh.receiveShadow = true;\n              scene.add(mesh);\n              playerMeshes[id] = mesh;\n            }\n\n            // Update player position and rotation\n            const mesh = playerMeshes[id];\n            mesh.position.set(player.x, 1, player.z);\n            mesh.rotation.y = player.rotation;\n          }\n        });\n\n        // Remove disconnected players\n        Object.keys(playerMeshes).forEach(id => {\n          if (!state.players[id]) {\n            scene.remove(playerMeshes[id]);\n            delete playerMeshes[id];\n          }\n        });\n      }\n\n      // Update bullets\n      if (state.bullets) {\n        Object.entries(state.bullets).forEach(([id, bullet]) => {\n          if (!bulletMeshes[id]) {\n            // Create bullet mesh (sphere)\n            const geometry = new THREE.SphereGeometry(0.2, 8, 8);\n            const material = new THREE.MeshStandardMaterial({ color: 0xffff00 });\n            const mesh = new THREE.Mesh(geometry, material);\n            mesh.castShadow = true;\n            scene.add(mesh);\n            bulletMeshes[id] = mesh;\n          }\n\n          // Update bullet position\n          const mesh = bulletMeshes[id];\n          mesh.position.set(bullet.x, bullet.y, bullet.z);\n        });\n\n        // Remove old bullets\n        Object.keys(bulletMeshes).forEach(id => {\n          if (!state.bullets[id]) {\n            scene.remove(bulletMeshes[id]);\n            delete bulletMeshes[id];\n          }\n        });\n      }\n\n      // Update enemies\n      if (state.enemies) {\n        Object.entries(state.enemies).forEach(([id, enemy]) => {\n          const enemyId = 'enemy_' + id;\n          if (!playerMeshes[enemyId]) {\n            // Create enemy mesh (purple cube)\n            const geometry = new THREE.BoxGeometry(1, 2, 1);\n            const material = new THREE.MeshStandardMaterial({ color: 0x800080 });\n            const mesh = new THREE.Mesh(geometry, material);\n            mesh.castShadow = true;\n            mesh.receiveShadow = true;\n            scene.add(mesh);\n            playerMeshes[enemyId] = mesh;\n          }\n\n          // Update enemy position\n          const mesh = playerMeshes[enemyId];\n          mesh.position.set(enemy.x, 1, enemy.z);\n        });\n\n        // Remove dead enemies\n        Object.keys(playerMeshes).forEach(id => {\n          if (id.startsWith('enemy_')) {\n            const enemyId = id.replace('enemy_', '');\n            if (!state.enemies[enemyId]) {\n              scene.remove(playerMeshes[id]);\n              delete playerMeshes[id];\n            }\n          }\n        });\n      }\n\n      // Update status display\n      const myPlayer = state.players ? state.players[myPlayerId] : null;\n      if (myPlayer) {\n        statusDiv.innerHTML =\n          'Health: ' + (myPlayer.health || 100) + '<br>' +\n          'Score: ' + (myPlayer.score || 0) + '<br>' +\n          'Enemies: ' + (state.enemies ? Object.keys(state.enemies).length : 0);\n      }\n    }\n  };\n}\n\nconst serverLogic = {\n  initialState: {\n    players: {},\n    bullets: {},\n    enemies: {},\n    nextBulletId: 0,\n    nextEnemyId: 0,\n    lastSpawnTime: Date.now()\n  },\n  moves: {\n    playerJoined: (state, payload, playerId) => {\n      // Spawn player at random position\n      state.players[playerId] = {\n        x: (Math.random() - 0.5) * 40,\n        z: (Math.random() - 0.5) * 40,\n        rotation: 0,\n        pitch: 0,\n        health: 100,\n        score: 0\n      };\n    },\n\n    move: (state, payload, playerId) => {\n      const player = state.players[playerId];\n      if (!player || player.health <= 0) return;\n\n      const speed = 0.3;\n      const rotSpeed = 0.002;  // Reduced from 0.05 for lower sensitivity\n      const pitchSpeed = 0.002;  // Reduced from 0.03 for lower sensitivity\n\n      // Update rotation (horizontal)\n      player.rotation -= payload.rotX * rotSpeed;\n\n      // Update pitch (vertical look) and clamp it\n      if (payload.rotY) {\n        player.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, player.pitch - payload.rotY * pitchSpeed));\n      }\n\n      // Calculate movement direction based on rotation\n      // Fixed: Negative Math.sin for forward movement (W key moves in -z direction in camera space)\n      const forward = {\n        x: -Math.sin(player.rotation),\n        z: -Math.cos(player.rotation)\n      };\n      const right = {\n        x: Math.cos(player.rotation),\n        z: -Math.sin(player.rotation)\n      };\n\n      // Apply movement\n      if (payload.forward) {\n        player.x += forward.x * speed;\n        player.z += forward.z * speed;\n      }\n      if (payload.backward) {\n        player.x -= forward.x * speed;\n        player.z -= forward.z * speed;\n      }\n      if (payload.right) {\n        player.x += right.x * speed;\n        player.z += right.z * speed;\n      }\n      if (payload.left) {\n        player.x -= right.x * speed;\n        player.z -= right.z * speed;\n      }\n\n      // Clamp to arena bounds\n      player.x = Math.max(-95, Math.min(95, player.x));\n      player.z = Math.max(-95, Math.min(95, player.z));\n    },\n\n    shoot: (state, payload, playerId) => {\n      const player = state.players[playerId];\n      if (!player || player.health <= 0) return;\n\n      // Create bullet - use same forward direction as movement\n      const bulletId = state.nextBulletId++;\n      state.bullets[bulletId] = {\n        x: player.x,\n        y: 1.5,\n        z: player.z,\n        vx: -Math.sin(player.rotation) * 2,  // Fixed to match movement direction\n        vz: -Math.cos(player.rotation) * 2,  // Fixed to match movement direction\n        ownerId: playerId,\n        createdAt: Date.now()\n      };\n    },\n\n    tick: (state) => {\n      const now = Date.now();\n\n      // Update bullets\n      Object.entries(state.bullets).forEach(([id, bullet]) => {\n        bullet.x += bullet.vx;\n        bullet.z += bullet.vz;\n\n        // Remove bullets that are out of bounds or too old\n        if (Math.abs(bullet.x) > 100 || Math.abs(bullet.z) > 100 || now - bullet.createdAt > 3000) {\n          delete state.bullets[id];\n          return;\n        }\n\n        // Check collision with enemies\n        Object.entries(state.enemies).forEach(([enemyId, enemy]) => {\n          const dx = bullet.x - enemy.x;\n          const dz = bullet.z - enemy.z;\n          const dist = Math.sqrt(dx * dx + dz * dz);\n\n          if (dist < 1) {\n            // Hit enemy\n            delete state.enemies[enemyId];\n            delete state.bullets[id];\n\n            // Award points to shooter\n            if (state.players[bullet.ownerId]) {\n              state.players[bullet.ownerId].score += 10;\n            }\n          }\n        });\n\n        // Check collision with players\n        Object.entries(state.players).forEach(([playerId, player]) => {\n          if (playerId === bullet.ownerId || player.health <= 0) return;\n\n          const dx = bullet.x - player.x;\n          const dz = bullet.z - player.z;\n          const dist = Math.sqrt(dx * dx + dz * dz);\n\n          if (dist < 1) {\n            // Hit player\n            player.health -= 20;\n            delete state.bullets[id];\n\n            if (player.health <= 0) {\n              // Award points for kill\n              if (state.players[bullet.ownerId]) {\n                state.players[bullet.ownerId].score += 50;\n              }\n            }\n          }\n        });\n      });\n\n      // Update enemies (move towards nearest player)\n      Object.entries(state.enemies).forEach(([enemyId, enemy]) => {\n        let nearestPlayer = null;\n        let nearestDist = Infinity;\n        let nearestPlayerId = null;\n\n        Object.entries(state.players).forEach(([playerId, player]) => {\n          if (player.health <= 0) return;\n          const dx = player.x - enemy.x;\n          const dz = player.z - enemy.z;\n          const dist = Math.sqrt(dx * dx + dz * dz);\n          if (dist < nearestDist) {\n            nearestDist = dist;\n            nearestPlayer = player;\n            nearestPlayerId = playerId;\n          }\n        });\n\n        if (nearestPlayer) {\n          const dx = nearestPlayer.x - enemy.x;\n          const dz = nearestPlayer.z - enemy.z;\n          const dist = Math.sqrt(dx * dx + dz * dz);\n\n          // Check for collision with player (deal damage)\n          if (dist < 1.5) {\n            // Enemy touches player - deal damage\n            if (!enemy.lastHitTime || now - enemy.lastHitTime > 1000) {\n              nearestPlayer.health -= 10;\n              enemy.lastHitTime = now;\n\n              // Kill enemy on contact\n              delete state.enemies[enemyId];\n            }\n          } else if (dist > 0) {\n            // Move towards player\n            enemy.x += (dx / dist) * 0.1;\n            enemy.z += (dz / dist) * 0.1;\n          }\n        }\n      });\n\n      // Spawn enemies periodically\n      const enemyCount = Object.keys(state.enemies).length;\n      if (enemyCount < 5 && now - state.lastSpawnTime > 3000) {\n        const enemyId = state.nextEnemyId++;\n        const angle = Math.random() * Math.PI * 2;\n        const dist = 50;\n        state.enemies[enemyId] = {\n          x: Math.cos(angle) * dist,\n          z: Math.sin(angle) * dist,\n          health: 1\n        };\n        state.lastSpawnTime = now;\n      }\n\n      // Respawn dead players after 3 seconds\n      Object.entries(state.players).forEach(([playerId, player]) => {\n        if (player.health <= 0) {\n          if (!player.deathTime) {\n            player.deathTime = now;\n          } else if (now - player.deathTime > 3000) {\n            player.health = 100;\n            player.x = (Math.random() - 0.5) * 40;\n            player.z = (Math.random() - 0.5) * 40;\n            player.pitch = 0;\n            delete player.deathTime;\n          }\n        }\n      });\n    }\n  }\n};\n"
+    code: `
+function initGameClient(container, socket, roomId, emitAction) {
+  // Load Three.js from CDN
+  const loadScript = (src) => {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  };
+
+  const gameContainer = document.createElement('div');
+  gameContainer.style.cssText = 'width: 100%; height: 100vh; position: relative; overflow: hidden;';
+  container.appendChild(gameContainer);
+
+  const statusDiv = document.createElement('div');
+  statusDiv.style.cssText = 'position: absolute; top: 20px; left: 20px; color: #fff; font-size: 18px; z-index: 100; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-family: monospace;';
+  gameContainer.appendChild(statusDiv);
+
+  const crosshair = document.createElement('div');
+  crosshair.style.cssText = 'position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin: -10px 0 0 -10px; border: 2px solid #fff; border-radius: 50%; pointer-events: none; z-index: 100;';
+  gameContainer.appendChild(crosshair);
+
+  const loadingDiv = document.createElement('div');
+  loadingDiv.textContent = 'Loading Three.js...';
+  loadingDiv.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 24px; z-index: 101;';
+  gameContainer.appendChild(loadingDiv);
+
+  let THREE, scene, camera, renderer;
+  let myPlayerId = null;
+  let keys = {};
+  let mouseMovement = { x: 0, y: 0 };
+  let playerMeshes = {};
+  let bulletMeshes = {};
+
+  loadScript('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js').then(() => {
+    loadingDiv.style.display = 'none';
+    THREE = window.THREE;
+
+    // Setup scene
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87ceeb);
+    scene.fog = new THREE.Fog(0x87ceeb, 0, 200);
+
+    // Setup camera
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 5, 0);
+
+    // Setup renderer
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    gameContainer.insertBefore(renderer.domElement, statusDiv);
+
+    // Add lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(50, 100, 50);
+    dirLight.castShadow = true;
+    dirLight.shadow.camera.left = -100;
+    dirLight.shadow.camera.right = 100;
+    dirLight.shadow.camera.top = 100;
+    dirLight.shadow.camera.bottom = -100;
+    scene.add(dirLight);
+
+    // Add ground
+    const groundGeometry = new THREE.PlaneGeometry(200, 200);
+    const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x7cfc00 });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Add grid helper
+    const gridHelper = new THREE.GridHelper(200, 40, 0x000000, 0x000000);
+    gridHelper.material.opacity = 0.2;
+    gridHelper.material.transparent = true;
+    scene.add(gridHelper);
+
+    // Input handling
+    document.addEventListener('keydown', (e) => {
+      keys[e.code] = true;
+      if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space'].includes(e.code)) {
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      keys[e.code] = false;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (document.pointerLockElement === renderer.domElement) {
+        mouseMovement.x = e.movementX || 0;
+        mouseMovement.y = e.movementY || 0;
+      }
+    });
+
+    // Request pointer lock on click
+    renderer.domElement.addEventListener('click', () => {
+      if (document.pointerLockElement !== renderer.domElement) {
+        renderer.domElement.requestPointerLock();
+      } else {
+        emitAction('shoot', {});
+      }
+    });
+
+    // Show instructions when not locked
+    const instructionsDiv = document.createElement('div');
+    instructionsDiv.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 24px; z-index: 102; text-align: center; background: rgba(0,0,0,0.8); padding: 40px; border-radius: 10px; pointer-events: none;';
+    instructionsDiv.innerHTML = 'Click to start<br><span style="font-size: 16px; color: #aaa;">WASD to move, Mouse to look, Click to shoot</span>';
+    gameContainer.appendChild(instructionsDiv);
+
+    document.addEventListener('pointerlockchange', () => {
+      if (document.pointerLockElement === renderer.domElement) {
+        instructionsDiv.style.display = 'none';
+      } else {
+        instructionsDiv.style.display = 'block';
+      }
+    });
+
+    // Game loop
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Send player input to server
+      if (myPlayerId) {
+        const movement = {
+          forward: keys['KeyW'] ? 1 : 0,
+          backward: keys['KeyS'] ? 1 : 0,
+          left: keys['KeyA'] ? 1 : 0,
+          right: keys['KeyD'] ? 1 : 0,
+          rotX: mouseMovement.x,
+          rotY: mouseMovement.y
+        };
+        mouseMovement.x = 0;
+        mouseMovement.y = 0;
+
+        if (movement.forward || movement.backward || movement.left || movement.right || movement.rotX || movement.rotY) {
+          emitAction('move', movement);
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  }).catch(err => {
+    loadingDiv.textContent = 'Error loading game. Please refresh.';
+    console.error('Failed to load Three.js:', err);
+  });
+
+  return {
+    onStateUpdate: (state) => {
+      if (!THREE || !scene) return;
+
+      myPlayerId = socket.id;
+
+      // Update players
+      if (state.players) {
+        Object.entries(state.players).forEach(([id, player]) => {
+          // Don't render the local player's mesh in first person
+          if (id === myPlayerId) {
+            // Update camera for first-person view
+            const eyeHeight = 1.6;
+            camera.position.set(player.x, eyeHeight, player.z);
+
+            // Set camera rotation based on player rotation
+            camera.rotation.order = 'YXZ';
+            camera.rotation.y = player.rotation;
+            camera.rotation.x = player.pitch || 0;
+
+            // Remove local player mesh if it exists
+            if (playerMeshes[id]) {
+              scene.remove(playerMeshes[id]);
+              delete playerMeshes[id];
+            }
+          } else {
+            // Render other players
+            if (!playerMeshes[id]) {
+              // Create player mesh (cube)
+              const geometry = new THREE.BoxGeometry(1, 2, 1);
+              const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+              const mesh = new THREE.Mesh(geometry, material);
+              mesh.castShadow = true;
+              mesh.receiveShadow = true;
+              scene.add(mesh);
+              playerMeshes[id] = mesh;
+            }
+
+            // Update player position and rotation
+            const mesh = playerMeshes[id];
+            mesh.position.set(player.x, 1, player.z);
+            mesh.rotation.y = player.rotation;
+          }
+        });
+
+        // Remove disconnected players
+        Object.keys(playerMeshes).forEach(id => {
+          if (!state.players[id]) {
+            scene.remove(playerMeshes[id]);
+            delete playerMeshes[id];
+          }
+        });
+      }
+
+      // Update bullets
+      if (state.bullets) {
+        Object.entries(state.bullets).forEach(([id, bullet]) => {
+          if (!bulletMeshes[id]) {
+            // Create bullet mesh (sphere)
+            const geometry = new THREE.SphereGeometry(0.2, 8, 8);
+            const material = new THREE.MeshStandardMaterial({ color: 0xffff00 });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = true;
+            scene.add(mesh);
+            bulletMeshes[id] = mesh;
+          }
+
+          // Update bullet position
+          const mesh = bulletMeshes[id];
+          mesh.position.set(bullet.x, bullet.y, bullet.z);
+        });
+
+        // Remove old bullets
+        Object.keys(bulletMeshes).forEach(id => {
+          if (!state.bullets[id]) {
+            scene.remove(bulletMeshes[id]);
+            delete bulletMeshes[id];
+          }
+        });
+      }
+
+      // Update enemies
+      if (state.enemies) {
+        Object.entries(state.enemies).forEach(([id, enemy]) => {
+          const enemyId = 'enemy_' + id;
+          if (!playerMeshes[enemyId]) {
+            // Create enemy mesh (purple cube)
+            const geometry = new THREE.BoxGeometry(1, 2, 1);
+            const material = new THREE.MeshStandardMaterial({ color: 0x800080 });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scene.add(mesh);
+            playerMeshes[enemyId] = mesh;
+          }
+
+          // Update enemy position
+          const mesh = playerMeshes[enemyId];
+          mesh.position.set(enemy.x, 1, enemy.z);
+        });
+
+        // Remove dead enemies
+        Object.keys(playerMeshes).forEach(id => {
+          if (id.startsWith('enemy_')) {
+            const enemyId = id.replace('enemy_', '');
+            if (!state.enemies[enemyId]) {
+              scene.remove(playerMeshes[id]);
+              delete playerMeshes[id];
+            }
+          }
+        });
+      }
+
+      // Update status display
+      const myPlayer = state.players ? state.players[myPlayerId] : null;
+      if (myPlayer) {
+        statusDiv.innerHTML =
+          'Health: ' + (myPlayer.health || 100) + '<br>' +
+          'Score: ' + (myPlayer.score || 0) + '<br>' +
+          'Enemies: ' + (state.enemies ? Object.keys(state.enemies).length : 0);
+      }
+    }
+  };
+}
+
+const serverLogic = {
+  initialState: {
+    players: {},
+    bullets: {},
+    enemies: {},
+    nextBulletId: 0,
+    nextEnemyId: 0,
+    lastSpawnTime: Date.now()
+  },
+  moves: {
+    playerJoined: (state, payload, playerId) => {
+      // Spawn player at random position
+      state.players[playerId] = {
+        x: (Math.random() - 0.5) * 40,
+        z: (Math.random() - 0.5) * 40,
+        rotation: 0,
+        pitch: 0,
+        health: 100,
+        score: 0
+      };
+    },
+
+    move: (state, payload, playerId) => {
+      const player = state.players[playerId];
+      if (!player || player.health <= 0) return;
+
+      const speed = 0.3;
+      const rotSpeed = 0.002;  // Reduced from 0.05 for lower sensitivity
+      const pitchSpeed = 0.002;  // Reduced from 0.03 for lower sensitivity
+
+      // Update rotation (horizontal)
+      player.rotation -= payload.rotX * rotSpeed;
+
+      // Update pitch (vertical look) and clamp it
+      if (payload.rotY) {
+        player.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, player.pitch - payload.rotY * pitchSpeed));
+      }
+
+      // Calculate movement direction based on rotation
+      // Fixed: Negative Math.sin for forward movement (W key moves in -z direction in camera space)
+      const forward = {
+        x: -Math.sin(player.rotation),
+        z: -Math.cos(player.rotation)
+      };
+      const right = {
+        x: Math.cos(player.rotation),
+        z: -Math.sin(player.rotation)
+      };
+
+      // Apply movement
+      if (payload.forward) {
+        player.x += forward.x * speed;
+        player.z += forward.z * speed;
+      }
+      if (payload.backward) {
+        player.x -= forward.x * speed;
+        player.z -= forward.z * speed;
+      }
+      if (payload.right) {
+        player.x += right.x * speed;
+        player.z += right.z * speed;
+      }
+      if (payload.left) {
+        player.x -= right.x * speed;
+        player.z -= right.z * speed;
+      }
+
+      // Clamp to arena bounds
+      player.x = Math.max(-95, Math.min(95, player.x));
+      player.z = Math.max(-95, Math.min(95, player.z));
+    },
+
+    shoot: (state, payload, playerId) => {
+      const player = state.players[playerId];
+      if (!player || player.health <= 0) return;
+
+      // Create bullet - use same forward direction as movement
+      const bulletId = state.nextBulletId++;
+      state.bullets[bulletId] = {
+        x: player.x,
+        y: 1.5,
+        z: player.z,
+        vx: -Math.sin(player.rotation) * 2,  // Fixed to match movement direction
+        vz: -Math.cos(player.rotation) * 2,  // Fixed to match movement direction
+        ownerId: playerId,
+        createdAt: Date.now()
+      };
+    },
+
+    tick: (state) => {
+      const now = Date.now();
+
+      // Update bullets
+      Object.entries(state.bullets).forEach(([id, bullet]) => {
+        bullet.x += bullet.vx;
+        bullet.z += bullet.vz;
+
+        // Remove bullets that are out of bounds or too old
+        if (Math.abs(bullet.x) > 100 || Math.abs(bullet.z) > 100 || now - bullet.createdAt > 3000) {
+          delete state.bullets[id];
+          return;
+        }
+
+        // Check collision with enemies
+        Object.entries(state.enemies).forEach(([enemyId, enemy]) => {
+          const dx = bullet.x - enemy.x;
+          const dz = bullet.z - enemy.z;
+          const dist = Math.sqrt(dx * dx + dz * dz);
+
+          if (dist < 1) {
+            // Hit enemy
+            delete state.enemies[enemyId];
+            delete state.bullets[id];
+
+            // Award points to shooter
+            if (state.players[bullet.ownerId]) {
+              state.players[bullet.ownerId].score += 10;
+            }
+          }
+        });
+
+        // Check collision with players
+        Object.entries(state.players).forEach(([playerId, player]) => {
+          if (playerId === bullet.ownerId || player.health <= 0) return;
+
+          const dx = bullet.x - player.x;
+          const dz = bullet.z - player.z;
+          const dist = Math.sqrt(dx * dx + dz * dz);
+
+          if (dist < 1) {
+            // Hit player
+            player.health -= 20;
+            delete state.bullets[id];
+
+            if (player.health <= 0) {
+              // Award points for kill
+              if (state.players[bullet.ownerId]) {
+                state.players[bullet.ownerId].score += 50;
+              }
+            }
+          }
+        });
+      });
+
+      // Update enemies (move towards nearest player)
+      Object.entries(state.enemies).forEach(([enemyId, enemy]) => {
+        let nearestPlayer = null;
+        let nearestDist = Infinity;
+        let nearestPlayerId = null;
+
+        Object.entries(state.players).forEach(([playerId, player]) => {
+          if (player.health <= 0) return;
+          const dx = player.x - enemy.x;
+          const dz = player.z - enemy.z;
+          const dist = Math.sqrt(dx * dx + dz * dz);
+          if (dist < nearestDist) {
+            nearestDist = dist;
+            nearestPlayer = player;
+            nearestPlayerId = playerId;
+          }
+        });
+
+        if (nearestPlayer) {
+          const dx = nearestPlayer.x - enemy.x;
+          const dz = nearestPlayer.z - enemy.z;
+          const dist = Math.sqrt(dx * dx + dz * dz);
+
+          // Check for collision with player (deal damage)
+          if (dist < 1.5) {
+            // Enemy touches player - deal damage
+            if (!enemy.lastHitTime || now - enemy.lastHitTime > 1000) {
+              nearestPlayer.health -= 10;
+              enemy.lastHitTime = now;
+
+              // Kill enemy on contact
+              delete state.enemies[enemyId];
+            }
+          } else if (dist > 0) {
+            // Move towards player
+            enemy.x += (dx / dist) * 0.1;
+            enemy.z += (dz / dist) * 0.1;
+          }
+        }
+      });
+
+      // Spawn enemies periodically
+      const enemyCount = Object.keys(state.enemies).length;
+      if (enemyCount < 5 && now - state.lastSpawnTime > 3000) {
+        const enemyId = state.nextEnemyId++;
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 50;
+        state.enemies[enemyId] = {
+          x: Math.cos(angle) * dist,
+          z: Math.sin(angle) * dist,
+          health: 1
+        };
+        state.lastSpawnTime = now;
+      }
+
+      // Respawn dead players after 3 seconds
+      Object.entries(state.players).forEach(([playerId, player]) => {
+        if (player.health <= 0) {
+          if (!player.deathTime) {
+            player.deathTime = now;
+          } else if (now - player.deathTime > 3000) {
+            player.health = 100;
+            player.x = (Math.random() - 0.5) * 40;
+            player.z = (Math.random() - 0.5) * 40;
+            player.pitch = 0;
+            delete player.deathTime;
+          }
+        }
+      });
+    }
+  }
 };
+`
+};
+//# sourceMappingURL=shooter.js.map

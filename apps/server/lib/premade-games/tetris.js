@@ -1,7 +1,336 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = {
+export default {
     name: "tetris",
     description: "Classic Tetris - use arrow keys to play",
-    code: "\nfunction initGameClient(container, socket, roomId, emitAction) {\n  const canvas = document.createElement('canvas');\n  canvas.width = 300;\n  canvas.height = 600;\n  canvas.style.cssText = 'display: block; margin: 20px auto; background: #000; border: 2px solid #fff;';\n  container.appendChild(canvas);\n\n  const ctx = canvas.getContext('2d');\n  const BLOCK_SIZE = 30;\n\n  const statusDiv = document.createElement('div');\n  statusDiv.style.cssText = 'text-align: center; margin-top: 20px; font-size: 18px; color: #fff;';\n  container.appendChild(statusDiv);\n\n  const COLORS = {\n    I: '#00f0f0',\n    O: '#f0f000',\n    T: '#a000f0',\n    S: '#00f000',\n    Z: '#f00000',\n    J: '#0000f0',\n    L: '#f0a000'\n  };\n\n  let keysPressed = {};\n\n  document.addEventListener('keydown', (e) => {\n    if (['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', 'Space'].includes(e.code)) {\n      e.preventDefault();\n    }\n\n    if (!keysPressed[e.code]) {\n      keysPressed[e.code] = true;\n\n      if (e.code === 'ArrowLeft') emitAction('move', { direction: 'left' });\n      if (e.code === 'ArrowRight') emitAction('move', { direction: 'right' });\n      if (e.code === 'ArrowDown') emitAction('move', { direction: 'down' });\n      if (e.code === 'ArrowUp') emitAction('rotate', {});\n      if (e.code === 'Space') emitAction('hardDrop', {});\n    }\n  });\n\n  document.addEventListener('keyup', (e) => {\n    keysPressed[e.code] = false;\n  });\n\n  function render(state) {\n    ctx.fillStyle = '#000';\n    ctx.fillRect(0, 0, canvas.width, canvas.height);\n\n    // Draw grid\n    ctx.strokeStyle = '#222';\n    for (let x = 0; x < 10; x++) {\n      for (let y = 0; y < 20; y++) {\n        ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);\n      }\n    }\n\n    // Draw placed blocks\n    if (state.grid) {\n      for (let y = 0; y < 20; y++) {\n        for (let x = 0; x < 10; x++) {\n          if (state.grid[y][x]) {\n            ctx.fillStyle = COLORS[state.grid[y][x]] || '#888';\n            ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);\n            ctx.strokeStyle = '#000';\n            ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);\n          }\n        }\n      }\n    }\n\n    // Draw current piece\n    if (state.currentPiece && state.currentPiece.shape) {\n      ctx.fillStyle = COLORS[state.currentPiece.type] || '#fff';\n      const piece = state.currentPiece;\n      for (let y = 0; y < piece.shape.length; y++) {\n        for (let x = 0; x < piece.shape[y].length; x++) {\n          if (piece.shape[y][x]) {\n            ctx.fillRect(\n              (piece.x + x) * BLOCK_SIZE,\n              (piece.y + y) * BLOCK_SIZE,\n              BLOCK_SIZE,\n              BLOCK_SIZE\n            );\n            ctx.strokeStyle = '#000';\n            ctx.strokeRect(\n              (piece.x + x) * BLOCK_SIZE,\n              (piece.y + y) * BLOCK_SIZE,\n              BLOCK_SIZE,\n              BLOCK_SIZE\n            );\n          }\n        }\n      }\n    }\n\n    // Update status\n    const isPlayer = state.playerId === socket.id;\n    if (state.gameOver) {\n      statusDiv.innerHTML = '<span style=\"color: #f00;\">GAME OVER</span><br>Score: ' + (state.score || 0) + '<br>Lines: ' + (state.lines || 0);\n    } else if (isPlayer) {\n      statusDiv.innerHTML = 'Score: ' + (state.score || 0) + '<br>Lines: ' + (state.lines || 0) + '<br><span style=\"color: #0f0;\">You are playing</span>';\n    } else {\n      statusDiv.innerHTML = 'Score: ' + (state.score || 0) + '<br>Lines: ' + (state.lines || 0) + '<br><span style=\"color: #888;\">Spectating</span>';\n    }\n  }\n\n  return {\n    onStateUpdate: (state) => render(state)\n  };\n}\n\nconst serverLogic = {\n  initialState: {\n    grid: Array(20).fill(null).map(() => Array(10).fill(null)),\n    currentPiece: null,\n    nextPiece: null,\n    score: 0,\n    lines: 0,\n    level: 1,\n    gameOver: false,\n    playerId: null,\n    dropCounter: 0,\n    dropInterval: 1000,\n    lastDropTime: Date.now()\n  },\n  moves: {\n    playerJoined: (state, payload, playerId) => {\n      // First player becomes the active player\n      if (!state.playerId) {\n        state.playerId = playerId;\n\n        // Spawn first piece\n        if (!state.currentPiece) {\n          state.currentPiece = spawnPiece(state);\n          state.nextPiece = getRandomPiece();\n        }\n      }\n    },\n\n    move: (state, payload, playerId) => {\n      if (state.gameOver || state.playerId !== playerId) return;\n\n      const piece = state.currentPiece;\n      if (!piece) return;\n\n      if (payload.direction === 'left') {\n        piece.x--;\n        if (checkCollision(state, piece)) piece.x++;\n      } else if (payload.direction === 'right') {\n        piece.x++;\n        if (checkCollision(state, piece)) piece.x--;\n      } else if (payload.direction === 'down') {\n        piece.y++;\n        if (checkCollision(state, piece)) {\n          piece.y--;\n          lockPiece(state);\n        }\n      }\n    },\n\n    rotate: (state, payload, playerId) => {\n      if (state.gameOver || state.playerId !== playerId) return;\n\n      const piece = state.currentPiece;\n      if (!piece) return;\n\n      // Store original\n      const originalShape = piece.shape;\n\n      // Rotate 90 degrees clockwise\n      piece.shape = piece.shape[0].map((_, i) =>\n        piece.shape.map(row => row[i]).reverse()\n      );\n\n      // Check if rotation is valid\n      if (checkCollision(state, piece)) {\n        // Try wall kicks\n        const kicks = [\n          { x: -1, y: 0 },\n          { x: 1, y: 0 },\n          { x: 0, y: -1 }\n        ];\n\n        let kicked = false;\n        for (const kick of kicks) {\n          piece.x += kick.x;\n          piece.y += kick.y;\n          if (!checkCollision(state, piece)) {\n            kicked = true;\n            break;\n          }\n          piece.x -= kick.x;\n          piece.y -= kick.y;\n        }\n\n        if (!kicked) {\n          piece.shape = originalShape;\n        }\n      }\n    },\n\n    hardDrop: (state, payload, playerId) => {\n      if (state.gameOver || state.playerId !== playerId) return;\n\n      const piece = state.currentPiece;\n      if (!piece) return;\n\n      while (!checkCollision(state, piece)) {\n        piece.y++;\n      }\n      piece.y--;\n      lockPiece(state);\n    },\n\n    tick: (state) => {\n      if (state.gameOver || !state.playerId || !state.currentPiece) return;\n\n      const now = Date.now();\n      const deltaTime = now - state.lastDropTime;\n\n      if (deltaTime > state.dropInterval) {\n        state.lastDropTime = now;\n\n        const piece = state.currentPiece;\n        piece.y++;\n\n        if (checkCollision(state, piece)) {\n          piece.y--;\n          lockPiece(state);\n        }\n      }\n    }\n  }\n};\n\n// Tetris pieces\nconst PIECES = {\n  I: [[1, 1, 1, 1]],\n  O: [[1, 1], [1, 1]],\n  T: [[0, 1, 0], [1, 1, 1]],\n  S: [[0, 1, 1], [1, 1, 0]],\n  Z: [[1, 1, 0], [0, 1, 1]],\n  J: [[1, 0, 0], [1, 1, 1]],\n  L: [[0, 0, 1], [1, 1, 1]]\n};\n\nfunction getRandomPiece() {\n  const types = Object.keys(PIECES);\n  const type = types[Math.floor(Math.random() * types.length)];\n  return { type, shape: PIECES[type] };\n}\n\nfunction spawnPiece(state) {\n  const piece = state.nextPiece || getRandomPiece();\n  state.nextPiece = getRandomPiece();\n\n  return {\n    ...piece,\n    x: Math.floor(10 / 2) - Math.floor(piece.shape[0].length / 2),\n    y: 0\n  };\n}\n\nfunction checkCollision(state, piece) {\n  for (let y = 0; y < piece.shape.length; y++) {\n    for (let x = 0; x < piece.shape[y].length; x++) {\n      if (piece.shape[y][x]) {\n        const newX = piece.x + x;\n        const newY = piece.y + y;\n\n        // Check bounds\n        if (newX < 0 || newX >= 10 || newY >= 20) {\n          return true;\n        }\n\n        // Check collision with placed blocks\n        if (newY >= 0 && state.grid[newY][newX]) {\n          return true;\n        }\n      }\n    }\n  }\n  return false;\n}\n\nfunction lockPiece(state) {\n  const piece = state.currentPiece;\n\n  // Place piece on grid\n  for (let y = 0; y < piece.shape.length; y++) {\n    for (let x = 0; x < piece.shape[y].length; x++) {\n      if (piece.shape[y][x]) {\n        const gridY = piece.y + y;\n        const gridX = piece.x + x;\n        if (gridY >= 0 && gridY < 20 && gridX >= 0 && gridX < 10) {\n          state.grid[gridY][gridX] = piece.type;\n        }\n      }\n    }\n  }\n\n  // Check for completed lines\n  let linesCleared = 0;\n  for (let y = 19; y >= 0; y--) {\n    if (state.grid[y].every(cell => cell !== null)) {\n      state.grid.splice(y, 1);\n      state.grid.unshift(Array(10).fill(null));\n      linesCleared++;\n      y++; // Check same row again\n    }\n  }\n\n  if (linesCleared > 0) {\n    state.lines += linesCleared;\n    state.score += [0, 100, 300, 500, 800][linesCleared] * state.level;\n    state.level = Math.floor(state.lines / 10) + 1;\n    state.dropInterval = Math.max(100, 1000 - (state.level - 1) * 100);\n  }\n\n  // Spawn next piece\n  state.currentPiece = spawnPiece(state);\n\n  // Check game over\n  if (checkCollision(state, state.currentPiece)) {\n    state.gameOver = true;\n  }\n}\n"
+    code: `
+function initGameClient(container, socket, roomId, emitAction) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 300;
+  canvas.height = 600;
+  canvas.style.cssText = 'display: block; margin: 20px auto; background: #000; border: 2px solid #fff;';
+  container.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  const BLOCK_SIZE = 30;
+
+  const statusDiv = document.createElement('div');
+  statusDiv.style.cssText = 'text-align: center; margin-top: 20px; font-size: 18px; color: #fff;';
+  container.appendChild(statusDiv);
+
+  const COLORS = {
+    I: '#00f0f0',
+    O: '#f0f000',
+    T: '#a000f0',
+    S: '#00f000',
+    Z: '#f00000',
+    J: '#0000f0',
+    L: '#f0a000'
+  };
+
+  let keysPressed = {};
+
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', 'Space'].includes(e.code)) {
+      e.preventDefault();
+    }
+
+    if (!keysPressed[e.code]) {
+      keysPressed[e.code] = true;
+
+      if (e.code === 'ArrowLeft') emitAction('move', { direction: 'left' });
+      if (e.code === 'ArrowRight') emitAction('move', { direction: 'right' });
+      if (e.code === 'ArrowDown') emitAction('move', { direction: 'down' });
+      if (e.code === 'ArrowUp') emitAction('rotate', {});
+      if (e.code === 'Space') emitAction('hardDrop', {});
+    }
+  });
+
+  document.addEventListener('keyup', (e) => {
+    keysPressed[e.code] = false;
+  });
+
+  function render(state) {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw grid
+    ctx.strokeStyle = '#222';
+    for (let x = 0; x < 10; x++) {
+      for (let y = 0; y < 20; y++) {
+        ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+      }
+    }
+
+    // Draw placed blocks
+    if (state.grid) {
+      for (let y = 0; y < 20; y++) {
+        for (let x = 0; x < 10; x++) {
+          if (state.grid[y][x]) {
+            ctx.fillStyle = COLORS[state.grid[y][x]] || '#888';
+            ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            ctx.strokeStyle = '#000';
+            ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+          }
+        }
+      }
+    }
+
+    // Draw current piece
+    if (state.currentPiece && state.currentPiece.shape) {
+      ctx.fillStyle = COLORS[state.currentPiece.type] || '#fff';
+      const piece = state.currentPiece;
+      for (let y = 0; y < piece.shape.length; y++) {
+        for (let x = 0; x < piece.shape[y].length; x++) {
+          if (piece.shape[y][x]) {
+            ctx.fillRect(
+              (piece.x + x) * BLOCK_SIZE,
+              (piece.y + y) * BLOCK_SIZE,
+              BLOCK_SIZE,
+              BLOCK_SIZE
+            );
+            ctx.strokeStyle = '#000';
+            ctx.strokeRect(
+              (piece.x + x) * BLOCK_SIZE,
+              (piece.y + y) * BLOCK_SIZE,
+              BLOCK_SIZE,
+              BLOCK_SIZE
+            );
+          }
+        }
+      }
+    }
+
+    // Update status
+    const isPlayer = state.playerId === socket.id;
+    if (state.gameOver) {
+      statusDiv.innerHTML = '<span style="color: #f00;">GAME OVER</span><br>Score: ' + (state.score || 0) + '<br>Lines: ' + (state.lines || 0);
+    } else if (isPlayer) {
+      statusDiv.innerHTML = 'Score: ' + (state.score || 0) + '<br>Lines: ' + (state.lines || 0) + '<br><span style="color: #0f0;">You are playing</span>';
+    } else {
+      statusDiv.innerHTML = 'Score: ' + (state.score || 0) + '<br>Lines: ' + (state.lines || 0) + '<br><span style="color: #888;">Spectating</span>';
+    }
+  }
+
+  return {
+    onStateUpdate: (state) => render(state)
+  };
+}
+
+const serverLogic = {
+  initialState: {
+    grid: Array(20).fill(null).map(() => Array(10).fill(null)),
+    currentPiece: null,
+    nextPiece: null,
+    score: 0,
+    lines: 0,
+    level: 1,
+    gameOver: false,
+    playerId: null,
+    dropCounter: 0,
+    dropInterval: 1000,
+    lastDropTime: Date.now()
+  },
+  moves: {
+    playerJoined: (state, payload, playerId) => {
+      // First player becomes the active player
+      if (!state.playerId) {
+        state.playerId = playerId;
+
+        // Spawn first piece
+        if (!state.currentPiece) {
+          state.currentPiece = spawnPiece(state);
+          state.nextPiece = getRandomPiece();
+        }
+      }
+    },
+
+    move: (state, payload, playerId) => {
+      if (state.gameOver || state.playerId !== playerId) return;
+
+      const piece = state.currentPiece;
+      if (!piece) return;
+
+      if (payload.direction === 'left') {
+        piece.x--;
+        if (checkCollision(state, piece)) piece.x++;
+      } else if (payload.direction === 'right') {
+        piece.x++;
+        if (checkCollision(state, piece)) piece.x--;
+      } else if (payload.direction === 'down') {
+        piece.y++;
+        if (checkCollision(state, piece)) {
+          piece.y--;
+          lockPiece(state);
+        }
+      }
+    },
+
+    rotate: (state, payload, playerId) => {
+      if (state.gameOver || state.playerId !== playerId) return;
+
+      const piece = state.currentPiece;
+      if (!piece) return;
+
+      // Store original
+      const originalShape = piece.shape;
+
+      // Rotate 90 degrees clockwise
+      piece.shape = piece.shape[0].map((_, i) =>
+        piece.shape.map(row => row[i]).reverse()
+      );
+
+      // Check if rotation is valid
+      if (checkCollision(state, piece)) {
+        // Try wall kicks
+        const kicks = [
+          { x: -1, y: 0 },
+          { x: 1, y: 0 },
+          { x: 0, y: -1 }
+        ];
+
+        let kicked = false;
+        for (const kick of kicks) {
+          piece.x += kick.x;
+          piece.y += kick.y;
+          if (!checkCollision(state, piece)) {
+            kicked = true;
+            break;
+          }
+          piece.x -= kick.x;
+          piece.y -= kick.y;
+        }
+
+        if (!kicked) {
+          piece.shape = originalShape;
+        }
+      }
+    },
+
+    hardDrop: (state, payload, playerId) => {
+      if (state.gameOver || state.playerId !== playerId) return;
+
+      const piece = state.currentPiece;
+      if (!piece) return;
+
+      while (!checkCollision(state, piece)) {
+        piece.y++;
+      }
+      piece.y--;
+      lockPiece(state);
+    },
+
+    tick: (state) => {
+      if (state.gameOver || !state.playerId || !state.currentPiece) return;
+
+      const now = Date.now();
+      const deltaTime = now - state.lastDropTime;
+
+      if (deltaTime > state.dropInterval) {
+        state.lastDropTime = now;
+
+        const piece = state.currentPiece;
+        piece.y++;
+
+        if (checkCollision(state, piece)) {
+          piece.y--;
+          lockPiece(state);
+        }
+      }
+    }
+  }
 };
+
+// Tetris pieces
+const PIECES = {
+  I: [[1, 1, 1, 1]],
+  O: [[1, 1], [1, 1]],
+  T: [[0, 1, 0], [1, 1, 1]],
+  S: [[0, 1, 1], [1, 1, 0]],
+  Z: [[1, 1, 0], [0, 1, 1]],
+  J: [[1, 0, 0], [1, 1, 1]],
+  L: [[0, 0, 1], [1, 1, 1]]
+};
+
+function getRandomPiece() {
+  const types = Object.keys(PIECES);
+  const type = types[Math.floor(Math.random() * types.length)];
+  return { type, shape: PIECES[type] };
+}
+
+function spawnPiece(state) {
+  const piece = state.nextPiece || getRandomPiece();
+  state.nextPiece = getRandomPiece();
+
+  return {
+    ...piece,
+    x: Math.floor(10 / 2) - Math.floor(piece.shape[0].length / 2),
+    y: 0
+  };
+}
+
+function checkCollision(state, piece) {
+  for (let y = 0; y < piece.shape.length; y++) {
+    for (let x = 0; x < piece.shape[y].length; x++) {
+      if (piece.shape[y][x]) {
+        const newX = piece.x + x;
+        const newY = piece.y + y;
+
+        // Check bounds
+        if (newX < 0 || newX >= 10 || newY >= 20) {
+          return true;
+        }
+
+        // Check collision with placed blocks
+        if (newY >= 0 && state.grid[newY][newX]) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function lockPiece(state) {
+  const piece = state.currentPiece;
+
+  // Place piece on grid
+  for (let y = 0; y < piece.shape.length; y++) {
+    for (let x = 0; x < piece.shape[y].length; x++) {
+      if (piece.shape[y][x]) {
+        const gridY = piece.y + y;
+        const gridX = piece.x + x;
+        if (gridY >= 0 && gridY < 20 && gridX >= 0 && gridX < 10) {
+          state.grid[gridY][gridX] = piece.type;
+        }
+      }
+    }
+  }
+
+  // Check for completed lines
+  let linesCleared = 0;
+  for (let y = 19; y >= 0; y--) {
+    if (state.grid[y].every(cell => cell !== null)) {
+      state.grid.splice(y, 1);
+      state.grid.unshift(Array(10).fill(null));
+      linesCleared++;
+      y++; // Check same row again
+    }
+  }
+
+  if (linesCleared > 0) {
+    state.lines += linesCleared;
+    state.score += [0, 100, 300, 500, 800][linesCleared] * state.level;
+    state.level = Math.floor(state.lines / 10) + 1;
+    state.dropInterval = Math.max(100, 1000 - (state.level - 1) * 100);
+  }
+
+  // Spawn next piece
+  state.currentPiece = spawnPiece(state);
+
+  // Check game over
+  if (checkCollision(state, state.currentPiece)) {
+    state.gameOver = true;
+  }
+}
+`
+};
+//# sourceMappingURL=tetris.js.map

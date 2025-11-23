@@ -27,7 +27,8 @@ const rooms = new Map();
 const TICK_RATE = 16; // ~60 FPS
 function startGameLoop(room) {
     // Only start game loop if the game has a tick action
-    if (!room.logic.moves.tick) {
+    const tickFn = room.logic.moves.tick;
+    if (!tickFn) {
         return;
     }
     // Don't start if already running
@@ -36,7 +37,8 @@ function startGameLoop(room) {
     }
     room.tickInterval = setInterval(() => {
         try {
-            room.logic.moves.tick(room.state);
+            // We've verified tick exists above, so we can safely call it
+            tickFn(room.state);
             // Broadcast updated state to all players in the room
             io.to(room.id).emit("state_update", room.state);
         }
@@ -49,7 +51,8 @@ function startGameLoop(room) {
 function stopGameLoop(room) {
     if (room.tickInterval) {
         clearInterval(room.tickInterval);
-        room.tickInterval = undefined;
+        // Delete the property instead of setting to undefined (exactOptionalPropertyTypes)
+        delete room.tickInterval;
         console.log(`Game loop stopped for room ${room.id}`);
     }
 }
@@ -74,7 +77,13 @@ async function serveGameClient(gameName, roomName, res) {
             if (rows.length === 0) {
                 return res.status(404).send('Game not found');
             }
-            game = rows[0];
+            // rows[0] could be undefined, convert to null if needed
+            game = rows[0] ?? null;
+        }
+        // At this point, game should never be null (we return early if not found)
+        // But TypeScript doesn't track the early return, so we add a safety check
+        if (!game) {
+            return res.status(404).send('Game not found');
         }
         const prefilledRoom = roomName || '';
         // Serve HTML page that loads the game
@@ -483,7 +492,15 @@ io.on("connection", (socket) => {
                         socket.emit("error", "Game not found");
                         return;
                     }
-                    game = rows[0];
+                    // rows[0] could be undefined, convert to null if needed
+                    game = rows[0] ?? null;
+                }
+                // At this point, game should never be null (we return early if not found)
+                // But TypeScript doesn't track the early return, so we add a safety check
+                if (!game) {
+                    console.error(`Game not found: ${gameName}`);
+                    socket.emit("error", "Game not found");
+                    return;
                 }
                 // Execute game logic to get server-side state machine
                 // We need to wrap the code to export serverLogic to the sandbox
