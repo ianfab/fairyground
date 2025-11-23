@@ -7,6 +7,7 @@ import { getGameUrl } from "@/lib/config";
 import { AlertCircle, X } from "lucide-react";
 import { useAuthInfo, useRedirectFunctions } from "@propelauth/react";
 import dynamic from 'next/dynamic';
+import { SnakeGameWhileWaiting } from "@/app/components/SnakeGameWhileWaiting";
 
 const Editor = dynamic(
   () => import('@monaco-editor/react'),
@@ -489,28 +490,34 @@ export default function CreateGame() {
         </div>
       </div>
 
-      {/* Right Pane: Code Preview */}
+      {/* Right Pane: Code Preview or Snake Game */}
       <div className="w-1/2 flex flex-col bg-gray-900/50 p-6 overflow-hidden">
-        <h2 className="text-xl font-bold mb-4 text-gray-400">Generated Code</h2>
-        <div className="flex-1 bg-black border border-gray-800 rounded overflow-hidden">
-          <Editor
-            height="100%"
-            defaultLanguage="javascript"
-            value={generatedCode || "// Code will appear here after generation..."}
-            onChange={handleCodeChange}
-            theme="vs-dark"
-            options={{
-              fontSize: 13,
-              minimap: { enabled: false },
-              scrollBeyondLastLine: false,
-              wordWrap: "on",
-              automaticLayout: true,
-              tabSize: 2,
-              insertSpaces: true,
-              readOnly: false,
-            }}
-          />
-        </div>
+        {generatingCode ? (
+          <SnakeGameWhileWaiting />
+        ) : (
+          <>
+            <h2 className="text-xl font-bold mb-4 text-gray-400">Generated Code</h2>
+            <div className="flex-1 bg-black border border-gray-800 rounded overflow-hidden">
+              <Editor
+                height="100%"
+                defaultLanguage="javascript"
+                value={generatedCode || "// Code will appear here after generation..."}
+                onChange={handleCodeChange}
+                theme="vs-dark"
+                options={{
+                  fontSize: 13,
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  wordWrap: "on",
+                  automaticLayout: true,
+                  tabSize: 2,
+                  insertSpaces: true,
+                  readOnly: false,
+                }}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

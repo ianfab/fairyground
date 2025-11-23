@@ -15,18 +15,23 @@ export class BoardComponent {
 
     // Initialize chessground if config is provided
     if (config) {
-      this.instance = Chessground(this.el, config, this.pocketTop, this.pocketBottom);
+      this.instance = Chessground(
+        this.el,
+        config,
+        this.pocketTop,
+        this.pocketBottom,
+      );
     }
   }
 
   initialize(variant, ffish, settings) {
     // settings: { isFischerRandom, showDests, clickClickMove, notation, events: { after, afterNewPiece, select } }
     if (this.board !== null) this.board.delete();
-    
+
     this.board = new ffish.Board(
       variant,
       ffish.startingFen(variant),
-      settings.isFischerRandom
+      settings.isFischerRandom,
     );
 
     const fenBoard = this.board.fen().split(" ")[0];
@@ -76,8 +81,13 @@ export class BoardComponent {
       notation: settings.notation,
     };
 
-    this.instance = Chessground(this.el, config, this.pocketTop, this.pocketBottom);
-    
+    this.instance = Chessground(
+      this.el,
+      config,
+      this.pocketTop,
+      this.pocketBottom,
+    );
+
     // Handle pocket visibility
     if (pocketRoles === undefined) {
       this.pocketTop.classList.add("no-inital-pocket-piece");
@@ -117,9 +127,13 @@ export class BoardComponent {
     return [...uniqueLetters].map((char) => char + "-piece");
   }
 
-
   reinitialize(config) {
-    this.instance = Chessground(this.el, config, this.pocketTop, this.pocketBottom);
+    this.instance = Chessground(
+      this.el,
+      config,
+      this.pocketTop,
+      this.pocketBottom,
+    );
     return this.instance;
   }
 
@@ -137,7 +151,8 @@ export class BoardComponent {
 
   updatePockets(dimensions, falsefen) {
     let mainboard = this.container.getElementsByTagName("cg-board")[0];
-    let mainboardcontainer = this.container.getElementsByTagName("cg-container")[0];
+    let mainboardcontainer =
+      this.container.getElementsByTagName("cg-container")[0];
     let css_height = mainboardcontainer.style.height;
     let css_width = mainboardcontainer.style.width;
     let state = this.instance.state;
@@ -165,14 +180,19 @@ export class BoardComponent {
     const setStyle = (el) => {
       el.setAttribute(
         "style",
-        `--pocketLength: ${pocketlength}; --files: ${dimensions.width}; --ranks: ${dimensions.height}; --cg-width: ${css_width}; --cg-height: ${css_height}`
+        `--pocketLength: ${pocketlength}; --files: ${dimensions.width}; --ranks: ${dimensions.height}; --cg-width: ${css_width}; --cg-height: ${css_height}`,
       );
     };
 
     setStyle(this.pocketTop);
     setStyle(this.pocketBottom);
 
-    pocketutil.renderPocketsInitial(state, elements, this.pocketTop, this.pocketBottom);
+    pocketutil.renderPocketsInitial(
+      state,
+      elements,
+      this.pocketTop,
+      this.pocketBottom,
+    );
     pocketutil.renderPockets(state);
 
     setStyle(this.pocketTop);
@@ -206,7 +226,7 @@ export class BoardComponent {
     const size = boardSize;
     let classes, styles;
     let isblack = this.instance.state.orientation == "black";
-    
+
     for (i = 0; i < coordinateobj.length; i++) {
       elem = coordinateobj[i];
       if (elem instanceof HTMLElement) {
@@ -328,4 +348,3 @@ export class BoardComponent {
     }
   }
 }
-

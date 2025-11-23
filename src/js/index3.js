@@ -205,7 +205,9 @@ function loadVariantFromConfig(iniText) {
   try {
     // Parse variant name from .ini file
     const variantNameMatch = iniText.match(/^\[([^:\]]+)/m);
-    const parsedVariantName = variantNameMatch ? variantNameMatch[1].toLowerCase() : null;
+    const parsedVariantName = variantNameMatch
+      ? variantNameMatch[1].toLowerCase()
+      : null;
     console.log("Parsed variant name from .ini:", parsedVariantName);
 
     ffish.loadVariantConfig(iniText);
@@ -215,15 +217,16 @@ function loadVariantFromConfig(iniText) {
     const variantsString = ffish.variants();
     console.log("Available variants:", variantsString);
 
-    const variants = variantsString.split(" ").filter(v => v.length > 0);
+    const variants = variantsString.split(" ").filter((v) => v.length > 0);
 
     if (variants.length === 0) {
       throw new Error("No variants found in configuration");
     }
 
     // Populate dropdown with variants
-    variantDropdown.innerHTML = '<option value="">-- Select a variant --</option>';
-    variants.forEach(variant => {
+    variantDropdown.innerHTML =
+      '<option value="">-- Select a variant --</option>';
+    variants.forEach((variant) => {
       const option = document.createElement("option");
       option.value = variant;
       option.textContent = variant;
@@ -232,12 +235,17 @@ function loadVariantFromConfig(iniText) {
 
     // Try to auto-select variant matching the parsed name from .ini
     if (parsedVariantName) {
-      const matchingVariant = variants.find(v => v.toLowerCase() === parsedVariantName);
+      const matchingVariant = variants.find(
+        (v) => v.toLowerCase() === parsedVariantName,
+      );
       if (matchingVariant) {
         variantDropdown.value = matchingVariant;
         currentVariant = matchingVariant;
         startGameBtn.disabled = false;
-        showMessage(uploadStatus, `Loaded ${matchingVariant} - click Start Game!`);
+        showMessage(
+          uploadStatus,
+          `Loaded ${matchingVariant} - click Start Game!`,
+        );
 
         // Show variant selector
         variantSelector.style.display = "flex";
@@ -246,7 +254,10 @@ function loadVariantFromConfig(iniText) {
       }
     }
 
-    showMessage(uploadStatus, `Successfully loaded ${variants.length} variant(s)!`);
+    showMessage(
+      uploadStatus,
+      `Successfully loaded ${variants.length} variant(s)!`,
+    );
     variantSelector.style.display = "flex";
 
     return variants[0];
@@ -341,7 +352,7 @@ function initEngine() {
         [],
         "ANALYSIS",
         15000,
-        ws
+        ws,
       );
 
       BinaryEngineFeature.analysis_engine = engineObj;
@@ -370,7 +381,7 @@ function initEngine() {
       // Load the engine
       engine.Load(
         () => console.log("Load callback fired"),
-        () => console.error("Load failure callback fired")
+        () => console.error("Load failure callback fired"),
       );
     } catch (e) {
       console.error("Failed to create engine:", e);
@@ -387,7 +398,13 @@ function makeEngineMove() {
   console.log("- engine:", !!engine);
   console.log("- engine.IsLoaded:", engine ? engine.IsLoaded : "N/A");
 
-  if (!board || board.isGameOver() || engineThinking || !engine || !engine.IsLoaded) {
+  if (
+    !board ||
+    board.isGameOver() ||
+    engineThinking ||
+    !engine ||
+    !engine.IsLoaded
+  ) {
     console.log("→ Skipping engine move (conditions not met)");
     return;
   }
@@ -400,7 +417,12 @@ function makeEngineMove() {
   // Get current position and moves
   const fen = board.fen();
   const moveStack = board.moveStack();
-  const moves = moveStack ? moveStack.split(" ").filter(m => m).join(" ") : "";
+  const moves = moveStack
+    ? moveStack
+        .split(" ")
+        .filter((m) => m)
+        .join(" ")
+    : "";
   const currentPlayer = board.turn() ? "WHITE" : "BLACK";
 
   // Set up position
@@ -430,7 +452,10 @@ function makeEngineMove() {
             fen: newFen,
             turnColor: board.turn() ? "white" : "black",
             check: board.isCheck(),
-            lastMove: bestMove.length >= 4 ? [bestMove.substring(0, 2), bestMove.substring(2, 4)] : undefined,
+            lastMove:
+              bestMove.length >= 4
+                ? [bestMove.substring(0, 2), bestMove.substring(2, 4)]
+                : undefined,
             movable: {
               color: board.turn() ? "white" : "black",
               dests: getDests(board),
@@ -457,20 +482,20 @@ function makeEngineMove() {
     false, // IsPonder
     false, // IsPonderHit
     false, // IsByoyomi
-    0,     // Depth (0 = no depth limit)
-    1000,  // MoveTime (1 second)
-    0,     // Nodes (0 = no node limit)
-    0,     // WhiteRemainingTime
-    0,     // WhiteTimeGain
-    0,     // BlackRemainingTime
-    0,     // BlackTimeGain
-    0      // ByoyomiPeriodLength
+    0, // Depth (0 = no depth limit)
+    1000, // MoveTime (1 second)
+    0, // Nodes (0 = no node limit)
+    0, // WhiteRemainingTime
+    0, // WhiteTimeGain
+    0, // BlackRemainingTime
+    0, // BlackTimeGain
+    0, // ByoyomiPeriodLength
   );
 }
 
 // Utility functions
 function showMessage(element, message, isError = false) {
-  element.innerHTML = `<div class="${isError ? 'error-message' : 'status-message'}">${message}</div>`;
+  element.innerHTML = `<div class="${isError ? "error-message" : "status-message"}">${message}</div>`;
 }
 
 function clearMessage(element) {
@@ -665,7 +690,9 @@ variantsUpload.addEventListener("change", (event) => {
 
       // Parse variant name from .ini file (look for [variant-name] or [variant-name:parent])
       const variantNameMatch = iniText.match(/^\[([^:\]]+)/m);
-      const parsedVariantName = variantNameMatch ? variantNameMatch[1].toLowerCase() : null;
+      const parsedVariantName = variantNameMatch
+        ? variantNameMatch[1].toLowerCase()
+        : null;
       console.log("Parsed variant name from .ini:", parsedVariantName);
 
       ffish.loadVariantConfig(iniText);
@@ -677,7 +704,7 @@ variantsUpload.addEventListener("change", (event) => {
       console.log("Available variants:", variantsString);
 
       // Convert string to array and filter empty strings
-      const variants = variantsString.split(" ").filter(v => v.length > 0);
+      const variants = variantsString.split(" ").filter((v) => v.length > 0);
 
       if (variants.length === 0) {
         showMessage(uploadStatus, "No variants found in file", true);
@@ -685,8 +712,9 @@ variantsUpload.addEventListener("change", (event) => {
       }
 
       // Populate dropdown with variants
-      variantDropdown.innerHTML = '<option value="">-- Select a variant --</option>';
-      variants.forEach(variant => {
+      variantDropdown.innerHTML =
+        '<option value="">-- Select a variant --</option>';
+      variants.forEach((variant) => {
         const option = document.createElement("option");
         option.value = variant;
         option.textContent = variant;
@@ -695,25 +723,39 @@ variantsUpload.addEventListener("change", (event) => {
 
       // Try to auto-select variant matching the parsed name from .ini
       if (parsedVariantName) {
-        const matchingVariant = variants.find(v => v.toLowerCase() === parsedVariantName);
+        const matchingVariant = variants.find(
+          (v) => v.toLowerCase() === parsedVariantName,
+        );
         if (matchingVariant) {
           variantDropdown.value = matchingVariant;
           currentVariant = matchingVariant;
           startGameBtn.disabled = false;
-          showMessage(uploadStatus, `Loaded ${matchingVariant} - click Start Game!`);
+          showMessage(
+            uploadStatus,
+            `Loaded ${matchingVariant} - click Start Game!`,
+          );
         } else {
-          showMessage(uploadStatus, `Successfully loaded ${variants.length} variant(s)!`);
+          showMessage(
+            uploadStatus,
+            `Successfully loaded ${variants.length} variant(s)!`,
+          );
         }
       } else {
-        showMessage(uploadStatus, `Successfully loaded ${variants.length} variant(s)!`);
+        showMessage(
+          uploadStatus,
+          `Successfully loaded ${variants.length} variant(s)!`,
+        );
       }
 
       // Show variant selector
       variantSelector.style.display = "flex";
-
     } catch (error) {
       console.error("Failed to load variants:", error);
-      showMessage(uploadStatus, `Error loading variants: ${error.message}`, true);
+      showMessage(
+        uploadStatus,
+        `Error loading variants: ${error.message}`,
+        true,
+      );
     }
   };
 
@@ -817,12 +859,12 @@ sendBtn.addEventListener("click", async () => {
 
       addChatMessage(
         `✓ Successfully loaded variant: ${variantName}. Click "Start Game" to play!`,
-        "assistant"
+        "assistant",
       );
     } else {
       addChatMessage(
         "I generated a response but couldn't find a valid .ini configuration. Please try rephrasing your request.",
-        "error"
+        "error",
       );
     }
   } catch (error) {

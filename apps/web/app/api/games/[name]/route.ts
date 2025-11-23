@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { Game } from "@/lib/types";
+import { checkCodeForMaliciousContent, quickSecurityCheck } from "@/lib/security-check";
 
 export async function GET(
   request: Request,
@@ -79,6 +80,46 @@ export async function PUT(
         { error: "Code must define serverLogic constant" },
         { status: 400 }
       );
+    }
+
+    // Quick security check for obvious malicious patterns
+    const quickCheck = quickSecurityCheck(code);
+    if (quickCheck.blocked) {
+      console.warn(`Quick security check blocked game update for ${name}: ${quickCheck.reason}`);
+      return NextResponse.json(
+        { 
+          error: "Security check failed",
+          details: quickCheck.reason,
+          type: "security"
+        },
+        { status: 403 }
+      );
+    }
+
+    // AI-powered deep security analysis
+    console.log(`Running AI security check on game update for ${name}...`);
+    const securityCheck = await checkCodeForMaliciousContent(code);
+    
+    // Block if malicious or high/critical risk
+    if (securityCheck.isMalicious || securityCheck.riskLevel === "high" || securityCheck.riskLevel === "critical") {
+      console.warn(`AI security check blocked game update for ${name}:`, securityCheck);
+      return NextResponse.json(
+        { 
+          error: "Code failed security review",
+          details: securityCheck.explanation,
+          findings: securityCheck.findings,
+          riskLevel: securityCheck.riskLevel,
+          type: "security"
+        },
+        { status: 403 }
+      );
+    }
+
+    // Log medium risk but allow it
+    if (securityCheck.riskLevel === "medium") {
+      console.warn(`Game update allowed with medium risk for ${name}:`, securityCheck);
+    } else {
+      console.log(`Game code passed security checks for ${name} (${securityCheck.riskLevel} risk)`);
     }
 
     const { rows } = await query<Game>`

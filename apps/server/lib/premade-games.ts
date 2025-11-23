@@ -7,6 +7,7 @@ import tetris from './premade-games/tetris.js';
 import tetrisBattle from './premade-games/tetris-battle.js';
 import shooter from './premade-games/shooter.js';
 import chess from './premade-games/chess.js';
+import snake from './premade-games/snake.js';
 
 export const PREMADE_GAMES = {
   clicker,
@@ -14,5 +15,6 @@ export const PREMADE_GAMES = {
   tetris,
   'tetris-battle': tetrisBattle,
   shooter,
-  chess
+  chess,
+  snake
 };

@@ -22,3 +22,10 @@ export function getGameUrl(gameName: string): string {
   return `${getGameServerUrl()}/game/${gameName}`;
 }
 
+/**
+ * Get the game server API URL for fetching stats
+ */
+export function getGameServerApiUrl(): string {
+  return `${getGameServerUrl()}/api`;
+}
+

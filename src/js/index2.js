@@ -28,35 +28,43 @@ async function initGame() {
           const iniText = e.target.result;
           ffish.loadVariantConfig(iniText);
           console.log("Loaded variant config");
-          
+
           // Re-initialize board with the first variant from the file
           const variants = ffish.variants();
           if (variants.length > 0) {
             // Assume the last variant is the one we just loaded
-            const newVariant = variants[variants.length - 1]; 
+            const newVariant = variants[variants.length - 1];
             console.log("Switching to variant:", newVariant);
-            
+
             // We need to update the board container dimensions classes
             const oldDimensions = boardComponent.getDimensions();
             const container = document.getElementById("game-container");
-            container.classList.remove(`board${oldDimensions.width}x${oldDimensions.height}`);
-            
-            const result = boardComponent.initialize(newVariant, ffish, settings);
+            container.classList.remove(
+              `board${oldDimensions.width}x${oldDimensions.height}`,
+            );
+
+            const result = boardComponent.initialize(
+              newVariant,
+              ffish,
+              settings,
+            );
             board = result.board;
-            
+
             const newDimensions = boardComponent.getDimensions();
-            container.classList.add(`board${newDimensions.width}x${newDimensions.height}`);
-            
+            container.classList.add(
+              `board${newDimensions.width}x${newDimensions.height}`,
+            );
+
             // Update pockets visibility
             const pocketTop = document.getElementById("pocket-top");
             const pocketBottom = document.getElementById("pocket-bottom");
-            
+
             if (ffish.capturesToHand(newVariant)) {
-                pocketTop.classList.add("pockets");
-                pocketBottom.classList.add("pockets");
+              pocketTop.classList.add("pockets");
+              pocketBottom.classList.add("pockets");
             } else {
-                pocketTop.classList.remove("pockets");
-                pocketBottom.classList.remove("pockets");
+              pocketTop.classList.remove("pockets");
+              pocketBottom.classList.remove("pockets");
             }
 
             boardComponent.instance.set({
@@ -152,7 +160,7 @@ function getDests(board) {
     if (move.includes("@")) {
       const parts = move.split("@");
       // Hand drop moves are not handled in this simple dests logic for drag-from-square
-      // But we need to handle them if we want to support drops. 
+      // But we need to handle them if we want to support drops.
       // Chessground handles drops via pocketRoles and drag-from-pocket.
       // Here we only care about on-board moves for `dests`.
       to = parts[1].substring(0, 2);
@@ -170,4 +178,3 @@ function getDests(board) {
 }
 
 initGame();
-

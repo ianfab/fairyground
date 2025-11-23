@@ -12,7 +12,7 @@ const OutputDirectory = "/public";
 let port = 5015;
 
 // Load environment variables
-require('dotenv').config();
+require("dotenv").config();
 
 // Add JSON body parser for API requests
 app.use(express.json());
@@ -33,16 +33,16 @@ app.post("/api/claude", async (req, res) => {
     console.error("[API] Missing ANTHROPIC_API_KEY in environment");
     return res.status(500).json({
       success: false,
-      error: "API key not configured on server"
+      error: "API key not configured on server",
     });
   }
 
   // Validate request body
   const { message, systemPrompt } = req.body;
-  if (!message || typeof message !== 'string') {
+  if (!message || typeof message !== "string") {
     return res.status(400).json({
       success: false,
-      error: "Invalid request: 'message' is required"
+      error: "Invalid request: 'message' is required",
     });
   }
 
@@ -70,21 +70,20 @@ app.post("/api/claude", async (req, res) => {
       console.error("[API] Claude API error:", responseData);
       return res.status(apiResponse.status).json({
         success: false,
-        error: responseData.error?.message || "Claude API request failed"
+        error: responseData.error?.message || "Claude API request failed",
       });
     }
 
     console.log("[API] Claude API request successful");
     return res.status(200).json({
       success: true,
-      data: responseData
+      data: responseData,
     });
-
   } catch (error) {
     console.error("[API] Unexpected error:", error);
     return res.status(500).json({
       success: false,
-      error: "Internal server error"
+      error: "Internal server error",
     });
   }
 });

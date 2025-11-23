@@ -1,0 +1,90 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { getGameUrl, getGameServerApiUrl } from "@/lib/config";
+import type { GameStats } from "@/lib/types";
+
+interface GameCardProps {
+  gameName: string;
+  title: string;
+  description: string;
+  emoji: string;
+  gradient: string;
+  isPremade?: boolean;
+}
+
+export function GameCard({ 
+  gameName, 
+  title, 
+  description, 
+  emoji, 
+  gradient,
+  isPremade = false 
+}: GameCardProps) {
+  const [stats, setStats] = useState<GameStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    
+    const fetchStats = async () => {
+      try {
+        const response = await fetch(`${getGameServerApiUrl()}/game-stats`);
+        if (!response.ok) throw new Error('Failed to fetch stats');
+        
+        const allStats: Record<string, GameStats> = await response.json();
+        if (mounted) {
+          setStats(allStats[gameName] || null);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error fetching game stats:', error);
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchStats();
+    // Refresh stats every 10 seconds
+    const interval = setInterval(fetchStats, 10000);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [gameName]);
+
+  return (
+    <a
+      href={`/play/${gameName}`}
+      className={`group block p-6 rounded-xl bg-gradient-to-br ${gradient} transition-all relative`}
+    >
+      {/* Subtle stats in top-right corner */}
+      {!loading && (
+        <div className="absolute top-4 right-4 flex items-center gap-2">
+          {stats && stats.activePlayers > 0 && (
+            <div className="flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+              <span className="text-xs font-semibold text-white">{stats.activePlayers}</span>
+            </div>
+          )}
+          {!isPremade && stats && stats.totalPlayCount > 0 && (
+            <div className="flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full" title={`${stats.totalPlayCount} total plays`}>
+              <svg className="w-3 h-3 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-xs font-medium text-white/90">{stats.totalPlayCount}</span>
+            </div>
+          )}
+        </div>
+      )}
+      
+      <h3 className="text-xl font-bold mb-2 pr-20">{emoji} {title}</h3>
+      <p className="text-gray-100 text-sm">{description}</p>
+      <p className="text-xs opacity-80 mt-4">Ready to play →</p>
+    </a>
+  );
+}
+

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { Game } from "@/lib/types";
 import { getUser } from "@propelauth/nextjs/server/app-router";
+import { quickSecurityCheck } from "@/lib/security-check";
 
 export async function POST(request: Request) {
   try {
@@ -36,6 +37,25 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    // Quick security check for obvious malicious patterns
+    const quickCheck = quickSecurityCheck(code);
+    if (quickCheck.blocked) {
+      console.warn(`Quick security check blocked game creation: ${quickCheck.reason}`);
+      return NextResponse.json(
+        { 
+          error: "Security check failed",
+          details: quickCheck.reason,
+          type: "security"
+        },
+        { status: 403 }
+      );
+    }
+
+    console.log(`Game code passed quick security check`);
+    
+    // Note: AI-powered deep security analysis is disabled for new games to reduce cost and latency
+    // The quick security check above catches most common malicious patterns
 
     // Check for unique name
     const existing = await query`SELECT id FROM games WHERE name = ${name}`;

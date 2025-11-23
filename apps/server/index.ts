@@ -3,7 +3,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import { query } from "./lib/db.js";
-import type { Game } from "./lib/types.js";
+import type { Game, GameStats } from "./lib/types.js";
 import { PREMADE_GAMES } from "./lib/premade-games.js";
 import vm from "vm";
 import path from "path";
@@ -105,6 +105,78 @@ interface Room {
 }
 
 const rooms = new Map<string, Room>();
+
+// Matchmaking queue
+interface MatchmakingPlayer {
+  playerId: string;
+  gameName: string;
+  timestamp: number;
+}
+
+interface MatchmakingResult {
+  status: 'waiting' | 'matched';
+  roomId?: string;
+}
+
+const matchmakingQueue: MatchmakingPlayer[] = [];
+const matchmakingResults = new Map<string, MatchmakingResult>();
+
+// Function to try to match players
+function tryMatchPlayers() {
+  // Group players by game
+  const playersByGame = new Map<string, MatchmakingPlayer[]>();
+  
+  matchmakingQueue.forEach(player => {
+    const players = playersByGame.get(player.gameName) || [];
+    players.push(player);
+    playersByGame.set(player.gameName, players);
+  });
+  
+  // Try to match players for each game
+  playersByGame.forEach((players, gameName) => {
+    while (players.length >= 2) {
+      // Match the two oldest players
+      const player1 = players.shift();
+      const player2 = players.shift();
+      
+      if (!player1 || !player2) break;
+      
+      // Generate a unique room ID for the match
+      const roomId = `match-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      
+      // Set match results
+      matchmakingResults.set(player1.playerId, {
+        status: 'matched',
+        roomId
+      });
+      matchmakingResults.set(player2.playerId, {
+        status: 'matched',
+        roomId
+      });
+      
+      // Remove players from queue
+      const index1 = matchmakingQueue.findIndex(p => p.playerId === player1.playerId);
+      const index2 = matchmakingQueue.findIndex(p => p.playerId === player2.playerId);
+      if (index1 !== -1) matchmakingQueue.splice(index1, 1);
+      if (index2 !== -1) matchmakingQueue.splice(index2, 1);
+      
+      console.log(`Matched players ${player1.playerId} and ${player2.playerId} for game ${gameName} in room ${roomId}`);
+    }
+  });
+}
+
+// Periodically clean up old matchmaking results (after 5 minutes)
+setInterval(() => {
+  const now = Date.now();
+  matchmakingResults.forEach((result, playerId) => {
+    const player = matchmakingQueue.find(p => p.playerId === playerId);
+    if (!player && result.status === 'matched') {
+      // Remove result after 5 minutes
+      const FIVE_MINUTES = 5 * 60 * 1000;
+      matchmakingResults.delete(playerId);
+    }
+  });
+}, 60000); // Check every minute
 
 // Game loop ticker - runs periodically for games that have a tick action
 const TICK_RATE = 16; // ~60 FPS
@@ -294,7 +366,7 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     }
     #back-button {
       position: fixed;
-      bottom: 20px;
+      top: 20px;
       left: 20px;
       padding: 12px 20px;
       background: rgba(255, 255, 255, 0.1);
@@ -316,6 +388,90 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       background: rgba(255, 255, 255, 0.15);
       border-color: rgba(255, 255, 255, 0.3);
       transform: translateY(-1px);
+    }
+    #play-again-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    #play-again-overlay.visible {
+      display: flex;
+    }
+    #play-again-container {
+      background: rgba(17, 17, 17, 0.95);
+      padding: 40px 60px;
+      border-radius: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    #game-over-message {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #game-over-details {
+      font-size: 18px;
+      color: #888;
+      margin-bottom: 30px;
+    }
+    #play-again-btn {
+      padding: 15px 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin: 0 10px;
+      width: auto;
+    }
+    #play-again-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+    #back-to-home-btn {
+      padding: 15px 40px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin: 0 10px;
+      width: auto;
+      text-decoration: none;
+      display: inline-block;
+    }
+    #back-to-home-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
     }
   </style>
 </head>
@@ -360,6 +516,18 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         <div style="color: #888; font-size: 11px; max-height: 200px; overflow-y: auto;">
           <pre id="state-display" style="white-space: pre-wrap; word-wrap: break-word;"></pre>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Play Again Overlay -->
+  <div id="play-again-overlay">
+    <div id="play-again-container">
+      <div id="game-over-message">Game Over!</div>
+      <div id="game-over-details"></div>
+      <div style="margin-top: 20px;">
+        <button id="play-again-btn">🔄 Play Again</button>
+        <a id="back-to-home-btn" href="${homeUrl}" target="_top">← Back to Home</a>
       </div>
     </div>
   </div>
@@ -478,6 +646,9 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         
         // Update UI
         updateStateDisplay(state);
+        
+        // Check if game is over
+        checkGameOver(state);
       });
 
       socket.on('player_joined', ({ count }) => {
@@ -501,6 +672,63 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         display.textContent = 'State too large to display';
       }
     }
+
+    // Check if game is over and show play again overlay
+    function checkGameOver(state) {
+      const overlay = document.getElementById('play-again-overlay');
+      const messageEl = document.getElementById('game-over-message');
+      const detailsEl = document.getElementById('game-over-details');
+      
+      // Check various common game over indicators
+      let isGameOver = false;
+      let message = 'Game Over!';
+      let details = '';
+      
+      // Check for gameOver flag
+      if (state.gameOver === true) {
+        isGameOver = true;
+      }
+      
+      // Check for winner
+      if (state.winner) {
+        isGameOver = true;
+        message = state.winner + ' Wins!';
+        if (state.reason) {
+          details = state.reason;
+        }
+      }
+      
+      // Check for ended flag
+      if (state.ended === true) {
+        isGameOver = true;
+      }
+      
+      // Check for game status messages (like "checkmate", "stalemate")
+      if (state.status) {
+        const statusLower = String(state.status).toLowerCase();
+        if (statusLower.includes('checkmate') || 
+            statusLower.includes('stalemate') || 
+            statusLower.includes('draw') ||
+            statusLower.includes('game over')) {
+          isGameOver = true;
+          details = state.status;
+        }
+      }
+      
+      // Show overlay if game is over
+      if (isGameOver) {
+        messageEl.textContent = message;
+        detailsEl.textContent = details;
+        overlay.classList.add('visible');
+      } else {
+        overlay.classList.remove('visible');
+      }
+    }
+    
+    // Setup play again button
+    document.getElementById('play-again-btn').addEventListener('click', () => {
+      window.location.reload();
+    });
 
     function emitAction(action, payload) {
       if (socket && isConnected && currentRoom) {
@@ -572,14 +800,170 @@ app.get('/game/:gameName', async (req, res) => {
   await serveGameClient(gameName, undefined, res);
 });
 
+// Helper function to get active player count for a game
+function getGameStats(gameName: string): { activePlayers: number; activeRooms: number } {
+  let activePlayers = 0;
+  let activeRooms = 0;
+  
+  rooms.forEach((room) => {
+    if (room.gameName === gameName) {
+      activePlayers += room.players.size;
+      activeRooms += 1;
+    }
+  });
+  
+  return { activePlayers, activeRooms };
+}
+
+// Helper function to increment play count for a game
+async function incrementPlayCount(gameName: string): Promise<void> {
+  try {
+    // Don't increment for premade games (they're not in the database)
+    if (PREMADE_GAMES[gameName as keyof typeof PREMADE_GAMES]) {
+      return;
+    }
+    
+    await query`
+      UPDATE games 
+      SET 
+        play_count = COALESCE(play_count, 0) + 1,
+        last_played_at = NOW()
+      WHERE name = ${gameName}
+    `;
+    console.log(`Incremented play count for game: ${gameName}`);
+  } catch (err) {
+    console.error(`Error incrementing play count for ${gameName}:`, err);
+  }
+}
+
 // API endpoint to list all games
 app.get('/api/games', async (req, res) => {
   try {
-    const { rows } = await query<Game>`SELECT id, name, description, created_at FROM games ORDER BY created_at DESC`;
+    const { rows } = await query<Game>`SELECT id, name, description, created_at, play_count, last_played_at FROM games ORDER BY created_at DESC`;
     res.json(rows);
   } catch (err) {
     console.error('Error fetching games:', err);
     res.status(500).json({ error: 'Failed to fetch games' });
+  }
+});
+
+// API endpoint to get game statistics (active players, play counts)
+app.get('/api/game-stats', async (req, res) => {
+  try {
+    const stats: Record<string, GameStats> = {};
+    
+    // Get stats for database games
+    const { rows } = await query<Game>`SELECT name, play_count, last_played_at FROM games`;
+    rows.forEach(game => {
+      const liveStats = getGameStats(game.name);
+      const gameStat: GameStats = {
+        gameName: game.name,
+        activePlayers: liveStats.activePlayers,
+        activeRooms: liveStats.activeRooms,
+        totalPlayCount: game.play_count || 0
+      };
+      // Only add lastPlayedAt if it exists (exactOptionalPropertyTypes)
+      if (game.last_played_at) {
+        gameStat.lastPlayedAt = game.last_played_at;
+      }
+      stats[game.name] = gameStat;
+    });
+    
+    // Add stats for premade games
+    Object.keys(PREMADE_GAMES).forEach(gameName => {
+      const liveStats = getGameStats(gameName);
+      stats[gameName] = {
+        gameName,
+        activePlayers: liveStats.activePlayers,
+        activeRooms: liveStats.activeRooms,
+        totalPlayCount: 0 // Premade games don't track play count in DB
+        // lastPlayedAt not included for premade games
+      };
+    });
+    
+    res.json(stats);
+  } catch (err) {
+    console.error('Error fetching game stats:', err);
+    res.status(500).json({ error: 'Failed to fetch game stats' });
+  }
+});
+
+// Matchmaking endpoints
+app.post('/api/matchmaking/join', (req, res) => {
+  try {
+    const { gameName, playerId } = req.body;
+    
+    if (!gameName || !playerId) {
+      return res.status(400).json({ error: 'gameName and playerId are required' });
+    }
+    
+    // Check if player is already in queue
+    const existingIndex = matchmakingQueue.findIndex(p => p.playerId === playerId);
+    if (existingIndex !== -1) {
+      return res.json({ message: 'Already in queue' });
+    }
+    
+    // Add player to queue
+    matchmakingQueue.push({
+      playerId,
+      gameName,
+      timestamp: Date.now()
+    });
+    
+    console.log(`Player ${playerId} joined matchmaking for ${gameName}. Queue size: ${matchmakingQueue.length}`);
+    
+    // Set initial status
+    matchmakingResults.set(playerId, { status: 'waiting' });
+    
+    // Try to match immediately
+    tryMatchPlayers();
+    
+    res.json({ message: 'Joined matchmaking queue' });
+  } catch (err) {
+    console.error('Error joining matchmaking:', err);
+    res.status(500).json({ error: 'Failed to join matchmaking' });
+  }
+});
+
+app.post('/api/matchmaking/leave', (req, res) => {
+  try {
+    const { playerId } = req.body;
+    
+    if (!playerId) {
+      return res.status(400).json({ error: 'playerId is required' });
+    }
+    
+    // Remove player from queue
+    const index = matchmakingQueue.findIndex(p => p.playerId === playerId);
+    if (index !== -1) {
+      matchmakingQueue.splice(index, 1);
+      console.log(`Player ${playerId} left matchmaking. Queue size: ${matchmakingQueue.length}`);
+    }
+    
+    // Remove result
+    matchmakingResults.delete(playerId);
+    
+    res.json({ message: 'Left matchmaking queue' });
+  } catch (err) {
+    console.error('Error leaving matchmaking:', err);
+    res.status(500).json({ error: 'Failed to leave matchmaking' });
+  }
+});
+
+app.get('/api/matchmaking/status/:playerId', (req, res) => {
+  try {
+    const { playerId } = req.params;
+    
+    const result = matchmakingResults.get(playerId);
+    
+    if (!result) {
+      return res.json({ status: 'not_in_queue' });
+    }
+    
+    res.json(result);
+  } catch (err) {
+    console.error('Error checking matchmaking status:', err);
+    res.status(500).json({ error: 'Failed to check status' });
   }
 });
 
@@ -699,6 +1083,9 @@ io.on("connection", (socket) => {
           };
           rooms.set(roomId, room);
           console.log(`Room ${roomId} created successfully`);
+
+          // Increment play count for this game
+          await incrementPlayCount(gameName);
 
           // Start game loop if the game has a tick action
           startGameLoop(room);
