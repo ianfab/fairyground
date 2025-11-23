@@ -7,7 +7,7 @@ import { quickSecurityCheck } from "@/lib/security-check";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, description, code, creatorId: clientCreatorId, creatorEmail: clientCreatorEmail, creatorUsername: clientCreatorUsername } = body;
+    const { name, description, code, preview = false, creatorId: clientCreatorId, creatorEmail: clientCreatorEmail, creatorUsername: clientCreatorUsername } = body;
 
     // Try to get user from server-side auth first
     const user = await getUser();
@@ -77,8 +77,8 @@ export async function POST(request: Request) {
     }
 
     const { rows } = await query<Game>`
-      INSERT INTO games (name, description, code, creator_id, creator_email, creator_username)
-      VALUES (${name}, ${description}, ${code}, ${creatorId}, ${creatorEmail}, ${creatorUsername})
+      INSERT INTO games (name, description, code, creator_id, creator_email, creator_username, preview)
+      VALUES (${name}, ${description}, ${code}, ${creatorId}, ${creatorEmail}, ${creatorUsername}, ${preview})
       RETURNING *
     `;
 
@@ -94,7 +94,8 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    const { rows } = await query<Game>`SELECT * FROM games ORDER BY created_at DESC`;
+    // Only return non-preview games for public listing
+    const { rows } = await query<Game>`SELECT * FROM games WHERE preview = false ORDER BY created_at DESC`;
     return NextResponse.json(rows);
   } catch (error) {
     console.error("Get games error:", error);

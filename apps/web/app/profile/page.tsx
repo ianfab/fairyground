@@ -14,7 +14,7 @@ export default function ProfilePage() {
   let user: any = null;
   let authLoading = false;
   let redirectToSignupPage = () => {
-    alert("PropelAuth not configured. Please set NEXT_PUBLIC_PROPELAUTH_AUTH_URL in your .env file.\n\nSee apps/web/PROPELAUTH_SETUP.md for instructions.");
+    alert("PropelAuth not configured. Please set NEXT_PUBLIC_AUTH_URL in your .env file.\n\nSee apps/web/PROPELAUTH_SETUP.md for instructions.");
   };
   let redirectToAccountPage = () => {};
   let redirectToLoginPage = () => {};

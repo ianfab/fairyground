@@ -40,8 +40,8 @@ export function SnakeGameWhileWaiting() {
     const savedHighScore = parseInt(localStorage.getItem('dinoHighScore') || '0');
     setHighScore(savedHighScore);
 
-    const GRAVITY = 0.4;
-    const JUMP_STRENGTH = -18;
+    const GRAVITY = 0.3;
+    const JUMP_STRENGTH = -12;
     const GROUND_Y = canvas.height - 60;
     const DINO_SIZE = 40;
     const OBSTACLE_WIDTH = 20;
@@ -84,6 +84,8 @@ export function SnakeGameWhileWaiting() {
     window.addEventListener('keydown', handleKeyPress);
     canvas.addEventListener('click', handleClick);
 
+    let animationFrameId: number;
+    
     const gameLoop = () => {
       if (!canvas || !ctx || !state.isRunning) return;
 
@@ -181,17 +183,18 @@ export function SnakeGameWhileWaiting() {
         ctx.fillText('Press SPACE or click to restart', canvas.width / 2, canvas.height / 2 + 50);
       }
 
-      requestAnimationFrame(gameLoop);
+      animationFrameId = requestAnimationFrame(gameLoop);
     };
 
     gameLoop();
 
     return () => {
       state.isRunning = false;
+      cancelAnimationFrame(animationFrameId);
       window.removeEventListener('keydown', handleKeyPress);
       canvas.removeEventListener('click', handleClick);
     };
-  }, [showIntro, highScore]);
+  }, [showIntro]);
 
   if (showIntro) {
     return (

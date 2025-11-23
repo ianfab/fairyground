@@ -60,17 +60,22 @@ function initGameClient(container, socket, roomId, emitAction) {
   let board = null;
   let game = null;
   let myColor = null;
+  let librariesLoaded = false;
   
-  // Initialize libraries and board once loaded
-  Promise.all([
-    loadScript('https://code.jquery.com/jquery-3.7.1.min.js'),
-    loadScript('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js'),
-    loadScript('https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js')
-  ]).then(() => {
-    waitingDiv.textContent = 'Waiting for opponent...';
+  // Function to load libraries with retry
+  function loadLibraries() {
+    waitingDiv.innerHTML = 'Loading chess libraries...';
     
-    // Initialize chess.js
-    game = new Chess();
+    return Promise.all([
+      loadScript('https://code.jquery.com/jquery-3.7.1.min.js'),
+      loadScript('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js'),
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js')
+    ]).then(() => {
+      librariesLoaded = true;
+      waitingDiv.textContent = 'Waiting for opponent...';
+      
+      // Initialize chess.js
+      game = new Chess();
     
     function onDragStart(source, piece, position, orientation) {
       // Do not pick up pieces if the game is over
@@ -170,8 +175,8 @@ function initGameClient(container, socket, roomId, emitAction) {
     board = Chessboard('chess-board', config);
     updateStatus({});
     
-    // Handle state updates
-    gameInstance.onStateUpdate = (state) => {
+    // Handle state updates - now that libraries are loaded
+    return (state) => {
       console.log('Chess onStateUpdate called with:', state);
       
       if (!state || !state.board) {
@@ -214,18 +219,46 @@ function initGameClient(container, socket, roomId, emitAction) {
         console.error('Error updating state:', e, e.stack);
       }
     };
-  }).catch(err => {
-    console.error('Failed to load chess libraries:', err);
-    waitingDiv.textContent = 'Error loading game. Please refresh.';
-  });
+    }).catch(err => {
+      console.error('Failed to load chess libraries:', err);
+      waitingDiv.innerHTML = \`
+        <div style="color: #f44;">Error loading chess libraries.</div>
+        <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+          Refresh Page
+        </button>
+      \`;
+      return null;
+    });
+  }
   
-  // Create game instance (will be populated once libraries load)
+  // Create game instance with async initialization
   const gameInstance = {
-    onStateUpdate: (state) => {
-      // This will be replaced once libraries are loaded
-      console.log('Waiting for libraries to load...');
+    _ready: false,
+    _pendingStates: [],
+    onStateUpdate: function(state) {
+      if (!this._ready) {
+        console.log('Game not ready yet, queuing state');
+        this._pendingStates.push(state);
+      }
+      // Once ready, this function will be replaced
     }
   };
+  
+  // Load libraries and initialize
+  loadLibraries().then(stateUpdateFn => {
+    if (stateUpdateFn) {
+      gameInstance._ready = true;
+      gameInstance.onStateUpdate = stateUpdateFn;
+      
+      // Apply any pending states that came in while loading
+      if (gameInstance._pendingStates && gameInstance._pendingStates.length > 0) {
+        console.log('Applying', gameInstance._pendingStates.length, 'pending states');
+        const lastState = gameInstance._pendingStates[gameInstance._pendingStates.length - 1];
+        gameInstance.onStateUpdate(lastState);
+        gameInstance._pendingStates = [];
+      }
+    }
+  });
   
   console.log('Chess game instance created');
   return gameInstance;
@@ -242,6 +275,12 @@ const serverLogic = {
   },
   moves: {
     playerJoined: (state, payload, playerId) => {
+      // Don't reassign colors if player already has one (reconnection)
+      if (state.playerColors[playerId]) {
+        console.log('Player', playerId, 'rejoining with existing color:', state.playerColors[playerId]);
+        return;
+      }
+      
       const existingPlayerCount = Object.keys(state.playerColors).length;
       
       if (existingPlayerCount === 0) {
@@ -336,6 +375,7 @@ TO CUSTOMIZE YOUR VARIANT:
 2. Customize move validation in the server's move handler
 3. Add special rules or win conditions
 4. Modify the onDragStart function for custom piece movement rules
+5. add any other ui or customizations you want
 
 EXAMPLE CUSTOMIZATIONS:
 - Chess960: Randomize starting position FEN

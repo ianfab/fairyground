@@ -50,7 +50,7 @@ export default function Navbar() {
                 onClick={() => redirectToLoginPage()}
                 className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 transition-colors text-white text-sm font-semibold"
               >
-                Log In
+                Log In / Sign Up
               </button>
             )}
           </div>

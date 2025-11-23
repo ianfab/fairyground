@@ -2,11 +2,18 @@ import { NextResponse } from "next/server";
 import { GAME_TEMPLATES } from "@/lib/game-templates";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+
+// Define structured output schema
+interface GameGenerationResponse {
+  code: string;
+  explanation: string;
+  reasoning?: string;
+}
 
 export async function POST(request: Request) {
   try {
-    const { template, description, name, model, existingCode } = await request.json();
+    const { template, description, name, model, existingCode, screenshot } = await request.json();
 
     if (!description) {
       return NextResponse.json(
@@ -58,6 +65,12 @@ User request: ${description}
 
 Return the complete modified code:`
       : `You are a game developer. Generate complete, working game code.
+
+## by default, you do the bare minimum, don't. if you have to generate some pre-written text, generate lots of funny variations, not just a few.
+
+## make games as engaging as you can by default:
+- movement should be acceleration based, not just velocity
+- where there are arrow key controls, make sure to also bind wasd and vice versa
 
 CRITICAL: Follow this EXACT structure:
 
@@ -122,102 +135,11 @@ When to use tick:
 
 ${templateConfig?.prompt || ''}
 
-Base template:
+Base template for a similar game:
 ${templateConfig?.baseCode || ''}`;
 
-    let rawResponse: string;
-
-    // Route to appropriate LLM based on model selection
-    if (selectedModel.startsWith("claude")) {
-      // Use Claude (Anthropic)
-      const anthropic = new Anthropic({
-        apiKey: process.env.ANTHROPIC_API_KEY,
-      });
-
-      const message = await anthropic.messages.create({
-        model: selectedModel,
-        max_tokens: 16000,
-        thinking: {
-          type: "enabled",
-          budget_tokens: 5000
-        },
-        messages: [
-          {
-            role: "user",
-            content: systemPrompt + "\n\nUser request:\n" + description
-          }
-        ],
-      });
-
-      rawResponse = message.content[0].type === "text"
-        ? message.content[0].text
-        : (isEditMode ? existingCode : templateConfig?.baseCode || '');
-
-    } else if (selectedModel.startsWith("gemini")) {
-      // Use Gemini (Google)
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-      const model = genAI.getGenerativeModel({ model: selectedModel });
-
-      const result = await model.generateContent({
-        contents: [{
-          role: "user",
-          parts: [{ text: systemPrompt + "\n\nUser request:\n" + description }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 16000,
-        },
-      });
-
-      const response = result.response;
-      rawResponse = response.text() || (isEditMode ? existingCode : templateConfig?.baseCode || '');
-
-    } else {
-      // Use OpenAI (GPT-5/o1, GPT-4o, etc.)
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-
-      // GPT-5/o1 models use reasoning_effort instead of temperature
-      const isO1Model = selectedModel.startsWith("o1") || selectedModel.startsWith("gpt-5") || selectedModel.startsWith("o3");
-      
-      let completion: OpenAI.Chat.ChatCompletion;
-      
-      if (isO1Model) {
-        // o1 models use reasoning_effort and don't support system messages or temperature
-        completion = await openai.chat.completions.create({
-          model: selectedModel,
-          messages: [
-            {
-              role: "user",
-              content: systemPrompt + "\n\nUser request:\n" + description
-            }
-          ],
-          reasoning_effort: "medium"
-        } as OpenAI.Chat.ChatCompletionCreateParams) as OpenAI.Chat.ChatCompletion;
-      } else {
-        // Other models use temperature and support system messages
-        completion = await openai.chat.completions.create({
-          model: selectedModel,
-          messages: [
-            {
-              role: "system",
-              content: systemPrompt
-            },
-            {
-              role: "user",
-              content: description
-            }
-          ],
-          temperature: 0.7
-        });
-      }
-
-      rawResponse = completion.choices[0].message.content || (isEditMode ? existingCode : templateConfig?.baseCode || '');
-    }
-
-    // Extract code from markdown code blocks
-    // LLMs often wrap code in ```javascript ... ``` or ``` ... ```
+    // Helper function to extract code from markdown code blocks
+    // LLMs sometimes wrap code in ```javascript ... ``` or ``` ... ```
     function extractCode(text: string): string {
       // Try to find code block with language specifier (```javascript or ```js)
       const jsCodeBlockMatch = text.match(/```(?:javascript|js)\n([\s\S]*?)\n```/);
@@ -236,7 +158,268 @@ ${templateConfig?.baseCode || ''}`;
       return text;
     }
 
-    const generatedCode = extractCode(rawResponse);
+    let generatedCode: string;
+    let explanation: string = "";
+    let reasoning: string = "";
+
+    // Route to appropriate LLM based on model selection
+    if (selectedModel.startsWith("claude")) {
+      // Use Claude (Anthropic) with proper Structured Outputs
+      const anthropic = new Anthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      });
+
+      const message = await anthropic.messages.create(
+        {
+          model: selectedModel,
+          max_tokens: 16000,
+          thinking: {
+            type: "enabled",
+            budget_tokens: 5000
+          },
+          output_format: {
+            type: "json_schema",
+            schema: {
+              type: "object",
+              properties: {
+                explanation: {
+                  type: "string",
+                  description: "Brief explanation of what you're doing and why (2-3 sentences)"
+                },
+                code: {
+                  type: "string",
+                  description: "The complete game code"
+                }
+              },
+              required: ["explanation", "code"],
+              additionalProperties: false
+            }
+          },
+          messages: [
+            {
+              role: "user",
+              content: systemPrompt + "\n\nUser request:\n" + description
+            }
+          ],
+        } as any, // Type assertion needed because output_format is in beta
+        {
+          headers: {
+            "anthropic-beta": "structured-outputs-2025-11-13"
+          }
+        }
+      );
+
+      // Extract thinking blocks for reasoning
+      const thinkingBlocks = message.content.filter(block => block.type === "thinking");
+      if (thinkingBlocks.length > 0 && thinkingBlocks[0].type === "thinking") {
+        reasoning = thinkingBlocks[0].thinking;
+      }
+
+      // Get the text response
+      const textBlock = message.content.find(block => block.type === "text");
+      if (!textBlock || textBlock.type !== "text") {
+        console.error("Claude returned no text content, falling back to default");
+        generatedCode = isEditMode ? existingCode : templateConfig?.baseCode || '';
+        explanation = "Error: Model returned no content. Using fallback.";
+      } else {
+        try {
+          const parsed = JSON.parse(textBlock.text) as GameGenerationResponse;
+          generatedCode = parsed.code;
+          explanation = parsed.explanation || "";
+        } catch (e) {
+          console.error("Failed to parse Claude structured output:", e);
+          generatedCode = extractCode(textBlock.text);
+          explanation = "Error parsing response, extracted code from text.";
+        }
+      }
+
+     } else if (selectedModel.startsWith("gemini")) {
+       // Use Gemini (Google) with proper Structured Outputs
+       const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+       
+       // Define JSON Schema for structured output
+       const jsonSchema = {
+         type: SchemaType.OBJECT,
+         properties: {
+           explanation: {
+             type: SchemaType.STRING,
+             description: "Brief explanation of what you're doing and why (2-3 sentences)"
+           },
+           code: {
+             type: SchemaType.STRING,
+             description: "The complete game code in the specified format"
+           }
+         },
+         required: ["explanation", "code"]
+       };
+       
+       const model = genAI.getGenerativeModel({ 
+         model: selectedModel,
+         generationConfig: {
+           temperature: 0.7,
+           maxOutputTokens: 16000,
+           responseMimeType: "application/json",
+           responseSchema: jsonSchema as any // Type assertion needed for schema compatibility
+         }
+       });
+ 
+       // Build parts array with text and optional image
+       const parts: any[] = [{ text: systemPrompt + "\n\nUser request:\n" + description }];
+
+       // Add screenshot if provided (Gemini supports vision)
+       if (screenshot && isEditMode) {
+         parts.push({
+           inlineData: {
+             mimeType: "image/png",
+             data: screenshot.replace(/^data:image\/\w+;base64,/, '')
+           }
+         });
+       }
+
+       const result = await model.generateContent({
+         contents: [{
+           role: "user",
+           parts: parts
+         }]
+       });
+ 
+       const response = result.response;
+       const responseText = response.text();
+       
+       if (!responseText) {
+         console.error("Gemini returned no content, falling back to default");
+         generatedCode = isEditMode ? existingCode : templateConfig?.baseCode || '';
+         explanation = "Error: Model returned no content. Using fallback.";
+       } else {
+         try {
+           const parsed = JSON.parse(responseText) as GameGenerationResponse;
+           generatedCode = parsed.code;
+           explanation = parsed.explanation || "";
+         } catch (e) {
+           console.error("Failed to parse Gemini structured output:", e);
+           generatedCode = extractCode(responseText);
+           explanation = "Error parsing response, extracted code from text.";
+         }
+       }
+
+    } else {
+      // Use OpenAI (GPT-5/o1, GPT-4o, etc.) with structured output
+      const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+
+      // GPT-5/o1 models use reasoning_effort instead of temperature
+      const isO1Model = selectedModel.startsWith("o1") || selectedModel.startsWith("gpt-5") || selectedModel.startsWith("o3");
+      
+      let completion: OpenAI.Chat.ChatCompletion;
+      
+      if (isO1Model) {
+        // o1 models don't support structured outputs yet, use prompt-based JSON
+        const structuredPrompt = `${systemPrompt}
+
+IMPORTANT: You must respond with a JSON object in this exact format:
+{
+  "explanation": "Brief explanation of what you're doing and why (2-3 sentences)",
+  "code": "The complete game code here"
+}
+
+User request: ${description}`;
+
+        completion = await openai.chat.completions.create({
+          model: selectedModel,
+          messages: [
+            {
+              role: "user",
+              content: structuredPrompt
+            }
+          ],
+          reasoning_effort: "medium"
+        } as OpenAI.Chat.ChatCompletionCreateParams) as OpenAI.Chat.ChatCompletion;
+      } else {
+        // Other models support proper Structured Outputs
+        // Build message content with text and optional image
+        let userContent: any = description;
+        
+        // Add screenshot if provided and model supports vision (gpt-4o, gpt-4-turbo, etc.)
+        if (screenshot && isEditMode && (selectedModel.includes("gpt-4") || selectedModel.includes("gpt-5"))) {
+          userContent = [
+            {
+              type: "text",
+              text: description
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: screenshot
+              }
+            }
+          ];
+        }
+
+        completion = await openai.chat.completions.create({
+          model: selectedModel,
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt
+            },
+            {
+              role: "user",
+              content: userContent
+            }
+          ],
+          temperature: 0.7,
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "game_generation_response",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  explanation: {
+                    type: "string",
+                    description: "Brief explanation of what you're doing and why (2-3 sentences)"
+                  },
+                  code: {
+                    type: "string",
+                    description: "The complete game code"
+                  }
+                },
+                required: ["explanation", "code"],
+                additionalProperties: false
+              }
+            }
+          }
+        });
+      }
+
+      const responseContent = completion.choices[0].message.content;
+      
+      if (!responseContent) {
+        console.error("OpenAI returned no content, falling back to default");
+        generatedCode = isEditMode ? existingCode : templateConfig?.baseCode || '';
+        explanation = "Error: Model returned no content. Using fallback.";
+      } else {
+        try {
+          const parsed = JSON.parse(responseContent) as GameGenerationResponse;
+          generatedCode = parsed.code;
+          explanation = parsed.explanation || "";
+          
+          // Extract reasoning from o1 models if available (using type assertion for new feature)
+          if (isO1Model) {
+            const messageWithReasoning = completion.choices[0].message as any;
+            if (messageWithReasoning.reasoning_content) {
+              reasoning = messageWithReasoning.reasoning_content;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to parse OpenAI structured output:", e);
+          generatedCode = extractCode(responseContent);
+          explanation = "Error parsing response, extracted code from text.";
+        }
+      }
+    }
 
     // Generate suggested name from description
     const suggestedName = name || description
@@ -245,10 +428,19 @@ ${templateConfig?.baseCode || ''}`;
       .replace(/^-|-$/g, '')
       .substring(0, 30);
 
+    // Log reasoning for debugging
+    if (reasoning) {
+      console.log("Model reasoning:", reasoning.substring(0, 500) + (reasoning.length > 500 ? "..." : ""));
+    }
+    
+    console.log("Model explanation:", explanation);
+
     return NextResponse.json({
       code: generatedCode,
       suggestedName,
       suggestedDescription: description.substring(0, 100),
+      explanation,
+      reasoning: reasoning.substring(0, 1000), // Limit reasoning to first 1000 chars for response
     });
   } catch (error) {
     console.error("Generate game error:", error);

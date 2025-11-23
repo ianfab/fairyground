@@ -97,6 +97,7 @@ interface Room {
   gameName: string;
   state: any;
   players: Map<string, any>;
+  persistentPlayerMap: Map<string, string>; // Maps persistent player ID to current socket ID
   logic: {
     moves: Record<string, (state: any, ...args: any[]) => void>;
     initialState: any;
@@ -217,7 +218,7 @@ function stopGameLoop(room: Room) {
 }
 
 // Helper function to serve game client
-async function serveGameClient(gameName: string, roomName: string | undefined, res: any) {
+async function serveGameClient(gameName: string, roomName: string | undefined, res: any, hideUI: boolean = false) {
   
   try {
     let game: Game | null = null;
@@ -364,6 +365,9 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       color: #fff;
       font-weight: bold;
     }
+    #metadata-header:hover {
+      color: #fff !important;
+    }
     #back-button {
       position: fixed;
       top: 20px;
@@ -488,12 +492,12 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     <div id="game-canvas"></div>
     
     <!-- Back button -->
-    <a id="back-button" href="${homeUrl}" target="_top">
+    <a id="back-button" href="${homeUrl}" target="_top" style="${hideUI ? 'display: none;' : ''}">
       <span>←</span>
       <span>Back to Home</span>
     </a>
     
-    <div id="game-ui">
+    <div id="game-ui" style="${hideUI ? 'display: none;' : ''}">
       <h3 style="margin-bottom: 15px; color: #fff;">Game Info</h3>
       <div class="info-row">
         <span class="info-label">Room:</span>
@@ -513,7 +517,11 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         </button>
       </div>
       <div id="game-info" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #333;">
-        <div style="color: #888; font-size: 11px; max-height: 200px; overflow-y: auto;">
+        <div id="metadata-header" style="cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; padding: 8px 0; color: #aaa; transition: color 0.2s;">
+          <span style="font-size: 12px; font-weight: 600;">Game Metadata</span>
+          <span id="metadata-toggle" style="font-size: 14px; transition: transform 0.2s;">▼</span>
+        </div>
+        <div id="metadata-content" style="color: #888; font-size: 11px; max-height: 200px; overflow-y: auto; display: none;">
           <pre id="state-display" style="white-space: pre-wrap; word-wrap: break-word;"></pre>
         </div>
       </div>
@@ -539,6 +547,14 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     let currentRoom;
     let gameInstance;
     let isConnected = false;
+    
+    // Get or create persistent player ID
+    let persistentPlayerId = localStorage.getItem('vibechess_player_id');
+    if (!persistentPlayerId) {
+      persistentPlayerId = 'player-' + Date.now() + '-' + Math.random().toString(36).substring(7);
+      localStorage.setItem('vibechess_player_id', persistentPlayerId);
+    }
+    console.log('Persistent Player ID:', persistentPlayerId);
     
     // Auto-join if room is in URL
     const prefilledRoom = '${prefilledRoom}';
@@ -566,6 +582,19 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
           btn.textContent = '📋 Copy Share Link';
         }, 2000);
       });
+    });
+
+    // Setup metadata toggle
+    document.getElementById('metadata-header').addEventListener('click', () => {
+      const content = document.getElementById('metadata-content');
+      const toggle = document.getElementById('metadata-toggle');
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        toggle.style.transform = 'rotate(180deg)';
+      } else {
+        content.style.display = 'none';
+        toggle.style.transform = 'rotate(0deg)';
+      }
     });
 
     function joinRoom() {
@@ -600,11 +629,12 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         document.getElementById('connection-status').textContent = 'Connected';
         document.getElementById('connection-status').style.color = '#0f0';
         
-        // Join the room
+        // Join the room with persistent player ID
         const parts = currentRoom.split('/');
         socket.emit('join_room', { 
           gameName: parts[0], 
-          roomName: parts[1] 
+          roomName: parts[1],
+          persistentPlayerId: persistentPlayerId
         });
       });
 
@@ -791,13 +821,15 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
 // With room name in URL
 app.get('/game/:gameName/:roomName', async (req, res) => {
   const { gameName, roomName } = req.params;
-  await serveGameClient(gameName, roomName, res);
+  const hideUI = req.query.hideUI === 'true';
+  await serveGameClient(gameName, roomName, res, hideUI);
 });
 
 // Without room name in URL
 app.get('/game/:gameName', async (req, res) => {
   const { gameName } = req.params;
-  await serveGameClient(gameName, undefined, res);
+  const hideUI = req.query.hideUI === 'true';
+  await serveGameClient(gameName, undefined, res, hideUI);
 });
 
 // Helper function to get active player count for a game
@@ -971,9 +1003,9 @@ app.get('/api/matchmaking/status/:playerId', (req, res) => {
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  socket.on("join_room", async ({ gameName, roomName }: { gameName: string, roomName: string }) => {
+  socket.on("join_room", async ({ gameName, roomName, persistentPlayerId }: { gameName: string, roomName: string, persistentPlayerId?: string }) => {
     const roomId = `${gameName}/${roomName}`;
-    console.log(`User ${socket.id} attempting to join room: ${roomId}`);
+    console.log(`User ${socket.id} attempting to join room: ${roomId}`, persistentPlayerId ? `with persistent ID: ${persistentPlayerId}` : '');
     
     // Leave previous rooms
     socket.rooms.forEach((room) => {
@@ -1079,6 +1111,7 @@ io.on("connection", (socket) => {
             gameName: game.name,
             state: JSON.parse(JSON.stringify(logic.initialState)),
             players: new Map(),
+            persistentPlayerMap: new Map(),
             logic: logic
           };
           rooms.set(roomId, room);
@@ -1105,10 +1138,44 @@ io.on("connection", (socket) => {
 
     // Join logic
     socket.join(roomId);
-    room.players.set(socket.id, { id: socket.id, joinedAt: Date.now() });
     
-    // Trigger playerJoined move to assign colors
-    if (room.logic.moves.playerJoined) {
+    let isReconnection = false;
+    let oldSocketId: string | undefined;
+    
+    // Handle persistent player ID for reconnections
+    if (persistentPlayerId) {
+      // Check if this persistent player was already in the room
+      oldSocketId = room.persistentPlayerMap.get(persistentPlayerId);
+      
+      if (oldSocketId && oldSocketId !== socket.id) {
+        console.log(`Reconnection detected: persistent player ${persistentPlayerId} had socket ${oldSocketId}, now ${socket.id}`);
+        isReconnection = true;
+        
+        // Update the player's socket ID in state (for games that track by socket ID)
+        if (room.state.playerColors && room.state.playerColors[oldSocketId]) {
+          const color = room.state.playerColors[oldSocketId];
+          delete room.state.playerColors[oldSocketId];
+          room.state.playerColors[socket.id] = color;
+          console.log(`Restored player color: ${color} for socket ${socket.id}`);
+        }
+        
+        // Remove old player entry
+        room.players.delete(oldSocketId);
+      }
+      
+      // Update persistent player mapping
+      room.persistentPlayerMap.set(persistentPlayerId, socket.id);
+    }
+    
+    // Add player to room
+    room.players.set(socket.id, { 
+      id: socket.id, 
+      persistentId: persistentPlayerId,
+      joinedAt: Date.now() 
+    });
+    
+    // Only trigger playerJoined for new players, not reconnections
+    if (!isReconnection && room.logic.moves.playerJoined) {
       try {
         room.logic.moves.playerJoined(room.state, {}, socket.id);
       } catch (e) {
@@ -1116,7 +1183,7 @@ io.on("connection", (socket) => {
       }
     }
     
-    console.log(`User ${socket.id} joined ${roomId}. Total players: ${room.players.size}`);
+    console.log(`User ${socket.id} ${isReconnection ? 'reconnected to' : 'joined'} ${roomId}. Total players: ${room.players.size}`);
     console.log('Player colors:', room.state.playerColors);
     
     // Send state to all players in room

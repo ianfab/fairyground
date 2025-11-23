@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Send, AlertCircle, Save, Play } from "lucide-react";
+import { Send, AlertCircle, Save, Play, Code, Eye } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import { useAuthInfo } from "@propelauth/react";
 import { Game } from "@/lib/types";
+import { getGameServerUrl } from "@/lib/config";
 
 export default function SandboxPage() {
   const params = useParams();
@@ -27,7 +28,7 @@ export default function SandboxPage() {
   const [gameData, setGameData] = useState<Game | null>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [chatMessages, setChatMessages] = useState<Array<{ role: string; content: string }>>([]);
+  const [chatMessages, setChatMessages] = useState<Array<{ role: string; content: string; explanation?: string; reasoning?: string }>>([]);
   const [userMessage, setUserMessage] = useState("");
 
   const [loading, setLoading] = useState(true);
@@ -38,6 +39,10 @@ export default function SandboxPage() {
   const [showSaveAsModal, setShowSaveAsModal] = useState(false);
   const [newGameName, setNewGameName] = useState("");
   const [newGameDescription, setNewGameDescription] = useState("");
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewRoomId, setPreviewRoomId] = useState(() => `room-${Math.random().toString(36).substring(7)}`);
+  const [screenshotData, setScreenshotData] = useState<string | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Debounced code change handler
   const handleCodeChange = useCallback((value: string | undefined) => {
@@ -101,10 +106,12 @@ export default function SandboxPage() {
 
       const data = await response.json();
 
-      // Add AI response to chat
+      // Add AI response to chat with explanation and reasoning
       setChatMessages(prev => [...prev, {
         role: "assistant",
-        content: "I've updated the code based on your request."
+        content: data.explanation || "I've updated the code based on your request.",
+        explanation: data.explanation,
+        reasoning: data.reasoning
       }]);
 
       // Update the code
@@ -308,13 +315,28 @@ export default function SandboxPage() {
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
+                    className={`max-w-[80%] rounded-lg overflow-hidden ${
                       msg.role === "user"
                         ? "bg-purple-600 text-white"
                         : "bg-gray-800 text-gray-100"
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    <div className="p-3">
+                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    </div>
+                    {msg.role === "assistant" && msg.reasoning && (
+                      <details className="group border-t border-gray-700">
+                        <summary className="cursor-pointer p-2 px-3 hover:bg-gray-700/50 transition-colors list-none flex items-center justify-between text-xs text-gray-400">
+                          <span>Model Reasoning</span>
+                          <svg className="w-3 h-3 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </summary>
+                        <div className="p-3 pt-2 max-h-32 overflow-y-auto bg-gray-900/50">
+                          <pre className="text-xs text-gray-400 whitespace-pre-wrap font-mono">{msg.reasoning}</pre>
+                        </div>
+                      </details>
+                    )}
                   </div>
                 </div>
               ))}
@@ -350,29 +372,88 @@ export default function SandboxPage() {
             </div>
           </div>
 
-          {/* Right: Code Editor */}
+          {/* Right: Code Editor or Preview */}
           <div className="bg-gray-900/50 rounded-xl border border-gray-800 flex flex-col min-h-0">
-            <div className="p-4 border-b border-gray-800">
-              <h2 className="text-lg font-semibold text-white">Game Code</h2>
-              <p className="text-sm text-gray-400">Edit directly or use AI to modify</p>
+            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-white">
+                  {showPreview ? "Game Preview" : "Game Code"}
+                </h2>
+                <p className="text-sm text-gray-400">
+                  {showPreview ? "Test your changes" : "Edit directly or use AI to modify"}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setShowPreview(true);
+                    // Generate new room ID to force reload
+                    setPreviewRoomId(`room-${Math.random().toString(36).substring(7)}`);
+                  }}
+                  className={`px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+                    showPreview
+                      ? "bg-purple-600 text-white"
+                      : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                  }`}
+                >
+                  <Eye className="w-4 h-4" />
+                  Preview
+                </button>
+                <button
+                  onClick={() => setShowPreview(false)}
+                  className={`px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+                    !showPreview
+                      ? "bg-purple-600 text-white"
+                      : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                  }`}
+                >
+                  <Code className="w-4 h-4" />
+                  Code
+                </button>
+                {showPreview && (
+                  <button
+                    onClick={() => {
+                      // Force iframe refresh by changing the room ID
+                      setPreviewRoomId(`room-${Math.random().toString(36).substring(7)}`);
+                    }}
+                    className="px-3 py-2 rounded-lg flex items-center gap-2 bg-gray-800 text-gray-400 hover:bg-gray-700 transition-colors"
+                    title="Refresh game"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh
+                  </button>
+                )}
+              </div>
             </div>
             <div className="flex-1 min-h-0 overflow-hidden">
-              <Editor
-                height="100%"
-                defaultLanguage="javascript"
-                value={gameCode}
-                onChange={handleCodeChange}
-                theme="vs-dark"
-                options={{
-                  fontSize: 13,
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                  wordWrap: "on",
-                  automaticLayout: true,
-                  tabSize: 2,
-                  insertSpaces: true,
-                }}
-              />
+              {showPreview ? (
+                <iframe
+                  ref={iframeRef}
+                  src={`${getGameServerUrl()}/game/${gameName}/${previewRoomId}`}
+                  className="w-full h-full border-0"
+                  title="Game Preview"
+                  key={previewRoomId}
+                />
+              ) : (
+                <Editor
+                  height="100%"
+                  defaultLanguage="javascript"
+                  value={gameCode}
+                  onChange={handleCodeChange}
+                  theme="vs-dark"
+                  options={{
+                    fontSize: 13,
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    wordWrap: "on",
+                    automaticLayout: true,
+                    tabSize: 2,
+                    insertSpaces: true,
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
