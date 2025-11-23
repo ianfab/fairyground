@@ -135,7 +135,7 @@ ${templateConfig?.baseCode || ''}`;
 
       const message = await anthropic.messages.create({
         model: selectedModel,
-        max_tokens: 8000,
+        max_tokens: 16000,
         messages: [
           {
             role: "user",
