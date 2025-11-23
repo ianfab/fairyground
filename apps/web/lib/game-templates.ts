@@ -16,258 +16,341 @@ export const GAME_TEMPLATES: Record<GameTemplate, GameTemplateConfig> = {
     description: "Create custom chess variants with modified rules, pieces, or board layouts",
     libraries: ["chess.js", "chessboard.js"],
     baseCode: `// Chess Variant Template
-// This code runs on both client and server
+// Uses chessboard.js for drag-and-drop UI and chess.js for move validation
 
 // CLIENT-SIDE CODE
 function initGameClient(container, socket, roomId, emitAction) {
-  // Create chess board container
+  // Load required libraries
+  const loadScript = (src) => {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  };
+  
+  const loadCSS = (href) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+  };
+  
+  // Load chessboard.js CSS
+  loadCSS('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css');
+  
   const boardContainer = document.createElement('div');
   boardContainer.id = 'chess-board';
   boardContainer.style.cssText = 'width: 400px; margin: 40px auto;';
   container.appendChild(boardContainer);
   
-  // Simple board state
-  let selectedSquare = null;
-  let currentPosition = null;
+  const statusDiv = document.createElement('div');
+  statusDiv.id = 'chess-status';
+  statusDiv.style.cssText = 'text-align: center; margin-top: 20px; font-size: 18px; color: #fff;';
+  container.appendChild(statusDiv);
   
-  // Initialize board with chessboard.js-like rendering
-  function createBoard() {
-    const board = document.createElement('div');
-    board.style.cssText = 'display: grid; grid-template-columns: repeat(8, 50px); gap: 0; border: 2px solid #333;';
+  const waitingDiv = document.createElement('div');
+  waitingDiv.id = 'waiting-message';
+  waitingDiv.style.cssText = 'text-align: center; margin-top: 20px; font-size: 16px; color: #888;';
+  waitingDiv.textContent = 'Loading chess libraries...';
+  container.appendChild(waitingDiv);
+  
+  let board = null;
+  let game = null;
+  let myColor = null;
+  
+  // Initialize libraries and board once loaded
+  Promise.all([
+    loadScript('https://code.jquery.com/jquery-3.7.1.min.js'),
+    loadScript('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js'),
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js')
+  ]).then(() => {
+    waitingDiv.textContent = 'Waiting for opponent...';
     
-    for (let row = 0; row < 8; row++) {
-      for (let col = 0; col < 8; col++) {
-        const square = document.createElement('div');
-        const squareName = String.fromCharCode(97 + col) + (8 - row);
-        const isLight = (row + col) % 2 === 0;
-        
-        square.id = 'square-' + squareName;
-        square.dataset.square = squareName;
-        square.style.cssText = 
-          'width: 50px; height: 50px; ' +
-          'background: ' + (isLight ? '#f0d9b5' : '#b58863') + '; ' +
-          'display: flex; align-items: center; justify-content: center; ' +
-          'font-size: 32px; cursor: pointer; user-select: none;';
-        
-        square.addEventListener('click', () => handleSquareClick(squareName));
-        board.appendChild(square);
-      }
-    }
+    // Initialize chess.js
+    game = new Chess();
     
-    return board;
-  }
-  
-  const board = createBoard();
-  boardContainer.appendChild(board);
-  
-  // Piece unicode characters
-  const pieceSymbols = {
-    'wK': '♔', 'wQ': '♕', 'wR': '♖', 'wB': '♗', 'wN': '♘', 'wP': '♙',
-    'bK': '♚', 'bQ': '♛', 'bR': '♜', 'bB': '♝', 'bN': '♞', 'bP': '♟'
-  };
-  
-  // Convert FEN to position object
-  function fenToPosition(fen) {
-    const position = {};
-    const rows = fen.split(' ')[0].split('/');
-    
-    for (let rowIdx = 0; rowIdx < rows.length; rowIdx++) {
-      const row = rows[rowIdx];
-      let colIdx = 0;
-      for (let i = 0; i < row.length; i++) {
-        const char = row[i];
-        if (char >= '1' && char <= '8') {
-          colIdx += parseInt(char);
-        } else {
-          const square = String.fromCharCode(97 + colIdx) + (8 - rowIdx);
-          const color = char === char.toUpperCase() ? 'w' : 'b';
-          const piece = char.toUpperCase();
-          position[square] = color + piece;
-          colIdx++;
-        }
-      }
-    }
-    
-    return position;
-  }
-  
-  // Render position on board
-  function renderPosition(position) {
-    // Clear all squares
-    for (let row = 0; row < 8; row++) {
-      for (let col = 0; col < 8; col++) {
-        const squareName = String.fromCharCode(97 + col) + (8 - row);
-        const square = document.getElementById('square-' + squareName);
-        if (square) {
-          square.textContent = '';
-          const isLight = (row + col) % 2 === 0;
-          square.style.background = isLight ? '#f0d9b5' : '#b58863';
-        }
-      }
-    }
-    
-    // Place pieces
-    Object.keys(position).forEach(square => {
-      const piece = position[square];
-      const squareEl = document.getElementById('square-' + square);
-      if (squareEl && pieceSymbols[piece]) {
-        squareEl.textContent = pieceSymbols[piece];
-      }
-    });
-  }
-  
-  // Handle square clicks
-  function handleSquareClick(square) {
-    if (!selectedSquare) {
-      // Select piece
-      const piece = currentPosition[square];
-      if (piece) {
-        selectedSquare = square;
-        const squareEl = document.getElementById('square-' + square);
-        if (squareEl) {
-          squareEl.style.background = '#baca44';
-        }
-      }
-    } else {
-      // Move piece
-      if (selectedSquare !== square) {
-        emitAction('move', { from: selectedSquare, to: square });
+    function onDragStart(source, piece, position, orientation) {
+      // Do not pick up pieces if the game is over
+      if (game.game_over()) return false;
+      
+      // Only allow moves if player has a color assigned
+      if (!myColor || myColor === 'spectator') return false;
+      
+      // Only pick up pieces for the side to move
+      if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+          (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+        return false;
       }
       
-      // Deselect
-      const oldSquareEl = document.getElementById('square-' + selectedSquare);
-      if (oldSquareEl) {
-        const row = 8 - parseInt(selectedSquare[1]);
-        const col = selectedSquare.charCodeAt(0) - 97;
-        const isLight = (row + col) % 2 === 0;
-        oldSquareEl.style.background = isLight ? '#f0d9b5' : '#b58863';
+      // Only allow player to move their own pieces
+      if ((myColor === 'white' && piece.search(/^b/) !== -1) ||
+          (myColor === 'black' && piece.search(/^w/) !== -1)) {
+        return false;
       }
-      selectedSquare = null;
     }
-  }
-  
-  return {
-    onStateUpdate: (state) => {
-      if (state.board) {
-        currentPosition = fenToPosition(state.board);
-        renderPosition(currentPosition);
+    
+    function onDrop(source, target) {
+      // See if the move is legal
+      const move = game.move({
+        from: source,
+        to: target,
+        promotion: 'q' // Always promote to queen for simplicity
+      });
+      
+      // Illegal move
+      if (move === null) return 'snapback';
+      
+      // Send move to server
+      emitAction('move', { from: source, to: target, promotion: 'q' });
+    }
+    
+    function onSnapEnd() {
+      // Update board position after piece snap
+      // This handles castling, en passant, pawn promotion
+      board.position(game.fen());
+    }
+    
+    function updateStatus(playerColors) {
+      let status = '';
+      const moveColor = game.turn() === 'w' ? 'White' : 'Black';
+      const myPlayerColor = playerColors ? playerColors[socket.id] : null;
+      
+      // Checkmate?
+      if (game.in_checkmate()) {
+        const winner = game.turn() === 'w' ? 'Black' : 'White';
+        status = 'Game over, ' + winner + ' wins by checkmate!';
       }
+      // Draw?
+      else if (game.in_draw()) {
+        status = 'Game over, drawn position';
+      }
+      // Stalemate?
+      else if (game.in_stalemate()) {
+        status = 'Game over, stalemate';
+      }
+      // Threefold repetition?
+      else if (game.in_threefold_repetition()) {
+        status = 'Game over, draw by threefold repetition';
+      }
+      // Insufficient material?
+      else if (game.insufficient_material()) {
+        status = 'Game over, draw by insufficient material';
+      }
+      // Game still on
+      else {
+        status = moveColor + ' to move';
+        
+        if (myPlayerColor === 'spectator') {
+          status += ' (You are spectating)';
+        } else if (myPlayerColor) {
+          status += ' (You are ' + myPlayerColor + ')';
+        }
+        
+        // Check?
+        if (game.in_check()) {
+          status += ' - ' + moveColor + ' is in check!';
+        }
+      }
+      
+      statusDiv.textContent = status;
+    }
+    
+    const config = {
+      draggable: true,
+      position: 'start',
+      onDragStart: onDragStart,
+      onDrop: onDrop,
+      onSnapEnd: onSnapEnd,
+      pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+    };
+    
+    board = Chessboard('chess-board', config);
+    updateStatus({});
+    
+    // Handle state updates
+    gameInstance.onStateUpdate = (state) => {
+      console.log('Chess onStateUpdate called with:', state);
+      
+      if (!state || !state.board) {
+        console.error('Invalid state received:', state);
+        return;
+      }
+      
+      try {
+        // Load position into chess.js
+        game.load(state.board);
+        
+        // Update board display
+        board.position(state.board);
+        
+        const playerCount = state.playerColors ? Object.keys(state.playerColors).length : 0;
+        
+        if (playerCount < 2) {
+          waitingDiv.style.display = 'block';
+          waitingDiv.textContent = 'Waiting for opponent...';
+        } else {
+          waitingDiv.style.display = 'none';
+        }
+        
+        if (state.playerColors && state.playerColors[socket.id]) {
+          const newColor = state.playerColors[socket.id];
+          
+          if (newColor === 'spectator') {
+            myColor = 'spectator';
+          } else if (!myColor || myColor !== newColor) {
+            myColor = newColor;
+            
+            // Flip board for black player
+            const orientation = myColor === 'black' ? 'black' : 'white';
+            board.orientation(orientation);
+          }
+        }
+        
+        updateStatus(state.playerColors);
+      } catch (e) {
+        console.error('Error updating state:', e, e.stack);
+      }
+    };
+  }).catch(err => {
+    console.error('Failed to load chess libraries:', err);
+    waitingDiv.textContent = 'Error loading game. Please refresh.';
+  });
+  
+  // Create game instance (will be populated once libraries load)
+  const gameInstance = {
+    onStateUpdate: (state) => {
+      // This will be replaced once libraries are loaded
+      console.log('Waiting for libraries to load...');
     }
   };
+  
+  console.log('Chess game instance created');
+  return gameInstance;
 }
 
 // SERVER-SIDE CODE
+// Note: Chess class is provided by the server sandbox context
 const serverLogic = {
   initialState: {
     board: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     players: {},
-    currentTurn: 'white',
-    moves: []
+    playerColors: {},
+    moveHistory: []
   },
   moves: {
+    playerJoined: (state, payload, playerId) => {
+      const existingPlayerCount = Object.keys(state.playerColors).length;
+      
+      if (existingPlayerCount === 0) {
+        state.playerColors[playerId] = Math.random() < 0.5 ? 'white' : 'black';
+      } else if (existingPlayerCount === 1) {
+        const firstPlayerColor = Object.values(state.playerColors)[0];
+        state.playerColors[playerId] = firstPlayerColor === 'white' ? 'black' : 'white';
+      } else {
+        state.playerColors[playerId] = 'spectator';
+      }
+      
+      console.log('Player', playerId, 'assigned color:', state.playerColors[playerId]);
+    },
+    
     move: (state, payload, playerId) => {
-      // Simple move tracking (no validation for now)
-      state.moves.push({
-        from: payload.from,
-        to: payload.to,
-        player: playerId,
-        timestamp: Date.now()
-      });
+      const playerColor = state.playerColors[playerId];
       
-      // Basic piece movement in FEN (simplified)
-      // In a real implementation, use chess.js or similar
-      const position = {};
-      const rows = state.board.split(' ')[0].split('/');
-      
-      // Parse FEN to position
-      for (let rowIdx = 0; rowIdx < rows.length; rowIdx++) {
-        const row = rows[rowIdx];
-        let colIdx = 0;
-        for (let i = 0; i < row.length; i++) {
-          const char = row[i];
-          if (char >= '1' && char <= '8') {
-            colIdx += parseInt(char);
-          } else {
-            const square = String.fromCharCode(97 + colIdx) + (8 - rowIdx);
-            position[square] = char;
-            colIdx++;
-          }
-        }
+      if (playerColor === 'spectator') {
+        console.log('Spectator attempted to move');
+        return;
       }
       
-      // Move piece
-      if (position[payload.from]) {
-        position[payload.to] = position[payload.from];
-        delete position[payload.from];
+      // Initialize chess.js with current board state
+      const game = new Chess(state.board);
+      
+      // Check if it's the player's turn
+      const currentTurn = game.turn(); // 'w' or 'b'
+      const turnColor = currentTurn === 'w' ? 'white' : 'black';
+      
+      if (playerColor !== turnColor) {
+        console.log('Not player turn:', playerColor, 'vs', turnColor);
+        return;
       }
       
-      // Convert back to FEN
-      let newFen = '';
-      for (let row = 0; row < 8; row++) {
-        let emptyCount = 0;
-        for (let col = 0; col < 8; col++) {
-          const square = String.fromCharCode(97 + col) + (8 - row);
-          if (position[square]) {
-            if (emptyCount > 0) {
-              newFen += emptyCount;
-              emptyCount = 0;
-            }
-            newFen += position[square];
-          } else {
-            emptyCount++;
-          }
+      // Attempt the move
+      try {
+        const move = game.move({
+          from: payload.from,
+          to: payload.to,
+          promotion: payload.promotion || 'q'
+        });
+        
+        if (move === null) {
+          console.log('Illegal move attempted:', payload);
+          return;
         }
-        if (emptyCount > 0) {
-          newFen += emptyCount;
-        }
-        if (row < 7) {
-          newFen += '/';
-        }
+        
+        console.log('Legal move executed:', move);
+        
+        // Update state with new FEN
+        state.board = game.fen();
+        
+        // Add to move history
+        state.moveHistory.push({
+          from: payload.from,
+          to: payload.to,
+          promotion: payload.promotion,
+          san: move.san,
+          player: playerId,
+          timestamp: Date.now()
+        });
+        
+        console.log('New board state:', state.board);
+        console.log('Game over:', game.game_over());
+        console.log('In check:', game.in_check());
+        console.log('In checkmate:', game.in_checkmate());
+        console.log('In draw:', game.in_draw());
+        
+      } catch (e) {
+        console.error('Error executing move:', e);
       }
-      
-      state.board = newFen + ' w KQkq - 0 1';
-      state.currentTurn = state.currentTurn === 'white' ? 'black' : 'white';
     }
   }
 };`,
-    prompt: `You are creating a chess variant. Generate game code following this EXACT structure:
+    prompt: `You are creating a chess variant using chessboard.js and chess.js.
 
-REQUIRED STRUCTURE:
-1. Define initGameClient(container, socket, roomId, emitAction) function
-2. Return object with onStateUpdate(state) method
-3. Define const serverLogic with initialState and moves
+LIBRARIES AVAILABLE:
+- chessboard.js: Drag-and-drop chess board UI (https://chessboardjs.com/)
+- chess.js: Full chess move validation and game logic (https://github.com/jhlywa/chess.js)
 
-The code must follow this template:
+STRUCTURE:
+The template already includes:
+✅ Drag-and-drop board with piece images
+✅ Complete legal move validation
+✅ Turn management and color assignment
+✅ Game end detection (checkmate, stalemate, draw)
+✅ Spectator support
+✅ Board orientation (flipped for black player)
 
-\`\`\`javascript
-// CLIENT-SIDE
-function initGameClient(container, socket, roomId, emitAction) {
-  // Create chess board UI
-  // Set up click handlers
-  // Return { onStateUpdate: (state) => { /* update UI */ } }
-}
+TO CUSTOMIZE YOUR VARIANT:
+1. Modify the initial FEN string in initialState.board
+2. Customize move validation in the server's move handler
+3. Add special rules or win conditions
+4. Modify the onDragStart function for custom piece movement rules
 
-// SERVER-SIDE
-const serverLogic = {
-  initialState: {
-    board: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-    players: {},
-    currentTurn: 'white'
-  },
-  moves: {
-    move: (state, payload, playerId) => {
-      // Validate and execute move
-      // Mutate state directly
-    }
-  }
-};
-\`\`\`
+EXAMPLE CUSTOMIZATIONS:
+- Chess960: Randomize starting position FEN
+- Three-check: Track checks in state, win after 3 checks
+- Atomic: Add explosion logic when pieces are captured
+- Fog of War: Filter visible pieces in onStateUpdate based on player position
 
-Key requirements:
-- Use FEN notation for board state
-- Implement move validation
-- Handle turn switching
-- Support custom rules as described
+The Chess class (from chess.js) provides methods like:
+- game.move({ from, to, promotion }) - Make a move
+- game.in_check() - Check if current player is in check
+- game.in_checkmate() - Check if current player is checkmated
+- game.game_over() - Check if game is over
+- game.fen() - Get current position as FEN string
+- game.load(fen) - Load a position from FEN
+- game.turn() - Get current turn ('w' or 'b')
 
 User's chess variant description:`
   },
