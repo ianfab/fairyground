@@ -178,6 +178,9 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     
     const prefilledRoom = roomName || '';
     
+    // Determine the home URL based on environment
+    const homeUrl = isDevelopment ? 'http://localhost:3000' : 'https://splork.io';
+    
     // Serve HTML page that loads the game
     res.send(`
 <!DOCTYPE html>
@@ -289,6 +292,31 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       color: #fff;
       font-weight: bold;
     }
+    #back-button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      z-index: 1000;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
+    }
+    #back-button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
   </style>
 </head>
 <body>
@@ -302,6 +330,13 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
 
   <div id="game-container" class="${prefilledRoom ? '' : 'hidden'}">
     <div id="game-canvas"></div>
+    
+    <!-- Back button -->
+    <a id="back-button" href="${homeUrl}" target="_top">
+      <span>←</span>
+      <span>Back to Home</span>
+    </a>
+    
     <div id="game-ui">
       <h3 style="margin-bottom: 15px; color: #fff;">Game Info</h3>
       <div class="info-row">
