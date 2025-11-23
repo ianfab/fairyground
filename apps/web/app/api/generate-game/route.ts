@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { GAME_TEMPLATES } from "@/lib/game-templates";
-
-// This is a placeholder - you'll need to integrate with an actual LLM API
-// Options: OpenAI, Anthropic Claude, or a local model
+import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 
 export async function POST(request: Request) {
   try {
-    const { template, description, name } = await request.json();
+    const { template, description, name, model } = await request.json();
 
     if (!template || !description) {
       return NextResponse.json(
@@ -23,14 +22,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // TODO: Integrate with LLM API (OpenAI, Anthropic, etc.)
-    // For now, return the base template
-    
-    // Example with OpenAI (uncomment and add API key):
-    /*
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    // Determine which model to use (default: gpt-4o)
+    const selectedModel = model || "gpt-4o";
 
     const systemPrompt = `You are a game developer. Generate complete, working game code.
 
@@ -42,7 +35,7 @@ function initGameClient(container, socket, roomId, emitAction) {
   // 1. Create your game UI
   // 2. Set up event listeners
   // 3. Return object with onStateUpdate method
-  
+
   return {
     onStateUpdate: (state) => {
       // Update UI based on state
@@ -58,6 +51,13 @@ const serverLogic = {
   moves: {
     actionName: (state, payload, playerId) => {
       // Mutate state directly
+    },
+
+    // OPTIONAL: For games with continuous physics/animation
+    tick: (state) => {
+      // Called automatically ~60 times per second (every 16ms)
+      // Update physics, animations, AI, etc.
+      // Mutate state directly
     }
   }
 };
@@ -72,32 +72,98 @@ RULES:
 6. No external dependencies unless in template
 7. Mutate state directly in move functions
 
+GAME LOOP (tick):
+- Add a 'tick' action for games needing continuous updates (physics, animation, AI)
+- Server automatically calls tick ~60 times per second (every 16ms)
+- Use for: ball movement, enemy AI, timers, animations, collision detection
+- Don't use for: turn-based games (chess, card games) or simple click games
+- Example: Pong uses tick for ball physics and collision detection
+
+When to use tick:
+✓ Real-time physics (ball bouncing, gravity)
+✓ Continuous movement (entities moving every frame)
+✓ Collision detection that needs frequent checks
+✓ Timers/countdowns
+✓ Enemy AI that updates every frame
+✗ Turn-based games (chess, tic-tac-toe)
+✗ Simple event-driven games (clicker games)
+
 ${templateConfig.prompt}
 
 Base template:
 ${templateConfig.baseCode}`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt
-        },
-        {
-          role: "user",
-          content: description
-        }
-      ],
-      temperature: 0.7,
-    });
+    let rawResponse: string;
 
-    const generatedCode = completion.choices[0].message.content;
-    */
+    // Route to appropriate LLM based on model selection
+    if (selectedModel.startsWith("claude")) {
+      // Use Claude (Anthropic)
+      const anthropic = new Anthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      });
 
-    // Placeholder response
-    const generatedCode = templateConfig.baseCode;
-    
+      const message = await anthropic.messages.create({
+        model: selectedModel,
+        max_tokens: 8000,
+        messages: [
+          {
+            role: "user",
+            content: systemPrompt + "\n\nUser request:\n" + description
+          }
+        ],
+        temperature: 0.7,
+      });
+
+      rawResponse = message.content[0].type === "text"
+        ? message.content[0].text
+        : templateConfig.baseCode;
+
+    } else {
+      // Use OpenAI (GPT-4o, etc.)
+      const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+
+      const completion = await openai.chat.completions.create({
+        model: selectedModel,
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          {
+            role: "user",
+            content: description
+          }
+        ],
+        temperature: 0.7,
+      });
+
+      rawResponse = completion.choices[0].message.content || templateConfig.baseCode;
+    }
+
+    // Extract code from markdown code blocks
+    // LLMs often wrap code in ```javascript ... ``` or ``` ... ```
+    function extractCode(text: string): string {
+      // Try to find code block with language specifier (```javascript or ```js)
+      const jsCodeBlockMatch = text.match(/```(?:javascript|js)\n([\s\S]*?)\n```/);
+      if (jsCodeBlockMatch) {
+        return jsCodeBlockMatch[1];
+      }
+
+      // Try to find generic code block (```)
+      const genericCodeBlockMatch = text.match(/```\n([\s\S]*?)\n```/);
+      if (genericCodeBlockMatch) {
+        return genericCodeBlockMatch[1];
+      }
+
+      // If no code block found, return the whole response
+      // (Maybe the LLM returned plain code without markdown)
+      return text;
+    }
+
+    const generatedCode = extractCode(rawResponse);
+
     // Generate suggested name from description
     const suggestedName = name || description
       .toLowerCase()

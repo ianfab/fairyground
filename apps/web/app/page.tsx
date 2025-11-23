@@ -70,6 +70,16 @@ export default async function Home() {
               <p className="text-gray-100 text-sm">Classic Pong game - use W/S keys to move your paddle</p>
               <p className="text-xs text-green-200 mt-4">Ready to play →</p>
             </a>
+            <a
+              href="http://localhost:3001/game/tetris"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block p-6 rounded-xl bg-gradient-to-br from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 transition-all"
+            >
+              <h3 className="text-xl font-bold mb-2">🟦 Tetris</h3>
+              <p className="text-gray-100 text-sm">Classic Tetris - arrow keys to move, up to rotate, space to drop</p>
+              <p className="text-xs text-red-200 mt-4">Ready to play →</p>
+            </a>
           </div>
 
           <h2 className="text-2xl font-bold mb-6 text-gray-200">Community Games</h2>

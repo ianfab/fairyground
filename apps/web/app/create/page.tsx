@@ -36,12 +36,13 @@ export default function CreateGame() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [gameDescription, setGameDescription] = useState("");
-  
+  const [selectedModel, setSelectedModel] = useState("claude-sonnet-4-5-20250929");
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [generatingCode, setGeneratingCode] = useState(false);
   const [generatedCode, setGeneratedCode] = useState("");
-  
+
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [gamesCreated, setGamesCreated] = useState(0);
 
@@ -81,16 +82,16 @@ export default function CreateGame() {
       
       // Free logged-in users check metadata count
       const userGamesCreated = (user as any).metadata?.gamesCreated || 0;
-      if (userGamesCreated >= 5) {
+      if (userGamesCreated >= 100) {
         setShowAuthModal(true);
         return false;
       }
-      
+
       return true;
     }
-    
+
     // Non-logged-in users check localStorage
-    if (gamesCreated >= 5) {
+    if (gamesCreated >= 100) {
       setShowAuthModal(true);
       return false;
     }
@@ -122,6 +123,7 @@ export default function CreateGame() {
           template: selectedTemplate,
           description: gameDescription,
           name,
+          model: selectedModel,
         }),
       });
 
@@ -420,6 +422,18 @@ export default function CreateGame() {
             className="w-full bg-gray-900 border border-gray-800 rounded p-3 focus:border-purple-500 focus:outline-none"
             placeholder="A fun multiplayer game..."
           />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm text-gray-400 mb-2">AI Model</label>
+          <select
+            value={selectedModel}
+            onChange={(e) => setSelectedModel(e.target.value)}
+            className="w-full bg-gray-900 border border-gray-800 rounded p-3 focus:border-purple-500 focus:outline-none"
+          >
+            <option value="gpt-4o">GPT-4o (OpenAI)</option>
+            <option value="claude-sonnet-4-5-20250929">Claude Sonnet 4.5 (Anthropic)</option>
+          </select>
         </div>
 
         <div className="flex-1 flex flex-col mb-4">
