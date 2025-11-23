@@ -23,6 +23,36 @@ const io = new Server(httpServer, {
 });
 const PORT = process.env.PORT || 3001;
 const rooms = new Map();
+// Game loop ticker - runs periodically for games that have a tick action
+const TICK_RATE = 16; // ~60 FPS
+function startGameLoop(room) {
+    // Only start game loop if the game has a tick action
+    if (!room.logic.moves.tick) {
+        return;
+    }
+    // Don't start if already running
+    if (room.tickInterval) {
+        return;
+    }
+    room.tickInterval = setInterval(() => {
+        try {
+            room.logic.moves.tick(room.state);
+            // Broadcast updated state to all players in the room
+            io.to(room.id).emit("state_update", room.state);
+        }
+        catch (e) {
+            console.error(`Error in tick for room ${room.id}:`, e);
+        }
+    }, TICK_RATE);
+    console.log(`Game loop started for room ${room.id}`);
+}
+function stopGameLoop(room) {
+    if (room.tickInterval) {
+        clearInterval(room.tickInterval);
+        room.tickInterval = undefined;
+        console.log(`Game loop stopped for room ${room.id}`);
+    }
+}
 // Helper function to serve game client
 async function serveGameClient(gameName, roomName, res) {
     try {
@@ -509,6 +539,8 @@ io.on("connection", (socket) => {
                     };
                     rooms.set(roomId, room);
                     console.log(`Room ${roomId} created successfully`);
+                    // Start game loop if the game has a tick action
+                    startGameLoop(room);
                 }
                 catch (e) {
                     console.error("Error executing game code:", e);
@@ -573,6 +605,7 @@ io.on("connection", (socket) => {
                 io.to(roomId).emit("player_joined", { playerId: socket.id, count: room.players.size });
                 // Clean up empty rooms
                 if (room.players.size === 0) {
+                    stopGameLoop(room);
                     rooms.delete(roomId);
                     console.log(`Cleaned up empty room: ${roomId}`);
                 }

@@ -80,6 +80,26 @@ export default async function Home() {
               <p className="text-gray-100 text-sm">Classic Tetris - arrow keys to move, up to rotate, space to drop</p>
               <p className="text-xs text-red-200 mt-4">Ready to play →</p>
             </a>
+            <a
+              href="http://localhost:3001/game/tetris-battle"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block p-6 rounded-xl bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 transition-all"
+            >
+              <h3 className="text-xl font-bold mb-2">⚔️ Tetris Battle</h3>
+              <p className="text-gray-100 text-sm">Competitive 2-player Tetris - clear lines to attack your opponent!</p>
+              <p className="text-xs text-pink-200 mt-4">Ready to play →</p>
+            </a>
+            <a
+              href="http://localhost:3001/game/shooter"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block p-6 rounded-xl bg-gradient-to-br from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 transition-all"
+            >
+              <h3 className="text-xl font-bold mb-2">🔫 3D Shooter</h3>
+              <p className="text-gray-100 text-sm">First-person shooter - WASD to move, mouse to look, click to shoot</p>
+              <p className="text-xs text-orange-200 mt-4">Ready to play →</p>
+            </a>
           </div>
 
           <h2 className="text-2xl font-bold mb-6 text-gray-200">Community Games</h2>
