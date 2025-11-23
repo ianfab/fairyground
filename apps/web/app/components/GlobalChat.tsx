@@ -34,6 +34,7 @@ export function GlobalChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auth
@@ -94,6 +95,7 @@ export function GlobalChat() {
     if (!inputMessage.trim() || isSending) return;
 
     setIsSending(true);
+    setError("");
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -108,9 +110,13 @@ export function GlobalChat() {
         const newMessage = await response.json();
         setMessages((prev) => [...prev, newMessage]);
         setInputMessage("");
+      } else {
+        const data = await response.json();
+        setError(data.error || "Failed to send message");
       }
     } catch (error) {
       console.error("Error sending message:", error);
+      setError("Failed to send message");
     } finally {
       setIsSending(false);
     }
@@ -183,11 +189,19 @@ export function GlobalChat() {
 
           {/* Input */}
           <div className="p-4 border-t border-gray-800">
+            {error && (
+              <div className="mb-2 text-xs text-red-400 bg-red-900/20 px-3 py-2 rounded">
+                {error}
+              </div>
+            )}
             <div className="flex gap-2">
               <input
                 type="text"
                 value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
+                onChange={(e) => {
+                  setInputMessage(e.target.value);
+                  setError("");
+                }}
                 onKeyPress={handleKeyPress}
                 placeholder={`Message as ${username}...`}
                 className="flex-1 px-3 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-500 text-sm border border-gray-700 focus:outline-none focus:border-purple-500"

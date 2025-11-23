@@ -147,7 +147,6 @@ ${templateConfig?.baseCode || ''}`;
             content: systemPrompt + "\n\nUser request:\n" + description
           }
         ],
-        temperature: 0.7,
       });
 
       rawResponse = message.content[0].type === "text"
