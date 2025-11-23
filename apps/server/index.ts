@@ -39,9 +39,45 @@ interface Room {
     moves: Record<string, (state: any, ...args: any[]) => void>;
     initialState: any;
   };
+  tickInterval?: NodeJS.Timeout;
 }
 
 const rooms = new Map<string, Room>();
+
+// Game loop ticker - runs periodically for games that have a tick action
+const TICK_RATE = 16; // ~60 FPS
+
+function startGameLoop(room: Room) {
+  // Only start game loop if the game has a tick action
+  if (!room.logic.moves.tick) {
+    return;
+  }
+
+  // Don't start if already running
+  if (room.tickInterval) {
+    return;
+  }
+
+  room.tickInterval = setInterval(() => {
+    try {
+      room.logic.moves.tick(room.state);
+      // Broadcast updated state to all players in the room
+      io.to(room.id).emit("state_update", room.state);
+    } catch (e) {
+      console.error(`Error in tick for room ${room.id}:`, e);
+    }
+  }, TICK_RATE);
+
+  console.log(`Game loop started for room ${room.id}`);
+}
+
+function stopGameLoop(room: Room) {
+  if (room.tickInterval) {
+    clearInterval(room.tickInterval);
+    room.tickInterval = undefined;
+    console.log(`Game loop stopped for room ${room.id}`);
+  }
+}
 
 // Helper function to serve game client
 async function serveGameClient(gameName: string, roomName: string | undefined, res: any) {
@@ -547,6 +583,9 @@ io.on("connection", (socket) => {
           };
           rooms.set(roomId, room);
           console.log(`Room ${roomId} created successfully`);
+
+          // Start game loop if the game has a tick action
+          startGameLoop(room);
         } catch (e: any) {
           console.error("Error executing game code:", e);
           socket.emit("error", `Invalid game code: ${e.message}`);
@@ -605,15 +644,16 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
-    
+
     // Remove player from all rooms
     rooms.forEach((room, roomId) => {
       if (room.players.has(socket.id)) {
         room.players.delete(socket.id);
         io.to(roomId).emit("player_joined", { playerId: socket.id, count: room.players.size });
-        
+
         // Clean up empty rooms
         if (room.players.size === 0) {
+          stopGameLoop(room);
           rooms.delete(roomId);
           console.log(`Cleaned up empty room: ${roomId}`);
         }
