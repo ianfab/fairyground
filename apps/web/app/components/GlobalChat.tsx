@@ -37,7 +37,7 @@ export function GlobalChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auth
-  let user = null;
+  let user: any = null;
   try {
     const authInfo = useAuthInfo();
     user = authInfo.user;

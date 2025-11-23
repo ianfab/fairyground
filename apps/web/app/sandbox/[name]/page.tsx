@@ -13,7 +13,7 @@ export default function SandboxPage() {
   const gameName = params.name as string;
 
   // Auth
-  let user = null;
+  let user: any = null;
   try {
     const authInfo = useAuthInfo();
     user = authInfo.user;

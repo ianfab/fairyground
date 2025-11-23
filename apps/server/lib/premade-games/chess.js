@@ -44,12 +44,11 @@ function initGameClient(container, socket, roomId, emitAction) {
   let game = null;
   let myColor = null;
 
-  // Initialize libraries and board once loaded
-  Promise.all([
-    loadScript('https://code.jquery.com/jquery-3.7.1.min.js'),
-    loadScript('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js'),
-    loadScript('https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js')
-  ]).then(() => {
+  // Initialize libraries in correct order (jQuery must load first!)
+  loadScript('https://code.jquery.com/jquery-3.7.1.min.js')
+    .then(() => loadScript('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js'))
+    .then(() => loadScript('https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js'))
+    .then(() => {
     waitingDiv.textContent = 'Waiting for opponent...';
 
     // Initialize chess.js

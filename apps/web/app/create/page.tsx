@@ -19,7 +19,7 @@ export default function CreateGame() {
   
   // Try to use auth, but gracefully handle if it's not configured
   let isLoggedIn = false;
-  let user = null;
+  let user: any = null;
   let authLoading = false;
   let redirectToSignupPage = () => {
     alert("PropelAuth not configured. Please set NEXT_PUBLIC_PROPELAUTH_AUTH_URL in your .env file.\n\nSee apps/web/PROPELAUTH_SETUP.md for instructions.");
