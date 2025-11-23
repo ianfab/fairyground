@@ -3,6 +3,7 @@ import { query } from "@/lib/db";
 import { Game } from "@/lib/types";
 import { GameCard } from "./components/GameCard";
 import { CommunityGameCard } from "./components/CommunityGameCard";
+import Navbar from "@/components/Navbar";
 
 // Force dynamic to ensure we fetch fresh data
 export const dynamic = 'force-dynamic';
@@ -22,6 +23,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans">
+      <Navbar />
       <main className="max-w-6xl mx-auto px-4 py-20 flex flex-col items-center text-center">
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
           Vibe code any multiplayer game

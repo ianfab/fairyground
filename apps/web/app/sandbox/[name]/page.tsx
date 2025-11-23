@@ -4,15 +4,28 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Send, AlertCircle, Save, Play } from "lucide-react";
 import Editor from "@monaco-editor/react";
+import Navbar from "@/components/Navbar";
+import { useAuthInfo } from "@propelauth/react";
+import { Game } from "@/lib/types";
 
 export default function SandboxPage() {
   const params = useParams();
   const router = useRouter();
   const gameName = params.name as string;
 
+  // Auth
+  let user = null;
+  try {
+    const authInfo = useAuthInfo();
+    user = authInfo.user;
+  } catch (e) {
+    // Auth not configured
+  }
+
   const [gameCode, setGameCode] = useState("");
   const [gameDescription, setGameDescription] = useState("");
   const [originalCode, setOriginalCode] = useState("");
+  const [gameData, setGameData] = useState<Game | null>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [chatMessages, setChatMessages] = useState<Array<{ role: string; content: string }>>([]);
@@ -47,6 +60,7 @@ export default function SandboxPage() {
           throw new Error("Game not found");
         }
         const game = await response.json();
+        setGameData(game);
         setGameCode(game.code);
         setOriginalCode(game.code);
         setGameDescription(game.description || "");
@@ -155,6 +169,10 @@ export default function SandboxPage() {
           name: newGameName.trim(),
           description: newGameDescription.trim() || gameDescription,
           code: gameCode,
+          // Send user info explicitly
+          creatorId: user?.userId,
+          creatorEmail: user?.email,
+          creatorUsername: user?.username
         }),
       });
 
@@ -182,6 +200,9 @@ export default function SandboxPage() {
 
   const hasChanges = gameCode !== originalCode;
 
+  // Check if current user is the creator
+  const isCreator = user?.userId && gameData?.creator_id && user.userId === gameData.creator_id;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center">
@@ -192,6 +213,7 @@ export default function SandboxPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+      <Navbar />
       {/* Header */}
       <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
         <div className="max-w-[1800px] mx-auto px-6 py-4 flex items-center justify-between">
@@ -213,18 +235,20 @@ export default function SandboxPage() {
               <Play className="w-4 h-4" />
               Test Game
             </a>
-            <button
-              onClick={handleSaveGame}
-              disabled={!hasChanges || saving}
-              className={`flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors ${
-                hasChanges && !saving
-                  ? "bg-purple-600 text-white hover:bg-purple-700"
-                  : "bg-gray-700 text-gray-400 cursor-not-allowed"
-              }`}
-            >
-              <Save className="w-4 h-4" />
-              {saving ? "Saving..." : hasChanges ? "Save Changes" : "Saved"}
-            </button>
+            {isCreator && (
+              <button
+                onClick={handleSaveGame}
+                disabled={!hasChanges || saving}
+                className={`flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors ${
+                  hasChanges && !saving
+                    ? "bg-purple-600 text-white hover:bg-purple-700"
+                    : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                <Save className="w-4 h-4" />
+                {saving ? "Saving..." : hasChanges ? "Save Changes" : "Saved"}
+              </button>
+            )}
             <button
               onClick={() => setShowSaveAsModal(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors"

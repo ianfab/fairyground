@@ -6,6 +6,7 @@ export interface Game {
   created_at: Date;
   creator_id?: string;
   creator_email?: string;
+  creator_username?: string;
   play_count?: number;
   last_played_at?: Date;
 }

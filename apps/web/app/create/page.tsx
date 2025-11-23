@@ -8,6 +8,7 @@ import { AlertCircle, X } from "lucide-react";
 import { useAuthInfo, useRedirectFunctions } from "@propelauth/react";
 import dynamic from 'next/dynamic';
 import { SnakeGameWhileWaiting } from "@/app/components/SnakeGameWhileWaiting";
+import Navbar from "@/components/Navbar";
 
 const Editor = dynamic(
   () => import('@monaco-editor/react'),
@@ -175,7 +176,15 @@ export default function CreateGame() {
       const res = await fetch("/api/games", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, description, code: codeToShip }),
+        body: JSON.stringify({
+          name,
+          description,
+          code: codeToShip,
+          // Send user info explicitly from client
+          creatorId: user?.userId,
+          creatorEmail: user?.email,
+          creatorUsername: user?.username
+        }),
       });
 
       if (!res.ok) {
@@ -300,8 +309,10 @@ export default function CreateGame() {
   // Template selection screen
   if (!selectedTemplate) {
     return (
-      <div className="min-h-screen bg-black text-white p-8 font-sans">
-        {showAuthModal && <AuthModal />}
+      <div className="min-h-screen bg-black text-white font-sans">
+        <Navbar />
+        <div className="p-8">
+          {showAuthModal && <AuthModal />}
         
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-center mb-8">
@@ -387,6 +398,7 @@ export default function CreateGame() {
             ))}
           </div>
         </div>
+        </div>
       </div>
     );
   }
@@ -394,11 +406,13 @@ export default function CreateGame() {
   const template = GAME_TEMPLATES[selectedTemplate];
 
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden font-sans">
-      {showAuthModal && <AuthModal />}
-      
-      {/* Left Pane: Game Description & Generation */}
-      <div className="w-1/2 flex flex-col border-r border-gray-800 p-6 overflow-y-auto">
+    <div className="min-h-screen bg-black text-white font-sans">
+      <Navbar />
+      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+        {showAuthModal && <AuthModal />}
+
+        {/* Left Pane: Game Description & Generation */}
+        <div className="w-1/2 flex flex-col border-r border-gray-800 p-6 overflow-y-auto">
         <div className="mb-4">
           <button
             onClick={() => setSelectedTemplate(null)}
@@ -518,6 +532,7 @@ export default function CreateGame() {
             </div>
           </>
         )}
+        </div>
       </div>
     </div>
   );

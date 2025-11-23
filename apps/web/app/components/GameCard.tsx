@@ -31,7 +31,7 @@ export function GameCard({
       try {
         const response = await fetch(`${getGameServerApiUrl()}/game-stats`);
         if (!response.ok) throw new Error('Failed to fetch stats');
-        
+
         const allStats: Record<string, GameStats> = await response.json();
         if (mounted) {
           setStats(allStats[gameName] || null);

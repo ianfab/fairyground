@@ -7,12 +7,22 @@ import { quickSecurityCheck } from "@/lib/security-check";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, description, code } = body;
+    const { name, description, code, creatorId: clientCreatorId, creatorEmail: clientCreatorEmail, creatorUsername: clientCreatorUsername } = body;
 
-    // Get the authenticated user
+    // Try to get user from server-side auth first
     const user = await getUser();
-    const creatorId = user?.userId || null;
-    const creatorEmail = user?.email || null;
+
+    // Use server-side user if available, otherwise fall back to client-provided
+    const creatorId = user?.userId || clientCreatorId || null;
+    const creatorEmail = user?.email || clientCreatorEmail || null;
+    const creatorUsername = user?.username || clientCreatorUsername || null;
+
+    console.log('Creating game with user info:', {
+      userId: creatorId,
+      email: creatorEmail,
+      username: creatorUsername,
+      source: user ? 'server-auth' : 'client-provided'
+    });
 
     if (!name || !code) {
       return NextResponse.json(
@@ -67,14 +77,27 @@ export async function POST(request: Request) {
     }
 
     const { rows } = await query<Game>`
-      INSERT INTO games (name, description, code, creator_id, creator_email)
-      VALUES (${name}, ${description}, ${code}, ${creatorId}, ${creatorEmail})
+      INSERT INTO games (name, description, code, creator_id, creator_email, creator_username)
+      VALUES (${name}, ${description}, ${code}, ${creatorId}, ${creatorEmail}, ${creatorUsername})
       RETURNING *
     `;
 
     return NextResponse.json(rows[0]);
   } catch (error) {
     console.error("Create game error:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(request: Request) {
+  try {
+    const { rows } = await query<Game>`SELECT * FROM games ORDER BY created_at DESC`;
+    return NextResponse.json(rows);
+  } catch (error) {
+    console.error("Get games error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

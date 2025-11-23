@@ -21,7 +21,7 @@ export function CommunityGameCard({ game }: CommunityGameCardProps) {
       try {
         const response = await fetch(`${getGameServerApiUrl()}/game-stats`);
         if (!response.ok) throw new Error('Failed to fetch stats');
-        
+
         const allStats: Record<string, GameStats> = await response.json();
         if (mounted) {
           setStats(allStats[game.name] || null);
@@ -78,7 +78,7 @@ export function CommunityGameCard({ game }: CommunityGameCardProps) {
         {game.description || "No description"}
       </p>
       <p className="text-xs text-gray-500 mt-2">
-        By {game.creator_email || "Anonymous"}
+        By {game.creator_username || "Anonymous"}
       </p>
       
       <div className="flex gap-3 mt-4">
