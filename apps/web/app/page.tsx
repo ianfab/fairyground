@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { query } from "@/lib/db";
 import { Game } from "@/lib/types";
+import { getGameUrl } from "@/lib/config";
 
 // Force dynamic to ensure we fetch fresh data
 export const dynamic = 'force-dynamic';
@@ -41,7 +42,7 @@ export default async function Home() {
           <h2 className="text-2xl font-bold mb-6 text-gray-200">🎮 Premade Games (Try These First!)</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             <a
-              href="http://localhost:3001/game/chess"
+              href={getGameUrl("chess")}
               target="_blank"
               rel="noopener noreferrer"
               className="group block p-6 rounded-xl bg-gradient-to-br from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 transition-all"
@@ -51,7 +52,7 @@ export default async function Home() {
               <p className="text-xs text-amber-200 mt-4">Ready to play →</p>
             </a>
             <a
-              href="http://localhost:3001/game/clicker"
+              href={getGameUrl("clicker")}
               target="_blank"
               rel="noopener noreferrer"
               className="group block p-6 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all"
@@ -61,7 +62,7 @@ export default async function Home() {
               <p className="text-xs text-purple-200 mt-4">Ready to play →</p>
             </a>
             <a
-              href="http://localhost:3001/game/pong"
+              href={getGameUrl("pong")}
               target="_blank"
               rel="noopener noreferrer"
               className="group block p-6 rounded-xl bg-gradient-to-br from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 transition-all"
@@ -71,7 +72,7 @@ export default async function Home() {
               <p className="text-xs text-green-200 mt-4">Ready to play →</p>
             </a>
             <a
-              href="http://localhost:3001/game/tetris"
+              href={getGameUrl("tetris")}
               target="_blank"
               rel="noopener noreferrer"
               className="group block p-6 rounded-xl bg-gradient-to-br from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 transition-all"
@@ -81,7 +82,7 @@ export default async function Home() {
               <p className="text-xs text-red-200 mt-4">Ready to play →</p>
             </a>
             <a
-              href="http://localhost:3001/game/tetris-battle"
+              href={getGameUrl("tetris-battle")}
               target="_blank"
               rel="noopener noreferrer"
               className="group block p-6 rounded-xl bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 transition-all"
@@ -91,7 +92,7 @@ export default async function Home() {
               <p className="text-xs text-pink-200 mt-4">Ready to play →</p>
             </a>
             <a
-              href="http://localhost:3001/game/shooter"
+              href={getGameUrl("shooter")}
               target="_blank"
               rel="noopener noreferrer"
               className="group block p-6 rounded-xl bg-gradient-to-br from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 transition-all"
@@ -113,7 +114,7 @@ export default async function Home() {
               {games.map((game) => (
                 <a
                   key={game.id}
-                  href={`http://localhost:3001/game/${game.name}`}
+                  href={getGameUrl(game.name)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group block p-6 rounded-xl border border-gray-800 bg-gray-900/30 hover:border-purple-500/50 hover:bg-gray-900/50 transition-all"
@@ -123,7 +124,7 @@ export default async function Home() {
                   <p className="text-xs text-gray-500 mt-2">
                     By {game.creator_email || "Anonymous"}
                   </p>
-                  <p className="text-xs text-purple-500 mt-4">Play on localhost:3001 →</p>
+                  <p className="text-xs text-purple-500 mt-4">Play now →</p>
                 </a>
               ))}
             </div>

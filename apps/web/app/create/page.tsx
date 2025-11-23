@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { GAME_TEMPLATES, GameTemplate } from "@/lib/game-templates";
+import { getGameUrl } from "@/lib/config";
 import { AlertCircle, X } from "lucide-react";
 import { useAuthInfo, useRedirectFunctions } from "@propelauth/react";
 
@@ -193,7 +194,7 @@ export default function CreateGame() {
       }
       
       // Redirect to game server
-      window.location.href = `http://localhost:3001/game/${name}`;
+      window.location.href = getGameUrl(name);
     } catch (err: any) {
       setError(err.message);
     } finally {
