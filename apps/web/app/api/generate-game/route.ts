@@ -35,8 +35,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Determine which model to use (default: gpt-4o)
-    const selectedModel = model || "gpt-4o";
+    // Determine which model to use (default: gpt-5/o1)
+    const selectedModel = model || "gpt-5";
 
     // Different prompts for edit mode vs new game mode
     const systemPrompt = isEditMode
@@ -137,6 +137,10 @@ ${templateConfig?.baseCode || ''}`;
       const message = await anthropic.messages.create({
         model: selectedModel,
         max_tokens: 16000,
+        thinking: {
+          type: "enabled",
+          budget_tokens: 5000
+        },
         messages: [
           {
             role: "user",
@@ -170,25 +174,45 @@ ${templateConfig?.baseCode || ''}`;
       rawResponse = response.text() || (isEditMode ? existingCode : templateConfig?.baseCode || '');
 
     } else {
-      // Use OpenAI (GPT-4o, etc.)
+      // Use OpenAI (GPT-5/o1, GPT-4o, etc.)
       const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
       });
 
-      const completion = await openai.chat.completions.create({
-        model: selectedModel,
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt
-          },
-          {
-            role: "user",
-            content: description
-          }
-        ],
-        temperature: 0.7,
-      });
+      // GPT-5/o1 models use reasoning_effort instead of temperature
+      const isO1Model = selectedModel.startsWith("o1") || selectedModel.startsWith("gpt-5") || selectedModel.startsWith("o3");
+      
+      let completion: OpenAI.Chat.ChatCompletion;
+      
+      if (isO1Model) {
+        // o1 models use reasoning_effort and don't support system messages or temperature
+        completion = await openai.chat.completions.create({
+          model: selectedModel,
+          messages: [
+            {
+              role: "user",
+              content: systemPrompt + "\n\nUser request:\n" + description
+            }
+          ],
+          reasoning_effort: "medium"
+        } as OpenAI.Chat.ChatCompletionCreateParams) as OpenAI.Chat.ChatCompletion;
+      } else {
+        // Other models use temperature and support system messages
+        completion = await openai.chat.completions.create({
+          model: selectedModel,
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt
+            },
+            {
+              role: "user",
+              content: description
+            }
+          ],
+          temperature: 0.7
+        });
+      }
 
       rawResponse = completion.choices[0].message.content || (isEditMode ? existingCode : templateConfig?.baseCode || '');
     }

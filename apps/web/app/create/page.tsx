@@ -463,8 +463,8 @@ export default function CreateGame() {
             className="w-full bg-gray-900 border border-gray-800 rounded p-3 focus:border-purple-500 focus:outline-none"
           >
             <option value="claude-sonnet-4-5-20250929">Claude Sonnet 4.5 (Anthropic) - Default</option>
-            <option value="gpt-4o">GPT-4o (OpenAI)</option>
-            <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (Google)</option>
+            <option value="gpt-5">GPT-4o (OpenAI)</option>
+            <option value="gemini-2.5-pro">Gemini 2.5 Pro (Google)</option>
           </select>
         </div>
 
