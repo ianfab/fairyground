@@ -14,15 +14,77 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(cors());
+
+// Configure allowed origins for CORS and iframe embedding
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+// Allow custom origins from environment variable (comma-separated)
+// Example: ALLOWED_ORIGINS=https://example.com,https://another.com
+const customOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
+
+const defaultOrigins = isDevelopment 
+  ? [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      'http://localhost:3001',
+      'http://127.0.0.1:3001'
+    ]
+  : [
+      'https://splork.io',
+      'https://www.splork.io',
+      'https://play.splork.io'
+    ];
+
+const allowedOrigins = [...defaultOrigins, ...customOrigins];
+
+console.log('🔒 Allowed origins for CORS and iframe embedding:', allowedOrigins);
+
+// CORS configuration
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(null, true); // Still allow for now, but log it
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+}));
+
+// Headers for iframe embedding
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  
+  // Set Content-Security-Policy to allow iframe embedding from allowed origins
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Content-Security-Policy', `frame-ancestors ${allowedOrigins.join(' ')}`);
+  } else {
+    // Allow all origins for iframe embedding in development, or if origin not specified
+    res.setHeader('Content-Security-Policy', `frame-ancestors ${allowedOrigins.join(' ')}`);
+  }
+  
+  // Don't set X-Frame-Options since we're using CSP frame-ancestors
+  // (X-Frame-Options would conflict with CSP)
+  
+  next();
+});
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
