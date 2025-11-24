@@ -1,9 +1,13 @@
-import { query } from "../lib/db.js";
+import { query, getGamesTableName } from "../lib/db.js";
 import vm from "vm";
 
 async function testGame(gameName: string) {
   try {
-    const { rows } = await query`SELECT * FROM games WHERE name = ${gameName}`;
+    const tableName = getGamesTableName();
+    const { rows } = await query(
+      `SELECT * FROM ${tableName} WHERE name = $1`,
+      gameName
+    );
     
     if (rows.length === 0) {
       console.log(`Game '${gameName}' not found`);

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { query } from "@/lib/db";
+import { query, getGamesTableName } from "@/lib/db";
 import { Game } from "@/lib/types";
 import { getUser } from "@propelauth/nextjs/server/app-router";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function GET(
   request: Request,
@@ -10,10 +11,12 @@ export async function GET(
   try {
     const params = await Promise.resolve(context.params);
     const gameName = params.name;
+    const tableName = getGamesTableName();
 
-    const { rows } = await query<Game>`
-      SELECT * FROM games WHERE name = ${gameName}
-    `;
+    const { rows } = await query<Game>(
+      `SELECT * FROM ${tableName} WHERE name = $1`,
+      gameName
+    );
 
     if (rows.length === 0) {
       return NextResponse.json(
@@ -37,24 +40,38 @@ export async function PUT(
   context: { params: Promise<{ name: string }> | { name: string } }
 ) {
   try {
-    const params = await Promise.resolve(context.params);
-    const oldName = params.name;
-    const body = await request.json();
-    const { name, description, code, preview = false, creatorId: clientCreatorId } = body;
-
-    // Try to get user from server-side auth first, fallback to client-provided
+    // Require authentication - no fallbacks
     const user = await getUser();
-    const userId = user?.userId || clientCreatorId;
-
-    if (!userId) {
+    if (!user) {
       return NextResponse.json(
-        { error: "Authentication required" },
+        { error: "Authentication required. Please sign in to edit games." },
         { status: 401 }
       );
     }
 
+    // Apply rate limiting
+    const rateLimitResponse = checkRateLimit(
+      user.userId,
+      "edit-game",
+      RATE_LIMITS.EDIT_GAME
+    );
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
+    const params = await Promise.resolve(context.params);
+    const oldName = params.name;
+    const body = await request.json();
+    const { name, description, code, preview = false } = body;
+
+    const userId = user.userId;
+
     // Check if user owns the game
-    const existing = await query`SELECT creator_id, preview FROM games WHERE name = ${oldName}`;
+    const tableName = getGamesTableName();
+    const existing = await query(
+      `SELECT creator_id, preview FROM ${tableName} WHERE name = $1`,
+      oldName
+    );
     if (existing.rows.length === 0) {
       return NextResponse.json(
         { error: "Game not found" },
@@ -71,15 +88,10 @@ export async function PUT(
     }
 
     // Update the game
-    const { rows } = await query<Game>`
-      UPDATE games
-      SET name = ${name}, 
-          description = ${description || ''}, 
-          code = ${code},
-          preview = ${preview}
-      WHERE name = ${oldName}
-      RETURNING *
-    `;
+    const { rows } = await query<Game>(
+      `UPDATE ${tableName} SET name = $1, description = $2, code = $3, preview = $4 WHERE name = $5 RETURNING *`,
+      name, description || '', code, preview, oldName
+    );
 
     return NextResponse.json(rows[0]);
   } catch (error) {

@@ -9,6 +9,10 @@ Add these to your `.env` file (root of project):
 NEXT_PUBLIC_PROPELAUTH_AUTH_URL=https://your-auth-url.propelauthtest.com
 PROPELAUTH_API_KEY=your_api_key_here
 PROPELAUTH_VERIFIER_KEY=your_verifier_key_here
+
+# Special Key for Unlimited Game Creation (optional)
+# This key can be shared with community members to bypass the 5-game limit
+SPECIAL_KEY=your-secret-key-here
 ```
 
 ## Getting Your PropelAuth Credentials
@@ -69,6 +73,27 @@ When adding payments:
 2. Update auth checks to verify `user.plan === 'paid'`
 3. Integrate Stripe/payment provider
 4. Update PropelAuth metadata on successful payment
+
+## Special Key System
+
+For users who hit the 5-game limit, they can request a special key to create unlimited games:
+
+### How it works:
+1. User creates 5 games and hits the limit
+2. Modal appears prompting them to join Discord
+3. They can request a special key in Discord
+4. Admin provides the special key (set in `SPECIAL_KEY` env variable)
+5. User enters the key in the modal
+6. Key is validated against the server and stored in localStorage
+7. User can now create unlimited games
+
+### Setting up the special key:
+```bash
+# In your .env file
+SPECIAL_KEY=my-super-secret-key-123
+```
+
+The special key is checked on both client and server side to ensure users can bypass the free tier limits.
 
 Example:
 ```typescript

@@ -2,7 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-import { query } from "./lib/db.js";
+import { query, getGamesTableName } from "./lib/db.js";
 import type { Game, GameStats } from "./lib/types.js";
 import { PREMADE_GAMES } from "./lib/premade-games.js";
 import vm from "vm";
@@ -251,7 +251,11 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       };
     } else {
       // Fetch from database
-      const { rows } = await query<Game>`SELECT * FROM games WHERE name = ${gameName}`;
+      const tableName = getGamesTableName();
+      const { rows } = await query<Game>(
+        `SELECT * FROM ${tableName} WHERE name = $1`,
+        gameName
+      );
       if (rows.length === 0) {
         return res.status(404).send('Game not found');
       }
@@ -871,13 +875,11 @@ async function incrementPlayCount(gameName: string): Promise<void> {
       return;
     }
     
-    await query`
-      UPDATE games 
-      SET 
-        play_count = COALESCE(play_count, 0) + 1,
-        last_played_at = NOW()
-      WHERE name = ${gameName}
-    `;
+    const tableName = getGamesTableName();
+    await query(
+      `UPDATE ${tableName} SET play_count = COALESCE(play_count, 0) + 1, last_played_at = NOW() WHERE name = $1`,
+      gameName
+    );
     console.log(`Incremented play count for game: ${gameName}`);
   } catch (err) {
     console.error(`Error incrementing play count for ${gameName}:`, err);
@@ -887,7 +889,10 @@ async function incrementPlayCount(gameName: string): Promise<void> {
 // API endpoint to list all games
 app.get('/api/games', async (req, res) => {
   try {
-    const { rows } = await query<Game>`SELECT id, name, description, created_at, play_count, last_played_at FROM games ORDER BY created_at DESC`;
+    const tableName = getGamesTableName();
+    const { rows } = await query<Game>(
+      `SELECT id, name, description, created_at, play_count, last_played_at FROM ${tableName} ORDER BY created_at DESC`
+    );
     res.json(rows);
   } catch (err) {
     console.error('Error fetching games:', err);
@@ -901,7 +906,10 @@ app.get('/api/game-stats', async (req, res) => {
     const stats: Record<string, GameStats> = {};
     
     // Get stats for database games
-    const { rows } = await query<Game>`SELECT name, play_count, last_played_at FROM games`;
+    const tableName = getGamesTableName();
+    const { rows } = await query<Game>(
+      `SELECT name, play_count, last_played_at FROM ${tableName}`
+    );
     rows.forEach(game => {
       const liveStats = getGameStats(game.name);
       const gameStat: GameStats = {
@@ -1062,7 +1070,11 @@ io.on("connection", (socket) => {
           };
         } else {
           // Fetch from database
-          const { rows } = await query<Game>`SELECT * FROM games WHERE name = ${gameName}`;
+          const tableName = getGamesTableName();
+          const { rows } = await query<Game>(
+            `SELECT * FROM ${tableName} WHERE name = $1`,
+            gameName
+          );
           if (rows.length === 0) {
             console.error(`Game not found: ${gameName}`);
             socket.emit("error", "Game not found");

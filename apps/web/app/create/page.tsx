@@ -76,10 +76,32 @@ export default function CreateGame() {
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [gamesCreated, setGamesCreated] = useState(0);
+  const [hasSpecialKey, setHasSpecialKey] = useState(false);
 
   // Check games created count on mount
   useEffect(() => {
     if (!authLoading) {
+      // Check for special key in localStorage
+      const storedKey = localStorage.getItem("specialKey");
+      if (storedKey) {
+        // Verify the key is still valid
+        fetch("/api/verify-special-key", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: storedKey }),
+        }).then(response => {
+          if (response.ok) {
+            setHasSpecialKey(true);
+          } else {
+            // Key is no longer valid, remove it
+            localStorage.removeItem("specialKey");
+            setHasSpecialKey(false);
+          }
+        }).catch(() => {
+          setHasSpecialKey(false);
+        });
+      }
+
       if (isLoggedIn && user) {
         // For logged-in users, check their plan from metadata
         const userPlan = (user as any).metadata?.plan || 'free';
@@ -103,6 +125,11 @@ export default function CreateGame() {
 
   // Check if user needs to sign up or upgrade
   const checkCanCreate = () => {
+    // Users with special key can always create
+    if (hasSpecialKey) {
+      return true;
+    }
+
     // Non-logged-in users must sign up first
     if (!isLoggedIn) {
       setShowAuthModal(true);
@@ -128,6 +155,12 @@ export default function CreateGame() {
     }
     
     return false;
+  };
+
+  const handleSpecialKeySubmit = (key: string) => {
+    setHasSpecialKey(true);
+    // Refresh the page state
+    setShowAuthModal(false);
   };
 
   const handleTemplateSelect = (templateId: GameTemplate) => {
@@ -384,6 +417,7 @@ export default function CreateGame() {
             isLoggedIn={isLoggedIn}
             gamesCreated={gamesCreated}
             onSignup={() => redirectToSignupPage()}
+            onSpecialKeySubmit={handleSpecialKeySubmit}
           />
         
         <div className="max-w-6xl mx-auto">
@@ -398,6 +432,11 @@ export default function CreateGame() {
             </div>
             
             <div className="text-right">
+              {hasSpecialKey && (
+                <p className="text-xs text-yellow-400 mb-2 font-semibold">
+                  🔑 Special Key Active - Unlimited Games
+                </p>
+              )}
               {isLoggedIn ? (
                 <div>
                   <p className="text-sm text-gray-400 mb-2">Logged in as</p>
@@ -407,7 +446,7 @@ export default function CreateGame() {
                   >
                     {user?.email}
                   </button>
-                  {user && (user as any).metadata?.plan === 'free' && (
+                  {user && (user as any).metadata?.plan === 'free' && !hasSpecialKey && (
                     <p className="text-xs text-gray-500 mt-1">
                       Free Plan: {(user as any).metadata?.gamesCreated || 0}/5 games created
                     </p>
@@ -480,6 +519,7 @@ export default function CreateGame() {
           isLoggedIn={isLoggedIn}
           gamesCreated={gamesCreated}
           onSignup={() => redirectToSignupPage()}
+          onSpecialKeySubmit={handleSpecialKeySubmit}
         />
 
         {/* Left Pane: Game Description & Generation */}

@@ -1,27 +1,43 @@
 import { NextResponse } from "next/server";
-import { query } from "@/lib/db";
+import { query, getGamesTableName } from "@/lib/db";
 import { Game } from "@/lib/types";
 import { getUser } from "@propelauth/nextjs/server/app-router";
 import { quickSecurityCheck } from "@/lib/security-check";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, description, code, preview = false, creatorId: clientCreatorId, creatorEmail: clientCreatorEmail, creatorUsername: clientCreatorUsername } = body;
-
-    // Try to get user from server-side auth first
+    // Require authentication - no fallbacks
     const user = await getUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Authentication required. Please sign in to create games." },
+        { status: 401 }
+      );
+    }
 
-    // Use server-side user if available, otherwise fall back to client-provided
-    const creatorId = user?.userId || clientCreatorId || null;
-    const creatorEmail = user?.email || clientCreatorEmail || null;
-    const creatorUsername = user?.username || clientCreatorUsername || null;
+    // Apply rate limiting
+    const rateLimitResponse = checkRateLimit(
+      user.userId,
+      "create-game",
+      RATE_LIMITS.CREATE_GAME
+    );
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
 
-    console.log('Creating game with user info:', {
+    const body = await request.json();
+    const { name, description, code, preview = false } = body;
+
+    // Use authenticated user info (no client-provided fallbacks)
+    const creatorId = user.userId;
+    const creatorEmail = user.email;
+    const creatorUsername = user.username;
+
+    console.log('Creating game with authenticated user:', {
       userId: creatorId,
       email: creatorEmail,
       username: creatorUsername,
-      source: user ? 'server-auth' : 'client-provided'
     });
 
     if (!name || !code) {
@@ -68,7 +84,11 @@ export async function POST(request: Request) {
     // The quick security check above catches most common malicious patterns
 
     // Check for unique name
-    const existing = await query`SELECT id FROM games WHERE name = ${name}`;
+    const tableName = getGamesTableName();
+    const existing = await query(
+      `SELECT id FROM ${tableName} WHERE name = $1`,
+      name
+    );
     if (existing.rows.length > 0) {
       return NextResponse.json(
         { error: "Game name already taken" },
@@ -76,11 +96,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const { rows } = await query<Game>`
-      INSERT INTO games (name, description, code, creator_id, creator_email, creator_username, preview)
-      VALUES (${name}, ${description}, ${code}, ${creatorId}, ${creatorEmail}, ${creatorUsername}, ${preview})
-      RETURNING *
-    `;
+    const { rows } = await query<Game>(
+      `INSERT INTO ${tableName} (name, description, code, creator_id, creator_email, creator_username, preview) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      name, description, code, creatorId, creatorEmail, creatorUsername, preview
+    );
 
     return NextResponse.json(rows[0]);
   } catch (error) {
@@ -95,7 +114,10 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     // Only return non-preview games for public listing
-    const { rows } = await query<Game>`SELECT * FROM games WHERE preview = false ORDER BY created_at DESC`;
+    const tableName = getGamesTableName();
+    const { rows } = await query<Game>(
+      `SELECT * FROM ${tableName} WHERE preview = false ORDER BY created_at DESC`
+    );
     return NextResponse.json(rows);
   } catch (error) {
     console.error("Get games error:", error);

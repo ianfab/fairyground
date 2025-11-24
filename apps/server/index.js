@@ -2,7 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-import { query } from "./lib/db.js";
+import { query, getGamesTableName } from "./lib/db.js";
 import { PREMADE_GAMES } from "./lib/premade-games.js";
 import vm from "vm";
 import path from "path";
@@ -93,7 +93,8 @@ async function serveGameClient(gameName, roomName, res) {
         }
         else {
             // Fetch from database
-            const { rows } = await query `SELECT * FROM games WHERE name = ${gameName}`;
+            const tableName = getGamesTableName();
+            const { rows } = await query(`SELECT * FROM ${tableName} WHERE name = $1`, gameName);
             if (rows.length === 0) {
                 return res.status(404).send('Game not found');
             }
@@ -508,7 +509,8 @@ app.get('/game/:gameName', async (req, res) => {
 // API endpoint to list all games
 app.get('/api/games', async (req, res) => {
     try {
-        const { rows } = await query `SELECT id, name, description, created_at FROM games ORDER BY created_at DESC`;
+        const tableName = getGamesTableName();
+        const { rows } = await query(`SELECT id, name, description, created_at FROM ${tableName} ORDER BY created_at DESC`);
         res.json(rows);
     }
     catch (err) {
@@ -552,7 +554,8 @@ io.on("connection", (socket) => {
                 }
                 else {
                     // Fetch from database
-                    const { rows } = await query `SELECT * FROM games WHERE name = ${gameName}`;
+                    const tableName = getGamesTableName();
+                    const { rows } = await query(`SELECT * FROM ${tableName} WHERE name = $1`, gameName);
                     if (rows.length === 0) {
                         console.error(`Game not found: ${gameName}`);
                         socket.emit("error", "Game not found");

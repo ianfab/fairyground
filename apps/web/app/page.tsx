@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { query } from "@/lib/db";
+import { query, getGamesTableName } from "@/lib/db";
 import { Game } from "@/lib/types";
 import { GameCard } from "./components/GameCard";
 import { CommunityGameCard } from "./components/CommunityGameCard";
@@ -10,8 +10,10 @@ export const dynamic = "force-dynamic";
 
 async function getGames(): Promise<Game[]> {
   try {
-    const { rows } =
-      await query<Game>`SELECT * FROM games ORDER BY created_at DESC`;
+    const tableName = getGamesTableName();
+    const { rows } = await query<Game>(
+      `SELECT * FROM ${tableName} ORDER BY created_at DESC`
+    );
     return rows;
   } catch (error) {
     console.error("Failed to fetch games:", error);
@@ -21,12 +23,10 @@ async function getGames(): Promise<Game[]> {
 
 async function getTrendingGames(): Promise<Game[]> {
   try {
-    const { rows } = await query<Game>`
-      SELECT * FROM games 
-      WHERE play_count > 0 
-      ORDER BY play_count DESC, last_played_at DESC 
-      LIMIT 3
-    `;
+    const tableName = getGamesTableName();
+    const { rows } = await query<Game>(
+      `SELECT * FROM ${tableName} WHERE play_count > 0 ORDER BY play_count DESC, last_played_at DESC LIMIT 3`
+    );
     return rows;
   } catch (error) {
     console.error("Failed to fetch trending games:", error);
@@ -36,12 +36,10 @@ async function getTrendingGames(): Promise<Game[]> {
 
 async function getTopGame(): Promise<Game | null> {
   try {
-    const { rows } = await query<Game>`
-      SELECT * FROM games 
-      WHERE play_count > 0 
-      ORDER BY play_count DESC, last_played_at DESC 
-      LIMIT 1
-    `;
+    const tableName = getGamesTableName();
+    const { rows } = await query<Game>(
+      `SELECT * FROM ${tableName} WHERE play_count > 0 ORDER BY play_count DESC, last_played_at DESC LIMIT 1`
+    );
     return rows[0] || null;
   } catch (error) {
     console.error("Failed to fetch top game:", error);

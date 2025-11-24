@@ -3,6 +3,8 @@ import { GAME_TEMPLATES } from "@/lib/game-templates";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { getUser } from "@propelauth/nextjs/server/app-router";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 // Define structured output schema
 interface GameGenerationResponse {
@@ -13,6 +15,25 @@ interface GameGenerationResponse {
 
 export async function POST(request: Request) {
   try {
+    // Require authentication
+    const user = await getUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Authentication required. Please sign in to generate games." },
+        { status: 401 }
+      );
+    }
+
+    // Apply rate limiting
+    const rateLimitResponse = checkRateLimit(
+      user.userId,
+      "generate-game",
+      RATE_LIMITS.GENERATE_GAME
+    );
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     const { template, description, name, model, existingCode, screenshot } = await request.json();
 
     if (!description) {

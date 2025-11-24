@@ -43,11 +43,29 @@ export const pool = new Pool({
   connectionTimeoutMillis: 5000,
 });
 
-export async function query<T = any>(strings: TemplateStringsArray, ...values: any[]): Promise<{ rows: T[] }>{
-  const text = (SQL as any)(strings, ...values).text;
-  const params = (SQL as any)(strings, ...values).values;
+// Helper function to get the games table name based on environment
+export function getGamesTableName(): string {
+  return process.env.NODE_ENV === 'development' ? 'games_dev' : 'games';
+}
+
+// Overloaded query function to support both template strings and raw SQL
+export async function query<T = any>(strings: TemplateStringsArray | string, ...values: any[]): Promise<{ rows: T[] }>{
   const client = await pool.connect();
   try {
+    let text: string;
+    let params: any[];
+    
+    if (typeof strings === 'string') {
+      // Raw SQL string
+      text = strings;
+      params = values;
+    } else {
+      // Template string
+      const sqlObj = (SQL as any)(strings, ...values);
+      text = sqlObj.text;
+      params = sqlObj.values;
+    }
+    
     const result = await client.query(text, params);
     return { rows: result.rows as T[] };
   } finally {

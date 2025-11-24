@@ -1,8 +1,11 @@
-import { query } from "../lib/db.js";
+import { query, getGamesTableName } from "../lib/db.js";
 
 async function checkGames() {
   try {
-    const { rows } = await query`SELECT name, LEFT(code, 300) as code_preview FROM games`;
+    const tableName = getGamesTableName();
+    const { rows } = await query(
+      `SELECT name, LEFT(code, 300) as code_preview FROM ${tableName}`
+    );
     
     console.log('\n=== Games in Database ===\n');
     rows.forEach((game: any) => {
@@ -12,7 +15,9 @@ async function checkGames() {
     });
     
     // Check for serverLogic
-    const { rows: fullRows } = await query`SELECT name, code FROM games`;
+    const { rows: fullRows } = await query(
+      `SELECT name, code FROM ${tableName}`
+    );
     fullRows.forEach((game: any) => {
       const hasInitGameClient = game.code.includes('function initGameClient');
       const hasServerLogic = game.code.includes('const serverLogic') || game.code.includes('var serverLogic');
