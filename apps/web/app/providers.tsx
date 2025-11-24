@@ -9,8 +9,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setIsMounted(true);
-
-    // Intercept fetch to detect and handle PropelAuth 401 errors
+        // Intercept fetch to detect and handle PropelAuth 401 errors
     const originalFetch = window.fetch;
     let errorCount = 0;
     const MAX_ERRORS = 3;
@@ -56,6 +55,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   // If no auth URL or it's the example URL, don't use auth provider
   if (!authUrl || authUrl.includes('example.com')) {
+    console.log('[Providers] Not using AuthProvider - authUrl:', authUrl);
     return <>{children}</>;
   }
 
@@ -64,6 +64,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
+  console.log('[Providers] Using AuthProvider with URL:', authUrl);
   return (
     <AuthProvider
       authUrl={authUrl}

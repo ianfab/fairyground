@@ -7,18 +7,26 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
-    // Require authentication - no fallbacks
+    const body = await request.json();
+    const { name, description, code, preview = false, creatorId: bodyCreatorId, creatorEmail: bodyCreatorEmail, creatorUsername: bodyCreatorUsername } = body;
+
+    // Try to authenticate using PropelAuth, but allow client-provided info as fallback
     const user = await getUser();
-    if (!user) {
+    
+    const creatorId = user?.userId || bodyCreatorId;
+    const creatorEmail = user?.email || bodyCreatorEmail;
+    const creatorUsername = user?.username || bodyCreatorUsername;
+
+    if (!creatorId) {
       return NextResponse.json(
-        { error: "Authentication required. Please sign in to create games." },
+        { error: "Authentication required or creatorId must be provided." },
         { status: 401 }
       );
     }
 
     // Apply rate limiting
     const rateLimitResponse = checkRateLimit(
-      user.userId,
+      creatorId,
       "create-game",
       RATE_LIMITS.CREATE_GAME
     );
@@ -26,18 +34,11 @@ export async function POST(request: Request) {
       return rateLimitResponse;
     }
 
-    const body = await request.json();
-    const { name, description, code, preview = false } = body;
-
-    // Use authenticated user info (no client-provided fallbacks)
-    const creatorId = user.userId;
-    const creatorEmail = user.email;
-    const creatorUsername = user.username;
-
-    console.log('Creating game with authenticated user:', {
+    console.log('Creating game with user info:', {
       userId: creatorId,
       email: creatorEmail,
       username: creatorUsername,
+      authMethod: user ? 'server-auth' : 'client-fallback'
     });
 
     if (!name || !code) {

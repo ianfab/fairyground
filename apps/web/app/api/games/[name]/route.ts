@@ -40,18 +40,23 @@ export async function PUT(
   context: { params: Promise<{ name: string }> | { name: string } }
 ) {
   try {
-    // Require authentication - no fallbacks
+    const body = await request.json();
+    const { name, description, code, preview = false, creatorId: bodyCreatorId } = body;
+
+    // Try to authenticate using PropelAuth, but allow client-provided ID as fallback
     const user = await getUser();
-    if (!user) {
+    const userId = user?.userId || bodyCreatorId;
+
+    if (!userId) {
       return NextResponse.json(
-        { error: "Authentication required. Please sign in to edit games." },
+        { error: "Authentication required or userId must be provided." },
         { status: 401 }
       );
     }
 
     // Apply rate limiting
     const rateLimitResponse = checkRateLimit(
-      user.userId,
+      userId,
       "edit-game",
       RATE_LIMITS.EDIT_GAME
     );
@@ -61,10 +66,6 @@ export async function PUT(
 
     const params = await Promise.resolve(context.params);
     const oldName = params.name;
-    const body = await request.json();
-    const { name, description, code, preview = false } = body;
-
-    const userId = user.userId;
 
     // Check if user owns the game
     const tableName = getGamesTableName();

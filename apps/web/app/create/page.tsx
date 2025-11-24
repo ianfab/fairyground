@@ -194,6 +194,7 @@ export default function CreateGame() {
           description: gameDescription,
           name,
           model: selectedModel,
+          userId: user?.userId,
         }),
       });
 
@@ -242,6 +243,7 @@ export default function CreateGame() {
           description: newMessage,
           existingCode: generatedCode,
           model: selectedModel,
+          userId: user?.userId,
         }),
       });
 
