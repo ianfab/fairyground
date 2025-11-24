@@ -1268,6 +1268,17 @@ io.on("connection", (socket) => {
       rooms.forEach((room, roomId) => {
         if (room.players.has(socket.id)) {
           room.players.delete(socket.id);
+
+          // Call game-specific playerLeft handler if it exists
+          if (room.logic.moves.playerLeft) {
+            try {
+              room.logic.moves.playerLeft(room.state, {}, socket.id);
+              io.to(roomId).emit("state_update", getClientState(room.state));
+            } catch (e) {
+              console.error(`Error in playerLeft handler for room ${roomId}:`, e);
+            }
+          }
+
           io.to(roomId).emit("player_joined", { playerId: socket.id, count: room.players.size });
 
           // Clean up empty rooms

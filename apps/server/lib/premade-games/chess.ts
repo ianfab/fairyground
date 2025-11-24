@@ -45,11 +45,13 @@ function initGameClient(container, socket, roomId, emitAction) {
   let myColor = null;
 
   // Initialize libraries and board once loaded
-  Promise.all([
-    loadScript('https://code.jquery.com/jquery-3.7.1.min.js'),
-    loadScript('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js'),
-    loadScript('https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js')
-  ]).then(() => {
+  // Load jQuery first, then load chessboard.js and chess.js
+  loadScript('https://code.jquery.com/jquery-3.7.1.min.js')
+    .then(() => Promise.all([
+      loadScript('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js'),
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js')
+    ]))
+    .then(() => {
     waitingDiv.textContent = 'Waiting for opponent...';
 
     // Initialize chess.js
@@ -227,16 +229,30 @@ const serverLogic = {
     playerJoined: (state, payload, playerId) => {
       const existingPlayerCount = Object.keys(state.playerColors).length;
 
+      let assignedColor;
       if (existingPlayerCount === 0) {
-        state.playerColors[playerId] = Math.random() < 0.5 ? 'white' : 'black';
+        assignedColor = Math.random() < 0.5 ? 'white' : 'black';
       } else if (existingPlayerCount === 1) {
         const firstPlayerColor = Object.values(state.playerColors)[0];
-        state.playerColors[playerId] = firstPlayerColor === 'white' ? 'black' : 'white';
+        assignedColor = firstPlayerColor === 'white' ? 'black' : 'white';
       } else {
-        state.playerColors[playerId] = 'spectator';
+        assignedColor = 'spectator';
       }
 
-      console.log('Player', playerId, 'assigned color:', state.playerColors[playerId]);
+      state.playerColors[playerId] = assignedColor;
+      state.players[playerId] = {
+        id: playerId,
+        color: assignedColor,
+        joinedAt: Date.now()
+      };
+
+      console.log('Player', playerId, 'assigned color:', assignedColor);
+    },
+
+    playerLeft: (state, payload, playerId) => {
+      delete state.playerColors[playerId];
+      delete state.players[playerId];
+      console.log('Player', playerId, 'left the game');
     },
 
     move: (state, payload, playerId) => {
