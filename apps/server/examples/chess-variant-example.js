@@ -82,19 +82,66 @@ const serverLogic = {
   initialState: {
     board: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     players: {},
+    playerColors: {},
     currentTurn: 'white',
-    moves: []
+    moveHistory: []
   },
   moves: {
+    playerJoined: (state, payload, playerId) => {
+      const existingPlayerCount = Object.keys(state.playerColors).length;
+
+      let assignedColor;
+      if (existingPlayerCount === 0) {
+        // First player gets a random color
+        assignedColor = Math.random() < 0.5 ? 'white' : 'black';
+      } else if (existingPlayerCount === 1) {
+        // Second player gets the opposite color
+        const firstPlayerColor = Object.values(state.playerColors)[0];
+        assignedColor = firstPlayerColor === 'white' ? 'black' : 'white';
+      } else {
+        // Third+ players become spectators
+        assignedColor = 'spectator';
+      }
+
+      state.playerColors[playerId] = assignedColor;
+      state.players[playerId] = {
+        id: playerId,
+        color: assignedColor,
+        joinedAt: Date.now()
+      };
+
+      console.log('Player', playerId, 'assigned color:', assignedColor);
+    },
+
+    playerLeft: (state, payload, playerId) => {
+      delete state.playerColors[playerId];
+      delete state.players[playerId];
+      console.log('Player', playerId, 'left the game');
+    },
+
     move: (state, payload, playerId) => {
+      const playerColor = state.playerColors[playerId];
+
+      if (playerColor === 'spectator') {
+        console.log('Spectator attempted to move');
+        return;
+      }
+
+      // Check if it's the player's turn
+      if (playerColor !== state.currentTurn) {
+        console.log('Not player turn:', playerColor, 'vs', state.currentTurn);
+        return;
+      }
+
       // Simple move tracking (real chess logic would go here)
-      state.moves.push({
+      state.moveHistory.push({
         from: payload.from,
         to: payload.to,
         player: playerId,
+        color: playerColor,
         timestamp: Date.now()
       });
-      
+
       // Toggle turn
       state.currentTurn = state.currentTurn === 'white' ? 'black' : 'white';
     }
