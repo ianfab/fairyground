@@ -18,6 +18,7 @@ function initGameClient(container, socket, roomId, emitAction) {
   let yaw = 0, pitch = 0;
   let isPointerLocked = false;
   let onGround = false;
+  let isDead = false; // Track local death state
   
   // Game Modes: 'shoot' or 'build'
   let gameMode = 'shoot'; 
@@ -144,7 +145,7 @@ function initGameClient(container, socket, roomId, emitAction) {
     cleanupEvents.push(() => document.removeEventListener('mousemove', onMouseMove));
 
     const onMouseDown = (e) => {
-      if (!isPointerLocked) return;
+      if (!isPointerLocked || isDead) return;
 
       const direction = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ'));
 
@@ -242,7 +243,7 @@ function initGameClient(container, socket, roomId, emitAction) {
       const delta = Math.min((now - lastTime) / 1000, 0.1);
       lastTime = now;
 
-      if (isPointerLocked) {
+      if (isPointerLocked && !isDead) {
         const speed = isShiftPressed ? 4 : 8; // Slower when crouching
         const direction = new THREE.Vector3();
         const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0,1,0), yaw);
@@ -252,7 +253,7 @@ function initGameClient(container, socket, roomId, emitAction) {
         if (moveBackward) direction.sub(forward);
         if (moveLeft) direction.sub(right);
         if (moveRight) direction.add(right);
-        
+
         if (direction.lengthSq() > 0) direction.normalize().multiplyScalar(speed);
 
         velocity.x = direction.x;
@@ -260,8 +261,8 @@ function initGameClient(container, socket, roomId, emitAction) {
 
         // Visual camera dip when crouching
         const targetY = isShiftPressed ? 3.6 : 5; // This is just visual offset relative to player Y
-        // Actually camera is updated in onStateUpdate based on player pos, 
-        // but we can add a local offset here if we want smoother crouching, 
+        // Actually camera is updated in onStateUpdate based on player pos,
+        // but we can add a local offset here if we want smoother crouching,
         // for now let's rely on server position updates.
 
         if (jump && onGround) {
@@ -270,7 +271,7 @@ function initGameClient(container, socket, roomId, emitAction) {
         }
 
         camera.rotation.set(pitch, yaw, 0, 'YXZ');
-        
+
         emitAction('move', {
           velocity: [velocity.x, velocity.y, velocity.z],
           rotation: [pitch, yaw, 0],
@@ -297,29 +298,51 @@ function initGameClient(container, socket, roomId, emitAction) {
 
       const me = state.players[localPlayerId];
       if (me) {
+        // Update local death state
+        isDead = me.isDead;
+
         // Camera follow
         const eyeHeight = 0.6; // Distance from center to eyes
         camera.position.lerp(new THREE.Vector3(me.position[0], me.position[1] + eyeHeight, me.position[2]), 0.5);
         onGround = me.onGround;
-        
+
         // Update stats UI
         const stats = document.getElementById('stats');
-        if(stats) stats.innerText = \`Score: \${me.score} | HP: \${me.health}\`;
+        if(stats) {
+          if (me.isDead) {
+            const timeLeft = Math.max(0, Math.ceil((me.respawnTime - Date.now()) / 1000));
+            stats.innerText = \`💀 DEAD | Score: \${me.score} | Respawning in \${timeLeft}s...\`;
+            // Auto-respawn when timer reaches 0
+            if (timeLeft === 0) {
+              emitAction('respawn', {});
+            }
+          } else {
+            stats.innerText = \`Score: \${me.score} | HP: \${me.health}\`;
+          }
+        }
       }
 
       // Render Players
       Object.entries(state.players).forEach(([id, player]) => {
         if (id === localPlayerId) return;
-        
+
         let mesh = playerMeshes.get(id);
+
+        // Hide dead players
+        if (player.isDead) {
+          if (mesh) mesh.visible = false;
+          return;
+        }
+
         if (!mesh) {
-           if (!playerGeo) return; 
+           if (!playerGeo) return;
            const mat = new THREE.MeshLambertMaterial({ color: player.color });
            mesh = new THREE.Mesh(playerGeo, mat);
            mesh.castShadow = true;
            scene.add(mesh);
            playerMeshes.set(id, mesh);
         }
+        mesh.visible = true;
         mesh.position.lerp(new THREE.Vector3(player.position[0], player.position[1], player.position[2]), 0.5);
         mesh.rotation.y = player.rotation[1];
       });
@@ -418,7 +441,9 @@ const serverLogic = {
         score: 0,
         color: Math.random() * 0xffffff,
         onGround: false,
-        isShiftPressed: false // Track shift
+        isShiftPressed: false, // Track shift
+        isDead: false,
+        respawnTime: 0
       };
     },
     move: (state, { velocity, rotation, shift }, playerId) => {
@@ -431,11 +456,23 @@ const serverLogic = {
     },
     jump: (state, _, playerId) => {
       const p = state.players[playerId];
-      if (p && p.onGround) p.velocity[1] = 10; 
+      if (p && p.onGround && !p.isDead) p.velocity[1] = 10;
+    },
+    respawn: (state, _, playerId) => {
+      const p = state.players[playerId];
+      if (!p || !p.isDead) return;
+      // Check if respawn cooldown has passed
+      if (Date.now() >= p.respawnTime) {
+        p.health = 100;
+        p.position = [0, 10, 0];
+        p.velocity = [0, 0, 0];
+        p.isDead = false;
+        p.respawnTime = 0;
+      }
     },
     shoot: (state, { position, direction }, playerId) => {
       const p = state.players[playerId];
-      if (!p || p.health <= 0) return;
+      if (!p || p.isDead) return;
       state.bullets.push({
         id: state.nextBulletId++,
         owner: playerId,
@@ -476,7 +513,7 @@ const serverLogic = {
       };
 
       Object.values(state.players).forEach(p => {
-        if (p.health <= 0) return;
+        if (p.isDead) return;
 
         p.velocity[1] -= 30 * dt; 
         
@@ -526,10 +563,12 @@ const serverLogic = {
            }
         }
 
-        // Void check
+        // Void check - instant death and respawn timer
         if (nextPos[1] < -10) {
-           p.health = 100;
-           p.position = [0, 10, 0];
+           p.health = 0;
+           p.isDead = true;
+           p.respawnTime = Date.now() + 3000; // 3 second respawn
+           p.position = [0, -50, 0]; // Move underground while dead
            p.velocity = [0, 0, 0];
         } else {
            p.position = nextPos;
@@ -546,16 +585,19 @@ const serverLogic = {
         b.position[2] += b.direction[2] * speed;
         if (isSolid(b.position[0], b.position[1], b.position[2])) return false;
         Object.entries(state.players).forEach(([pid, p]) => {
-           if (pid === b.owner || p.health <= 0) return;
+           if (pid === b.owner || p.isDead) return;
            const dist = Math.sqrt(
-             (p.position[0]-b.position[0])**2 + 
-             (p.position[1]-b.position[1])**2 + 
+             (p.position[0]-b.position[0])**2 +
+             (p.position[1]-b.position[1])**2 +
              (p.position[2]-b.position[2])**2
            );
            if (dist < 1.0) {
              p.health -= 20;
              if (p.health <= 0) {
-                p.position = [0, -50, 0];
+                p.isDead = true;
+                p.respawnTime = Date.now() + 3000; // 3 second respawn
+                p.position = [0, -50, 0]; // Move underground while dead
+                p.velocity = [0, 0, 0];
                 const shooter = state.players[b.owner];
                 if (shooter) shooter.score += 100;
              }
