@@ -97,6 +97,7 @@ export default function SandboxPage() {
           description: newMessage,
           existingCode: gameCode,
           model: "claude-sonnet-4-5-20250929",
+          userId: user?.userId,
         }),
       });
 
@@ -139,6 +140,7 @@ export default function SandboxPage() {
         body: JSON.stringify({
           code: gameCode,
           description: gameDescription,
+          creatorId: user?.userId,
         }),
       });
 
