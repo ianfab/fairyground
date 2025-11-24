@@ -467,10 +467,12 @@ User request: ${description}`;
       explanation,
       reasoning: reasoning.substring(0, 1000), // Limit reasoning to first 1000 chars for response
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Generate game error:", error);
+    console.error("Error stack:", error?.stack);
+    console.error("Error message:", error?.message);
     return NextResponse.json(
-      { error: "Failed to generate game" },
+      { error: error?.message || "Failed to generate game" },
       { status: 500 }
     );
   }

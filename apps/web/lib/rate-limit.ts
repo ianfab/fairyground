@@ -108,15 +108,15 @@ export function getClientIp(request: Request): string | null {
 // Predefined rate limit configs
 export const RATE_LIMITS = {
   CREATE_GAME: {
-    maxRequests: 10,
+    maxRequests: 50,
     windowMs: 60 * 1000, // 1 minute
   },
   EDIT_GAME: {
-    maxRequests: 10,
+    maxRequests: 50,
     windowMs: 60 * 1000, // 1 minute
   },
   GENERATE_GAME: {
-    maxRequests: 10,
+    maxRequests: 50,
     windowMs: 60 * 1000, // 1 minute
   },
 };
