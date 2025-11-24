@@ -126,38 +126,13 @@ export default function HowItWorksPage() {
             </div>
           </section>
 
-          <section>
-            <h3 className="text-xl font-bold text-purple-400 mb-3">Complete Game Structure</h3>
-            <p className="text-base leading-relaxed mb-4">
-              A complete game exports an object with name, description, and code:
-            </p>
-            <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm border border-gray-800">
-{`export default {
-  name: "my-game",
-  description: "A fun multiplayer game",
-  code: \`
-    function initGameClient(container, socket, roomId, emitAction) {
-      // Client code here...
-      return gameInstance;
-    }
-
-    const serverLogic = {
-      initialState: { /* ... */ },
-      moves: { /* ... */ }
-    }
-  \`
-}`}
-            </pre>
-          </section>
-
           <section className="bg-gray-900/50 p-6 rounded-lg border border-gray-800">
             <h3 className="text-xl font-bold text-blue-400 mb-3">Tips</h3>
             <ul className="list-disc list-inside space-y-2">
-              <li>The server runs at 20 ticks per second, syncing state to all clients</li>
+              <li>The server runs at 60 ticks per second, syncing state to all clients</li>
               <li>Keep your state updates efficient - they're sent to all players</li>
               <li>Use <code className="bg-gray-800 px-2 py-1 rounded">emitAction</code> sparingly to reduce network traffic</li>
               <li>Client-side prediction can make your game feel more responsive</li>
-              <li>You can load external libraries (Three.js, Phaser, etc.) in your client code</li>
             </ul>
           </section>
         </div>
