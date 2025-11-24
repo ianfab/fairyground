@@ -36,7 +36,14 @@ export default function Navbar() {
             <span className="text-2xl font-bold text-white">splork.io</span>
           </Link>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
+            <Link
+              href="/how-it-works"
+              className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
+            >
+              How It Works
+            </Link>
+
             {isLoggedIn ? (
               <Link
                 href="/profile"

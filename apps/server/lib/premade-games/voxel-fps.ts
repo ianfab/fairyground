@@ -389,17 +389,18 @@ const serverLogic = {
     nextBulletId: 0,
     worldSize: { x: 64, y: 32, z: 64 },
     worldOffset: { x: 32, y: 0, z: 32 },
-    world: null
+    _world: null, // Prefix with _ to exclude from client sync
+    _dirtyVoxels: {} // Track changed voxels
   },
   moves: {
     playerJoined: (state, payload, playerId) => {
-      if (!state.world) {
-        state.world = Array(64).fill(null).map(() => Array(32).fill(null).map(() => Array(64).fill(0)));
-        
+      if (!state._world) {
+        state._world = Array(64).fill(null).map(() => Array(32).fill(null).map(() => Array(64).fill(0)));
+
         const addBlock = (x, y, z, type) => {
            const ix = x + 32, iy = y, iz = z + 32;
            if(ix>=0 && ix<64 && iy>=0 && iy<32 && iz>=0 && iz<64) {
-             state.world[ix][iy][iz] = type;
+             state._world[ix][iy][iz] = type;
              state.voxels[\`\${x},\${y},\${z}\`] = {x,y,z,type};
            }
         };
@@ -446,21 +447,21 @@ const serverLogic = {
     placeBlock: (state, { x, y, z, type }, playerId) => {
       const ix = x + 32, iy = y, iz = z + 32;
       if (ix<0 || ix>=64 || iy<0 || iy>=32 || iz<0 || iz>=64) return;
-      if (state.world[ix][iy][iz] !== 0) return;
+      if (state._world[ix][iy][iz] !== 0) return;
       const isTrapping = Object.values(state.players).some(p => {
-         return Math.abs(p.position[0] - (x+0.5)) < 0.8 && 
-                Math.abs(p.position[1] - (y+0.5)) < 1.8 && 
+         return Math.abs(p.position[0] - (x+0.5)) < 0.8 &&
+                Math.abs(p.position[1] - (y+0.5)) < 1.8 &&
                 Math.abs(p.position[2] - (z+0.5)) < 0.8;
       });
       if (isTrapping) return;
-      state.world[ix][iy][iz] = type;
+      state._world[ix][iy][iz] = type;
       state.voxels[\`\${x},\${y},\${z}\`] = { x, y, z, type };
     },
     destroyBlock: (state, { x, y, z }, playerId) => {
       const ix = x + 32, iy = y, iz = z + 32;
       if (ix<0 || ix>=64 || iy<0 || iy>=32 || iz<0 || iz>=64) return;
-      if (state.world[ix][iy][iz] === 0) return;
-      state.world[ix][iy][iz] = 0;
+      if (state._world[ix][iy][iz] === 0) return;
+      state._world[ix][iy][iz] = 0;
       delete state.voxels[\`\${x},\${y},\${z}\`];
     },
     tick: (state) => {
@@ -471,7 +472,7 @@ const serverLogic = {
         const iy = Math.floor(y);
         const iz = Math.floor(z) + 32;
         if (ix<0 || ix>=64 || iy<0 || iy>=32 || iz<0 || iz>=64) return false;
-        return state.world[ix][iy][iz] !== 0;
+        return state._world[ix][iy][iz] !== 0;
       };
 
       Object.values(state.players).forEach(p => {

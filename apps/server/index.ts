@@ -182,6 +182,22 @@ setInterval(() => {
 // Game loop ticker - runs periodically for games that have a tick action
 const TICK_RATE = 16; // ~60 FPS
 
+// Helper function to filter out server-only state fields (prefixed with _)
+function getClientState(state: any): any {
+  if (Array.isArray(state)) {
+    return state.map(item => getClientState(item));
+  } else if (state && typeof state === 'object') {
+    const filtered: any = {};
+    for (const key in state) {
+      if (!key.startsWith('_')) {
+        filtered[key] = getClientState(state[key]);
+      }
+    }
+    return filtered;
+  }
+  return state;
+}
+
 function startGameLoop(room: Room) {
   // Only start game loop if the game has a tick action
   const tickFn = room.logic.moves.tick;
@@ -198,8 +214,8 @@ function startGameLoop(room: Room) {
     try {
       // We've verified tick exists above, so we can safely call it
       tickFn(room.state);
-      // Broadcast updated state to all players in the room
-      io.to(room.id).emit("state_update", room.state);
+      // Broadcast updated state to all players in the room (filter out _ prefixed fields)
+      io.to(room.id).emit("state_update", getClientState(room.state));
     } catch (e) {
       console.error(`Error in tick for room ${room.id}:`, e);
     }
@@ -1196,9 +1212,9 @@ io.on("connection", (socket) => {
     
     console.log(`User ${socket.id} ${isReconnection ? 'reconnected to' : 'joined'} ${roomId}. Total players: ${room.players.size}`);
     console.log('Player colors:', room.state.playerColors);
-    
-      // Send state to all players in room
-      io.to(roomId).emit("state_update", room.state);
+
+      // Send state to all players in room (filter out _ prefixed fields)
+      io.to(roomId).emit("state_update", getClientState(room.state));
       io.to(roomId).emit("player_joined", { playerId: socket.id, count: room.players.size });
     } catch (error) {
       console.error(`Error in join_room for ${socket.id}:`, error);
@@ -1218,7 +1234,7 @@ io.on("connection", (socket) => {
         try {
           console.log(`Executing action ${action} in room ${roomId} by player ${socket.id}`);
           room.logic.moves[action](room.state, payload, socket.id);
-          io.to(roomId).emit("state_update", room.state);
+          io.to(roomId).emit("state_update", getClientState(room.state));
         } catch (e: any) {
           console.error("Game Logic Error:", e);
           socket.emit("error", `Game logic execution failed: ${e.message}`);
