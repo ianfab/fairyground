@@ -6,7 +6,7 @@ import { Send, AlertCircle, Save, Play, Code, Eye } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import { useAuthInfo } from "@propelauth/react";
 import { Game } from "@/lib/types";
-import { getGameServerUrl } from "@/lib/config";
+import { getGameServerUrl, getGameUrl } from "@/lib/config";
 
 export default function SandboxPage() {
   const params = useParams();
@@ -234,7 +234,7 @@ export default function SandboxPage() {
           </div>
           <div className="flex items-center gap-4">
             <a
-              href={`http://localhost:3001/game/${gameName}`}
+              href={getGameUrl(gameName)}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700 transition-colors"
