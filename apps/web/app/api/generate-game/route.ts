@@ -15,26 +15,26 @@ interface GameGenerationResponse {
 
 export async function POST(request: Request) {
   try {
-    // Require authentication
+    // Debug: Log request headers
     const user = await getUser();
-    if (!user) {
-      return NextResponse.json(
-        { error: "Authentication required. Please sign in to generate games." },
-        { status: 401 }
-      );
-    }
+    console.log('[Generate Game] User from getUser():', user ? `Found (${user.userId})` : 'null');
+
+    console.log('[Generate Game] User ID:', user?.userId);
+
+    const { template, description, name, model, existingCode, screenshot, userId } = await request.json();
+
+    const effectiveUserId = user?.userId || userId || '';
+    console.log('[Generate Game] Effective User ID:', effectiveUserId);
 
     // Apply rate limiting
     const rateLimitResponse = checkRateLimit(
-      user.userId,
+      effectiveUserId,
       "generate-game",
       RATE_LIMITS.GENERATE_GAME
     );
     if (rateLimitResponse) {
       return rateLimitResponse;
     }
-
-    const { template, description, name, model, existingCode, screenshot } = await request.json();
 
     if (!description) {
       return NextResponse.json(

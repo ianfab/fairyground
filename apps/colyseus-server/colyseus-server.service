@@ -1,0 +1,27 @@
+[Unit]
+Description=Vibechess Colyseus Server
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/colyseus-server/apps/colyseus-server
+Environment=NODE_ENV=production
+EnvironmentFile=/var/www/colyseus-server/apps/colyseus-server/.env
+ExecStart=/usr/bin/node dist/index.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=colyseus-server
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/colyseus-server
+
+[Install]
+WantedBy=multi-user.target
+

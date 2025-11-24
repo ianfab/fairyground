@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colyseus Chess Variant Client Example</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 40px;
+      border-radius: 20px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #aaa;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      background: rgba(255, 255, 255, 0.15);
+    }
+    button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+      margin-top: 10px;
+    }
+    button:hover {
+      transform: translateY(-2px);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .status {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .status-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .status-label {
+      color: #aaa;
+    }
+    .status-value {
+      color: #fff;
+      font-weight: bold;
+    }
+    .board {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      overflow-x: auto;
+    }
+    .move-input {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .move-input input {
+      flex: 1;
+    }
+    .move-input button {
+      width: auto;
+      padding: 12px 24px;
+      margin-top: 0;
+    }
+    .log {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .log-entry {
+      margin-bottom: 5px;
+      color: #aaa;
+    }
+    .log-entry.error {
+      color: #ff6b6b;
+    }
+    .log-entry.success {
+      color: #51cf66;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎮 Colyseus Chess Client</h1>
+    
+    <div class="input-group">
+      <label>Server URL</label>
+      <input type="text" id="server-url" value="ws://localhost:2567" placeholder="ws://localhost:2567">
+    </div>
+    
+    <div class="input-group">
+      <label>Player Name</label>
+      <input type="text" id="player-name" value="Player 1" placeholder="Your name">
+    </div>
+    
+    <div class="input-group">
+      <label>Chess Variant</label>
+      <select id="variant">
+        <option value="chess">Standard Chess</option>
+        <option value="chess960">Chess960</option>
+        <option value="3check">Three-Check</option>
+        <option value="atomic">Atomic</option>
+        <option value="crazyhouse">Crazyhouse</option>
+        <option value="kingofthehill">King of the Hill</option>
+      </select>
+    </div>
+    
+    <button id="connect-btn" onclick="connectToRoom()">Connect to Room</button>
+    <button id="ready-btn" onclick="markReady()" disabled>Mark Ready</button>
+    <button id="disconnect-btn" onclick="disconnectFromRoom()" disabled>Disconnect</button>
+    
+    <div class="status">
+      <div class="status-item">
+        <span class="status-label">Connection:</span>
+        <span class="status-value" id="connection-status">Disconnected</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Room ID:</span>
+        <span class="status-value" id="room-id">-</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Players:</span>
+        <span class="status-value" id="player-count">0/2</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Your Color:</span>
+        <span class="status-value" id="player-color">-</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Game Status:</span>
+        <span class="status-value" id="game-status">-</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Current Turn:</span>
+        <span class="status-value" id="current-turn">-</span>
+      </div>
+    </div>
+    
+    <div class="move-input">
+      <input type="text" id="move-from" placeholder="From (e.g., e2)" maxlength="2">
+      <input type="text" id="move-to" placeholder="To (e.g., e4)" maxlength="2">
+      <button onclick="makeMove()" id="move-btn" disabled>Move</button>
+    </div>
+    
+    <div class="board">
+      <strong>FEN:</strong>
+      <div id="fen">-</div>
+      <div style="margin-top: 10px;"><strong>Move History:</strong></div>
+      <div id="move-history">-</div>
+    </div>
+    
+    <div class="log" id="log">
+      <div class="log-entry">Welcome! Connect to start playing.</div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/colyseus.js@^0.15.0/dist/colyseus.js"></script>
+  <script>
+    let client = null;
+    let room = null;
+    let mySessionId = null;
+    let myColor = null;
+
+    function log(message, type = 'info') {
+      const logEl = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    async function connectToRoom() {
+      try {
+        const serverUrl = document.getElementById('server-url').value;
+        const playerName = document.getElementById('player-name').value;
+        const variant = document.getElementById('variant').value;
+
+        log(`Connecting to ${serverUrl}...`);
+        
+        client = new Colyseus.Client(serverUrl);
+        
+        room = await client.joinOrCreate("chess_variant", {
+          variant: variant,
+          name: playerName,
+          rating: 1500
+        });
+
+        mySessionId = room.sessionId;
+        
+        log(`Connected! Room ID: ${room.id}`, 'success');
+        
+        document.getElementById('connect-btn').disabled = true;
+        document.getElementById('ready-btn').disabled = false;
+        document.getElementById('disconnect-btn').disabled = false;
+        document.getElementById('connection-status').textContent = 'Connected';
+        document.getElementById('room-id').textContent = room.id;
+
+        // Listen to state changes
+        room.onStateChange((state) => {
+          updateUI(state);
+        });
+
+        // Listen to messages
+        room.onMessage("game_start", (message) => {
+          log(`Game started! Variant: ${message.variant}`, 'success');
+          document.getElementById('move-btn').disabled = false;
+        });
+
+        room.onMessage("move_made", (message) => {
+          log(`Move: ${message.from}-${message.to} by ${message.player}`);
+        });
+
+        room.onMessage("game_over", (message) => {
+          log(`Game Over! Winner: ${message.winner}, Reason: ${message.reason}`, 'success');
+          document.getElementById('move-btn').disabled = true;
+        });
+
+        room.onMessage("player_joined", (message) => {
+          log(`Player joined. Total: ${message.playerCount}`);
+        });
+
+        room.onMessage("player_left", (message) => {
+          log(`Player left. Total: ${message.playerCount}`);
+        });
+
+        room.onMessage("error", (message) => {
+          log(`Error: ${message.message}`, 'error');
+        });
+
+        room.onError((code, message) => {
+          log(`Room error (${code}): ${message}`, 'error');
+        });
+
+        room.onLeave((code) => {
+          log(`Left room (code: ${code})`);
+          resetUI();
+        });
+
+      } catch (e) {
+        log(`Connection failed: ${e.message}`, 'error');
+        console.error(e);
+      }
+    }
+
+    function updateUI(state) {
+      // Update player count
+      const playerCount = Object.keys(state.players).length;
+      document.getElementById('player-count').textContent = `${playerCount}/2`;
+
+      // Find my player
+      const myPlayer = state.players[mySessionId];
+      if (myPlayer) {
+        myColor = myPlayer.color;
+        document.getElementById('player-color').textContent = myPlayer.color;
+      }
+
+      // Update game status
+      document.getElementById('game-status').textContent = state.gameStatus;
+      document.getElementById('current-turn').textContent = state.currentTurn;
+      
+      // Update FEN
+      document.getElementById('fen').textContent = state.fen;
+      
+      // Update move history
+      const moveHistory = state.moveHistory.join(', ') || 'No moves yet';
+      document.getElementById('move-history').textContent = moveHistory;
+    }
+
+    function resetUI() {
+      document.getElementById('connect-btn').disabled = false;
+      document.getElementById('ready-btn').disabled = true;
+      document.getElementById('disconnect-btn').disabled = true;
+      document.getElementById('move-btn').disabled = true;
+      document.getElementById('connection-status').textContent = 'Disconnected';
+      document.getElementById('room-id').textContent = '-';
+      document.getElementById('player-count').textContent = '0/2';
+      document.getElementById('player-color').textContent = '-';
+      document.getElementById('game-status').textContent = '-';
+      document.getElementById('current-turn').textContent = '-';
+      document.getElementById('fen').textContent = '-';
+      document.getElementById('move-history').textContent = '-';
+      
+      room = null;
+      client = null;
+      mySessionId = null;
+      myColor = null;
+    }
+
+    function markReady() {
+      if (room) {
+        room.send("ready");
+        log("Marked as ready");
+        document.getElementById('ready-btn').disabled = true;
+      }
+    }
+
+    function makeMove() {
+      if (!room) return;
+      
+      const from = document.getElementById('move-from').value.toLowerCase();
+      const to = document.getElementById('move-to').value.toLowerCase();
+      
+      if (!from || !to) {
+        log("Please enter both from and to squares", 'error');
+        return;
+      }
+      
+      room.send("move", { from, to });
+      
+      // Clear inputs
+      document.getElementById('move-from').value = '';
+      document.getElementById('move-to').value = '';
+    }
+
+    function disconnectFromRoom() {
+      if (room) {
+        room.leave();
+        log("Disconnected from room");
+      }
+    }
+
+    // Allow Enter key to submit move
+    document.getElementById('move-to').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        makeMove();
+      }
+    });
+  </script>
+</body>
+</html>
+
