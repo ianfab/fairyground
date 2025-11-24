@@ -89,9 +89,12 @@ export async function PUT(
     }
 
     // Update the game
+    // If name is not provided in the body, use the existing name (oldName)
+    const newName = name || oldName;
+    
     const { rows } = await query<Game>(
       `UPDATE ${tableName} SET name = $1, description = $2, code = $3, preview = $4 WHERE name = $5 RETURNING *`,
-      name, description || '', code, preview, oldName
+      newName, description || '', code, preview, oldName
     );
 
     return NextResponse.json(rows[0]);
