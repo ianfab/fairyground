@@ -97,7 +97,11 @@ const serverLogic = {
     actionName: (state, payload, playerId) => {
       // Mutate state directly
     },
-
+    playerJoined(state, payload, playerId) => {
+      // process new player joining the game
+      // This action is automatically called when a new player joins the game
+      // Use it to initialize player state, assign colors/teams, set starting positions, etc.
+    },
     // OPTIONAL: For games with continuous physics/animation
     tick: (state) => {
       // Called automatically ~60 times per second (every 16ms)
@@ -118,7 +122,7 @@ RULES:
 7. Mutate state directly in move functions
 
 GAME LOOP (tick):
-- Add a 'tick' action for games needing continuous updates (physics, animation, AI)
+- OPTIONAL: Add a 'tick' action for games needing continuous updates (physics, animation, AI)
 - Server automatically calls tick ~60 times per second (every 16ms)
 - Use for: ball movement, enemy AI, timers, animations, collision detection
 - Don't use for: turn-based games (chess, card games) or simple click games
@@ -175,7 +179,7 @@ ${templateConfig?.baseCode || ''}`;
           max_tokens: 16000,
           thinking: {
             type: "enabled",
-            budget_tokens: 5000
+            budget_tokens: 10000
           },
           output_format: {
             type: "json_schema",

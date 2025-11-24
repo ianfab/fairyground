@@ -999,21 +999,32 @@ app.get('/api/matchmaking/status/:playerId', (req, res) => {
   }
 });
 
-// Socket.io game logic
+// Socket.io game logic with error handling
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  try {
+    console.log("User connected:", socket.id);
+
+    // Handle socket errors to prevent crashes
+    socket.on("error", (error) => {
+      console.error(`Socket error for ${socket.id}:`, error);
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error(`Socket connect error for ${socket.id}:`, error);
+    });
 
   socket.on("join_room", async ({ gameName, roomName, persistentPlayerId }: { gameName: string, roomName: string, persistentPlayerId?: string }) => {
-    const roomId = `${gameName}/${roomName}`;
-    console.log(`User ${socket.id} attempting to join room: ${roomId}`, persistentPlayerId ? `with persistent ID: ${persistentPlayerId}` : '');
-    
-    // Leave previous rooms
-    socket.rooms.forEach((room) => {
-      if (room !== socket.id) {
-        socket.leave(room);
-        console.log(`User ${socket.id} left room: ${room}`);
-      }
-    });
+    try {
+      const roomId = `${gameName}/${roomName}`;
+      console.log(`User ${socket.id} attempting to join room: ${roomId}`, persistentPlayerId ? `with persistent ID: ${persistentPlayerId}` : '');
+
+      // Leave previous rooms
+      socket.rooms.forEach((room) => {
+        if (room !== socket.id) {
+          socket.leave(room);
+          console.log(`User ${socket.id} left room: ${room}`);
+        }
+      });
 
     // Join or Create Room
     let room = rooms.get(roomId);
@@ -1186,53 +1197,146 @@ io.on("connection", (socket) => {
     console.log(`User ${socket.id} ${isReconnection ? 'reconnected to' : 'joined'} ${roomId}. Total players: ${room.players.size}`);
     console.log('Player colors:', room.state.playerColors);
     
-    // Send state to all players in room
-    io.to(roomId).emit("state_update", room.state);
-    io.to(roomId).emit("player_joined", { playerId: socket.id, count: room.players.size });
+      // Send state to all players in room
+      io.to(roomId).emit("state_update", room.state);
+      io.to(roomId).emit("player_joined", { playerId: socket.id, count: room.players.size });
+    } catch (error) {
+      console.error(`Error in join_room for ${socket.id}:`, error);
+      socket.emit("error", "Failed to join room. Please try again.");
+    }
   });
 
   socket.on("game_action", ({ roomId, action, payload }: { roomId: string, action: string, payload: any }) => {
-    const room = rooms.get(roomId);
-    if (!room) {
-      console.warn(`Action ${action} for non-existent room: ${roomId}`);
-      return;
-    }
-
-    if (room.logic.moves[action]) {
-      try {
-        console.log(`Executing action ${action} in room ${roomId} by player ${socket.id}`);
-        room.logic.moves[action](room.state, payload, socket.id);
-        io.to(roomId).emit("state_update", room.state);
-      } catch (e: any) {
-        console.error("Game Logic Error:", e);
-        socket.emit("error", `Game logic execution failed: ${e.message}`);
+    try {
+      const room = rooms.get(roomId);
+      if (!room) {
+        console.warn(`Action ${action} for non-existent room: ${roomId}`);
+        return;
       }
-    } else {
-      console.warn(`Unknown action: ${action}. Available: ${Object.keys(room.logic.moves).join(', ')}`);
+
+      if (room.logic.moves[action]) {
+        try {
+          console.log(`Executing action ${action} in room ${roomId} by player ${socket.id}`);
+          room.logic.moves[action](room.state, payload, socket.id);
+          io.to(roomId).emit("state_update", room.state);
+        } catch (e: any) {
+          console.error("Game Logic Error:", e);
+          socket.emit("error", `Game logic execution failed: ${e.message}`);
+        }
+      } else {
+        console.warn(`Unknown action: ${action}. Available: ${Object.keys(room.logic.moves).join(', ')}`);
+      }
+    } catch (error) {
+      console.error(`Error in game_action for ${socket.id}:`, error);
+      socket.emit("error", "Failed to execute action. Please try again.");
     }
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+    try {
+      console.log("User disconnected:", socket.id);
 
-    // Remove player from all rooms
-    rooms.forEach((room, roomId) => {
-      if (room.players.has(socket.id)) {
-        room.players.delete(socket.id);
-        io.to(roomId).emit("player_joined", { playerId: socket.id, count: room.players.size });
+      // Remove player from all rooms
+      rooms.forEach((room, roomId) => {
+        if (room.players.has(socket.id)) {
+          room.players.delete(socket.id);
+          io.to(roomId).emit("player_joined", { playerId: socket.id, count: room.players.size });
 
-        // Clean up empty rooms
-        if (room.players.size === 0) {
-          stopGameLoop(room);
-          rooms.delete(roomId);
-          console.log(`Cleaned up empty room: ${roomId}`);
+          // Clean up empty rooms
+          if (room.players.size === 0) {
+            stopGameLoop(room);
+            rooms.delete(roomId);
+            console.log(`Cleaned up empty room: ${roomId}`);
+          }
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.error(`Error in disconnect handler for ${socket.id}:`, error);
+    }
   });
+  } catch (error) {
+    console.error(`Error setting up socket handlers for ${socket.id}:`, error);
+  }
 });
 
 httpServer.listen(PORT, () => {
   console.log(`🎮 Game Server running on http://localhost:${PORT}`);
   console.log(`📝 Create games at http://localhost:3000`);
 });
+
+// Graceful shutdown handling
+let isShuttingDown = false;
+
+async function gracefulShutdown(signal: string) {
+  if (isShuttingDown) {
+    console.log('Shutdown already in progress...');
+    return;
+  }
+
+  isShuttingDown = true;
+  console.log(`\n${signal} received. Starting graceful shutdown...`);
+
+  try {
+    // Stop accepting new connections
+    console.log('Stopping HTTP server...');
+    await new Promise<void>((resolve, reject) => {
+      httpServer.close((err) => {
+        if (err) {
+          console.error('Error closing HTTP server:', err);
+          reject(err);
+        } else {
+          console.log('HTTP server closed');
+          resolve();
+        }
+      });
+    });
+
+    // Stop all game loops
+    console.log('Stopping all game loops...');
+    rooms.forEach((room) => {
+      stopGameLoop(room);
+    });
+    console.log(`Stopped ${rooms.size} game loops`);
+
+    // Disconnect all sockets gracefully
+    console.log('Disconnecting all sockets...');
+    const sockets = await io.fetchSockets();
+    for (const socket of sockets) {
+      socket.disconnect(true);
+    }
+    console.log(`Disconnected ${sockets.length} sockets`);
+
+    // Close Socket.io server
+    console.log('Closing Socket.io server...');
+    await new Promise<void>((resolve) => {
+      io.close(() => {
+        console.log('Socket.io server closed');
+        resolve();
+      });
+    });
+
+    console.log('Graceful shutdown completed successfully');
+    process.exit(0);
+  } catch (error) {
+    console.error('Error during graceful shutdown:', error);
+    process.exit(1);
+  }
+}
+
+// Handle various shutdown signals
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Handle uncaught errors to prevent crashes
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  gracefulShutdown('uncaughtException');
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // Don't exit on unhandled rejection, just log it
+});
+
+// Increase max listeners to avoid warnings
+process.setMaxListeners(20);

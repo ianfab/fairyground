@@ -63,6 +63,7 @@ export function GameCard({
     'from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700': 'linear-gradient(to bottom right, rgb(220, 38, 38), rgb(219, 39, 119))',
     'from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700': 'linear-gradient(to bottom right, rgb(219, 39, 119), rgb(225, 29, 72))',
     'from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700': 'linear-gradient(to bottom right, rgb(234, 88, 12), rgb(220, 38, 38))',
+    'from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700': 'linear-gradient(to bottom right, rgb(37, 99, 235), rgb(8, 145, 178))',
   };
 
   return (

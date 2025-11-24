@@ -109,6 +109,14 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {/* Featured premade games */}
             <GameCard
+              gameName="voxel-fps"
+              title="Voxel FPS"
+              description="3D multiplayer shooter with destructible terrain - Minecraft meets Krunker!"
+              emoji="🧱"
+              gradient="from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+              isPremade
+            />
+            <GameCard
               gameName="tetris-battle"
               title="Tetris Battle"
               description="Competitive 2-player Tetris - clear lines to attack your opponent!"
@@ -122,14 +130,6 @@ export default async function Home() {
               description="Classic Chess - click pieces to select and move them"
               emoji="♟️"
               gradient="from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
-              isPremade
-            />
-            <GameCard
-              gameName="shooter"
-              title="3D Shooter"
-              description="First-person shooter - WASD to move, mouse to look, click to shoot"
-              emoji="🔫"
-              gradient="from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700"
               isPremade
             />
             {/* Top 3 trending community games */}

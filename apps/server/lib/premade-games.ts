@@ -8,6 +8,7 @@ import tetrisBattle from './premade-games/tetris-battle.js';
 import shooter from './premade-games/shooter.js';
 import chess from './premade-games/chess.js';
 import snake from './premade-games/snake.js';
+import voxelFps from './premade-games/voxel-fps.js';
 
 export const PREMADE_GAMES = {
   clicker,
@@ -16,5 +17,6 @@ export const PREMADE_GAMES = {
   'tetris-battle': tetrisBattle,
   shooter,
   chess,
-  snake
+  snake,
+  'voxel-fps': voxelFps
 };

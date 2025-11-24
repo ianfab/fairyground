@@ -9,6 +9,20 @@ const routeHandlers = getRouteHandlers({
   }
 });
 
-export const GET = routeHandlers.getRouteHandler;
-export const POST = routeHandlers.postRouteHandler;
+// Wrap handlers to handle Next.js 15 async params
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ slug: string }> }
+) {
+  const params = await context.params;
+  return routeHandlers.getRouteHandler(req, { params });
+}
+
+export async function POST(
+  req: NextRequest,
+  context: { params: Promise<{ slug: string }> }
+) {
+  const params = await context.params;
+  return routeHandlers.postRouteHandler(req, { params });
+}
 
