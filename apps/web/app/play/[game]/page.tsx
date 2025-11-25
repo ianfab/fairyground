@@ -4,6 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { getGameServerUrl } from "@/lib/config";
 import { Matchmaking } from "@/app/components/Matchmaking";
+import { GameLeaderboard } from "@/app/components/GameLeaderboard";
+import { useAuthSafe } from "@/lib/useAuthSafe";
 
 export default function GameModePage() {
   const params = useParams();
@@ -11,14 +13,24 @@ export default function GameModePage() {
   const gameName = params.game as string;
   const [roomName, setRoomName] = useState("");
   const [showMatchmaking, setShowMatchmaking] = useState(false);
+  const authInfo = useAuthSafe();
 
   const handlePlayWithFriend = () => {
     if (!roomName.trim()) {
       alert("Please enter a room name");
       return;
     }
-    // Navigate to the game server with the room name
-    window.open(`${getGameServerUrl()}/game/${gameName}/${roomName}`, '_blank');
+    // Navigate to the game server with the room name, user ID, and username
+    const userId = authInfo.user?.userId || '';
+    const username = authInfo.user?.username || authInfo.user?.email || '';
+    let url = `${getGameServerUrl()}/game/${gameName}/${roomName}`;
+    if (userId) {
+      url += `?userId=${encodeURIComponent(userId)}`;
+      if (username) {
+        url += `&username=${encodeURIComponent(username)}`;
+      }
+    }
+    window.open(url, '_blank');
   };
 
   const handleMatchmaking = () => {
@@ -35,8 +47,8 @@ export default function GameModePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans flex items-center justify-center">
-      <div className="max-w-4xl w-full mx-auto px-4">
+    <div className="min-h-screen bg-black text-white font-sans py-8">
+      <div className="max-w-6xl w-full mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
             Choose Game Mode
@@ -46,7 +58,14 @@ export default function GameModePage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Leaderboard */}
+          <div className="lg:col-span-1 order-last lg:order-first">
+            <GameLeaderboard gameName={gameName} />
+          </div>
+
+          {/* Game Mode Options */}
+          <div className="lg:col-span-2 grid md:grid-cols-2 gap-6">
           {/* Matchmaking Option */}
           <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl p-8 hover:scale-105 transition-transform cursor-pointer"
                onClick={handleMatchmaking}>
@@ -96,6 +115,7 @@ export default function GameModePage() {
               </div>
             </div>
           </div>
+        </div>
         </div>
 
         <div className="text-center mt-8">

@@ -45,7 +45,7 @@ export default function CreateGame() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [gameDescription, setGameDescription] = useState("");
-  const [selectedModel, setSelectedModel] = useState("claude-sonnet-4-5-20250929");
+  const [selectedModel, setSelectedModel] = useState("gpt-4o");
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);

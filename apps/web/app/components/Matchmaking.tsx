@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { getGameServerUrl } from "@/lib/config";
+import { useAuthSafe } from "@/lib/useAuthSafe";
 
 interface MatchmakingProps {
   gameName: string;
@@ -14,6 +15,7 @@ export function Matchmaking({ gameName, onCancel }: MatchmakingProps) {
   const playerIdRef = useRef<string>(crypto.randomUUID());
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const hasJoinedRef = useRef<boolean>(false);
+  const authInfo = useAuthSafe();
 
   useEffect(() => {
     const playerId = playerIdRef.current;
@@ -52,7 +54,16 @@ export function Matchmaking({ gameName, onCancel }: MatchmakingProps) {
               setStatus('matched');
               // Redirect to the game with the matched room
               setTimeout(() => {
-                window.location.href = `${getGameServerUrl()}/game/${gameName}/${data.roomId}`;
+                const userId = authInfo.user?.userId || '';
+                const username = authInfo.user?.username || authInfo.user?.email || '';
+                let url = `${getGameServerUrl()}/game/${gameName}/${data.roomId}`;
+                if (userId) {
+                  url += `?userId=${encodeURIComponent(userId)}`;
+                  if (username) {
+                    url += `&username=${encodeURIComponent(username)}`;
+                  }
+                }
+                window.location.href = url;
               }, 1000);
             }
           } catch (error) {

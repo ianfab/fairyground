@@ -144,9 +144,9 @@ function initGameClient(container, socket, roomId, emitAction) {
         score2El.textContent = 'Score: ' + (p2.score || 0);
       }
 
-      // Show game over
-      if (state.gameOver) {
-        const winner = state.winner;
+      // Show game over (check new standard flag)
+      if (state.gameEnded) {
+        const winner = state.gameWinner;
         const winnerNum = playerIds.indexOf(winner) + 1;
         [ctx1, ctx2].forEach(ctx => {
           ctx.fillStyle = 'rgba(0,0,0,0.7)';
@@ -155,6 +155,11 @@ function initGameClient(container, socket, roomId, emitAction) {
           ctx.font = 'bold 20px Arial';
           ctx.textAlign = 'center';
           ctx.fillText('Game Over!', BOARD_WIDTH * BLOCK_SIZE / 2, BOARD_HEIGHT * BLOCK_SIZE / 2 - 20);
+          if (state.gameEndReason) {
+            ctx.font = '14px Arial';
+            ctx.fillText(state.gameEndReason, BOARD_WIDTH * BLOCK_SIZE / 2, BOARD_HEIGHT * BLOCK_SIZE / 2 + 30);
+          }
+          ctx.font = 'bold 20px Arial';
           ctx.fillText('Player ' + winnerNum + ' Wins!', BOARD_WIDTH * BLOCK_SIZE / 2, BOARD_HEIGHT * BLOCK_SIZE / 2 + 10);
         });
       }
@@ -166,8 +171,9 @@ const serverLogic = {
   initialState: {
     players: {},
     gameStarted: false,
-    gameOver: false,
-    winner: null,
+    gameEnded: false,
+    gameWinner: null,
+    gameEndReason: null,
     lastTickTime: Date.now()
   },
   moves: {
@@ -205,7 +211,7 @@ const serverLogic = {
 
     move: (state, payload, playerId) => {
       const player = state.players[playerId];
-      if (!player || player.gameOver || state.gameOver) return;
+      if (!player || player.gameOver || state.gameEnded) return;
 
       const piece = player.currentPiece;
       const shape = piece.shapeData;
@@ -235,7 +241,7 @@ const serverLogic = {
 
     rotate: (state, payload, playerId) => {
       const player = state.players[playerId];
-      if (!player || player.gameOver || state.gameOver) return;
+      if (!player || player.gameOver || state.gameEnded) return;
 
       const piece = player.currentPiece;
       if (piece.shape === 'O') return; // O piece doesn't rotate
@@ -267,7 +273,7 @@ const serverLogic = {
 
     hardDrop: (state, payload, playerId) => {
       const player = state.players[playerId];
-      if (!player || player.gameOver || state.gameOver) return;
+      if (!player || player.gameOver || state.gameEnded) return;
 
       const piece = player.currentPiece;
       const shape = piece.shapeData;
@@ -363,19 +369,21 @@ const serverLogic = {
 
       // Check game over
       const newShape = piece.shapeData;
+      const opponentId = Object.keys(state.players).find(id => id !== playerId);
       for (let y = 0; y < newShape.length; y++) {
         for (let x = 0; x < newShape[y].length; x++) {
           if (newShape[y][x] && player.board[y][piece.x + x]) {
             player.gameOver = true;
-            state.gameOver = true;
-            state.winner = opponentId;
+            state.gameEnded = true;
+            state.gameWinner = opponentId;
+            state.gameEndReason = 'Top out - board filled!';
           }
         }
       }
     },
 
     tick: (state) => {
-      if (!state.gameStarted || state.gameOver) return;
+      if (!state.gameStarted || state.gameEnded) return;
 
       const now = Date.now();
       if (now - state.lastTickTime < 1000) return; // Tick every 1 second
@@ -482,9 +490,10 @@ const serverLogic = {
             for (let x = 0; x < newShape[y].length; x++) {
               if (newShape[y][x] && player.board[y] && player.board[y][piece.x + x]) {
                 player.gameOver = true;
-                state.gameOver = true;
+                state.gameEnded = true;
                 const opponentId = Object.keys(state.players).find(id => id !== playerId);
-                state.winner = opponentId;
+                state.gameWinner = opponentId;
+                state.gameEndReason = 'Top out - board filled!';
               }
             }
           }

@@ -9,6 +9,8 @@ import vm from "vm";
 import path from "path";
 import { fileURLToPath } from 'url';
 import { Chess } from 'chess.js';
+import { DEFAULT_ELO, calculate1v1EloChange, calculateMultiplayerEloChanges } from './lib/elo.js';
+import eloRouter from './routes/elo.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -78,6 +80,9 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Mount ELO API routes
+app.use('/api/elo', eloRouter);
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -198,6 +203,187 @@ function getClientState(state: any): any {
   return state;
 }
 
+// Helper to add player metadata to state for clients
+function enrichStateWithPlayerMetadata(state: any, room: Room): any {
+  const clientState = getClientState(state);
+
+  // Build player metadata map (socket ID -> persistent ID + username)
+  const playerMetadata: Record<string, { persistentId: string; username: string }> = {};
+  for (const [socketId, player] of room.players.entries()) {
+    playerMetadata[socketId] = {
+      persistentId: player.persistentId || socketId,
+      username: player.username || 'Guest'
+    };
+  }
+
+  // Add metadata to client state (not prefixed with _ so it's sent to clients)
+  clientState.playerMetadata = playerMetadata;
+
+  return clientState;
+}
+
+// Helper to get or create player ELO for a game
+async function getPlayerElo(playerId: string, gameName: string): Promise<number> {
+  try {
+    const { rows } = await query<{elo_rating: number}>`
+      SELECT elo_rating FROM player_elo
+      WHERE player_id = ${playerId} AND game_name = ${gameName}
+    `;
+    return rows[0]?.elo_rating || DEFAULT_ELO;
+  } catch (e) {
+    console.error(`Error fetching ELO for ${playerId} in ${gameName}:`, e);
+    return DEFAULT_ELO;
+  }
+}
+
+// Handle game end - update ELO ratings
+async function handleGameEnd(room: Room): Promise<void> {
+  const state = room.state;
+
+  // Check if game has ended
+  if (!state.gameEnded) return;
+
+  // Only process once
+  if ((state as any)._eloProcessed) return;
+  (state as any)._eloProcessed = true;
+
+  try {
+    // Get socket IDs and their corresponding persistent IDs
+    const socketIds = Array.from(room.players.keys());
+    if (socketIds.length < 2) {
+      console.log(`Not enough players to calculate ELO for room ${room.id}`);
+      return;
+    }
+
+    // Build mapping of socket ID -> persistent ID/username and collect persistent IDs
+    const socketToPersistentId: Record<string, string> = {};
+    const persistentIdToUsername: Record<string, string> = {};
+    const persistentIds: string[] = [];
+
+    for (const socketId of socketIds) {
+      const player = room.players.get(socketId);
+      const persistentId = player?.persistentId || socketId; // Fallback to socket ID if no persistent ID
+      const username: string = player?.username || 'Guest';
+      socketToPersistentId[socketId] = persistentId;
+      persistentIdToUsername[persistentId] = username;
+      persistentIds.push(persistentId);
+    }
+
+    // Get current ELO ratings for all players (using persistent IDs)
+    const playerRatings: Record<string, number> = {};
+    for (const persistentId of persistentIds) {
+      playerRatings[persistentId] = await getPlayerElo(persistentId, room.gameName);
+    }
+
+    // Calculate ELO changes
+    let eloChanges: Record<string, { newElo: number; change: number }>;
+
+    // Convert gameWinner from socket ID to persistent ID
+    const winnerPersistentId: string | null = state.gameWinner ? (socketToPersistentId[state.gameWinner] || null) : null;
+
+    if (persistentIds.length === 2) {
+      // 1v1 game
+      const player1 = persistentIds[0];
+      const player2 = persistentIds[1];
+
+      if (!player1 || !player2) {
+        console.log(`Invalid player IDs for room ${room.id}`);
+        return;
+      }
+
+      const player1Elo = playerRatings[player1];
+      const player2Elo = playerRatings[player2];
+
+      if (player1Elo === undefined || player2Elo === undefined) {
+        console.log(`Missing ELO ratings for players in room ${room.id}`);
+        return;
+      }
+
+      let result: 'player1' | 'player2' | 'draw';
+
+      if (winnerPersistentId === player1) {
+        result = 'player1';
+      } else if (winnerPersistentId === player2) {
+        result = 'player2';
+      } else {
+        result = 'draw';
+      }
+
+      const changes = calculate1v1EloChange(
+        player1Elo,
+        player2Elo,
+        result
+      );
+
+      eloChanges = {
+        [player1]: { newElo: changes.player1NewElo, change: changes.player1Change },
+        [player2]: { newElo: changes.player2NewElo, change: changes.player2Change }
+      };
+    } else {
+      // Multiplayer game (3+ players)
+      eloChanges = calculateMultiplayerEloChanges(playerRatings, winnerPersistentId);
+    }
+
+    // Update database for each player (using persistent IDs)
+    for (const persistentId of persistentIds) {
+      const eloChange = eloChanges[persistentId];
+      if (!eloChange) {
+        console.log(`No ELO change calculated for player ${persistentId}`);
+        continue;
+      }
+
+      const { newElo, change } = eloChange;
+      const isWinner = winnerPersistentId === persistentId;
+      const isDraw = state.gameWinner === null;
+
+      const username = persistentIdToUsername[persistentId] || 'Guest';
+
+      await query`
+        INSERT INTO player_elo (player_id, game_name, elo_rating, games_played, wins, losses, draws, username)
+        VALUES (
+          ${persistentId},
+          ${room.gameName},
+          ${newElo},
+          1,
+          ${isWinner ? 1 : 0},
+          ${!isWinner && !isDraw ? 1 : 0},
+          ${isDraw ? 1 : 0},
+          ${username}
+        )
+        ON CONFLICT (player_id, game_name)
+        DO UPDATE SET
+          elo_rating = ${newElo},
+          games_played = player_elo.games_played + 1,
+          wins = player_elo.wins + ${isWinner ? 1 : 0},
+          losses = player_elo.losses + ${!isWinner && !isDraw ? 1 : 0},
+          draws = player_elo.draws + ${isDraw ? 1 : 0},
+          username = ${username},
+          last_played_at = NOW()
+      `;
+    }
+
+    // Record game result (using persistent IDs)
+    await query`
+      INSERT INTO game_results (game_name, room_id, winner_id, end_reason, players, elo_changes)
+      VALUES (
+        ${room.gameName},
+        ${room.id},
+        ${winnerPersistentId},
+        ${state.gameEndReason || null},
+        ${JSON.stringify(persistentIds)},
+        ${JSON.stringify(eloChanges)}
+      )
+    `;
+
+    console.log(`✓ ELO updated for room ${room.id} (${room.gameName})`);
+    console.log('  Winner (persistent ID):', winnerPersistentId);
+    console.log('  Changes:', eloChanges);
+
+  } catch (e) {
+    console.error(`Error handling game end for room ${room.id}:`, e);
+  }
+}
+
 function startGameLoop(room: Room) {
   // Only start game loop if the game has a tick action
   const tickFn = room.logic.moves.tick;
@@ -210,12 +396,18 @@ function startGameLoop(room: Room) {
     return;
   }
 
-  room.tickInterval = setInterval(() => {
+  room.tickInterval = setInterval(async () => {
     try {
       // We've verified tick exists above, so we can safely call it
       tickFn(room.state);
+
+      // Check if game ended and handle ELO updates
+      if (room.state.gameEnded) {
+        await handleGameEnd(room);
+      }
+
       // Broadcast updated state to all players in the room (filter out _ prefixed fields)
-      io.to(room.id).emit("state_update", getClientState(room.state));
+      io.to(room.id).emit("state_update", enrichStateWithPlayerMetadata(room.state, room));
     } catch (e) {
       console.error(`Error in tick for room ${room.id}:`, e);
     }
@@ -413,6 +605,44 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       border-color: rgba(255, 255, 255, 0.3);
       transform: translateY(-1px);
     }
+    #players-display {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      background: rgba(17, 17, 17, 0.9);
+      padding: 15px 30px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .player-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .player-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .player-elo {
+      font-size: 12px;
+      color: #999;
+    }
+    .vs-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
     #play-again-overlay {
       position: fixed;
       top: 0;
@@ -510,12 +740,15 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
 
   <div id="game-container" class="${prefilledRoom ? '' : 'hidden'}">
     <div id="game-canvas"></div>
-    
+
     <!-- Back button -->
     <a id="back-button" href="${homeUrl}" target="_top" style="${hideUI ? 'display: none;' : ''}">
       <span>←</span>
       <span>Back to Home</span>
     </a>
+
+    <!-- Players Display -->
+    <div id="players-display" style="display: none;"></div>
     
     <div id="game-ui" style="${hideUI ? 'display: none;' : ''}">
       <h3 style="margin-bottom: 15px; color: #fff;">Game Info</h3>
@@ -568,13 +801,22 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     let gameInstance;
     let isConnected = false;
     
-    // Get or create persistent player ID
-    let persistentPlayerId = localStorage.getItem('vibechess_player_id');
+    // Get player ID and username from URL parameters (set by web app) or fallback to localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    let persistentPlayerId = urlParams.get('userId');
+    let playerUsername = urlParams.get('username');
+
     if (!persistentPlayerId) {
-      persistentPlayerId = 'player-' + Date.now() + '-' + Math.random().toString(36).substring(7);
-      localStorage.setItem('vibechess_player_id', persistentPlayerId);
+      // Fallback to localStorage for anonymous players
+      persistentPlayerId = localStorage.getItem('vibechess_player_id');
+      if (!persistentPlayerId) {
+        persistentPlayerId = 'player-' + Date.now() + '-' + Math.random().toString(36).substring(7);
+        localStorage.setItem('vibechess_player_id', persistentPlayerId);
+      }
+      playerUsername = 'Guest';
     }
-    console.log('Persistent Player ID:', persistentPlayerId);
+
+    console.log('Player ID:', persistentPlayerId, 'Username:', playerUsername);
     
     // Auto-join if room is in URL
     const prefilledRoom = '${prefilledRoom}';
@@ -649,12 +891,13 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         document.getElementById('connection-status').textContent = 'Connected';
         document.getElementById('connection-status').style.color = '#0f0';
         
-        // Join the room with persistent player ID
+        // Join the room with persistent player ID and username
         const parts = currentRoom.split('/');
-        socket.emit('join_room', { 
-          gameName: parts[0], 
+        socket.emit('join_room', {
+          gameName: parts[0],
           roomName: parts[1],
-          persistentPlayerId: persistentPlayerId
+          persistentPlayerId: persistentPlayerId,
+          username: playerUsername
         });
       });
 
@@ -696,7 +939,8 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         
         // Update UI
         updateStateDisplay(state);
-        
+        updatePlayersDisplay(state);
+
         // Check if game is over
         checkGameOver(state);
       });
@@ -715,12 +959,85 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       const display = document.getElementById('state-display');
       try {
         const stateStr = JSON.stringify(state, null, 2);
-        display.textContent = stateStr.length > 500 
-          ? stateStr.substring(0, 500) + '...' 
+        display.textContent = stateStr.length > 500
+          ? stateStr.substring(0, 500) + '...'
           : stateStr;
       } catch (e) {
         display.textContent = 'State too large to display';
       }
+    }
+
+    // Track fetched ELO data to avoid repeated requests
+    const playerEloCache = {};
+
+    async function updatePlayersDisplay(state) {
+      const playersDisplay = document.getElementById('players-display');
+      if (!playersDisplay) return;
+
+      // Get player metadata from state
+      const playerMetadata = state.playerMetadata || {};
+
+      // Try to get socket IDs from different possible state structures
+      let socketIds = [];
+
+      if (state.players && typeof state.players === 'object') {
+        socketIds = Object.keys(state.players);
+      } else if (state.playerColors && typeof state.playerColors === 'object') {
+        socketIds = Object.keys(state.playerColors);
+      }
+
+      // Only show if we have 2 or more players
+      if (socketIds.length < 2) {
+        playersDisplay.style.display = 'none';
+        return;
+      }
+
+      playersDisplay.style.display = 'flex';
+
+      // Fetch ELO data for each player using their persistent ID
+      const playerData = await Promise.all(
+        socketIds.slice(0, 2).map(async (socketId) => {
+          const metadata = playerMetadata[socketId] || {};
+          const persistentId = metadata.persistentId || socketId;
+          const username = metadata.username || 'Guest';
+
+          if (playerEloCache[persistentId]) {
+            return playerEloCache[persistentId];
+          }
+
+          try {
+            const response = await fetch(\`/api/elo/player/\${encodeURIComponent(persistentId)}\`);
+            if (response.ok) {
+              const data = await response.json();
+              const gameData = data.games.find(g => g.game_name === '${gameName}');
+              const result = {
+                id: persistentId,
+                username: gameData?.username || username,
+                elo: gameData?.elo_rating
+              };
+              playerEloCache[persistentId] = result;
+              return result;
+            }
+          } catch (e) {
+            console.error('Error fetching ELO for player:', persistentId, e);
+          }
+
+          return {
+            id: persistentId,
+            username: username,
+            elo: null
+          };
+        })
+      );
+
+      // Render player display
+      playersDisplay.innerHTML = playerData.map((player, index) => \`
+        <div class="player-info">
+          <div class="player-name">\${player.username}</div>
+          <div class="player-elo">\${player.elo ? \`\${player.elo} ELO\` : 'Unranked'}</div>
+        </div>
+        \${index === 0 ? '<div class="vs-text">VS</div>' : ''}
+      \`).join('');
     }
 
     // Check if game is over and show play again overlay
@@ -728,18 +1045,34 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       const overlay = document.getElementById('play-again-overlay');
       const messageEl = document.getElementById('game-over-message');
       const detailsEl = document.getElementById('game-over-details');
-      
+
       // Check various common game over indicators
       let isGameOver = false;
       let message = 'Game Over!';
       let details = '';
-      
-      // Check for gameOver flag
+
+      // NEW STANDARD: Check for gameEnded flag (preferred)
+      if (state.gameEnded === true) {
+        isGameOver = true;
+
+        // Check for winner ID
+        if (state.gameWinner) {
+          message = 'Player ' + state.gameWinner.substring(0, 8) + '... Wins!';
+        } else {
+          message = 'Draw!';
+        }
+
+        // Use gameEndReason if provided
+        if (state.gameEndReason) {
+          details = state.gameEndReason;
+        }
+      }
+
+      // Legacy support for old flags
       if (state.gameOver === true) {
         isGameOver = true;
       }
-      
-      // Check for winner
+
       if (state.winner) {
         isGameOver = true;
         message = state.winner + ' Wins!';
@@ -747,21 +1080,20 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
           details = state.reason;
         }
       }
-      
-      // Check for ended flag
+
       if (state.ended === true) {
         isGameOver = true;
       }
-      
+
       // Check for game status messages (like "checkmate", "stalemate")
       if (state.status) {
         const statusLower = String(state.status).toLowerCase();
-        if (statusLower.includes('checkmate') || 
-            statusLower.includes('stalemate') || 
+        if (statusLower.includes('checkmate') ||
+            statusLower.includes('stalemate') ||
             statusLower.includes('draw') ||
             statusLower.includes('game over')) {
           isGameOver = true;
-          details = state.status;
+          if (!details) details = state.status;
         }
       }
       
@@ -1037,7 +1369,7 @@ io.on("connection", (socket) => {
       console.error(`Socket connect error for ${socket.id}:`, error);
     });
 
-  socket.on("join_room", async ({ gameName, roomName, persistentPlayerId }: { gameName: string, roomName: string, persistentPlayerId?: string }) => {
+  socket.on("join_room", async ({ gameName, roomName, persistentPlayerId, username }: { gameName: string, roomName: string, persistentPlayerId?: string, username?: string }) => {
     try {
       const roomId = `${gameName}/${roomName}`;
       console.log(`User ${socket.id} attempting to join room: ${roomId}`, persistentPlayerId ? `with persistent ID: ${persistentPlayerId}` : '');
@@ -1207,10 +1539,11 @@ io.on("connection", (socket) => {
     }
     
     // Add player to room
-    room.players.set(socket.id, { 
-      id: socket.id, 
+    room.players.set(socket.id, {
+      id: socket.id,
       persistentId: persistentPlayerId,
-      joinedAt: Date.now() 
+      username: username || 'Guest',
+      joinedAt: Date.now()
     });
     
     // Only trigger playerJoined for new players, not reconnections
@@ -1226,7 +1559,7 @@ io.on("connection", (socket) => {
     console.log('Player colors:', room.state.playerColors);
 
       // Send state to all players in room (filter out _ prefixed fields)
-      io.to(roomId).emit("state_update", getClientState(room.state));
+      io.to(roomId).emit("state_update", enrichStateWithPlayerMetadata(room.state, room));
       io.to(roomId).emit("player_joined", { playerId: socket.id, count: room.players.size });
     } catch (error) {
       console.error(`Error in join_room for ${socket.id}:`, error);
@@ -1234,7 +1567,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("game_action", ({ roomId, action, payload }: { roomId: string, action: string, payload: any }) => {
+  socket.on("game_action", async ({ roomId, action, payload }: { roomId: string, action: string, payload: any }) => {
     try {
       const room = rooms.get(roomId);
       if (!room) {
@@ -1246,7 +1579,13 @@ io.on("connection", (socket) => {
         try {
           console.log(`Executing action ${action} in room ${roomId} by player ${socket.id}`);
           room.logic.moves[action](room.state, payload, socket.id);
-          io.to(roomId).emit("state_update", getClientState(room.state));
+
+          // Check if game ended and handle ELO updates
+          if (room.state.gameEnded) {
+            await handleGameEnd(room);
+          }
+
+          io.to(roomId).emit("state_update", enrichStateWithPlayerMetadata(room.state, room));
         } catch (e: any) {
           console.error("Game Logic Error:", e);
           socket.emit("error", `Game logic execution failed: ${e.message}`);
@@ -1273,7 +1612,7 @@ io.on("connection", (socket) => {
           if (room.logic.moves.playerLeft) {
             try {
               room.logic.moves.playerLeft(room.state, {}, socket.id);
-              io.to(roomId).emit("state_update", getClientState(room.state));
+              io.to(roomId).emit("state_update", enrichStateWithPlayerMetadata(room.state, room));
             } catch (e) {
               console.error(`Error in playerLeft handler for room ${roomId}:`, e);
             }

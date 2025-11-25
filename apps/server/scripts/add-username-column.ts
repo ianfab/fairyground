@@ -1,30 +1,19 @@
-#!/usr/bin/env tsx
-import { query } from '../lib/db.js';
+import { query } from "../lib/db.js";
 
-async function addUsernameColumn() {
+async function main() {
   try {
-    console.log('Adding creator_username column to games table...');
-
+    // Add username column to player_elo table
     await query`
-      ALTER TABLE games
-      ADD COLUMN IF NOT EXISTS creator_username TEXT
+      ALTER TABLE player_elo
+      ADD COLUMN IF NOT EXISTS username TEXT
     `;
+    console.log("✓ Added username column to player_elo table");
 
-    console.log('✓ Successfully added creator_username column');
-
-    // Create index for faster lookups
-    await query`
-      CREATE INDEX IF NOT EXISTS idx_games_creator_username ON games(creator_username)
-    `;
-
-    console.log('✓ Created index on creator_username');
-    console.log('Migration completed successfully!');
-
-    process.exit(0);
-  } catch (error) {
-    console.error('Migration failed:', error);
+    console.log("\n✅ Migration complete!");
+  } catch (err) {
+    console.error("❌ Error during migration:", err);
     process.exit(1);
   }
 }
 
-addUsernameColumn();
+main();

@@ -96,7 +96,7 @@ export default function SandboxPage() {
         body: JSON.stringify({
           description: newMessage,
           existingCode: gameCode,
-          model: "claude-sonnet-4-5-20250929",
+          model: "gpt-4o",
           userId: user?.userId,
         }),
       });
