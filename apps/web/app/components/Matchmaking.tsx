@@ -57,12 +57,18 @@ export function Matchmaking({ gameName, onCancel }: MatchmakingProps) {
                 const userId = authInfo.user?.userId || '';
                 const username = authInfo.user?.username || authInfo.user?.email || '';
                 let url = `${getGameServerUrl()}/game/${gameName}/${data.roomId}`;
+
+                // Build query parameters
+                const params = new URLSearchParams();
                 if (userId) {
-                  url += `?userId=${encodeURIComponent(userId)}`;
+                  params.append('userId', userId);
                   if (username) {
-                    url += `&username=${encodeURIComponent(username)}`;
+                    params.append('username', username);
                   }
                 }
+                params.append('matchmakingPlayerId', playerId);
+
+                url += `?${params.toString()}`;
                 window.location.href = url;
               }, 1000);
             }

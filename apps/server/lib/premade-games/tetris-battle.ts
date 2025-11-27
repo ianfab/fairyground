@@ -31,6 +31,10 @@ function initGameClient(container, socket, roomId, emitAction) {
   container.innerHTML = \`
     <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); gap: 40px; padding: 20px;">
       <div style="text-align: center;">
+        <div style="margin-bottom: 10px;">
+          <div style="color: #fff; font-size: 14px; margin-bottom: 5px;">Hold (Shift)</div>
+          <canvas id="hold1" width="\${4 * BLOCK_SIZE}" height="\${4 * BLOCK_SIZE}" style="border: 2px solid #fff; background: #000;"></canvas>
+        </div>
         <h2 style="color: #fff; margin-bottom: 10px;">Player 1</h2>
         <canvas id="canvas1" width="\${BOARD_WIDTH * BLOCK_SIZE}" height="\${BOARD_HEIGHT * BLOCK_SIZE}" style="border: 3px solid #fff; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"></canvas>
         <div id="score1" style="color: #fff; font-size: 24px; margin-top: 10px; font-weight: bold;">Score: 0</div>
@@ -41,10 +45,15 @@ function initGameClient(container, socket, roomId, emitAction) {
           <div style="margin-bottom: 10px;">⬆️ Rotate</div>
           <div style="margin-bottom: 10px;">⬇️ Soft Drop</div>
           <div style="margin-bottom: 10px;">Space: Hard Drop</div>
+          <div style="margin-bottom: 10px;">Shift: Hold Piece</div>
           <div style="margin-top: 20px; font-size: 14px; opacity: 0.8;">Clear lines to send garbage to opponent!</div>
         </div>
       </div>
       <div style="text-align: center;">
+        <div style="margin-bottom: 10px;">
+          <div style="color: #fff; font-size: 14px; margin-bottom: 5px;">Hold (Shift)</div>
+          <canvas id="hold2" width="\${4 * BLOCK_SIZE}" height="\${4 * BLOCK_SIZE}" style="border: 2px solid #fff; background: #000;"></canvas>
+        </div>
         <h2 style="color: #fff; margin-bottom: 10px;">Player 2</h2>
         <canvas id="canvas2" width="\${BOARD_WIDTH * BLOCK_SIZE}" height="\${BOARD_HEIGHT * BLOCK_SIZE}" style="border: 3px solid #fff; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"></canvas>
         <div id="score2" style="color: #fff; font-size: 24px; margin-top: 10px; font-weight: bold;">Score: 0</div>
@@ -56,6 +65,10 @@ function initGameClient(container, socket, roomId, emitAction) {
   const ctx1 = canvas1.getContext('2d');
   const canvas2 = document.getElementById('canvas2');
   const ctx2 = canvas2.getContext('2d');
+  const hold1 = document.getElementById('hold1');
+  const holdCtx1 = hold1.getContext('2d');
+  const hold2 = document.getElementById('hold2');
+  const holdCtx2 = hold2.getContext('2d');
   const score1El = document.getElementById('score1');
   const score2El = document.getElementById('score2');
 
@@ -65,7 +78,7 @@ function initGameClient(container, socket, roomId, emitAction) {
   const pressedKeys = new Set();
 
   document.addEventListener('keydown', (e) => {
-    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space'].includes(e.code)) {
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', 'ShiftLeft', 'ShiftRight'].includes(e.code)) {
       e.preventDefault();
     }
 
@@ -77,11 +90,41 @@ function initGameClient(container, socket, roomId, emitAction) {
     if (e.code === 'ArrowDown') emitAction('move', { direction: 'down' });
     if (e.code === 'ArrowUp') emitAction('rotate', {});
     if (e.code === 'Space') emitAction('hardDrop', {});
+    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') emitAction('hold', {});
   });
 
   document.addEventListener('keyup', (e) => {
     pressedKeys.delete(e.code);
   });
+
+  function calculateGhostY(board, piece) {
+    if (!piece || !piece.shapeData) return piece.y;
+
+    let ghostY = piece.y;
+    const shape = piece.shapeData;
+
+    // Drop until collision
+    while (true) {
+      let canMove = true;
+      for (let y = 0; y < shape.length; y++) {
+        for (let x = 0; x < shape[y].length; x++) {
+          if (shape[y][x]) {
+            const newY = ghostY + y + 1;
+            const newX = piece.x + x;
+            if (newY >= 20 || (newY >= 0 && board[newY] && board[newY][newX])) {
+              canMove = false;
+              break;
+            }
+          }
+        }
+        if (!canMove) break;
+      }
+      if (!canMove) break;
+      ghostY += 1;
+    }
+
+    return ghostY;
+  }
 
   function drawBoard(ctx, board, currentPiece, playerNum) {
     // Clear canvas
@@ -106,6 +149,31 @@ function initGameClient(container, socket, roomId, emitAction) {
       }
     }
 
+    // Draw ghost piece (hard drop preview)
+    if (currentPiece && currentPiece.shapeData) {
+      const ghostY = calculateGhostY(board, currentPiece);
+      const shape = currentPiece.shapeData;
+      const color = COLORS[currentPiece.shape];
+
+      // Draw ghost piece with transparency
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.3;
+      for (let y = 0; y < shape.length; y++) {
+        for (let x = 0; x < shape[y].length; x++) {
+          if (shape[y][x]) {
+            const drawX = (currentPiece.x + x) * BLOCK_SIZE;
+            const drawY = (ghostY + y) * BLOCK_SIZE;
+            ctx.fillRect(drawX + 1, drawY + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2);
+            ctx.strokeStyle = color;
+            ctx.globalAlpha = 0.5;
+            ctx.strokeRect(drawX + 2, drawY + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4);
+            ctx.globalAlpha = 0.3;
+          }
+        }
+      }
+      ctx.globalAlpha = 1.0;
+    }
+
     // Draw current piece
     if (currentPiece && currentPiece.shapeData) {
       const shape = currentPiece.shapeData;
@@ -124,6 +192,35 @@ function initGameClient(container, socket, roomId, emitAction) {
     }
   }
 
+  function drawHoldPiece(ctx, holdPiece) {
+    // Clear hold canvas
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 4 * BLOCK_SIZE, 4 * BLOCK_SIZE);
+
+    if (holdPiece && holdPiece.shapeData) {
+      const shape = holdPiece.shapeData;
+      const color = COLORS[holdPiece.shape];
+      ctx.fillStyle = color;
+
+      // Center the piece in the hold box
+      const offsetX = (4 - shape[0].length) / 2;
+      const offsetY = (4 - shape.length) / 2;
+
+      for (let y = 0; y < shape.length; y++) {
+        for (let x = 0; x < shape[y].length; x++) {
+          if (shape[y][x]) {
+            ctx.fillRect(
+              (offsetX + x) * BLOCK_SIZE + 2,
+              (offsetY + y) * BLOCK_SIZE + 2,
+              BLOCK_SIZE - 4,
+              BLOCK_SIZE - 4
+            );
+          }
+        }
+      }
+    }
+  }
+
   return {
     onStateUpdate: (state) => {
       if (!state.players) return;
@@ -135,12 +232,14 @@ function initGameClient(container, socket, roomId, emitAction) {
       if (player1Id) {
         const p1 = state.players[player1Id];
         drawBoard(ctx1, p1.board, p1.currentPiece, 1);
+        drawHoldPiece(holdCtx1, p1.heldPiece);
         score1El.textContent = 'Score: ' + (p1.score || 0);
       }
 
       if (player2Id) {
         const p2 = state.players[player2Id];
         drawBoard(ctx2, p2.board, p2.currentPiece, 2);
+        drawHoldPiece(holdCtx2, p2.heldPiece);
         score2El.textContent = 'Score: ' + (p2.score || 0);
       }
 
@@ -199,6 +298,8 @@ const serverLogic = {
           y: 0,
           rotation: 0
         },
+        heldPiece: null,
+        canHold: true,
         score: 0,
         gameOver: false
       };
@@ -380,6 +481,71 @@ const serverLogic = {
           }
         }
       }
+
+      // Re-enable hold for next piece
+      player.canHold = true;
+    },
+
+    hold: (state, payload, playerId) => {
+      const player = state.players[playerId];
+      if (!player || player.gameOver || state.gameEnded) return;
+      if (!player.canHold) return; // Can only hold once per piece
+
+      const baseShapes = {
+        I: [[1,1,1,1]],
+        O: [[1,1],[1,1]],
+        T: [[0,1,0],[1,1,1]],
+        S: [[0,1,1],[1,1,0]],
+        Z: [[1,1,0],[0,1,1]],
+        J: [[1,0,0],[1,1,1]],
+        L: [[0,0,1],[1,1,1]]
+      };
+
+      const currentPiece = player.currentPiece;
+
+      if (player.heldPiece === null) {
+        // First time holding - store current piece and spawn new one
+        player.heldPiece = {
+          shape: currentPiece.shape,
+          shapeData: baseShapes[currentPiece.shape],
+          x: 3,
+          y: 0,
+          rotation: 0
+        };
+
+        // Spawn new piece
+        const shapeKeys = Object.keys(baseShapes);
+        const randomShape = shapeKeys[Math.floor(Math.random() * shapeKeys.length)];
+        player.currentPiece = {
+          shape: randomShape,
+          shapeData: baseShapes[randomShape],
+          x: 3,
+          y: 0,
+          rotation: 0
+        };
+      } else {
+        // Swap current piece with held piece
+        const temp = {
+          shape: currentPiece.shape,
+          shapeData: baseShapes[currentPiece.shape],
+          x: 3,
+          y: 0,
+          rotation: 0
+        };
+
+        player.currentPiece = {
+          shape: player.heldPiece.shape,
+          shapeData: baseShapes[player.heldPiece.shape],
+          x: 3,
+          y: 0,
+          rotation: 0
+        };
+
+        player.heldPiece = temp;
+      }
+
+      // Prevent holding again until piece is locked
+      player.canHold = false;
     },
 
     tick: (state) => {
@@ -483,6 +649,9 @@ const serverLogic = {
           piece.shapeData = baseShapes[randomShape];  // Reset to base shape
           piece.x = 3;
           piece.y = 0;
+
+          // Re-enable hold for next piece
+          player.canHold = true;
 
           // Check game over
           const newShape = piece.shapeData;

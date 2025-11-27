@@ -118,19 +118,29 @@ router.get('/leaderboard', async (req, res) => {
   }
 });
 
-// Get recent game results for a specific game
-router.get('/recent-games/:gameName', async (req, res) => {
+// Get recent game results (all games or filtered by game name via query param)
+router.get('/recent-games', async (req, res) => {
   try {
-    const { gameName } = req.params;
+    const gameName = req.query.gameName as string | undefined;
     const limit = parseInt(req.query.limit as string) || 50;
 
-    const result = await query`
-      SELECT *
-      FROM game_results
-      WHERE game_name = ${gameName}
-      ORDER BY ended_at DESC
-      LIMIT ${limit}
-    `;
+    let result;
+    if (gameName) {
+      result = await query`
+        SELECT *
+        FROM game_results
+        WHERE game_name = ${gameName}
+        ORDER BY ended_at DESC
+        LIMIT ${limit}
+      `;
+    } else {
+      result = await query`
+        SELECT *
+        FROM game_results
+        ORDER BY ended_at DESC
+        LIMIT ${limit}
+      `;
+    }
 
     res.json({ results: result.rows });
   } catch (error) {
@@ -139,14 +149,16 @@ router.get('/recent-games/:gameName', async (req, res) => {
   }
 });
 
-// Get all recent game results
-router.get('/recent-games', async (req, res) => {
+// Get recent game results for a specific game (alternative path-based endpoint)
+router.get('/recent-games/game/:gameName', async (req, res) => {
   try {
+    const { gameName } = req.params;
     const limit = parseInt(req.query.limit as string) || 50;
 
     const result = await query`
       SELECT *
       FROM game_results
+      WHERE game_name = ${gameName}
       ORDER BY ended_at DESC
       LIMIT ${limit}
     `;

@@ -265,10 +265,10 @@ export default function CreateGame() {
       setGeneratedCode(data.code);
       setExplanation(data.explanation || "");
       setReasoning(data.reasoning || "");
-      
-      // Update preview
+
+      // Update preview - use PUT to update existing preview game instead of creating a new one
       if (previewGameName) {
-        await shipGameInPreviewMode(previewGameName, description || "", data.code);
+        await updatePreviewGame(previewGameName, description || "", data.code);
         // Force refresh preview
         setPreviewRoomId(`room-${Math.random().toString(36).substring(7)}`);
       }
@@ -314,17 +314,45 @@ export default function CreateGame() {
     }
   };
 
+  const updatePreviewGame = async (gameName: string, gameDesc: string, code: string) => {
+    try {
+      const response = await fetch(`/api/games/${encodeURIComponent(gameName)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: gameDesc,
+          code: code,
+          preview: true,
+          creatorId: user?.userId,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to update preview:", await response.text());
+      }
+    } catch (err) {
+      console.error("Failed to update preview:", err);
+    }
+  };
+
   const handleShipIt = async () => {
     setError("");
     setLoading(true);
 
     try {
-      const finalName = name || previewGameName;
+      // Require a proper game name before shipping
+      if (!name || !name.trim()) {
+        setError("Please provide a game name before shipping");
+        setLoading(false);
+        return;
+      }
+
+      const finalName = name.trim();
       const codeToShip = generatedCode || GAME_TEMPLATES[selectedTemplate!].baseCode;
-      
+
       // If preview game exists, update it to non-preview
       if (previewGameName) {
-        const res = await fetch(`/api/games/${previewGameName}`, {
+        const res = await fetch(`/api/games/${encodeURIComponent(previewGameName)}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -340,6 +368,9 @@ export default function CreateGame() {
           const data = await res.json();
           throw new Error(data.error || "Failed to update game");
         }
+
+        // Update preview game name to the final name for correct redirect
+        setPreviewGameName(finalName);
       } else {
         // Create new game (shouldn't happen normally)
         const res = await fetch("/api/games", {
@@ -724,8 +755,9 @@ export default function CreateGame() {
           <div className="mt-auto pt-4 border-t border-gray-800 space-y-3">
             <button
               onClick={handleShipIt}
-              disabled={loading || !name}
+              disabled={loading || !name || !name.trim()}
               className="w-full bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-gray-200 disabled:opacity-50 transition-all"
+              title={!name || !name.trim() ? "Please enter a game name first" : "Ship your game"}
             >
               {loading ? "Shipping..." : "Ship It 🚀"}
             </button>

@@ -127,6 +127,16 @@ interface MatchmakingResult {
 const matchmakingQueue: MatchmakingPlayer[] = [];
 const matchmakingResults = new Map<string, MatchmakingResult>();
 
+// Track matchmaking rooms and their expected players
+interface MatchmakingRoom {
+  roomId: string;
+  gameName: string;
+  expectedPlayers: Set<string>; // playerIds
+  connectedPlayers: Set<string>; // socket IDs
+  createdAt: number;
+}
+const matchmakingRooms = new Map<string, MatchmakingRoom>();
+
 // Function to try to match players
 function tryMatchPlayers() {
   // Group players by game
@@ -149,7 +159,16 @@ function tryMatchPlayers() {
       
       // Generate a unique room ID for the match
       const roomId = `match-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-      
+
+      // Register the matchmaking room
+      matchmakingRooms.set(roomId, {
+        roomId,
+        gameName,
+        expectedPlayers: new Set([player1.playerId, player2.playerId]),
+        connectedPlayers: new Set(),
+        createdAt: Date.now()
+      });
+
       // Set match results
       matchmakingResults.set(player1.playerId, {
         status: 'matched',
@@ -159,13 +178,13 @@ function tryMatchPlayers() {
         status: 'matched',
         roomId
       });
-      
+
       // Remove players from queue
       const index1 = matchmakingQueue.findIndex(p => p.playerId === player1.playerId);
       const index2 = matchmakingQueue.findIndex(p => p.playerId === player2.playerId);
       if (index1 !== -1) matchmakingQueue.splice(index1, 1);
       if (index2 !== -1) matchmakingQueue.splice(index2, 1);
-      
+
       console.log(`Matched players ${player1.playerId} and ${player2.playerId} for game ${gameName} in room ${roomId}`);
     }
   });
@@ -787,8 +806,8 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       <div id="game-over-message">Game Over!</div>
       <div id="game-over-details"></div>
       <div style="margin-top: 20px;">
-        <button id="play-again-btn">🔄 Play Again</button>
-        <a id="back-to-home-btn" href="${homeUrl}" target="_top">← Back to Home</a>
+        <button id="play-again-btn">🎯 Enter Matchmaking Again</button>
+        <a id="back-to-home-btn" href="${homeUrl}/play/${gameName}" target="_top">← Back to Game Selection</a>
       </div>
     </div>
   </div>
@@ -805,6 +824,7 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     const urlParams = new URLSearchParams(window.location.search);
     let persistentPlayerId = urlParams.get('userId');
     let playerUsername = urlParams.get('username');
+    const matchmakingPlayerId = urlParams.get('matchmakingPlayerId');
 
     if (!persistentPlayerId) {
       // Fallback to localStorage for anonymous players
@@ -816,7 +836,7 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       playerUsername = 'Guest';
     }
 
-    console.log('Player ID:', persistentPlayerId, 'Username:', playerUsername);
+    console.log('Player ID:', persistentPlayerId, 'Username:', playerUsername, 'Matchmaking ID:', matchmakingPlayerId);
     
     // Auto-join if room is in URL
     const prefilledRoom = '${prefilledRoom}';
@@ -890,13 +910,14 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         isConnected = true;
         document.getElementById('connection-status').textContent = 'Connected';
         document.getElementById('connection-status').style.color = '#0f0';
-        
+
         // Join the room with persistent player ID and username
         const parts = currentRoom.split('/');
         socket.emit('join_room', {
           gameName: parts[0],
           roomName: parts[1],
           persistentPlayerId: persistentPlayerId,
+          matchmakingPlayerId: matchmakingPlayerId,
           username: playerUsername
         });
       });
@@ -1107,9 +1128,10 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       }
     }
     
-    // Setup play again button
+    // Setup play again button - redirect to /play page (matchmaking)
     document.getElementById('play-again-btn').addEventListener('click', () => {
-      window.location.reload();
+      // Redirect to play page where user can enter matchmaking
+      window.location.href = '${homeUrl}/play/' + gameName;
     });
 
     function emitAction(action, payload) {
@@ -1290,7 +1312,14 @@ app.post('/api/matchmaking/join', (req, res) => {
     if (existingIndex !== -1) {
       return res.json({ message: 'Already in queue' });
     }
-    
+
+    // Check if player already has a match result (prevent joining while already matched)
+    const existingResult = matchmakingResults.get(playerId);
+    if (existingResult && existingResult.status === 'matched') {
+      // Player is already matched, don't add them to queue again
+      return res.json({ message: 'Already matched' });
+    }
+
     // Add player to queue
     matchmakingQueue.push({
       playerId,
@@ -1369,10 +1398,39 @@ io.on("connection", (socket) => {
       console.error(`Socket connect error for ${socket.id}:`, error);
     });
 
-  socket.on("join_room", async ({ gameName, roomName, persistentPlayerId, username }: { gameName: string, roomName: string, persistentPlayerId?: string, username?: string }) => {
+  socket.on("join_room", async ({ gameName, roomName, persistentPlayerId, matchmakingPlayerId, username }: { gameName: string, roomName: string, persistentPlayerId?: string, matchmakingPlayerId?: string, username?: string }) => {
     try {
-      const roomId = `${gameName}/${roomName}`;
-      console.log(`User ${socket.id} attempting to join room: ${roomId}`, persistentPlayerId ? `with persistent ID: ${persistentPlayerId}` : '');
+      // Sanitize roomName - strip any query parameters that might have been incorrectly included
+      // This handles cases where old client code sent malformed URLs
+      const sanitizedRoomName = (roomName?.split('?')[0] || roomName)?.split('&')[0] || roomName;
+
+      const roomId = `${gameName}/${sanitizedRoomName}`;
+      console.log(`User ${socket.id} attempting to join room: ${roomId}`, persistentPlayerId ? `with persistent ID: ${persistentPlayerId}` : '', matchmakingPlayerId ? `with matchmaking ID: ${matchmakingPlayerId}` : '');
+
+      // Check if this is a matchmaking room
+      const matchmakingRoom = matchmakingRooms.get(sanitizedRoomName);
+      if (matchmakingRoom) {
+        // Verify the player is expected in this matchmaking room using matchmakingPlayerId
+        if (!matchmakingPlayerId || !matchmakingRoom.expectedPlayers.has(matchmakingPlayerId)) {
+          console.log(`Player ${socket.id} (matchmakingId: ${matchmakingPlayerId}) attempted to join matchmaking room ${sanitizedRoomName} but was not matched for it`);
+          socket.emit("error", "You are not authorized to join this matchmaking room");
+          return;
+        }
+        // Track that this player has connected
+        matchmakingRoom.connectedPlayers.add(socket.id);
+        console.log(`Matchmaking room ${sanitizedRoomName}: ${matchmakingRoom.connectedPlayers.size}/${matchmakingRoom.expectedPlayers.size} players connected`);
+
+        // Remove player from matchmaking queue (in case they're still there)
+        const queueIndex = matchmakingQueue.findIndex(p => p.playerId === matchmakingPlayerId);
+        if (queueIndex !== -1) {
+          matchmakingQueue.splice(queueIndex, 1);
+          console.log(`Removed player ${matchmakingPlayerId} from matchmaking queue on connection`);
+        }
+
+        // Clear the matchmaking result for this player so they can join matchmaking again later
+        matchmakingResults.delete(matchmakingPlayerId);
+        console.log(`Cleared matchmaking result for player ${matchmakingPlayerId}`);
+      }
 
       // Leave previous rooms
       socket.rooms.forEach((room) => {

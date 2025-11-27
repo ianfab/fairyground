@@ -91,7 +91,21 @@ export async function PUT(
     // Update the game
     // If name is not provided in the body, use the existing name (oldName)
     const newName = name || oldName;
-    
+
+    // If the name is changing, check if the new name is already taken
+    if (newName !== oldName) {
+      const nameCheck = await query(
+        `SELECT id FROM ${tableName} WHERE name = $1`,
+        newName
+      );
+      if (nameCheck.rows.length > 0) {
+        return NextResponse.json(
+          { error: "Game name already taken" },
+          { status: 409 }
+        );
+      }
+    }
+
     const { rows } = await query<Game>(
       `UPDATE ${tableName} SET name = $1, description = $2, code = $3, preview = $4 WHERE name = $5 RETURNING *`,
       newName, description || '', code, preview, oldName
