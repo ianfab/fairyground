@@ -233,14 +233,12 @@ export default function CreateGame() {
               case "token":
                 if (parsed.delta) {
                   streamedText += parsed.delta;
-                  console.log("[Stream] Token delta:", parsed.delta, "Total length:", streamedText.length);
                   setLiveModelStream(streamedText);
                 }
                 break;
               case "reasoning":
                 if (parsed.delta) {
                   streamedReasoning += parsed.delta;
-                  console.log("[Stream] Reasoning delta:", parsed.delta, "Total length:", streamedReasoning.length);
                   setLiveReasoningStream(streamedReasoning);
                 }
                 break;
@@ -656,11 +654,11 @@ export default function CreateGame() {
             {Object.values(GAME_TEMPLATES).map((template) => {
               // Map template IDs to background images
               const backgroundImages: Record<GameTemplate, string> = {
-                "chess-variant": "/game-images/chess-default.png",
+                "chess-variant": "/game-images/chess-default.webp",
                 "2d-shooter": "/game-images/2d-shooter-default.png",
-                "3d-shooter": "/game-images/3d-shooter-default.png",
-                "tetris-duels": "/game-images/tetris-default.png",
-                "open-ended": "/game-images/open-ended-default.jpg",
+                "3d-shooter": "/game-images/3d-shooter-default.webp",
+                "tetris-duels": "/game-images/tetris-default.webp",
+                "open-ended": "/game-images/open-ended-default.webp",
               };
 
               return (
