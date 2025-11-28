@@ -101,8 +101,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Determine which model to use (default: gpt-5/o1)
-    const selectedModel = model || "gpt-5";
+    // Determine which model to use (default: Claude Sonnet 4.5)
+    const selectedModel = model || "claude-sonnet-4-5-20250929";
 
     // Different prompts for edit mode vs new game mode
     const systemPrompt = isEditMode
