@@ -10,906 +10,6 @@ export interface GameTemplateConfig {
 }
 
 export const GAME_TEMPLATES: Record<GameTemplate, GameTemplateConfig> = {
-  "chess-variant": {
-    id: "chess-variant",
-    name: "Chess Variant",
-    description: "Create custom chess variants with modified rules, pieces, or board layouts",
-    libraries: ["chess.js", "chessboard.js"],
-    baseCode: `// Chess Variant Template
-// Uses chessboard.js for drag-and-drop UI and chess.js for move validation
-
-// CLIENT-SIDE CODE
-function initGameClient(container, socket, roomId, emitAction) {
-  // Load required libraries
-  const loadScript = (src) => {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  };
-  
-  const loadCSS = (href) => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  };
-  
-  // Load chessboard.js CSS
-  loadCSS('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css');
-  
-  const boardContainer = document.createElement('div');
-  boardContainer.id = 'chess-board';
-  boardContainer.style.cssText = 'width: 400px; margin: 40px auto;';
-  container.appendChild(boardContainer);
-  
-  const statusDiv = document.createElement('div');
-  statusDiv.id = 'chess-status';
-  statusDiv.style.cssText = 'text-align: center; margin-top: 20px; font-size: 18px; color: #fff;';
-  container.appendChild(statusDiv);
-  
-  const waitingDiv = document.createElement('div');
-  waitingDiv.id = 'waiting-message';
-  waitingDiv.style.cssText = 'text-align: center; margin-top: 20px; font-size: 16px; color: #888;';
-  waitingDiv.textContent = 'Loading chess libraries...';
-  container.appendChild(waitingDiv);
-  
-  let board = null;
-  let game = null;
-  let myColor = null;
-  let librariesLoaded = false;
-  
-  // Function to load libraries with retry
-  function loadLibraries() {
-    waitingDiv.innerHTML = 'Loading chess libraries...';
-    
-    return Promise.all([
-      loadScript('https://code.jquery.com/jquery-3.7.1.min.js'),
-      loadScript('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js'),
-      loadScript('https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js')
-    ]).then(() => {
-      librariesLoaded = true;
-      waitingDiv.textContent = 'Waiting for opponent...';
-      
-      // Initialize chess.js
-      game = new Chess();
-    
-    function onDragStart(source, piece, position, orientation) {
-      // Do not pick up pieces if the game is over
-      if (game.game_over()) return false;
-      
-      // Only allow moves if player has a color assigned
-      if (!myColor || myColor === 'spectator') return false;
-      
-      // Only pick up pieces for the side to move
-      if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-          (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
-        return false;
-      }
-      
-      // Only allow player to move their own pieces
-      if ((myColor === 'white' && piece.search(/^b/) !== -1) ||
-          (myColor === 'black' && piece.search(/^w/) !== -1)) {
-        return false;
-      }
-    }
-    
-    function onDrop(source, target) {
-      // See if the move is legal
-      const move = game.move({
-        from: source,
-        to: target,
-        promotion: 'q' // Always promote to queen for simplicity
-      });
-      
-      // Illegal move
-      if (move === null) return 'snapback';
-      
-      // Send move to server
-      emitAction('move', { from: source, to: target, promotion: 'q' });
-    }
-    
-    function onSnapEnd() {
-      // Update board position after piece snap
-      // This handles castling, en passant, pawn promotion
-      board.position(game.fen());
-    }
-    
-    function updateStatus(playerColors) {
-      let status = '';
-      const moveColor = game.turn() === 'w' ? 'White' : 'Black';
-      const myPlayerColor = playerColors ? playerColors[socket.id] : null;
-      
-      // Checkmate?
-      if (game.in_checkmate()) {
-        const winner = game.turn() === 'w' ? 'Black' : 'White';
-        status = 'Game over, ' + winner + ' wins by checkmate!';
-      }
-      // Draw?
-      else if (game.in_draw()) {
-        status = 'Game over, drawn position';
-      }
-      // Stalemate?
-      else if (game.in_stalemate()) {
-        status = 'Game over, stalemate';
-      }
-      // Threefold repetition?
-      else if (game.in_threefold_repetition()) {
-        status = 'Game over, draw by threefold repetition';
-      }
-      // Insufficient material?
-      else if (game.insufficient_material()) {
-        status = 'Game over, draw by insufficient material';
-      }
-      // Game still on
-      else {
-        status = moveColor + ' to move';
-        
-        if (myPlayerColor === 'spectator') {
-          status += ' (You are spectating)';
-        } else if (myPlayerColor) {
-          status += ' (You are ' + myPlayerColor + ')';
-        }
-        
-        // Check?
-        if (game.in_check()) {
-          status += ' - ' + moveColor + ' is in check!';
-        }
-      }
-      
-      statusDiv.textContent = status;
-    }
-    
-    const config = {
-      draggable: true,
-      position: 'start',
-      onDragStart: onDragStart,
-      onDrop: onDrop,
-      onSnapEnd: onSnapEnd,
-      pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
-    };
-    
-    board = Chessboard('chess-board', config);
-    updateStatus({});
-    
-    // Handle state updates - now that libraries are loaded
-    return (state) => {
-      console.log('Chess onStateUpdate called with:', state);
-      
-      if (!state || !state.board) {
-        console.error('Invalid state received:', state);
-        return;
-      }
-      
-      try {
-        // Load position into chess.js
-        game.load(state.board);
-        
-        // Update board display
-        board.position(state.board);
-        
-        const playerCount = state.playerColors ? Object.keys(state.playerColors).length : 0;
-        
-        if (playerCount < 2) {
-          waitingDiv.style.display = 'block';
-          waitingDiv.textContent = 'Waiting for opponent...';
-        } else {
-          waitingDiv.style.display = 'none';
-        }
-        
-        if (state.playerColors && state.playerColors[socket.id]) {
-          const newColor = state.playerColors[socket.id];
-          
-          if (newColor === 'spectator') {
-            myColor = 'spectator';
-          } else if (!myColor || myColor !== newColor) {
-            myColor = newColor;
-            
-            // Flip board for black player
-            const orientation = myColor === 'black' ? 'black' : 'white';
-            board.orientation(orientation);
-          }
-        }
-        
-        updateStatus(state.playerColors);
-      } catch (e) {
-        console.error('Error updating state:', e, e.stack);
-      }
-    };
-    }).catch(err => {
-      console.error('Failed to load chess libraries:', err);
-      waitingDiv.innerHTML = \`
-        <div style="color: #f44;">Error loading chess libraries.</div>
-        <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
-          Refresh Page
-        </button>
-      \`;
-      return null;
-    });
-  }
-  
-  // Create game instance with async initialization
-  const gameInstance = {
-    _ready: false,
-    _pendingStates: [],
-    onStateUpdate: function(state) {
-      if (!this._ready) {
-        console.log('Game not ready yet, queuing state');
-        this._pendingStates.push(state);
-      }
-      // Once ready, this function will be replaced
-    }
-  };
-  
-  // Load libraries and initialize
-  loadLibraries().then(stateUpdateFn => {
-    if (stateUpdateFn) {
-      gameInstance._ready = true;
-      gameInstance.onStateUpdate = stateUpdateFn;
-      
-      // Apply any pending states that came in while loading
-      if (gameInstance._pendingStates && gameInstance._pendingStates.length > 0) {
-        console.log('Applying', gameInstance._pendingStates.length, 'pending states');
-        const lastState = gameInstance._pendingStates[gameInstance._pendingStates.length - 1];
-        gameInstance.onStateUpdate(lastState);
-        gameInstance._pendingStates = [];
-      }
-    }
-  });
-  
-  console.log('Chess game instance created');
-  return gameInstance;
-}
-
-// SERVER-SIDE CODE
-// Note: Chess class is provided by the server sandbox context
-const serverLogic = {
-  initialState: {
-    board: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-    players: {},
-    playerColors: {},
-    moveHistory: []
-  },
-  moves: {
-    playerJoined: (state, payload, playerId) => {
-      // Don't reassign colors if player already has one (reconnection)
-      if (state.playerColors[playerId]) {
-        console.log('Player', playerId, 'rejoining with existing color:', state.playerColors[playerId]);
-        return;
-      }
-      
-      const existingPlayerCount = Object.keys(state.playerColors).length;
-      
-      if (existingPlayerCount === 0) {
-        state.playerColors[playerId] = Math.random() < 0.5 ? 'white' : 'black';
-      } else if (existingPlayerCount === 1) {
-        const firstPlayerColor = Object.values(state.playerColors)[0];
-        state.playerColors[playerId] = firstPlayerColor === 'white' ? 'black' : 'white';
-      } else {
-        state.playerColors[playerId] = 'spectator';
-      }
-      
-      console.log('Player', playerId, 'assigned color:', state.playerColors[playerId]);
-    },
-    
-    move: (state, payload, playerId) => {
-      const playerColor = state.playerColors[playerId];
-      
-      if (playerColor === 'spectator') {
-        console.log('Spectator attempted to move');
-        return;
-      }
-      
-      // Initialize chess.js with current board state
-      const game = new Chess(state.board);
-      
-      // Check if it's the player's turn
-      const currentTurn = game.turn(); // 'w' or 'b'
-      const turnColor = currentTurn === 'w' ? 'white' : 'black';
-      
-      if (playerColor !== turnColor) {
-        console.log('Not player turn:', playerColor, 'vs', turnColor);
-        return;
-      }
-      
-      // Attempt the move
-      try {
-        const move = game.move({
-          from: payload.from,
-          to: payload.to,
-          promotion: payload.promotion || 'q'
-        });
-        
-        if (move === null) {
-          console.log('Illegal move attempted:', payload);
-          return;
-        }
-        
-        console.log('Legal move executed:', move);
-        
-        // Update state with new FEN
-        state.board = game.fen();
-        
-        // Add to move history
-        state.moveHistory.push({
-          from: payload.from,
-          to: payload.to,
-          promotion: payload.promotion,
-          san: move.san,
-          player: playerId,
-          timestamp: Date.now()
-        });
-        
-        console.log('New board state:', state.board);
-        console.log('Game over:', game.game_over());
-        console.log('In check:', game.in_check());
-        console.log('In checkmate:', game.in_checkmate());
-        console.log('In draw:', game.in_draw());
-        
-      } catch (e) {
-        console.error('Error executing move:', e);
-      }
-    }
-  }
-};`,
-    prompt: `You are creating a chess variant using chessboard.js and chess.js.
-
-LIBRARIES AVAILABLE:
-- chessboard.js: Drag-and-drop chess board UI (https://chessboardjs.com/)
-- chess.js: Full chess move validation and game logic (https://github.com/jhlywa/chess.js)
-
-STRUCTURE:
-The template already includes:
-✅ Drag-and-drop board with piece images
-✅ Complete legal move validation
-✅ Turn management and color assignment
-✅ Game end detection (checkmate, stalemate, draw)
-✅ Spectator support
-✅ Board orientation (flipped for black player)
-
-TO CUSTOMIZE YOUR VARIANT:
-1. Modify the initial FEN string in initialState.board
-2. Customize move validation in the server's move handler
-3. Add special rules or win conditions
-4. Modify the onDragStart function for custom piece movement rules
-5. add any other ui or customizations you want
-
-EXAMPLE CUSTOMIZATIONS:
-- Chess960: Randomize starting position FEN
-- Three-check: Track checks in state, win after 3 checks
-- Atomic: Add explosion logic when pieces are captured
-- Fog of War: Filter visible pieces in onStateUpdate based on player position
-
-The Chess class (from chess.js) provides methods like:
-- game.move({ from, to, promotion }) - Make a move
-- game.in_check() - Check if current player is in check
-- game.in_checkmate() - Check if current player is checkmated
-- game.game_over() - Check if game is over
-- game.fen() - Get current position as FEN string
-- game.load(fen) - Load a position from FEN
-- game.turn() - Get current turn ('w' or 'b')
-
-User's chess variant description:`
-  },
-  
-  "2d-shooter": {
-    id: "2d-shooter",
-    name: "2D Shooter",
-    description: "Build top-down or side-scrolling shooters with physics and multiplayer",
-    libraries: ["phaser"],
-    baseCode: `// 2D Shooter Template
-// Uses basic canvas for rendering
-
-// CLIENT-SIDE CODE
-function initGameClient(container, socket, roomId, emitAction) {
-  // Create canvas
-  const canvas = document.createElement('canvas');
-  canvas.width = 800;
-  canvas.height = 600;
-  canvas.style.cssText = 'display: block; margin: 40px auto; background: #1a1a2e; border: 2px solid #16213e;';
-  container.appendChild(canvas);
-  
-  const ctx = canvas.getContext('2d');
-  
-  // Player controls
-  const keys = {};
-  document.addEventListener('keydown', (e) => {
-    keys[e.code] = true;
-  });
-  document.addEventListener('keyup', (e) => {
-    keys[e.code] = false;
-  });
-  
-  // Send input state continuously
-  setInterval(() => {
-    const input = {
-      up: keys['KeyW'] || keys['ArrowUp'] || false,
-      down: keys['KeyS'] || keys['ArrowDown'] || false,
-      left: keys['KeyA'] || keys['ArrowLeft'] || false,
-      right: keys['KeyD'] || keys['ArrowRight'] || false
-    };
-    
-    if (input.up || input.down || input.left || input.right) {
-      emitAction('input', input);
-    }
-  }, 16); // ~60fps
-  
-  // Shooting
-  canvas.addEventListener('click', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    emitAction('shoot', { targetX: x, targetY: y });
-  });
-  
-  // Render function
-  function render(state) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw players
-    if (state.players) {
-      Object.entries(state.players).forEach(([id, player]) => {
-        ctx.fillStyle = player.color || '#00ff00';
-        ctx.beginPath();
-        ctx.arc(player.x, player.y, 15, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Draw health bar
-        ctx.fillStyle = '#ff0000';
-        ctx.fillRect(player.x - 20, player.y - 30, 40, 5);
-        ctx.fillStyle = '#00ff00';
-        ctx.fillRect(player.x - 20, player.y - 30, 40 * (player.health / 100), 5);
-      });
-    }
-    
-    // Draw bullets
-    if (state.bullets) {
-      ctx.fillStyle = '#ffff00';
-      state.bullets.forEach(bullet => {
-        ctx.beginPath();
-        ctx.arc(bullet.x, bullet.y, 3, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    }
-  }
-  
-  return {
-    onStateUpdate: (state) => {
-      render(state);
-    }
-  };
-}
-
-// SERVER-SIDE CODE
-const serverLogic = {
-  initialState: {
-    players: {},
-    bullets: [],
-    score: 0
-  },
-  moves: {
-    playerJoined: (state, payload, playerId) => {
-      state.players[playerId] = {
-        x: 400,
-        y: 300,
-        vx: 0,
-        vy: 0,
-        health: 100,
-        color: '#' + Math.floor(Math.random()*16777215).toString(16),
-        input: { up: false, down: false, left: false, right: false }
-      };
-    },
-    
-    input: (state, payload, playerId) => {
-      const player = state.players[playerId];
-      if (!player) return;
-      
-      // Store input state for processing in tick
-      player.input = payload;
-    },
-    
-    shoot: (state, payload, playerId) => {
-      const player = state.players[playerId];
-      if (!player) return;
-      
-      const angle = Math.atan2(payload.targetY - player.y, payload.targetX - player.x);
-      state.bullets.push({
-        id: Date.now() + Math.random(),
-        x: player.x,
-        y: player.y,
-        vx: Math.cos(angle) * 8,
-        vy: Math.sin(angle) * 8,
-        playerId: playerId
-      });
-    },
-    
-    tick: (state) => {
-      // Update player physics with acceleration
-      Object.values(state.players).forEach(player => {
-        const acceleration = 0.5;
-        const maxSpeed = 6;
-        const friction = 0.85;
-        
-        // Apply acceleration based on input
-        if (player.input.up) player.vy -= acceleration;
-        if (player.input.down) player.vy += acceleration;
-        if (player.input.left) player.vx -= acceleration;
-        if (player.input.right) player.vx += acceleration;
-        
-        // Apply friction
-        player.vx *= friction;
-        player.vy *= friction;
-        
-        // Clamp velocity to max speed
-        const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
-        if (speed > maxSpeed) {
-          player.vx = (player.vx / speed) * maxSpeed;
-          player.vy = (player.vy / speed) * maxSpeed;
-        }
-        
-        // Update position
-        player.x += player.vx;
-        player.y += player.vy;
-        
-        // Clamp to bounds with bounce
-        if (player.x < 15) {
-          player.x = 15;
-          player.vx *= -0.5;
-        }
-        if (player.x > 785) {
-          player.x = 785;
-          player.vx *= -0.5;
-        }
-        if (player.y < 15) {
-          player.y = 15;
-          player.vy *= -0.5;
-        }
-        if (player.y > 585) {
-          player.y = 585;
-          player.vy *= -0.5;
-        }
-      });
-      
-      // Update bullets continuously
-      state.bullets = state.bullets.filter(bullet => {
-        bullet.x += bullet.vx;
-        bullet.y += bullet.vy;
-        
-        // Remove bullets that are out of bounds
-        return bullet.x > 0 && bullet.x < 800 && bullet.y > 0 && bullet.y < 600;
-      });
-    }
-  }
-};`,
-    prompt: `You are creating a 2D shooter game. The base template includes canvas-based rendering with physics.
-
-Key considerations:
-- Define game mechanics (top-down, side-scroller, bullet hell, etc.)
-- Implement shooting mechanics and projectile behavior
-- Add enemy AI and spawn patterns
-- Handle collision detection between bullets, players, enemies, and obstacles
-- Implement scoring and health systems
-- Consider power-ups and special abilities
-
-DEFAULT MAPS AVAILABLE:
-You can use pre-made maps by importing from '@/lib/default-maps':
-
-1. MAP_2D_BASIC_SHOOTER - Mix of open space with rectangular obstacles
-   - 800x600 canvas
-   - Various sized cover and walls interspersed throughout
-   - 4 corner spawn points
-   
-2. MAP_2D_URBAN - Real-world style map with buildings and rooms
-   - 800x600 canvas  
-   - Buildings with doorways (gaps in walls)
-   - Mixed terrain (buildings, concrete barriers, bushes)
-   - 4 spawn points inside buildings
-
-To use a default map:
-\`\`\`javascript
-import { MAP_2D_BASIC_SHOOTER, generate2DMapCode } from '@/lib/default-maps';
-
-// In your client code:
-const obstacles = MAP_2D_BASIC_SHOOTER.obstacles;
-const spawnPoints = MAP_2D_BASIC_SHOOTER.spawnPoints;
-
-// Draw obstacles
-function drawObstacles(ctx) {
-  obstacles.forEach(obstacle => {
-    ctx.fillStyle = obstacle.color || '#555';
-    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-  });
-}
-
-// Check collision
-function checkObstacleCollision(x, y, radius) {
-  return obstacles.some(obstacle => {
-    return x + radius > obstacle.x &&
-           x - radius < obstacle.x + obstacle.width &&
-           y + radius > obstacle.y &&
-           y - radius < obstacle.y + obstacle.height;
-  });
-}
-
-// Spawn player
-function spawnPlayer(playerIndex) {
-  const spawn = spawnPoints[playerIndex % spawnPoints.length];
-  return { x: spawn.x, y: spawn.y };
-}
-\`\`\`
-
-OR create your own custom map with the same structure!
-
-Describe your 2D shooter and I'll implement it.`
-  },
-  
-  "3d-shooter": {
-    id: "3d-shooter",
-    name: "3D Shooter",
-    description: "Create first-person or third-person 3D shooters with Three.js",
-    libraries: ["three.js"],
-    baseCode: `// 3D Shooter Template
-// Uses Three.js for 3D rendering with optimizations
-
-import * as THREE from 'three';
-import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
-
-export function initGame(container) {
-  // Scene setup
-  const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x000000, 0, 750);
-  
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.y = 10;
-  
-  const renderer = new THREE.WebGLRenderer({ antialias: false }); // Disable for performance
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio
-  container.appendChild(renderer.domElement);
-  
-  // Controls
-  const controls = new PointerLockControls(camera, renderer.domElement);
-  
-  container.addEventListener('click', () => {
-    controls.lock();
-  });
-  
-  // Basic ground
-  const groundGeometry = new THREE.PlaneGeometry(2000, 2000, 100, 100);
-  groundGeometry.rotateX(-Math.PI / 2);
-  const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-  const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-  scene.add(ground);
-  
-  // Player movement
-  const velocity = new THREE.Vector3();
-  const direction = new THREE.Vector3();
-  const moveState = { forward: false, backward: false, left: false, right: false };
-  
-  document.addEventListener('keydown', (e) => {
-    switch(e.code) {
-      case 'KeyW': moveState.forward = true; break;
-      case 'KeyS': moveState.backward = true; break;
-      case 'KeyA': moveState.left = true; break;
-      case 'KeyD': moveState.right = true; break;
-    }
-  });
-  
-  document.addEventListener('keyup', (e) => {
-    switch(e.code) {
-      case 'KeyW': moveState.forward = false; break;
-      case 'KeyS': moveState.backward = false; break;
-      case 'KeyA': moveState.left = false; break;
-      case 'KeyD': moveState.right = false; break;
-    }
-  });
-  
-  // Shooting
-  const raycaster = new THREE.Raycaster();
-  const bullets = [];
-  
-  document.addEventListener('click', () => {
-    if (controls.isLocked) {
-      shoot();
-    }
-  });
-  
-  function shoot() {
-    const bullet = new THREE.Mesh(
-      new THREE.SphereGeometry(0.2, 8, 8),
-      new THREE.MeshBasicMaterial({ color: 0xff0000 })
-    );
-    bullet.position.copy(camera.position);
-    
-    const direction = new THREE.Vector3();
-    camera.getWorldDirection(direction);
-    bullet.velocity = direction.multiplyScalar(2);
-    
-    scene.add(bullet);
-    bullets.push(bullet);
-    
-    // Emit to server
-    socket.emit('game_action', {
-      roomId: currentRoom,
-      action: 'shoot',
-      payload: { 
-        position: camera.position.toArray(),
-        direction: direction.toArray()
-      }
-    });
-  }
-  
-  // Game loop
-  function animate() {
-    requestAnimationFrame(animate);
-    
-    // Update player movement
-    direction.z = Number(moveState.forward) - Number(moveState.backward);
-    direction.x = Number(moveState.right) - Number(moveState.left);
-    direction.normalize();
-    
-    if (moveState.forward || moveState.backward) velocity.z -= direction.z * 0.4;
-    if (moveState.left || moveState.right) velocity.x -= direction.x * 0.4;
-    
-    controls.moveRight(-velocity.x);
-    controls.moveForward(-velocity.z);
-    
-    velocity.x *= 0.9;
-    velocity.z *= 0.9;
-    
-    // Update bullets
-    bullets.forEach((bullet, i) => {
-      bullet.position.add(bullet.velocity);
-      if (bullet.position.length() > 500) {
-        scene.remove(bullet);
-        bullets.splice(i, 1);
-      }
-    });
-    
-    renderer.render(scene, camera);
-  }
-  
-  animate();
-  
-  return { scene, camera, renderer, controls };
-}
-
-// Server-side game state
-export const serverLogic = {
-  initialState: {
-    players: {},
-    bullets: [],
-    enemies: []
-  },
-  moves: {
-    move: (state, payload, playerId) => {
-      if (!state.players[playerId]) {
-        state.players[playerId] = { 
-          position: [0, 10, 0],
-          rotation: [0, 0, 0],
-          health: 100 
-        };
-      }
-      state.players[playerId].position = payload.position;
-      state.players[playerId].rotation = payload.rotation;
-    },
-    shoot: (state, payload, playerId) => {
-      state.bullets.push({
-        id: Date.now(),
-        playerId,
-        position: payload.position,
-        direction: payload.direction,
-        timestamp: Date.now()
-      });
-    }
-  }
-};`,
-    prompt: `You are creating a 3D shooter game. The base template includes Three.js with optimizations for performance.
-
-Key considerations:
-- Define perspective (first-person or third-person)
-- Implement 3D movement and camera controls
-- Add 3D models or use primitive geometries
-- Implement raycasting for shooting and hit detection
-- Optimize rendering (use instancing for many objects, frustum culling)
-- Add lighting and shadows carefully (performance impact)
-- Consider level design and collision detection
-
-Performance optimizations included:
-- Pixel ratio capped at 2
-- Antialiasing disabled by default
-- Fog for draw distance
-- Use MeshBasicMaterial for better performance
-
-DEFAULT MAPS AVAILABLE:
-You can use pre-made 3D maps by importing from '@/lib/default-maps':
-
-1. MAP_3D_AWP_STYLE - Symmetrical 1v1 sniper map (CS:GO AWP style)
-   - 100x200 units
-   - High ground platforms on each side
-   - Central divider with gap
-   - Long sightlines for sniper duels
-   
-2. MAP_3D_BASIC - Simple symmetrical arena
-   - 80x80 units
-   - Spawn walls for each player
-   - Center obstacles and cover
-   - Open middle for direct engagement
-   
-3. MAP_3D_KRUNKER - Bunny hop / fast movement map (Krunker.io style)
-   - 120x120 units
-   - Central elevated platform with ramps
-   - Corner platforms at different heights
-   - Optimized for fast strafing and jumping
-   - Multiple elevation levels
-
-To use a default map:
-\`\`\`javascript
-import * as THREE from 'three';
-import { MAP_3D_BASIC } from '@/lib/default-maps';
-
-// Create map geometry
-function createMapGeometry(scene) {
-  const mapObjects = [];
-  
-  MAP_3D_BASIC.objects.forEach(obj => {
-    const geometry = new THREE.BoxGeometry(obj.size[0], obj.size[1], obj.size[2]);
-    const material = new THREE.MeshBasicMaterial({ 
-      color: obj.color || '#555',
-      wireframe: false 
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(obj.position[0], obj.position[1], obj.position[2]);
-    mesh.userData.collidable = true;
-    mesh.userData.type = obj.type;
-    
-    scene.add(mesh);
-    mapObjects.push(mesh);
-  });
-  
-  return mapObjects;
-}
-
-// Spawn player at spawn point
-function spawnPlayer(playerIndex) {
-  const spawn = MAP_3D_BASIC.spawnPoints[playerIndex % MAP_3D_BASIC.spawnPoints.length];
-  camera.position.set(spawn.position[0], spawn.position[1], spawn.position[2]);
-  camera.rotation.y = spawn.rotation;
-}
-
-// Simple 3D collision check (AABB)
-function checkCollision(position, size) {
-  return MAP_3D_BASIC.objects.some(obj => {
-    // Allow walking under platforms
-    if (obj.type === 'platform' && position[1] < obj.position[1] + obj.size[1]/2) {
-      return false;
-    }
-    
-    return Math.abs(position[0] - obj.position[0]) < (size[0] + obj.size[0]) / 2 &&
-           Math.abs(position[1] - obj.position[1]) < (size[1] + obj.size[1]) / 2 &&
-           Math.abs(position[2] - obj.position[2]) < (size[2] + obj.size[2]) / 2;
-  });
-}
-\`\`\`
-
-OR create your own custom map with the same structure!
-
-Available Three.js features:
-- Geometries: BoxGeometry, SphereGeometry, etc.
-- Materials: MeshBasicMaterial (fast), MeshLambertMaterial, MeshPhongMaterial
-- Lights: AmbientLight, DirectionalLight, PointLight
-- Raycaster: for shooting and collision detection
-- PointerLockControls: for FPS controls
-
-Describe your 3D shooter and I'll implement it.`
-  },
-
   "tetris-duels": {
     id: "tetris-duels",
     name: "Tetris Duels",
@@ -1615,6 +715,520 @@ The tick action runs automatically for gravity. Modify tick speed for difficulty
 
 Describe your Tetris variant and I'll implement it:`
   },
+  "2d-shooter": {
+    id: "2d-shooter",
+    name: "2D Shooter",
+    description: "Build top-down or side-scrolling shooters with physics and multiplayer",
+    libraries: ["phaser"],
+    baseCode: `// 2D Shooter Template
+// Uses basic canvas for rendering
+
+// CLIENT-SIDE CODE
+function initGameClient(container, socket, roomId, emitAction) {
+  // Create canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = 800;
+  canvas.height = 600;
+  canvas.style.cssText = 'display: block; margin: 40px auto; background: #1a1a2e; border: 2px solid #16213e;';
+  container.appendChild(canvas);
+  
+  const ctx = canvas.getContext('2d');
+  
+  // Player controls
+  const keys = {};
+  document.addEventListener('keydown', (e) => {
+    keys[e.code] = true;
+  });
+  document.addEventListener('keyup', (e) => {
+    keys[e.code] = false;
+  });
+  
+  // Send input state continuously
+  setInterval(() => {
+    const input = {
+      up: keys['KeyW'] || keys['ArrowUp'] || false,
+      down: keys['KeyS'] || keys['ArrowDown'] || false,
+      left: keys['KeyA'] || keys['ArrowLeft'] || false,
+      right: keys['KeyD'] || keys['ArrowRight'] || false
+    };
+    
+    if (input.up || input.down || input.left || input.right) {
+      emitAction('input', input);
+    }
+  }, 16); // ~60fps
+  
+  // Shooting
+  canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    emitAction('shoot', { targetX: x, targetY: y });
+  });
+  
+  // Render function
+  function render(state) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw players
+    if (state.players) {
+      Object.entries(state.players).forEach(([id, player]) => {
+        ctx.fillStyle = player.color || '#00ff00';
+        ctx.beginPath();
+        ctx.arc(player.x, player.y, 15, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw health bar
+        ctx.fillStyle = '#ff0000';
+        ctx.fillRect(player.x - 20, player.y - 30, 40, 5);
+        ctx.fillStyle = '#00ff00';
+        ctx.fillRect(player.x - 20, player.y - 30, 40 * (player.health / 100), 5);
+      });
+    }
+    
+    // Draw bullets
+    if (state.bullets) {
+      ctx.fillStyle = '#ffff00';
+      state.bullets.forEach(bullet => {
+        ctx.beginPath();
+        ctx.arc(bullet.x, bullet.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+  }
+  
+  return {
+    onStateUpdate: (state) => {
+      render(state);
+    }
+  };
+}
+
+// SERVER-SIDE CODE
+const serverLogic = {
+  initialState: {
+    players: {},
+    bullets: [],
+    score: 0
+  },
+  moves: {
+    playerJoined: (state, payload, playerId) => {
+      state.players[playerId] = {
+        x: 400,
+        y: 300,
+        vx: 0,
+        vy: 0,
+        health: 100,
+        color: '#' + Math.floor(Math.random()*16777215).toString(16),
+        input: { up: false, down: false, left: false, right: false }
+      };
+    },
+    
+    input: (state, payload, playerId) => {
+      const player = state.players[playerId];
+      if (!player) return;
+      
+      // Store input state for processing in tick
+      player.input = payload;
+    },
+    
+    shoot: (state, payload, playerId) => {
+      const player = state.players[playerId];
+      if (!player) return;
+      
+      const angle = Math.atan2(payload.targetY - player.y, payload.targetX - player.x);
+      state.bullets.push({
+        id: Date.now() + Math.random(),
+        x: player.x,
+        y: player.y,
+        vx: Math.cos(angle) * 8,
+        vy: Math.sin(angle) * 8,
+        playerId: playerId
+      });
+    },
+    
+    tick: (state) => {
+      // Update player physics with acceleration
+      Object.values(state.players).forEach(player => {
+        const acceleration = 0.5;
+        const maxSpeed = 6;
+        const friction = 0.85;
+        
+        // Apply acceleration based on input
+        if (player.input.up) player.vy -= acceleration;
+        if (player.input.down) player.vy += acceleration;
+        if (player.input.left) player.vx -= acceleration;
+        if (player.input.right) player.vx += acceleration;
+        
+        // Apply friction
+        player.vx *= friction;
+        player.vy *= friction;
+        
+        // Clamp velocity to max speed
+        const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+        if (speed > maxSpeed) {
+          player.vx = (player.vx / speed) * maxSpeed;
+          player.vy = (player.vy / speed) * maxSpeed;
+        }
+        
+        // Update position
+        player.x += player.vx;
+        player.y += player.vy;
+        
+        // Clamp to bounds with bounce
+        if (player.x < 15) {
+          player.x = 15;
+          player.vx *= -0.5;
+        }
+        if (player.x > 785) {
+          player.x = 785;
+          player.vx *= -0.5;
+        }
+        if (player.y < 15) {
+          player.y = 15;
+          player.vy *= -0.5;
+        }
+        if (player.y > 585) {
+          player.y = 585;
+          player.vy *= -0.5;
+        }
+      });
+      
+      // Update bullets continuously
+      state.bullets = state.bullets.filter(bullet => {
+        bullet.x += bullet.vx;
+        bullet.y += bullet.vy;
+        
+        // Remove bullets that are out of bounds
+        return bullet.x > 0 && bullet.x < 800 && bullet.y > 0 && bullet.y < 600;
+      });
+    }
+  }
+};`,
+    prompt: `You are creating a 2D shooter game. The base template includes canvas-based rendering with physics.
+
+Key considerations:
+- Define game mechanics (top-down, side-scroller, bullet hell, etc.)
+- Implement shooting mechanics and projectile behavior
+- Add enemy AI and spawn patterns
+- Handle collision detection between bullets, players, enemies, and obstacles
+- Implement scoring and health systems
+- Consider power-ups and special abilities
+
+DEFAULT MAPS AVAILABLE:
+You can use pre-made maps by importing from '@/lib/default-maps':
+
+1. MAP_2D_BASIC_SHOOTER - Mix of open space with rectangular obstacles
+   - 800x600 canvas
+   - Various sized cover and walls interspersed throughout
+   - 4 corner spawn points
+   
+2. MAP_2D_URBAN - Real-world style map with buildings and rooms
+   - 800x600 canvas  
+   - Buildings with doorways (gaps in walls)
+   - Mixed terrain (buildings, concrete barriers, bushes)
+   - 4 spawn points inside buildings
+
+To use a default map:
+\`\`\`javascript
+import { MAP_2D_BASIC_SHOOTER, generate2DMapCode } from '@/lib/default-maps';
+
+// In your client code:
+const obstacles = MAP_2D_BASIC_SHOOTER.obstacles;
+const spawnPoints = MAP_2D_BASIC_SHOOTER.spawnPoints;
+
+// Draw obstacles
+function drawObstacles(ctx) {
+  obstacles.forEach(obstacle => {
+    ctx.fillStyle = obstacle.color || '#555';
+    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+  });
+}
+
+// Check collision
+function checkObstacleCollision(x, y, radius) {
+  return obstacles.some(obstacle => {
+    return x + radius > obstacle.x &&
+           x - radius < obstacle.x + obstacle.width &&
+           y + radius > obstacle.y &&
+           y - radius < obstacle.y + obstacle.height;
+  });
+}
+
+// Spawn player
+function spawnPlayer(playerIndex) {
+  const spawn = spawnPoints[playerIndex % spawnPoints.length];
+  return { x: spawn.x, y: spawn.y };
+}
+\`\`\`
+
+OR create your own custom map with the same structure!
+
+Describe your 2D shooter and I'll implement it.`
+  },
+  
+  "3d-shooter": {
+    id: "3d-shooter",
+    name: "3D Shooter",
+    description: "Create first-person or third-person 3D shooters with Three.js",
+    libraries: ["three.js"],
+    baseCode: `// 3D Shooter Template
+// Uses Three.js for 3D rendering with optimizations
+
+import * as THREE from 'three';
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
+
+export function initGame(container) {
+  // Scene setup
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x000000, 0, 750);
+  
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.y = 10;
+  
+  const renderer = new THREE.WebGLRenderer({ antialias: false }); // Disable for performance
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio
+  container.appendChild(renderer.domElement);
+  
+  // Controls
+  const controls = new PointerLockControls(camera, renderer.domElement);
+  
+  container.addEventListener('click', () => {
+    controls.lock();
+  });
+  
+  // Basic ground
+  const groundGeometry = new THREE.PlaneGeometry(2000, 2000, 100, 100);
+  groundGeometry.rotateX(-Math.PI / 2);
+  const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+  const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+  scene.add(ground);
+  
+  // Player movement
+  const velocity = new THREE.Vector3();
+  const direction = new THREE.Vector3();
+  const moveState = { forward: false, backward: false, left: false, right: false };
+  
+  document.addEventListener('keydown', (e) => {
+    switch(e.code) {
+      case 'KeyW': moveState.forward = true; break;
+      case 'KeyS': moveState.backward = true; break;
+      case 'KeyA': moveState.left = true; break;
+      case 'KeyD': moveState.right = true; break;
+    }
+  });
+  
+  document.addEventListener('keyup', (e) => {
+    switch(e.code) {
+      case 'KeyW': moveState.forward = false; break;
+      case 'KeyS': moveState.backward = false; break;
+      case 'KeyA': moveState.left = false; break;
+      case 'KeyD': moveState.right = false; break;
+    }
+  });
+  
+  // Shooting
+  const raycaster = new THREE.Raycaster();
+  const bullets = [];
+  
+  document.addEventListener('click', () => {
+    if (controls.isLocked) {
+      shoot();
+    }
+  });
+  
+  function shoot() {
+    const bullet = new THREE.Mesh(
+      new THREE.SphereGeometry(0.2, 8, 8),
+      new THREE.MeshBasicMaterial({ color: 0xff0000 })
+    );
+    bullet.position.copy(camera.position);
+    
+    const direction = new THREE.Vector3();
+    camera.getWorldDirection(direction);
+    bullet.velocity = direction.multiplyScalar(2);
+    
+    scene.add(bullet);
+    bullets.push(bullet);
+    
+    // Emit to server
+    socket.emit('game_action', {
+      roomId: currentRoom,
+      action: 'shoot',
+      payload: { 
+        position: camera.position.toArray(),
+        direction: direction.toArray()
+      }
+    });
+  }
+  
+  // Game loop
+  function animate() {
+    requestAnimationFrame(animate);
+    
+    // Update player movement
+    direction.z = Number(moveState.forward) - Number(moveState.backward);
+    direction.x = Number(moveState.right) - Number(moveState.left);
+    direction.normalize();
+    
+    if (moveState.forward || moveState.backward) velocity.z -= direction.z * 0.4;
+    if (moveState.left || moveState.right) velocity.x -= direction.x * 0.4;
+    
+    controls.moveRight(-velocity.x);
+    controls.moveForward(-velocity.z);
+    
+    velocity.x *= 0.9;
+    velocity.z *= 0.9;
+    
+    // Update bullets
+    bullets.forEach((bullet, i) => {
+      bullet.position.add(bullet.velocity);
+      if (bullet.position.length() > 500) {
+        scene.remove(bullet);
+        bullets.splice(i, 1);
+      }
+    });
+    
+    renderer.render(scene, camera);
+  }
+  
+  animate();
+  
+  return { scene, camera, renderer, controls };
+}
+
+// Server-side game state
+export const serverLogic = {
+  initialState: {
+    players: {},
+    bullets: [],
+    enemies: []
+  },
+  moves: {
+    move: (state, payload, playerId) => {
+      if (!state.players[playerId]) {
+        state.players[playerId] = { 
+          position: [0, 10, 0],
+          rotation: [0, 0, 0],
+          health: 100 
+        };
+      }
+      state.players[playerId].position = payload.position;
+      state.players[playerId].rotation = payload.rotation;
+    },
+    shoot: (state, payload, playerId) => {
+      state.bullets.push({
+        id: Date.now(),
+        playerId,
+        position: payload.position,
+        direction: payload.direction,
+        timestamp: Date.now()
+      });
+    }
+  }
+};`,
+    prompt: `You are creating a 3D shooter game. The base template includes Three.js with optimizations for performance.
+
+Key considerations:
+- Define perspective (first-person or third-person)
+- Implement 3D movement and camera controls
+- Add 3D models or use primitive geometries
+- Implement raycasting for shooting and hit detection
+- Optimize rendering (use instancing for many objects, frustum culling)
+- Add lighting and shadows carefully (performance impact)
+- Consider level design and collision detection
+
+Performance optimizations included:
+- Pixel ratio capped at 2
+- Antialiasing disabled by default
+- Fog for draw distance
+- Use MeshBasicMaterial for better performance
+
+DEFAULT MAPS AVAILABLE:
+You can use pre-made 3D maps by importing from '@/lib/default-maps':
+
+1. MAP_3D_AWP_STYLE - Symmetrical 1v1 sniper map (CS:GO AWP style)
+   - 100x200 units
+   - High ground platforms on each side
+   - Central divider with gap
+   - Long sightlines for sniper duels
+   
+2. MAP_3D_BASIC - Simple symmetrical arena
+   - 80x80 units
+   - Spawn walls for each player
+   - Center obstacles and cover
+   - Open middle for direct engagement
+   
+3. MAP_3D_KRUNKER - Bunny hop / fast movement map (Krunker.io style)
+   - 120x120 units
+   - Central elevated platform with ramps
+   - Corner platforms at different heights
+   - Optimized for fast strafing and jumping
+   - Multiple elevation levels
+
+To use a default map:
+\`\`\`javascript
+import * as THREE from 'three';
+import { MAP_3D_BASIC } from '@/lib/default-maps';
+
+// Create map geometry
+function createMapGeometry(scene) {
+  const mapObjects = [];
+  
+  MAP_3D_BASIC.objects.forEach(obj => {
+    const geometry = new THREE.BoxGeometry(obj.size[0], obj.size[1], obj.size[2]);
+    const material = new THREE.MeshBasicMaterial({ 
+      color: obj.color || '#555',
+      wireframe: false 
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(obj.position[0], obj.position[1], obj.position[2]);
+    mesh.userData.collidable = true;
+    mesh.userData.type = obj.type;
+    
+    scene.add(mesh);
+    mapObjects.push(mesh);
+  });
+  
+  return mapObjects;
+}
+
+// Spawn player at spawn point
+function spawnPlayer(playerIndex) {
+  const spawn = MAP_3D_BASIC.spawnPoints[playerIndex % MAP_3D_BASIC.spawnPoints.length];
+  camera.position.set(spawn.position[0], spawn.position[1], spawn.position[2]);
+  camera.rotation.y = spawn.rotation;
+}
+
+// Simple 3D collision check (AABB)
+function checkCollision(position, size) {
+  return MAP_3D_BASIC.objects.some(obj => {
+    // Allow walking under platforms
+    if (obj.type === 'platform' && position[1] < obj.position[1] + obj.size[1]/2) {
+      return false;
+    }
+    
+    return Math.abs(position[0] - obj.position[0]) < (size[0] + obj.size[0]) / 2 &&
+           Math.abs(position[1] - obj.position[1]) < (size[1] + obj.size[1]) / 2 &&
+           Math.abs(position[2] - obj.position[2]) < (size[2] + obj.size[2]) / 2;
+  });
+}
+\`\`\`
+
+OR create your own custom map with the same structure!
+
+Available Three.js features:
+- Geometries: BoxGeometry, SphereGeometry, etc.
+- Materials: MeshBasicMaterial (fast), MeshLambertMaterial, MeshPhongMaterial
+- Lights: AmbientLight, DirectionalLight, PointLight
+- Raycaster: for shooting and collision detection
+- PointerLockControls: for FPS controls
+
+Describe your 3D shooter and I'll implement it.`
+  },
 
   "open-ended": {
     id: "open-ended",
@@ -1702,6 +1316,390 @@ Common libraries you might want to use:
 Note: Open-ended games may require more iteration and debugging than template-based games.
 
 Describe your game concept in detail and I'll implement it.`
+  },
+  "chess-variant": {
+    id: "chess-variant",
+    name: "Chess Variant",
+    description: "Create custom chess variants with modified rules, pieces, or board layouts",
+    libraries: ["chess.js", "chessboard.js"],
+    baseCode: `// Chess Variant Template
+// Uses chessboard.js for drag-and-drop UI and chess.js for move validation
+
+// CLIENT-SIDE CODE
+function initGameClient(container, socket, roomId, emitAction) {
+  // Load required libraries
+  const loadScript = (src) => {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  };
+  
+  const loadCSS = (href) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+  };
+  
+  // Load chessboard.js CSS
+  loadCSS('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css');
+  
+  const boardContainer = document.createElement('div');
+  boardContainer.id = 'chess-board';
+  boardContainer.style.cssText = 'width: 400px; margin: 40px auto;';
+  container.appendChild(boardContainer);
+  
+  const statusDiv = document.createElement('div');
+  statusDiv.id = 'chess-status';
+  statusDiv.style.cssText = 'text-align: center; margin-top: 20px; font-size: 18px; color: #fff;';
+  container.appendChild(statusDiv);
+  
+  const waitingDiv = document.createElement('div');
+  waitingDiv.id = 'waiting-message';
+  waitingDiv.style.cssText = 'text-align: center; margin-top: 20px; font-size: 16px; color: #888;';
+  waitingDiv.textContent = 'Loading chess libraries...';
+  container.appendChild(waitingDiv);
+  
+  let board = null;
+  let game = null;
+  let myColor = null;
+  let librariesLoaded = false;
+  
+  // Function to load libraries with retry
+  function loadLibraries() {
+    waitingDiv.innerHTML = 'Loading chess libraries...';
+    
+    return Promise.all([
+      loadScript('https://code.jquery.com/jquery-3.7.1.min.js'),
+      loadScript('https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js'),
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js')
+    ]).then(() => {
+      librariesLoaded = true;
+      waitingDiv.textContent = 'Waiting for opponent...';
+      
+      // Initialize chess.js
+      game = new Chess();
+    
+    function onDragStart(source, piece, position, orientation) {
+      // Do not pick up pieces if the game is over
+      if (game.game_over()) return false;
+      
+      // Only allow moves if player has a color assigned
+      if (!myColor || myColor === 'spectator') return false;
+      
+      // Only pick up pieces for the side to move
+      if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+          (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+        return false;
+      }
+      
+      // Only allow player to move their own pieces
+      if ((myColor === 'white' && piece.search(/^b/) !== -1) ||
+          (myColor === 'black' && piece.search(/^w/) !== -1)) {
+        return false;
+      }
+    }
+    
+    function onDrop(source, target) {
+      // See if the move is legal
+      const move = game.move({
+        from: source,
+        to: target,
+        promotion: 'q' // Always promote to queen for simplicity
+      });
+      
+      // Illegal move
+      if (move === null) return 'snapback';
+      
+      // Send move to server
+      emitAction('move', { from: source, to: target, promotion: 'q' });
+    }
+    
+    function onSnapEnd() {
+      // Update board position after piece snap
+      // This handles castling, en passant, pawn promotion
+      board.position(game.fen());
+    }
+    
+    function updateStatus(playerColors) {
+      let status = '';
+      const moveColor = game.turn() === 'w' ? 'White' : 'Black';
+      const myPlayerColor = playerColors ? playerColors[socket.id] : null;
+      
+      // Checkmate?
+      if (game.in_checkmate()) {
+        const winner = game.turn() === 'w' ? 'Black' : 'White';
+        status = 'Game over, ' + winner + ' wins by checkmate!';
+      }
+      // Draw?
+      else if (game.in_draw()) {
+        status = 'Game over, drawn position';
+      }
+      // Stalemate?
+      else if (game.in_stalemate()) {
+        status = 'Game over, stalemate';
+      }
+      // Threefold repetition?
+      else if (game.in_threefold_repetition()) {
+        status = 'Game over, draw by threefold repetition';
+      }
+      // Insufficient material?
+      else if (game.insufficient_material()) {
+        status = 'Game over, draw by insufficient material';
+      }
+      // Game still on
+      else {
+        status = moveColor + ' to move';
+        
+        if (myPlayerColor === 'spectator') {
+          status += ' (You are spectating)';
+        } else if (myPlayerColor) {
+          status += ' (You are ' + myPlayerColor + ')';
+        }
+        
+        // Check?
+        if (game.in_check()) {
+          status += ' - ' + moveColor + ' is in check!';
+        }
+      }
+      
+      statusDiv.textContent = status;
+    }
+    
+    const config = {
+      draggable: true,
+      position: 'start',
+      onDragStart: onDragStart,
+      onDrop: onDrop,
+      onSnapEnd: onSnapEnd,
+      pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+    };
+    
+    board = Chessboard('chess-board', config);
+    updateStatus({});
+    
+    // Handle state updates - now that libraries are loaded
+    return (state) => {
+      console.log('Chess onStateUpdate called with:', state);
+      
+      if (!state || !state.board) {
+        console.error('Invalid state received:', state);
+        return;
+      }
+      
+      try {
+        // Load position into chess.js
+        game.load(state.board);
+        
+        // Update board display
+        board.position(state.board);
+        
+        const playerCount = state.playerColors ? Object.keys(state.playerColors).length : 0;
+        
+        if (playerCount < 2) {
+          waitingDiv.style.display = 'block';
+          waitingDiv.textContent = 'Waiting for opponent...';
+        } else {
+          waitingDiv.style.display = 'none';
+        }
+        
+        if (state.playerColors && state.playerColors[socket.id]) {
+          const newColor = state.playerColors[socket.id];
+          
+          if (newColor === 'spectator') {
+            myColor = 'spectator';
+          } else if (!myColor || myColor !== newColor) {
+            myColor = newColor;
+            
+            // Flip board for black player
+            const orientation = myColor === 'black' ? 'black' : 'white';
+            board.orientation(orientation);
+          }
+        }
+        
+        updateStatus(state.playerColors);
+      } catch (e) {
+        console.error('Error updating state:', e, e.stack);
+      }
+    };
+    }).catch(err => {
+      console.error('Failed to load chess libraries:', err);
+      waitingDiv.innerHTML = \`
+        <div style="color: #f44;">Error loading chess libraries.</div>
+        <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+          Refresh Page
+        </button>
+      \`;
+      return null;
+    });
   }
+  
+  // Create game instance with async initialization
+  const gameInstance = {
+    _ready: false,
+    _pendingStates: [],
+    onStateUpdate: function(state) {
+      if (!this._ready) {
+        console.log('Game not ready yet, queuing state');
+        this._pendingStates.push(state);
+      }
+      // Once ready, this function will be replaced
+    }
+  };
+  
+  // Load libraries and initialize
+  loadLibraries().then(stateUpdateFn => {
+    if (stateUpdateFn) {
+      gameInstance._ready = true;
+      gameInstance.onStateUpdate = stateUpdateFn;
+      
+      // Apply any pending states that came in while loading
+      if (gameInstance._pendingStates && gameInstance._pendingStates.length > 0) {
+        console.log('Applying', gameInstance._pendingStates.length, 'pending states');
+        const lastState = gameInstance._pendingStates[gameInstance._pendingStates.length - 1];
+        gameInstance.onStateUpdate(lastState);
+        gameInstance._pendingStates = [];
+      }
+    }
+  });
+  
+  console.log('Chess game instance created');
+  return gameInstance;
+}
+
+// SERVER-SIDE CODE
+// Note: Chess class is provided by the server sandbox context
+const serverLogic = {
+  initialState: {
+    board: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    players: {},
+    playerColors: {},
+    moveHistory: []
+  },
+  moves: {
+    playerJoined: (state, payload, playerId) => {
+      // Don't reassign colors if player already has one (reconnection)
+      if (state.playerColors[playerId]) {
+        console.log('Player', playerId, 'rejoining with existing color:', state.playerColors[playerId]);
+        return;
+      }
+      
+      const existingPlayerCount = Object.keys(state.playerColors).length;
+      
+      if (existingPlayerCount === 0) {
+        state.playerColors[playerId] = Math.random() < 0.5 ? 'white' : 'black';
+      } else if (existingPlayerCount === 1) {
+        const firstPlayerColor = Object.values(state.playerColors)[0];
+        state.playerColors[playerId] = firstPlayerColor === 'white' ? 'black' : 'white';
+      } else {
+        state.playerColors[playerId] = 'spectator';
+      }
+      
+      console.log('Player', playerId, 'assigned color:', state.playerColors[playerId]);
+    },
+    
+    move: (state, payload, playerId) => {
+      const playerColor = state.playerColors[playerId];
+      
+      if (playerColor === 'spectator') {
+        console.log('Spectator attempted to move');
+        return;
+      }
+      
+      // Initialize chess.js with current board state
+      const game = new Chess(state.board);
+      
+      // Check if it's the player's turn
+      const currentTurn = game.turn(); // 'w' or 'b'
+      const turnColor = currentTurn === 'w' ? 'white' : 'black';
+      
+      if (playerColor !== turnColor) {
+        console.log('Not player turn:', playerColor, 'vs', turnColor);
+        return;
+      }
+      
+      // Attempt the move
+      try {
+        const move = game.move({
+          from: payload.from,
+          to: payload.to,
+          promotion: payload.promotion || 'q'
+        });
+        
+        if (move === null) {
+          console.log('Illegal move attempted:', payload);
+          return;
+        }
+        
+        console.log('Legal move executed:', move);
+        
+        // Update state with new FEN
+        state.board = game.fen();
+        
+        // Add to move history
+        state.moveHistory.push({
+          from: payload.from,
+          to: payload.to,
+          promotion: payload.promotion,
+          san: move.san,
+          player: playerId,
+          timestamp: Date.now()
+        });
+        
+        console.log('New board state:', state.board);
+        console.log('Game over:', game.game_over());
+        console.log('In check:', game.in_check());
+        console.log('In checkmate:', game.in_checkmate());
+        console.log('In draw:', game.in_draw());
+        
+      } catch (e) {
+        console.error('Error executing move:', e);
+      }
+    }
+  }
+};`,
+    prompt: `You are creating a chess variant using chessboard.js and chess.js.
+
+LIBRARIES AVAILABLE:
+- chessboard.js: Drag-and-drop chess board UI (https://chessboardjs.com/)
+- chess.js: Full chess move validation and game logic (https://github.com/jhlywa/chess.js)
+
+STRUCTURE:
+The template already includes:
+✅ Drag-and-drop board with piece images
+✅ Complete legal move validation
+✅ Turn management and color assignment
+✅ Game end detection (checkmate, stalemate, draw)
+✅ Spectator support
+✅ Board orientation (flipped for black player)
+
+TO CUSTOMIZE YOUR VARIANT:
+1. Modify the initial FEN string in initialState.board
+2. Customize move validation in the server's move handler
+3. Add special rules or win conditions
+4. Modify the onDragStart function for custom piece movement rules
+5. add any other ui or customizations you want
+
+EXAMPLE CUSTOMIZATIONS:
+- Chess960: Randomize starting position FEN
+- Three-check: Track checks in state, win after 3 checks
+- Atomic: Add explosion logic when pieces are captured
+- Fog of War: Filter visible pieces in onStateUpdate based on player position
+
+The Chess class (from chess.js) provides methods like:
+- game.move({ from, to, promotion }) - Make a move
+- game.in_check() - Check if current player is in check
+- game.in_checkmate() - Check if current player is checkmated
+- game.game_over() - Check if game is over
+- game.fen() - Get current position as FEN string
+- game.load(fen) - Load a position from FEN
+- game.turn() - Get current turn ('w' or 'b')
+
+User's chess variant description:`
+  },
 };
 

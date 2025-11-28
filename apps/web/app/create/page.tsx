@@ -502,23 +502,41 @@ export default function CreateGame() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {Object.values(GAME_TEMPLATES).map((template) => (
+            {Object.values(GAME_TEMPLATES).map((template) => {
+              // Map template IDs to background images
+              const backgroundImages: Record<GameTemplate, string> = {
+                "chess-variant": "/game-images/chess-default.png",
+                "2d-shooter": "/game-images/2d-shooter-default.png",
+                "3d-shooter": "/game-images/3d-shooter-default.png",
+                "tetris-duels": "/game-images/tetris-default.png",
+                "open-ended": "/game-images/open-ended-default.jpg",
+              };
+
+              return (
               <button
                 key={template.id}
                 onClick={() => handleTemplateSelect(template.id)}
-                className="group relative p-6 bg-gray-900 border border-gray-800 rounded-xl text-left hover:border-purple-500 transition-all"
+                  className="group relative p-6 bg-gray-900 border border-gray-800 rounded-xl text-left hover:border-purple-500 transition-all overflow-hidden"
               >
+                  {/* Background Image with low opacity */}
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity"
+                    style={{ backgroundImage: `url(${backgroundImages[template.id]})` }}
+                  />
+                  
+                  {/* Content overlay */}
+                  <div className="relative z-10">
                 <h3 className="text-2xl font-bold mb-2 group-hover:text-purple-400 transition-colors">
                   {template.name}
                 </h3>
-                <p className="text-gray-400 mb-4">{template.description}</p>
+                    <p className="text-gray-200 mb-4">{template.description}</p>
                 
                 {template.libraries.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {template.libraries.map((lib) => (
                       <span
                         key={lib}
-                        className="px-2 py-1 bg-gray-800 text-gray-300 text-xs rounded"
+                            className="px-2 py-1 bg-gray-800/80 text-gray-300 text-xs rounded backdrop-blur-sm"
                       >
                         {lib}
                       </span>
@@ -532,8 +550,10 @@ export default function CreateGame() {
                     <span>May require more iteration</span>
                   </div>
                 )}
+                  </div>
               </button>
-            ))}
+              );
+            })}
           </div>
         </div>
         </div>
@@ -836,7 +856,7 @@ export default function CreateGame() {
             <div className="flex-1 bg-black border border-gray-800 rounded overflow-hidden">
               {showPreview && generatedCode && previewGameName ? (
                 <iframe
-                  src={`${getGameServerUrl()}/game/${previewGameName}/${previewRoomId}?hideUI=true`}
+                  src={`${getGameServerUrl()}/game/${encodeURIComponent(previewGameName)}/${encodeURIComponent(previewRoomId)}?hideUI=true`}
                   className="w-full h-full border-0"
                   title="Game Preview"
                   key={previewRoomId} // Force reload on room change
