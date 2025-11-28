@@ -513,19 +513,13 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
           },
         };
 
-        const isReasoningModel =
-          selectedModel.startsWith("o") || selectedModel.startsWith("gpt-5");
-
         const responseStream = await client.responses.stream({
           model: selectedModel,
           input: inputMessages,
           text: {
             format: structuredFormat,
           },
-          max_output_tokens: 16000,
-          temperature: isReasoningModel ? undefined : 0.7,
-          reasoning: isReasoningModel ? { effort: "medium" } : undefined,
-          safety_identifier: effectiveUserId || undefined,
+          reasoning: { effort: "medium"}
         });
 
         let aggregatedJson = "";
@@ -536,6 +530,7 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
             case "response.output_text.delta": {
               if (event.delta) {
                 aggregatedJson += event.delta;
+                console.log("event.delta", event.delta);
                 send({ type: "token", delta: event.delta });
               }
               break;
@@ -543,6 +538,7 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
             case "response.reasoning_text.delta": {
               if (event.delta) {
                 streamedReasoning += event.delta;
+                console.log("streamedReasoning", streamedReasoning);
                 send({ type: "reasoning", delta: event.delta });
               }
               break;

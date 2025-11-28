@@ -6,7 +6,7 @@ import { Send, AlertCircle, Save, Play, Code, Eye } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import { useAuthInfo } from "@propelauth/react";
 import { Game } from "@/lib/types";
-import { getGameServerUrl, getGameUrl } from "@/lib/config";
+import { getGameServerUrl, getGameUrl, safeEncodeURIComponent } from "@/lib/config";
 
 export default function SandboxPage() {
   const params = useParams();
@@ -96,7 +96,7 @@ export default function SandboxPage() {
         body: JSON.stringify({
           description: newMessage,
           existingCode: gameCode,
-          model: "gpt-4o",
+          model: "gpt-5",
           userId: user?.userId,
         }),
       });
@@ -433,7 +433,7 @@ export default function SandboxPage() {
               {showPreview ? (
                 <iframe
                   ref={iframeRef}
-                  src={`${getGameServerUrl()}/game/${gameName}/${previewRoomId}`}
+                  src={`${getGameServerUrl()}/game/${safeEncodeURIComponent(gameName)}/${safeEncodeURIComponent(previewRoomId)}`}
                   className="w-full h-full border-0"
                   title="Game Preview"
                   key={previewRoomId}

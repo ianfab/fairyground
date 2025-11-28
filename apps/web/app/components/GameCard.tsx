@@ -68,7 +68,7 @@ export function GameCard({
 
   return (
     <a
-      href={`/play/${encodeURIComponent(gameName)}`}
+      href={`/play/${gameName}`}
       className="group block p-6 rounded-xl transition-all relative text-white"
       style={{ background: gradientMap[gradient] || gradient }}
     >

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { getGameServerUrl } from "@/lib/config";
+import { getGameServerUrl, safeEncodeURIComponent } from "@/lib/config";
 import { useAuthSafe } from "@/lib/useAuthSafe";
 
 interface MatchmakingProps {
@@ -56,7 +56,7 @@ export function Matchmaking({ gameName, onCancel }: MatchmakingProps) {
               setTimeout(() => {
                 const userId = authInfo.user?.userId || '';
                 const username = authInfo.user?.username || authInfo.user?.email || '';
-                let url = `${getGameServerUrl()}/game/${encodeURIComponent(gameName)}/${encodeURIComponent(data.roomId)}`;
+                let url = `${getGameServerUrl()}/game/${safeEncodeURIComponent(gameName)}/${safeEncodeURIComponent(data.roomId)}`;
 
                 // Build query parameters
                 const params = new URLSearchParams();

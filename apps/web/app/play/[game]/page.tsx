@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { getGameServerUrl } from "@/lib/config";
+import { getGameServerUrl, safeEncodeURIComponent } from "@/lib/config";
 import { Matchmaking } from "@/app/components/Matchmaking";
 import { GameLeaderboard } from "@/app/components/GameLeaderboard";
 import { useAuthSafe } from "@/lib/useAuthSafe";
@@ -23,7 +23,7 @@ export default function GameModePage() {
     // Navigate to the game server with the room name, user ID, and username
     const userId = authInfo.user?.userId || '';
     const username = authInfo.user?.username || authInfo.user?.email || '';
-    let url = `${getGameServerUrl()}/game/${encodeURIComponent(gameName)}/${encodeURIComponent(roomName)}`;
+    let url = `${getGameServerUrl()}/game/${safeEncodeURIComponent(gameName)}/${safeEncodeURIComponent(roomName)}`;
     if (userId) {
       url += `?userId=${encodeURIComponent(userId)}`;
       if (username) {

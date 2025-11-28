@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getGameServerUrl } from "@/lib/config";
+import { getGameServerUrl, safeEncodeURIComponent } from "@/lib/config";
 
 interface LeaderboardEntry {
   rank: number;
@@ -31,12 +31,9 @@ export function GameLeaderboard({ gameName }: GameLeaderboardProps) {
       try {
         setLoading(true);
 
-        // Decode the game name if it's already URL encoded
-        const decodedGameName = gameName.includes('%20') ? decodeURIComponent(gameName) : gameName;
         console.log('[GameLeaderboard] Raw gameName from props:', JSON.stringify(gameName));
-        console.log('[GameLeaderboard] Decoded gameName:', JSON.stringify(decodedGameName));
 
-        const url = `${getGameServerUrl()}/api/elo/leaderboard/${encodeURIComponent(decodedGameName)}?limit=10`;
+        const url = `${getGameServerUrl()}/api/elo/leaderboard/${safeEncodeURIComponent(gameName)}?limit=10`;
         console.log('[GameLeaderboard] Final URL:', url);
 
         const response = await fetch(url);

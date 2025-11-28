@@ -856,7 +856,21 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     // Setup share button
     document.getElementById('share-btn').addEventListener('click', () => {
       const roomName = document.getElementById('current-room').textContent;
-      const shareUrl = window.location.origin + '/game/' + encodeURIComponent('${gameName}') + '/' + encodeURIComponent(roomName);
+      
+      // Safe encode function to prevent double encoding
+      const safeEncode = (str) => {
+        const isEncoded = /%[0-9A-Fa-f]{2}/.test(str);
+        if (isEncoded) {
+          try {
+            return encodeURIComponent(decodeURIComponent(str));
+          } catch (e) {
+            return encodeURIComponent(str);
+          }
+        }
+        return encodeURIComponent(str);
+      };
+      
+      const shareUrl = window.location.origin + '/game/' + safeEncode('${gameName}') + '/' + safeEncode(roomName);
       navigator.clipboard.writeText(shareUrl).then(() => {
         const btn = document.getElementById('share-btn');
         btn.textContent = '✅ Link Copied!';

@@ -48,7 +48,7 @@ export function CommunityGameCard({ game }: CommunityGameCardProps) {
   return (
     <div
       className="p-6 rounded-xl border border-gray-800 bg-gray-900/30 hover:border-purple-500/50 transition-all relative cursor-pointer"
-      onClick={() => router.push(`/play/${encodeURIComponent(game.name)}`)}
+      onClick={() => router.push(`/play/${game.name}`)}
       suppressHydrationWarning
     >
       {/* Subtle stats in top-right corner */}

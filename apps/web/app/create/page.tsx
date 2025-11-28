@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { GAME_TEMPLATES, GameTemplate } from "@/lib/game-templates";
-import { getGameUrl, getGameServerUrl } from "@/lib/config";
+import { getGameUrl, getGameServerUrl, safeEncodeURIComponent } from "@/lib/config";
 import { AlertCircle, Code, Eye, Send } from "lucide-react";
 import { useAuthInfo, useRedirectFunctions } from "@propelauth/react";
 import dynamic from 'next/dynamic';
@@ -14,6 +14,15 @@ const Editor = dynamic(
   () => import('@monaco-editor/react'),
   { ssr: false }
 );
+
+interface GenerationResultPayload {
+  code: string;
+  explanation?: string;
+  reasoning?: string;
+  suggestedName?: string;
+  suggestedDescription?: string;
+  type?: string;
+}
 
 export default function CreateGame() {
   const router = useRouter();
@@ -45,7 +54,7 @@ export default function CreateGame() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [gameDescription, setGameDescription] = useState("");
-  const [selectedModel, setSelectedModel] = useState("gpt-4o");
+  const [selectedModel, setSelectedModel] = useState("gpt-5");
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -62,6 +71,21 @@ export default function CreateGame() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [chatMessages, setChatMessages] = useState<Array<{ role: string; content: string; explanation?: string; reasoning?: string }>>([]);
   const [userMessage, setUserMessage] = useState("");
+  const [liveModelStream, setLiveModelStream] = useState("");
+  const [liveReasoningStream, setLiveReasoningStream] = useState("");
+
+  // Debug: log stream changes
+  useEffect(() => {
+    if (liveModelStream) {
+      console.log("[State] liveModelStream updated, length:", liveModelStream.length, "first 100 chars:", liveModelStream.substring(0, 100));
+    }
+  }, [liveModelStream]);
+
+  useEffect(() => {
+    if (liveReasoningStream) {
+      console.log("[State] liveReasoningStream updated, length:", liveReasoningStream.length, "first 100 chars:", liveReasoningStream.substring(0, 100));
+    }
+  }, [liveReasoningStream]);
 
   // Debounced code change handler
   const handleCodeChange = useCallback((value: string | undefined) => {
@@ -176,6 +200,169 @@ export default function CreateGame() {
     setSelectedTemplate(templateId);
   };
 
+  const consumeEventStream = async (response: Response): Promise<GenerationResultPayload> => {
+    if (!response.body) {
+      throw new Error("Streaming is not supported in this browser.");
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let finalPayload: (GenerationResultPayload & { type?: string }) | null = null;
+    let streamedText = "";
+    let streamedReasoning = "";
+
+    const processBuffer = () => {
+      let boundary = buffer.indexOf("\n\n");
+      while (boundary !== -1) {
+        const chunk = buffer.slice(0, boundary);
+        buffer = buffer.slice(boundary + 2);
+        if (chunk.startsWith("data:")) {
+          const data = chunk.slice(5).trim();
+          if (data && data !== "[DONE]") {
+            let parsed: any;
+            try {
+              parsed = JSON.parse(data);
+            } catch (err) {
+              console.error("Failed to parse stream chunk", err);
+              boundary = buffer.indexOf("\n\n");
+              continue;
+            }
+
+            switch (parsed.type) {
+              case "token":
+                if (parsed.delta) {
+                  streamedText += parsed.delta;
+                  console.log("[Stream] Token delta:", parsed.delta, "Total length:", streamedText.length);
+                  setLiveModelStream(streamedText);
+                }
+                break;
+              case "reasoning":
+                if (parsed.delta) {
+                  streamedReasoning += parsed.delta;
+                  console.log("[Stream] Reasoning delta:", parsed.delta, "Total length:", streamedReasoning.length);
+                  setLiveReasoningStream(streamedReasoning);
+                }
+                break;
+              case "result":
+                finalPayload = parsed;
+                break;
+              case "error":
+                throw new Error(parsed.error?.message || "Model error");
+            }
+          }
+        }
+        boundary = buffer.indexOf("\n\n");
+      }
+    };
+
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (value) {
+          buffer += decoder.decode(value, { stream: true });
+          processBuffer();
+        }
+        if (done) {
+          buffer += decoder.decode();
+          processBuffer();
+          break;
+        }
+      }
+    } finally {
+      reader.releaseLock();
+      // Don't clear the streams here - let them stay visible until the next generation
+      // setLiveModelStream("");
+      // setLiveReasoningStream("");
+    }
+
+    if (!finalPayload) {
+      throw new Error("Stream ended without a result payload.");
+    }
+
+    return finalPayload as GenerationResultPayload;
+  };
+
+  const parseLLMResponse = async (response: Response): Promise<GenerationResultPayload> => {
+    if (!response.ok) {
+      let errorMessage = "Failed to generate game";
+      const contentType = response.headers.get("content-type") || "";
+      try {
+        if (contentType.includes("application/json")) {
+          const data = await response.json();
+          errorMessage = data?.error || errorMessage;
+        } else {
+          const text = await response.text();
+          if (text) {
+            errorMessage = text;
+          }
+        }
+      } catch {
+        // ignore parsing errors
+      }
+      throw new Error(errorMessage);
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    console.log("[parseLLMResponse] Content-Type:", contentType);
+    console.log("[parseLLMResponse] Selected model:", selectedModel);
+    
+    if (contentType.includes("text/event-stream")) {
+      console.log("[parseLLMResponse] Using event stream consumption");
+      return consumeEventStream(response);
+    }
+
+    console.log("[parseLLMResponse] Using regular JSON parse");
+    return (await response.json()) as GenerationResultPayload;
+  };
+
+  const applyGenerationResult = async (
+    result: GenerationResultPayload,
+    options: { mode: "create" | "edit" }
+  ) => {
+    if (!result.code) {
+      throw new Error("Model did not return any code.");
+    }
+
+    const explanationText = result.explanation || "";
+    const reasoningText = result.reasoning || "";
+
+    setGeneratedCode(result.code);
+    setExplanation(explanationText);
+    setReasoning(reasoningText);
+
+    if (options.mode === "create") {
+      if (result.suggestedName && !name) {
+        setName(result.suggestedName);
+      }
+      if (result.suggestedDescription && !description) {
+        setDescription(result.suggestedDescription);
+      }
+
+      const previewName =
+        result.suggestedName ||
+        `preview-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+      await shipGameInPreviewMode(previewName, result.suggestedDescription || "", result.code);
+      setShowPreview(true);
+    } else {
+      setChatMessages(prev => [
+        ...prev,
+        {
+          role: "assistant",
+          content: explanationText || "I've updated the code based on your request.",
+          explanation: explanationText,
+          reasoning: reasoningText,
+        },
+      ]);
+
+      if (previewGameName) {
+        await updatePreviewGame(previewGameName, description || "", result.code);
+        setPreviewRoomId(`room-${Math.random().toString(36).substring(7)}`);
+      }
+    }
+  };
+
   const handleGenerateGame = async () => {
     if (!selectedTemplate || !gameDescription) {
       setError("Please select a template and describe your game");
@@ -184,6 +371,8 @@ export default function CreateGame() {
 
     setGeneratingCode(true);
     setError("");
+    setLiveModelStream("");
+    setLiveReasoningStream("");
 
     try {
       const res = await fetch("/api/generate-game", {
@@ -198,25 +387,8 @@ export default function CreateGame() {
         }),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to generate game");
-      }
-
-      const { code, suggestedName, suggestedDescription, explanation, reasoning } = await res.json();
-      
-      if (suggestedName && !name) setName(suggestedName);
-      if (suggestedDescription && !description) setDescription(suggestedDescription);
-      
-      setGeneratedCode(code);
-      setExplanation(explanation || "");
-      setReasoning(reasoning || "");
-      
-      // Immediately ship in preview mode
-      const previewName = suggestedName || `preview-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-      await shipGameInPreviewMode(previewName, suggestedDescription || "", code);
-      
-      setShowPreview(true); // Default to showing preview when code is generated
+      const result = await parseLLMResponse(res);
+      await applyGenerationResult(result, { mode: "create" });
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -234,6 +406,8 @@ export default function CreateGame() {
     setChatMessages(prev => [...prev, { role: "user", content: newMessage }]);
     setGeneratingCode(true);
     setError("");
+    setLiveModelStream("");
+    setLiveReasoningStream("");
 
     try {
       const response = await fetch("/api/generate-game", {
@@ -247,31 +421,8 @@ export default function CreateGame() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to generate code");
-      }
-
-      const data = await response.json();
-
-      // Add AI response to chat with explanation and reasoning
-      setChatMessages(prev => [...prev, {
-        role: "assistant",
-        content: data.explanation || "I've updated the code based on your request.",
-        explanation: data.explanation,
-        reasoning: data.reasoning
-      }]);
-
-      // Update the code
-      setGeneratedCode(data.code);
-      setExplanation(data.explanation || "");
-      setReasoning(data.reasoning || "");
-
-      // Update preview - use PUT to update existing preview game instead of creating a new one
-      if (previewGameName) {
-        await updatePreviewGame(previewGameName, description || "", data.code);
-        // Force refresh preview
-        setPreviewRoomId(`room-${Math.random().toString(36).substring(7)}`);
-      }
+      const data = await parseLLMResponse(response);
+      await applyGenerationResult(data, { mode: "edit" });
     } catch (err: any) {
       setError(err.message || "Failed to generate code");
       setChatMessages(prev => [...prev, {
@@ -316,7 +467,7 @@ export default function CreateGame() {
 
   const updatePreviewGame = async (gameName: string, gameDesc: string, code: string) => {
     try {
-      const response = await fetch(`/api/games/${encodeURIComponent(gameName)}`, {
+      const response = await fetch(`/api/games/${safeEncodeURIComponent(gameName)}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -352,7 +503,7 @@ export default function CreateGame() {
 
       // If preview game exists, update it to non-preview
       if (previewGameName) {
-        const res = await fetch(`/api/games/${encodeURIComponent(previewGameName)}`, {
+        const res = await fetch(`/api/games/${safeEncodeURIComponent(previewGameName)}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -513,11 +664,11 @@ export default function CreateGame() {
               };
 
               return (
-              <button
-                key={template.id}
-                onClick={() => handleTemplateSelect(template.id)}
-                  className="group relative p-6 bg-gray-900 border border-gray-800 rounded-xl text-left hover:border-purple-500 transition-all overflow-hidden"
-              >
+                <button
+                  key={template.id}
+                  onClick={() => handleTemplateSelect(template.id)}
+                  className="group relative p-6 bg-gray-900 border border-gray-800 rounded-xl text-left hover:border-purple-500 transition-all overflow-hidden cursor-pointer"
+                >
                   {/* Background Image with low opacity */}
                   <div 
                     className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity"
@@ -526,32 +677,32 @@ export default function CreateGame() {
                   
                   {/* Content overlay */}
                   <div className="relative z-10">
-                <h3 className="text-2xl font-bold mb-2 group-hover:text-purple-400 transition-colors">
-                  {template.name}
-                </h3>
+                    <h3 className="text-2xl font-bold mb-2 group-hover:text-purple-400 transition-colors">
+                      {template.name}
+                    </h3>
                     <p className="text-gray-200 mb-4">{template.description}</p>
-                
-                {template.libraries.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {template.libraries.map((lib) => (
-                      <span
-                        key={lib}
+                    
+                    {template.libraries.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {template.libraries.map((lib) => (
+                          <span
+                            key={lib}
                             className="px-2 py-1 bg-gray-800/80 text-gray-300 text-xs rounded backdrop-blur-sm"
-                      >
-                        {lib}
-                      </span>
-                    ))}
+                          >
+                            {lib}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {template.id === "open-ended" && (
+                      <div className="flex items-center gap-2 text-yellow-500 text-sm">
+                        <AlertCircle size={16} />
+                        <span>May require more iteration</span>
+                      </div>
+                    )}
                   </div>
-                )}
-                
-                {template.id === "open-ended" && (
-                  <div className="flex items-center gap-2 text-yellow-500 text-sm">
-                    <AlertCircle size={16} />
-                    <span>May require more iteration</span>
-                  </div>
-                )}
-                  </div>
-              </button>
+                </button>
               );
             })}
           </div>
@@ -629,8 +780,8 @@ export default function CreateGame() {
             onChange={(e) => setSelectedModel(e.target.value)}
             className="w-full bg-gray-900 border border-gray-800 rounded p-3 focus:border-purple-500 focus:outline-none"
           >
+            <option value="gpt-5">GPT-5 (OpenAI) - Default</option>
             <option value="claude-sonnet-4-5-20250929">Claude Sonnet 4.5 (Anthropic) - Default</option>
-            <option value="gpt-5">GPT-4o (OpenAI)</option>
             <option value="gemini-2.5-pro">Gemini 2.5 Pro (Google)</option>
           </select>
         </div>
@@ -667,6 +818,44 @@ export default function CreateGame() {
                 {generatingCode ? "Generating Code..." : "Generate Game Code 🤖"}
               </button>
             </details>
+
+            {generatingCode && (
+              <div className="mb-4 bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden">
+                <div className="p-4 border-b border-gray-700">
+                  <h3 className="text-sm font-semibold text-green-400 mb-1">Live Model Output</h3>
+                  <p className="text-xs text-gray-400">
+                    Streaming raw text as the model generates it
+                    <span className="ml-2 text-yellow-400 text-xs">
+                      (Stream: {liveModelStream ? `${liveModelStream.length} chars` : 'empty'} | 
+                      Reasoning: {liveReasoningStream ? `${liveReasoningStream.length} chars` : 'empty'})
+                    </span>
+                  </p>
+                </div>
+                {liveModelStream ? (
+                  <div className="p-4 border-b border-gray-700 max-h-48 overflow-y-auto">
+                    <pre className="text-xs text-gray-300 whitespace-pre-wrap font-mono">
+                      {liveModelStream}
+                    </pre>
+                  </div>
+                ) : (
+                  <div className="p-4 border-b border-gray-700 text-xs text-gray-500 italic">
+                    Waiting for model output...
+                  </div>
+                )}
+                {liveReasoningStream ? (
+                  <div className="p-4 max-h-48 overflow-y-auto">
+                    <h4 className="text-xs font-semibold text-blue-400 mb-2">Reasoning</h4>
+                    <pre className="text-xs text-gray-300 whitespace-pre-wrap font-mono">
+                      {liveReasoningStream}
+                    </pre>
+                  </div>
+                ) : (
+                  <div className="p-4 text-xs text-gray-500 italic">
+                    Waiting for reasoning output...
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Model Explanation and Reasoning - Moved to left side */}
             {(explanation || reasoning) && generatedCode && (
@@ -856,7 +1045,7 @@ export default function CreateGame() {
             <div className="flex-1 bg-black border border-gray-800 rounded overflow-hidden">
               {showPreview && generatedCode && previewGameName ? (
                 <iframe
-                  src={`${getGameServerUrl()}/game/${encodeURIComponent(previewGameName)}/${encodeURIComponent(previewRoomId)}?hideUI=true`}
+                  src={`${getGameServerUrl()}/game/${safeEncodeURIComponent(previewGameName)}/${safeEncodeURIComponent(previewRoomId)}?hideUI=true`}
                   className="w-full h-full border-0"
                   title="Game Preview"
                   key={previewRoomId} // Force reload on room change

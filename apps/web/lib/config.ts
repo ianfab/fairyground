@@ -16,10 +16,32 @@ export function getGameServerUrl(): string {
 }
 
 /**
+ * Safely encode a URI component by first decoding it if already encoded
+ * This prevents double encoding (e.g., "My%20Game" -> "My%2520Game")
+ */
+export function safeEncodeURIComponent(str: string): string {
+  // Check if the string appears to be already encoded
+  // by looking for % followed by two hex digits
+  const isEncoded = /%[0-9A-Fa-f]{2}/.test(str);
+  
+  if (isEncoded) {
+    // Decode first, then encode to ensure single encoding
+    try {
+      return encodeURIComponent(decodeURIComponent(str));
+    } catch (e) {
+      // If decoding fails, just encode as-is
+      return encodeURIComponent(str);
+    }
+  }
+  
+  return encodeURIComponent(str);
+}
+
+/**
  * Get the full game URL for a specific game name
  */
 export function getGameUrl(gameName: string): string {
-  return `${getGameServerUrl()}/game/${encodeURIComponent(gameName)}`;
+  return `${getGameServerUrl()}/game/${safeEncodeURIComponent(gameName)}`;
 }
 
 /**
