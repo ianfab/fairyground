@@ -86,12 +86,26 @@ export function Matchmaking({ gameName, onCancel }: MatchmakingProps) {
 
     joinQueue();
 
+    // Add beforeunload handler to clean up when page is closing/refreshing
+    const handleBeforeUnload = () => {
+      if (hasJoinedRef.current) {
+        // Use sendBeacon for more reliable cleanup on page unload
+        const data = JSON.stringify({ playerId });
+        const blob = new Blob([data], { type: 'application/json' });
+        navigator.sendBeacon(`${getGameServerUrl()}/api/matchmaking/leave`, blob);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     // Cleanup function
     return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current);
       }
-      
+
       // Leave queue when component unmounts
       if (hasJoinedRef.current) {
         fetch(`${getGameServerUrl()}/api/matchmaking/leave`, {

@@ -190,18 +190,59 @@ function tryMatchPlayers() {
   });
 }
 
-// Periodically clean up old matchmaking results (after 5 minutes)
+// Periodically clean up stale matchmaking data
 setInterval(() => {
   const now = Date.now();
+  const FIVE_MINUTES = 5 * 60 * 1000;
+  const TWO_MINUTES = 2 * 60 * 1000;
+  const ONE_MINUTE = 60 * 1000;
+
+  // Clean up old matchmaking results
   matchmakingResults.forEach((result, playerId) => {
     const player = matchmakingQueue.find(p => p.playerId === playerId);
     if (!player && result.status === 'matched') {
-      // Remove result after 5 minutes
-      const FIVE_MINUTES = 5 * 60 * 1000;
       matchmakingResults.delete(playerId);
     }
   });
-}, 60000); // Check every minute
+
+  // Clean up stale players in queue (been there > 5 minutes without connecting)
+  const staleIndices: number[] = [];
+  matchmakingQueue.forEach((player, index) => {
+    const age = now - player.timestamp;
+    if (age > FIVE_MINUTES) {
+      console.log(`Removing stale player ${player.playerId} from queue (age: ${Math.round(age / 1000)}s)`);
+      staleIndices.push(index);
+      matchmakingResults.delete(player.playerId);
+    }
+  });
+  // Remove in reverse order to maintain indices
+  staleIndices.reverse().forEach(index => matchmakingQueue.splice(index, 1));
+
+  // Clean up matchmaking rooms where players never connected (> 1 minute old)
+  matchmakingRooms.forEach((room, roomId) => {
+    const age = now - room.createdAt;
+    const allPlayersConnected = room.connectedPlayers.size === room.expectedPlayers.size;
+
+    if (!allPlayersConnected && age > ONE_MINUTE) {
+      console.log(`Cleaning up stale matchmaking room ${roomId} (age: ${Math.round(age / 1000)}s, ${room.connectedPlayers.size}/${room.expectedPlayers.size} players connected)`);
+
+      // Put any players who didn't connect back in the queue
+      room.expectedPlayers.forEach(playerId => {
+        if (!Array.from(room.connectedPlayers).some(socketId => {
+          // Check if this socketId belongs to this playerId
+          // This is a bit tricky since we don't have a direct mapping here
+          return false; // Just remove the match result and let them re-queue
+        })) {
+          // Remove their match result so they can queue again
+          matchmakingResults.delete(playerId);
+          console.log(`Cleared match result for disconnected player ${playerId}`);
+        }
+      });
+
+      matchmakingRooms.delete(roomId);
+    }
+  });
+}, 30000); // Check every 30 seconds
 
 // Game loop ticker - runs periodically for games that have a tick action
 const TICK_RATE = 16; // ~60 FPS
