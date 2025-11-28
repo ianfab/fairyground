@@ -526,6 +526,39 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       min-width: 250px;
       max-width: 300px;
       z-index: 1000;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    #game-ui.collapsed {
+      transform: translateX(calc(100% + 20px));
+      opacity: 0;
+      pointer-events: none;
+    }
+    #game-ui-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      z-index: 1001;
+      color: #fff;
+      font-size: 20px;
+      transition: all 0.2s ease;
+      display: none;
+    }
+    #game-ui-toggle:hover {
+      background: rgba(102, 126, 234, 0.9);
+      border-color: #667eea;
+    }
+    @media (max-width: 768px) {
+      #game-ui-toggle {
+        display: block;
+      }
+      #game-ui {
+        max-width: 90vw;
+      }
     }
     #room-setup {
       position: fixed;
@@ -768,7 +801,12 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
 
     <!-- Players Display -->
     <div id="players-display" style="display: none;"></div>
-    
+
+    <!-- Toggle button for mobile -->
+    <button id="game-ui-toggle" style="${hideUI ? 'display: none;' : ''}" title="Toggle Game Info">
+      ℹ️
+    </button>
+
     <div id="game-ui" style="${hideUI ? 'display: none;' : ''}">
       <h3 style="margin-bottom: 15px; color: #fff;">Game Info</h3>
       <div class="info-row">
@@ -852,7 +890,27 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     document.getElementById('room-name').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') joinRoom();
     });
-    
+
+    // Setup game UI toggle for mobile
+    const gameUIToggle = document.getElementById('game-ui-toggle');
+    const gameUI = document.getElementById('game-ui');
+    let gameUICollapsed = false;
+
+    // Start collapsed on mobile
+    if (window.innerWidth <= 768) {
+      gameUICollapsed = true;
+      gameUI.classList.add('collapsed');
+    }
+
+    gameUIToggle.addEventListener('click', () => {
+      gameUICollapsed = !gameUICollapsed;
+      if (gameUICollapsed) {
+        gameUI.classList.add('collapsed');
+      } else {
+        gameUI.classList.remove('collapsed');
+      }
+    });
+
     // Setup share button
     document.getElementById('share-btn').addEventListener('click', () => {
       const roomName = document.getElementById('current-room').textContent;
