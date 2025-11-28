@@ -19,7 +19,7 @@ export function getGameServerUrl(): string {
  * Get the full game URL for a specific game name
  */
 export function getGameUrl(gameName: string): string {
-  return `${getGameServerUrl()}/game/${gameName}`;
+  return `${getGameServerUrl()}/game/${encodeURIComponent(gameName)}`;
 }
 
 /**

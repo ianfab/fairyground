@@ -4,6 +4,7 @@ import { useAuthInfo, useRedirectFunctions } from "@propelauth/react";
 import { useEffect, useState } from "react";
 import { Game } from "@/lib/types";
 import { User } from "lucide-react";
+import { getGameServerUrl } from "@/lib/config";
 
 export default function ProfilePage() {
   const [userGames, setUserGames] = useState<Game[]>([]);
@@ -179,7 +180,7 @@ export default function ProfilePage() {
                   </p>
                   <div className="flex gap-3">
                     <a
-                      href={`http://localhost:3001/game/${game.name}`}
+                      href={`${getGameServerUrl()}/game/${encodeURIComponent(game.name)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-purple-500 hover:text-purple-400"
@@ -187,7 +188,7 @@ export default function ProfilePage() {
                       Play →
                     </a>
                     <a
-                      href={`/sandbox/${game.name}`}
+                      href={`/sandbox/${encodeURIComponent(game.name)}`}
                       className="text-sm text-blue-500 hover:text-blue-400"
                     >
                       Edit

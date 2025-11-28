@@ -23,7 +23,7 @@ export default function GameModePage() {
     // Navigate to the game server with the room name, user ID, and username
     const userId = authInfo.user?.userId || '';
     const username = authInfo.user?.username || authInfo.user?.email || '';
-    let url = `${getGameServerUrl()}/game/${gameName}/${roomName}`;
+    let url = `${getGameServerUrl()}/game/${encodeURIComponent(gameName)}/${encodeURIComponent(roomName)}`;
     if (userId) {
       url += `?userId=${encodeURIComponent(userId)}`;
       if (username) {

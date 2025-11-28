@@ -856,7 +856,7 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     // Setup share button
     document.getElementById('share-btn').addEventListener('click', () => {
       const roomName = document.getElementById('current-room').textContent;
-      const shareUrl = window.location.origin + '/game/${gameName}/' + roomName;
+      const shareUrl = window.location.origin + '/game/' + encodeURIComponent('${gameName}') + '/' + encodeURIComponent(roomName);
       navigator.clipboard.writeText(shareUrl).then(() => {
         const btn = document.getElementById('share-btn');
         btn.textContent = '✅ Link Copied!';
