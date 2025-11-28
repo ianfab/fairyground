@@ -30,19 +30,36 @@ export function GameLeaderboard({ gameName }: GameLeaderboardProps) {
     async function fetchLeaderboard() {
       try {
         setLoading(true);
-        const response = await fetch(
-          `${getGameServerUrl()}/api/elo/leaderboard/${encodeURIComponent(gameName)}?limit=10`
-        );
+
+        // Decode the game name if it's already URL encoded
+        const decodedGameName = gameName.includes('%20') ? decodeURIComponent(gameName) : gameName;
+        console.log('[GameLeaderboard] Raw gameName from props:', JSON.stringify(gameName));
+        console.log('[GameLeaderboard] Decoded gameName:', JSON.stringify(decodedGameName));
+
+        const url = `${getGameServerUrl()}/api/elo/leaderboard/${encodeURIComponent(decodedGameName)}?limit=10`;
+        console.log('[GameLeaderboard] Final URL:', url);
+
+        const response = await fetch(url);
 
         if (!response.ok) {
-          throw new Error("Failed to fetch leaderboard");
+          console.error('[GameLeaderboard] Response not OK:', response.status, response.statusText);
+          const errorText = await response.text();
+          console.error('[GameLeaderboard] Error response:', errorText);
+          throw new Error(`Failed to fetch leaderboard: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('[GameLeaderboard] Received data:', data);
+        console.log('[GameLeaderboard] Leaderboard length:', data.leaderboard?.length || 0);
+
+        if (!data.leaderboard || data.leaderboard.length === 0) {
+          console.warn('[GameLeaderboard] Empty leaderboard returned for game:', gameName);
+        }
+
         setLeaderboard(data.leaderboard || []);
         setError(null);
       } catch (err) {
-        console.error("Error fetching leaderboard:", err);
+        console.error("[GameLeaderboard] Error fetching leaderboard:", err);
         setError("Unable to load leaderboard");
         setLeaderboard([]);
       } finally {

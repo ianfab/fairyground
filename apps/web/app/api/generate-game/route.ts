@@ -181,16 +181,16 @@ RULES:
 7. Mutate state directly in move functions
 
 GAME ENDING:
-When the game ends, you MUST set these flags in state:
+When the game ends, set these flags in state:
 - state.gameEnded = true (boolean flag indicating game is over)
 - state.gameWinner = playerId (socket ID of the winning player, or null for tie/draw)
-- state.gameEndReason = "reason" (optional: "checkmate", "timeout", "score limit", etc.)
+- state.gameEndReason = "reason" (optional: human-readable reason like "Player 1 won!")
 
 Example:
 \`\`\`javascript
 // When a player wins
 state.gameEnded = true;
-state.gameWinner = playerId; // The socket ID of the winner
+state.gameWinner = playerId; // The socket ID of the winner (from move function parameter)
 state.gameEndReason = "Player reached score limit";
 
 // For a tie/draw
@@ -199,10 +199,7 @@ state.gameWinner = null; // null means no winner (tie/draw)
 state.gameEndReason = "Draw by stalemate";
 \`\`\`
 
-The system will automatically:
-- Update ELO ratings for all players based on the outcome
-- Show a game over screen to players
-- Allow players to play again
+The server will automatically handle ratings, stats, and show a game over screen.
 
 GAME LOOP (tick):
 - OPTIONAL: Add a 'tick' action for games needing continuous updates (physics, animation, AI)
