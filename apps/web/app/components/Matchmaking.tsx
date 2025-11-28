@@ -49,9 +49,29 @@ export function Matchmaking({ gameName, onCancel }: MatchmakingProps) {
             }
 
             const data = await statusResponse.json();
-            
+
+            if (data.status === 'not_in_queue') {
+              // Server cleaned us up - show error and exit
+              if (pollIntervalRef.current) {
+                clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+              }
+              setStatus('error');
+              setErrorMessage('Matchmaking timed out. Your opponent may have disconnected. Please try again.');
+              return;
+            }
+
             if (data.status === 'matched' && data.roomId) {
               setStatus('matched');
+
+              // Play notification sound
+              try {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE');
+                audio.play().catch(err => console.log('Could not play sound:', err));
+              } catch (err) {
+                console.log('Audio not supported:', err);
+              }
+
               // Redirect to the game with the matched room
               setTimeout(() => {
                 const userId = authInfo.user?.userId || '';
@@ -86,27 +106,13 @@ export function Matchmaking({ gameName, onCancel }: MatchmakingProps) {
 
     joinQueue();
 
-    // Add beforeunload handler to clean up when page is closing/refreshing
-    const handleBeforeUnload = () => {
-      if (hasJoinedRef.current) {
-        // Use sendBeacon for more reliable cleanup on page unload
-        const data = JSON.stringify({ playerId });
-        const blob = new Blob([data], { type: 'application/json' });
-        navigator.sendBeacon(`${getGameServerUrl()}/api/matchmaking/leave`, blob);
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    // Cleanup function
+    // Cleanup function - only runs when component unmounts (Cancel button or back navigation)
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current);
       }
 
-      // Leave queue when component unmounts
+      // Leave queue when component unmounts (user clicked Cancel or navigated back)
       if (hasJoinedRef.current) {
         fetch(`${getGameServerUrl()}/api/matchmaking/leave`, {
           method: 'POST',

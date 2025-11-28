@@ -193,8 +193,7 @@ function tryMatchPlayers() {
 // Periodically clean up stale matchmaking data
 setInterval(() => {
   const now = Date.now();
-  const FIVE_MINUTES = 5 * 60 * 1000;
-  const TWO_MINUTES = 2 * 60 * 1000;
+  const ONE_HOUR = 60 * 60 * 1000;
   const ONE_MINUTE = 60 * 1000;
 
   // Clean up old matchmaking results
@@ -205,11 +204,11 @@ setInterval(() => {
     }
   });
 
-  // Clean up stale players in queue (been there > 5 minutes without connecting)
+  // Clean up stale players in queue (been there > 1 hour without connecting)
   const staleIndices: number[] = [];
   matchmakingQueue.forEach((player, index) => {
     const age = now - player.timestamp;
-    if (age > FIVE_MINUTES) {
+    if (age > ONE_HOUR) {
       console.log(`Removing stale player ${player.playerId} from queue (age: ${Math.round(age / 1000)}s)`);
       staleIndices.push(index);
       matchmakingResults.delete(player.playerId);
