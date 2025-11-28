@@ -12,7 +12,7 @@ async function getGames(): Promise<Game[]> {
   try {
     const tableName = getGamesTableName();
     const { rows } = await query<Game>(
-      `SELECT * FROM ${tableName} ORDER BY created_at DESC`
+      `SELECT * FROM ${tableName} WHERE preview IS NOT TRUE ORDER BY created_at DESC`
     );
     return rows;
   } catch (error) {
@@ -25,7 +25,7 @@ async function getTrendingGames(): Promise<Game[]> {
   try {
     const tableName = getGamesTableName();
     const { rows } = await query<Game>(
-      `SELECT * FROM ${tableName} WHERE play_count > 0 ORDER BY play_count DESC, last_played_at DESC LIMIT 3`
+      `SELECT * FROM ${tableName} WHERE play_count > 0 AND preview IS NOT TRUE ORDER BY play_count DESC, last_played_at DESC LIMIT 3`
     );
     return rows;
   } catch (error) {
@@ -38,7 +38,7 @@ async function getTopGame(): Promise<Game | null> {
   try {
     const tableName = getGamesTableName();
     const { rows } = await query<Game>(
-      `SELECT * FROM ${tableName} WHERE play_count > 0 ORDER BY play_count DESC, last_played_at DESC LIMIT 1`
+      `SELECT * FROM ${tableName} WHERE play_count > 0 AND preview IS NOT TRUE ORDER BY play_count DESC, last_played_at DESC LIMIT 1`
     );
     return rows[0] || null;
   } catch (error) {
