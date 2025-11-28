@@ -852,7 +852,7 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    const gameName = '${gameName}';
+    const gameName = "${gameName}";
     let socket;
     let currentRoom;
     let gameInstance;
@@ -1102,7 +1102,7 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
             const response = await fetch(\`/api/elo/player/\${encodeURIComponent(persistentId)}\`);
             if (response.ok) {
               const data = await response.json();
-              const gameData = data.games.find(g => g.game_name === '${gameName}');
+              const gameData = data.games.find(g => g.game_name === "${gameName}");
               const result = {
                 id: persistentId,
                 username: gameData?.username || username,
