@@ -13,6 +13,44 @@ interface GameGenerationResponse {
   reasoning?: string;
 }
 
+function extractCode(text: string): string {
+  const jsCodeBlockMatch = text.match(/```(?:javascript|js)\n([\s\S]*?)\n```/);
+  if (jsCodeBlockMatch) {
+    return jsCodeBlockMatch[1];
+  }
+
+  const genericCodeBlockMatch = text.match(/```\n([\s\S]*?)\n```/);
+  if (genericCodeBlockMatch) {
+    return genericCodeBlockMatch[1];
+  }
+
+  return text;
+}
+
+function buildSuggestedName(providedName: string | undefined, description: string): string {
+  if (providedName && providedName.trim()) {
+    return providedName;
+  }
+
+  return description
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .substring(0, 30);
+}
+
+interface OpenAIStreamParams {
+  description: string;
+  name?: string;
+  selectedModel: string;
+  systemPrompt: string;
+  isEditMode: boolean;
+  existingCode?: string;
+  templateBaseCode?: string;
+  screenshot?: string;
+  effectiveUserId: string;
+}
+
 export async function POST(request: Request) {
   try {
     // Debug: Log request headers
@@ -182,29 +220,40 @@ When to use tick:
 ✗ Turn-based games (chess, tic-tac-toe)
 ✗ Simple event-driven games (clicker games)
 
+DEFAULT MAPS AVAILABLE:
+For shooter games, you can import pre-made maps from the default-maps library:
+
+2D Maps:
+- MAP_2D_BASIC_SHOOTER: Mix of open space with obstacles (800x600)
+- MAP_2D_URBAN: Buildings, rooms, and terrain (800x600)
+
+3D Maps:
+- MAP_3D_AWP_STYLE: Symmetrical 1v1 sniper map (100x200)
+- MAP_3D_BASIC: Simple arena with spawn walls (80x80)
+- MAP_3D_KRUNKER: Fast movement/bhop optimized (120x120)
+
+These maps include obstacles/objects, spawn points, and helper functions. See the template prompts for usage examples.
+
 ${templateConfig?.prompt || ''}
 
 Base template for a similar game:
 ${templateConfig?.baseCode || ''}`;
 
-    // Helper function to extract code from markdown code blocks
-    // LLMs sometimes wrap code in ```javascript ... ``` or ``` ... ```
-    function extractCode(text: string): string {
-      // Try to find code block with language specifier (```javascript or ```js)
-      const jsCodeBlockMatch = text.match(/```(?:javascript|js)\n([\s\S]*?)\n```/);
-      if (jsCodeBlockMatch) {
-        return jsCodeBlockMatch[1];
-      }
+    const isOpenAIModel =
+      !selectedModel.startsWith("claude") && !selectedModel.startsWith("gemini");
 
-      // Try to find generic code block (```)
-      const genericCodeBlockMatch = text.match(/```\n([\s\S]*?)\n```/);
-      if (genericCodeBlockMatch) {
-        return genericCodeBlockMatch[1];
-      }
-
-      // If no code block found, return the whole response
-      // (Maybe the LLM returned plain code without markdown)
-      return text;
+    if (isOpenAIModel) {
+      return streamOpenAIResponse({
+        description,
+        name,
+        selectedModel,
+        systemPrompt,
+        isEditMode,
+        existingCode,
+        templateBaseCode: templateConfig?.baseCode,
+        screenshot,
+        effectiveUserId,
+      });
     }
 
     let generatedCode: string;
@@ -352,130 +401,14 @@ ${templateConfig?.baseCode || ''}`;
        }
 
     } else {
-      // Use OpenAI (GPT-5/o1, GPT-4o, etc.) with structured output
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-
-      // GPT-5/o1 models use reasoning_effort instead of temperature
-      const isO1Model = selectedModel.startsWith("o1") || selectedModel.startsWith("gpt-5") || selectedModel.startsWith("o3");
-      
-      let completion: OpenAI.Chat.ChatCompletion;
-      
-      if (isO1Model) {
-        // o1 models don't support structured outputs yet, use prompt-based JSON
-        const structuredPrompt = `${systemPrompt}
-
-IMPORTANT: You must respond with a JSON object in this exact format:
-{
-  "explanation": "Brief explanation of what you're doing and why (2-3 sentences)",
-  "code": "The complete game code here"
-}
-
-User request: ${description}`;
-
-        completion = await openai.chat.completions.create({
-          model: selectedModel,
-          messages: [
-            {
-              role: "user",
-              content: structuredPrompt
-            }
-          ],
-          reasoning_effort: "medium"
-        } as OpenAI.Chat.ChatCompletionCreateParams) as OpenAI.Chat.ChatCompletion;
-      } else {
-        // Other models support proper Structured Outputs
-        // Build message content with text and optional image
-        let userContent: any = description;
-        
-        // Add screenshot if provided and model supports vision (gpt-4o, gpt-4-turbo, etc.)
-        if (screenshot && isEditMode && (selectedModel.includes("gpt-4") || selectedModel.includes("gpt-5"))) {
-          userContent = [
-            {
-              type: "text",
-              text: description
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: screenshot
-              }
-            }
-          ];
-        }
-
-        completion = await openai.chat.completions.create({
-          model: selectedModel,
-          messages: [
-            {
-              role: "system",
-              content: systemPrompt
-            },
-            {
-              role: "user",
-              content: userContent
-            }
-          ],
-          temperature: 0.7,
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "game_generation_response",
-              strict: true,
-              schema: {
-                type: "object",
-                properties: {
-                  explanation: {
-                    type: "string",
-                    description: "Brief explanation of what you're doing and why (2-3 sentences)"
-                  },
-                  code: {
-                    type: "string",
-                    description: "The complete game code"
-                  }
-                },
-                required: ["explanation", "code"],
-                additionalProperties: false
-              }
-            }
-          }
-        });
-      }
-
-      const responseContent = completion.choices[0].message.content;
-      
-      if (!responseContent) {
-        console.error("OpenAI returned no content, falling back to default");
-        generatedCode = isEditMode ? existingCode : templateConfig?.baseCode || '';
-        explanation = "Error: Model returned no content. Using fallback.";
-      } else {
-        try {
-          const parsed = JSON.parse(responseContent) as GameGenerationResponse;
-          generatedCode = parsed.code;
-          explanation = parsed.explanation || "";
-          
-          // Extract reasoning from o1 models if available (using type assertion for new feature)
-          if (isO1Model) {
-            const messageWithReasoning = completion.choices[0].message as any;
-            if (messageWithReasoning.reasoning_content) {
-              reasoning = messageWithReasoning.reasoning_content;
-            }
-          }
-        } catch (e) {
-          console.error("Failed to parse OpenAI structured output:", e);
-          generatedCode = extractCode(responseContent);
-          explanation = "Error parsing response, extracted code from text.";
-        }
-      }
+      return NextResponse.json(
+        { error: "Unsupported model provider" },
+        { status: 400 }
+      );
     }
 
     // Generate suggested name from description
-    const suggestedName = name || description
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-      .substring(0, 30);
+    const suggestedName = buildSuggestedName(name, description);
 
     // Log reasoning for debugging
     if (reasoning) {
@@ -500,5 +433,203 @@ User request: ${description}`;
       { status: 500 }
     );
   }
+}
+
+async function streamOpenAIResponse(params: OpenAIStreamParams) {
+  const {
+    description,
+    name,
+    selectedModel,
+    systemPrompt,
+    isEditMode,
+    existingCode,
+    templateBaseCode,
+    screenshot,
+    effectiveUserId,
+  } = params;
+
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const send = (payload: Record<string, unknown>) => {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+      };
+
+      try {
+        const client = new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY,
+        });
+
+        const userContentParts: Array<
+          | { type: "input_text"; text: string }
+          | { type: "input_image"; image_url: string; detail: "low" | "high" | "auto" }
+        > = [
+          {
+            type: "input_text",
+            text: description,
+          },
+        ];
+
+        if (screenshot && isEditMode) {
+          userContentParts.push({
+            type: "input_image",
+            image_url: screenshot,
+            detail: "high",
+          });
+        }
+
+        const inputMessages = [
+          {
+            role: "system" as const,
+            content: [
+              {
+                type: "input_text" as const,
+                text: systemPrompt,
+              },
+            ],
+          },
+          {
+            role: "user" as const,
+            content: userContentParts,
+          },
+        ];
+
+        const structuredFormat = {
+          type: "json_schema" as const,
+          name: "game_generation_response",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              explanation: {
+                type: "string",
+                description: "Brief explanation of what you're doing and why (2-3 sentences)",
+              },
+              code: {
+                type: "string",
+                description: "The complete game code",
+              },
+            },
+            required: ["explanation", "code"],
+            additionalProperties: false,
+          },
+        };
+
+        const isReasoningModel =
+          selectedModel.startsWith("o") || selectedModel.startsWith("gpt-5");
+
+        const responseStream = await client.responses.stream({
+          model: selectedModel,
+          input: inputMessages,
+          text: {
+            format: structuredFormat,
+          },
+          max_output_tokens: 16000,
+          temperature: isReasoningModel ? undefined : 0.7,
+          reasoning: isReasoningModel ? { effort: "medium" } : undefined,
+          safety_identifier: effectiveUserId || undefined,
+        });
+
+        let aggregatedJson = "";
+        let streamedReasoning = "";
+
+        for await (const event of responseStream) {
+          switch (event.type) {
+            case "response.output_text.delta": {
+              if (event.delta) {
+                aggregatedJson += event.delta;
+                send({ type: "token", delta: event.delta });
+              }
+              break;
+            }
+            case "response.reasoning_text.delta": {
+              if (event.delta) {
+                streamedReasoning += event.delta;
+                send({ type: "reasoning", delta: event.delta });
+              }
+              break;
+            }
+            case "response.failed": {
+              throw new Error("Model response failed");
+            }
+            case "error": {
+              throw new Error(event.message);
+            }
+          }
+        }
+
+        const finalResponse = await responseStream.finalResponse();
+        const parsedPayload =
+          (finalResponse.output_parsed as GameGenerationResponse | null) ||
+          (() => {
+            try {
+              return JSON.parse(finalResponse.output_text || aggregatedJson || "") as GameGenerationResponse;
+            } catch {
+              return null;
+            }
+          })();
+
+        const fallbackCode = isEditMode ? existingCode || "" : templateBaseCode || "";
+
+        let generatedCode = parsedPayload?.code || "";
+        let explanation = parsedPayload?.explanation || "";
+        let reasoning = (parsedPayload?.reasoning || streamedReasoning || "").substring(0, 1000);
+
+        if (!generatedCode) {
+          const extracted = extractCode(finalResponse.output_text || aggregatedJson || "");
+          generatedCode = extracted || fallbackCode;
+          if (!explanation) {
+            explanation = extracted ? "Parsed code directly from the model output." : "Model returned no content. Using fallback.";
+          }
+        }
+
+        if (!generatedCode) {
+          throw new Error("Model did not return any code.");
+        }
+
+        if (!reasoning && streamedReasoning) {
+          reasoning = streamedReasoning.substring(0, 1000);
+        }
+
+        if (reasoning) {
+          console.log(
+            "Model reasoning:",
+            reasoning.substring(0, 500) + (reasoning.length > 500 ? "..." : "")
+          );
+        }
+        console.log("Model explanation:", explanation);
+
+        const resultPayload = {
+          type: "result",
+          code: generatedCode,
+          explanation,
+          reasoning,
+          suggestedName: buildSuggestedName(name, description),
+          suggestedDescription: description.substring(0, 100),
+        };
+
+        send(resultPayload);
+      } catch (error) {
+        console.error("OpenAI streaming error:", error);
+        send({
+          type: "error",
+          error: {
+            message: error instanceof Error ? error.message : "Failed to generate game",
+          },
+        });
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new NextResponse(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+    },
+  });
 }
 

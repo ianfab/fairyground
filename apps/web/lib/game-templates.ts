@@ -418,23 +418,24 @@ function initGameClient(container, socket, roomId, emitAction) {
   const keys = {};
   document.addEventListener('keydown', (e) => {
     keys[e.code] = true;
-    handleInput();
   });
   document.addEventListener('keyup', (e) => {
     keys[e.code] = false;
   });
   
-  function handleInput() {
-    const movement = { x: 0, y: 0 };
-    if (keys['KeyW'] || keys['ArrowUp']) movement.y = -5;
-    if (keys['KeyS'] || keys['ArrowDown']) movement.y = 5;
-    if (keys['KeyA'] || keys['ArrowLeft']) movement.x = -5;
-    if (keys['KeyD'] || keys['ArrowRight']) movement.x = 5;
+  // Send input state continuously
+  setInterval(() => {
+    const input = {
+      up: keys['KeyW'] || keys['ArrowUp'] || false,
+      down: keys['KeyS'] || keys['ArrowDown'] || false,
+      left: keys['KeyA'] || keys['ArrowLeft'] || false,
+      right: keys['KeyD'] || keys['ArrowRight'] || false
+    };
     
-    if (movement.x !== 0 || movement.y !== 0) {
-      emitAction('move', movement);
+    if (input.up || input.down || input.left || input.right) {
+      emitAction('input', input);
     }
-  }
+  }, 16); // ~60fps
   
   // Shooting
   canvas.addEventListener('click', (e) => {
@@ -490,19 +491,24 @@ const serverLogic = {
     score: 0
   },
   moves: {
-    move: (state, payload, playerId) => {
-      if (!state.players[playerId]) {
-        state.players[playerId] = {
-          x: 400,
-          y: 300,
-          health: 100,
-          color: '#' + Math.floor(Math.random()*16777215).toString(16)
-        };
-      }
-      
+    playerJoined: (state, payload, playerId) => {
+      state.players[playerId] = {
+        x: 400,
+        y: 300,
+        vx: 0,
+        vy: 0,
+        health: 100,
+        color: '#' + Math.floor(Math.random()*16777215).toString(16),
+        input: { up: false, down: false, left: false, right: false }
+      };
+    },
+    
+    input: (state, payload, playerId) => {
       const player = state.players[playerId];
-      player.x = Math.max(15, Math.min(785, player.x + payload.x));
-      player.y = Math.max(15, Math.min(585, player.y + payload.y));
+      if (!player) return;
+      
+      // Store input state for processing in tick
+      player.input = payload;
     },
     
     shoot: (state, payload, playerId) => {
@@ -514,36 +520,131 @@ const serverLogic = {
         id: Date.now() + Math.random(),
         x: player.x,
         y: player.y,
-        vx: Math.cos(angle) * 5,
-        vy: Math.sin(angle) * 5,
+        vx: Math.cos(angle) * 8,
+        vy: Math.sin(angle) * 8,
         playerId: playerId
       });
+    },
+    
+    tick: (state) => {
+      // Update player physics with acceleration
+      Object.values(state.players).forEach(player => {
+        const acceleration = 0.5;
+        const maxSpeed = 6;
+        const friction = 0.85;
+        
+        // Apply acceleration based on input
+        if (player.input.up) player.vy -= acceleration;
+        if (player.input.down) player.vy += acceleration;
+        if (player.input.left) player.vx -= acceleration;
+        if (player.input.right) player.vx += acceleration;
+        
+        // Apply friction
+        player.vx *= friction;
+        player.vy *= friction;
+        
+        // Clamp velocity to max speed
+        const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+        if (speed > maxSpeed) {
+          player.vx = (player.vx / speed) * maxSpeed;
+          player.vy = (player.vy / speed) * maxSpeed;
+        }
+        
+        // Update position
+        player.x += player.vx;
+        player.y += player.vy;
+        
+        // Clamp to bounds with bounce
+        if (player.x < 15) {
+          player.x = 15;
+          player.vx *= -0.5;
+        }
+        if (player.x > 785) {
+          player.x = 785;
+          player.vx *= -0.5;
+        }
+        if (player.y < 15) {
+          player.y = 15;
+          player.vy *= -0.5;
+        }
+        if (player.y > 585) {
+          player.y = 585;
+          player.vy *= -0.5;
+        }
+      });
       
-      // Update bullets (simple physics)
+      // Update bullets continuously
       state.bullets = state.bullets.filter(bullet => {
         bullet.x += bullet.vx;
         bullet.y += bullet.vy;
+        
+        // Remove bullets that are out of bounds
         return bullet.x > 0 && bullet.x < 800 && bullet.y > 0 && bullet.y < 600;
       });
     }
   }
 };`,
-    prompt: `You are creating a 2D shooter game. The base template includes Phaser 3 for game engine, physics, and rendering.
+    prompt: `You are creating a 2D shooter game. The base template includes canvas-based rendering with physics.
 
 Key considerations:
 - Define game mechanics (top-down, side-scroller, bullet hell, etc.)
 - Implement shooting mechanics and projectile behavior
 - Add enemy AI and spawn patterns
-- Handle collision detection between bullets, players, and enemies
+- Handle collision detection between bullets, players, enemies, and obstacles
 - Implement scoring and health systems
 - Consider power-ups and special abilities
 
-Available Phaser features:
-- Physics: arcade physics with velocity, acceleration, collision
-- Input: keyboard, mouse, touch support
-- Sprites: animated sprites, sprite sheets
-- Groups: object pooling for bullets/enemies
-- Timers: for spawn rates, cooldowns
+DEFAULT MAPS AVAILABLE:
+You can use pre-made maps by importing from '@/lib/default-maps':
+
+1. MAP_2D_BASIC_SHOOTER - Mix of open space with rectangular obstacles
+   - 800x600 canvas
+   - Various sized cover and walls interspersed throughout
+   - 4 corner spawn points
+   
+2. MAP_2D_URBAN - Real-world style map with buildings and rooms
+   - 800x600 canvas  
+   - Buildings with doorways (gaps in walls)
+   - Mixed terrain (buildings, concrete barriers, bushes)
+   - 4 spawn points inside buildings
+
+To use a default map:
+\`\`\`javascript
+import { MAP_2D_BASIC_SHOOTER, generate2DMapCode } from '@/lib/default-maps';
+
+// In your client code:
+const obstacles = MAP_2D_BASIC_SHOOTER.obstacles;
+const spawnPoints = MAP_2D_BASIC_SHOOTER.spawnPoints;
+
+// Draw obstacles
+function drawObstacles(ctx) {
+  obstacles.forEach(obstacle => {
+    ctx.fillStyle = obstacle.color || '#555';
+    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+  });
+}
+
+// Check collision
+function checkObstacleCollision(x, y, radius) {
+  return obstacles.some(obstacle => {
+    return x + radius > obstacle.x &&
+           x - radius < obstacle.x + obstacle.width &&
+           y + radius > obstacle.y &&
+           y - radius < obstacle.y + obstacle.height;
+  });
+}
+
+// Spawn player
+function spawnPlayer(playerIndex) {
+  const spawn = spawnPoints[playerIndex % spawnPoints.length];
+  return { x: spawn.x, y: spawn.y };
+}
+\`\`\`
+
+OR create your own custom map with the same structure!
 
 Describe your 2D shooter and I'll implement it.`
   },
@@ -725,6 +826,79 @@ Performance optimizations included:
 - Antialiasing disabled by default
 - Fog for draw distance
 - Use MeshBasicMaterial for better performance
+
+DEFAULT MAPS AVAILABLE:
+You can use pre-made 3D maps by importing from '@/lib/default-maps':
+
+1. MAP_3D_AWP_STYLE - Symmetrical 1v1 sniper map (CS:GO AWP style)
+   - 100x200 units
+   - High ground platforms on each side
+   - Central divider with gap
+   - Long sightlines for sniper duels
+   
+2. MAP_3D_BASIC - Simple symmetrical arena
+   - 80x80 units
+   - Spawn walls for each player
+   - Center obstacles and cover
+   - Open middle for direct engagement
+   
+3. MAP_3D_KRUNKER - Bunny hop / fast movement map (Krunker.io style)
+   - 120x120 units
+   - Central elevated platform with ramps
+   - Corner platforms at different heights
+   - Optimized for fast strafing and jumping
+   - Multiple elevation levels
+
+To use a default map:
+\`\`\`javascript
+import * as THREE from 'three';
+import { MAP_3D_BASIC } from '@/lib/default-maps';
+
+// Create map geometry
+function createMapGeometry(scene) {
+  const mapObjects = [];
+  
+  MAP_3D_BASIC.objects.forEach(obj => {
+    const geometry = new THREE.BoxGeometry(obj.size[0], obj.size[1], obj.size[2]);
+    const material = new THREE.MeshBasicMaterial({ 
+      color: obj.color || '#555',
+      wireframe: false 
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(obj.position[0], obj.position[1], obj.position[2]);
+    mesh.userData.collidable = true;
+    mesh.userData.type = obj.type;
+    
+    scene.add(mesh);
+    mapObjects.push(mesh);
+  });
+  
+  return mapObjects;
+}
+
+// Spawn player at spawn point
+function spawnPlayer(playerIndex) {
+  const spawn = MAP_3D_BASIC.spawnPoints[playerIndex % MAP_3D_BASIC.spawnPoints.length];
+  camera.position.set(spawn.position[0], spawn.position[1], spawn.position[2]);
+  camera.rotation.y = spawn.rotation;
+}
+
+// Simple 3D collision check (AABB)
+function checkCollision(position, size) {
+  return MAP_3D_BASIC.objects.some(obj => {
+    // Allow walking under platforms
+    if (obj.type === 'platform' && position[1] < obj.position[1] + obj.size[1]/2) {
+      return false;
+    }
+    
+    return Math.abs(position[0] - obj.position[0]) < (size[0] + obj.size[0]) / 2 &&
+           Math.abs(position[1] - obj.position[1]) < (size[1] + obj.size[1]) / 2 &&
+           Math.abs(position[2] - obj.position[2]) < (size[2] + obj.size[2]) / 2;
+  });
+}
+\`\`\`
+
+OR create your own custom map with the same structure!
 
 Available Three.js features:
 - Geometries: BoxGeometry, SphereGeometry, etc.
