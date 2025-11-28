@@ -5,6 +5,7 @@ import { useState } from "react";
 import { getGameServerUrl, safeEncodeURIComponent } from "@/lib/config";
 import { Matchmaking } from "@/app/components/Matchmaking";
 import { GameLeaderboard } from "@/app/components/GameLeaderboard";
+import { MatchmakingStats } from "@/app/components/MatchmakingStats";
 import { useAuthSafe } from "@/lib/useAuthSafe";
 
 export default function GameModePage() {
@@ -76,11 +77,14 @@ export default function GameModePage() {
                 Get automatically matched with another player
               </p>
               <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                <p className="text-sm text-gray-200">
+                <p className="text-sm text-gray-200 mb-3">
                   ⚡ Quick match<br />
                   🎲 Random opponent<br />
                   🏆 Competitive play
                 </p>
+                <div className="flex justify-center">
+                  <MatchmakingStats gameName={gameName} />
+                </div>
               </div>
             </div>
           </div>

@@ -1359,25 +1359,61 @@ app.post('/api/matchmaking/join', (req, res) => {
 app.post('/api/matchmaking/leave', (req, res) => {
   try {
     const { playerId } = req.body;
-    
+
     if (!playerId) {
       return res.status(400).json({ error: 'playerId is required' });
     }
-    
+
     // Remove player from queue
     const index = matchmakingQueue.findIndex(p => p.playerId === playerId);
     if (index !== -1) {
       matchmakingQueue.splice(index, 1);
       console.log(`Player ${playerId} left matchmaking. Queue size: ${matchmakingQueue.length}`);
     }
-    
+
     // Remove result
     matchmakingResults.delete(playerId);
-    
+
     res.json({ message: 'Left matchmaking queue' });
   } catch (err) {
     console.error('Error leaving matchmaking:', err);
     res.status(500).json({ error: 'Failed to leave matchmaking' });
+  }
+});
+
+// Get matchmaking stats for a specific game
+app.get('/api/matchmaking/stats/:gameName', (req, res) => {
+  try {
+    const { gameName } = req.params;
+
+    if (!gameName) {
+      return res.status(400).json({ error: 'gameName is required' });
+    }
+
+    // Decode the game name (Express automatically decodes route params, but just to be sure)
+    const decodedGameName = decodeURIComponent(gameName);
+
+    // Count players in queue for this game - need to compare both encoded and decoded versions
+    // because the queue might store either depending on how the client sent it
+    const playersInQueue = matchmakingQueue.filter(p => {
+      const queueGameName = p.gameName;
+      // Try to decode the queue game name to compare
+      const decodedQueueGameName = queueGameName.includes('%') ? decodeURIComponent(queueGameName) : queueGameName;
+      return decodedQueueGameName === decodedGameName || queueGameName === decodedGameName;
+    }).length;
+
+    console.log(`[Matchmaking Stats] Requested game: "${gameName}" (decoded: "${decodedGameName}")`);
+    console.log(`[Matchmaking Stats] Players in queue: ${playersInQueue}`);
+    console.log(`[Matchmaking Stats] Full queue:`, matchmakingQueue.map(p => ({ game: p.gameName, player: p.playerId })));
+
+    res.json({
+      gameName: decodedGameName,
+      playersInQueue,
+      timestamp: Date.now()
+    });
+  } catch (err) {
+    console.error('Error getting matchmaking stats:', err);
+    res.status(500).json({ error: 'Failed to get matchmaking stats' });
   }
 });
 

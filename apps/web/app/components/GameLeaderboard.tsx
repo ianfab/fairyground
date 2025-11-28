@@ -25,6 +25,9 @@ export function GameLeaderboard({ gameName }: GameLeaderboardProps) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPlayers, setTotalPlayers] = useState(0);
+  const playersPerPage = 10;
 
   useEffect(() => {
     async function fetchLeaderboard() {
@@ -33,7 +36,8 @@ export function GameLeaderboard({ gameName }: GameLeaderboardProps) {
 
         console.log('[GameLeaderboard] Raw gameName from props:', JSON.stringify(gameName));
 
-        const url = `${getGameServerUrl()}/api/elo/leaderboard/${safeEncodeURIComponent(gameName)}?limit=10`;
+        // Fetch a larger set to know total count
+        const url = `${getGameServerUrl()}/api/elo/leaderboard/${safeEncodeURIComponent(gameName)}?limit=100`;
         console.log('[GameLeaderboard] Final URL:', url);
 
         const response = await fetch(url);
@@ -53,18 +57,23 @@ export function GameLeaderboard({ gameName }: GameLeaderboardProps) {
           console.warn('[GameLeaderboard] Empty leaderboard returned for game:', gameName);
         }
 
-        setLeaderboard(data.leaderboard || []);
+        const fullLeaderboard = data.leaderboard || [];
+        setLeaderboard(fullLeaderboard);
+        setTotalPlayers(fullLeaderboard.length);
         setError(null);
       } catch (err) {
         console.error("[GameLeaderboard] Error fetching leaderboard:", err);
         setError("Unable to load leaderboard");
         setLeaderboard([]);
+        setTotalPlayers(0);
       } finally {
         setLoading(false);
       }
     }
 
     fetchLeaderboard();
+    // Reset to page 1 when game changes
+    setCurrentPage(1);
   }, [gameName]);
 
   if (loading) {
@@ -112,6 +121,20 @@ export function GameLeaderboard({ gameName }: GameLeaderboardProps) {
     return `${rank}.`;
   };
 
+  // Calculate pagination
+  const totalPages = Math.ceil(totalPlayers / playersPerPage);
+  const startIndex = (currentPage - 1) * playersPerPage;
+  const endIndex = startIndex + playersPerPage;
+  const currentPageData = leaderboard.slice(startIndex, endIndex);
+
+  const handlePrevPage = () => {
+    setCurrentPage(prev => Math.max(1, prev - 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(totalPages, prev + 1));
+  };
+
   return (
     <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 border border-gray-700">
       <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
@@ -119,7 +142,7 @@ export function GameLeaderboard({ gameName }: GameLeaderboardProps) {
       </h2>
 
       <div className="space-y-2">
-        {leaderboard.map((entry) => (
+        {currentPageData.map((entry) => (
           <div
             key={entry.player_id}
             className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
@@ -159,9 +182,36 @@ export function GameLeaderboard({ gameName }: GameLeaderboardProps) {
         ))}
       </div>
 
-      {leaderboard.length >= 10 && (
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between border-t border-gray-700 pt-4">
+          <button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors"
+          >
+            ← Previous
+          </button>
+
+          <div className="text-sm text-gray-400">
+            Page {currentPage} of {totalPages}
+            <span className="text-gray-600 mx-1">•</span>
+            {totalPlayers} players
+          </div>
+
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors"
+          >
+            Next →
+          </button>
+        </div>
+      )}
+
+      {totalPlayers > 0 && totalPages === 1 && (
         <div className="text-center mt-4 text-sm text-gray-500">
-          Showing top 10 players
+          Showing all {totalPlayers} {totalPlayers === 1 ? 'player' : 'players'}
         </div>
       )}
     </div>
