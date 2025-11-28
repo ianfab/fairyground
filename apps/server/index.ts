@@ -535,30 +535,185 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     }
     #game-ui-toggle {
       position: fixed;
-      top: 20px;
-      right: 20px;
+      bottom: 20px;
+      left: 78px;
       background: rgba(0, 0, 0, 0.9);
       border: 1px solid #444;
-      border-radius: 8px;
-      padding: 10px 12px;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      z-index: 1001;
+      z-index: 999;
       color: #fff;
-      font-size: 20px;
+      font-size: 24px;
       transition: all 0.2s ease;
-      display: none;
+      opacity: 0;
+      pointer-events: none;
+      padding: 0;
+    }
+    #game-ui-toggle.visible {
+      opacity: 1;
+      pointer-events: auto;
     }
     #game-ui-toggle:hover {
       background: rgba(102, 126, 234, 0.9);
       border-color: #667eea;
+      transform: scale(1.1);
+    }
+    #game-ui-header {
+      padding: 12px 15px;
+      border-bottom: 1px solid #444;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      margin: -20px -20px 15px -20px;
+    }
+    #game-ui-header:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    #game-ui-title {
+      color: #fff;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    #game-ui-collapse-toggle {
+      color: #888;
+      font-size: 12px;
     }
     @media (max-width: 768px) {
-      #game-ui-toggle {
-        display: block;
-      }
       #game-ui {
         max-width: 90vw;
       }
+      #game-chat {
+        bottom: 80px;
+        max-width: calc(100vw - 40px);
+      }
+    }
+    #chat-toggle-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid #444;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+      color: #fff;
+      font-size: 24px;
+      transition: all 0.2s ease;
+      opacity: 0;
+      pointer-events: none;
+      padding: 0;
+    }
+    #chat-toggle-btn.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #chat-toggle-btn:hover {
+      background: rgba(102, 126, 234, 0.9);
+      border-color: #667eea;
+      transform: scale(1.1);
+    }
+    #game-chat {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid #444;
+      border-radius: 10px;
+      width: 350px;
+      max-width: calc(100vw - 40px);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    #game-chat.collapsed {
+      transform: translateY(calc(100% + 20px));
+      opacity: 0;
+      pointer-events: none;
+    }
+    #chat-header {
+      padding: 12px 15px;
+      border-bottom: 1px solid #444;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    #chat-header:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    #chat-title {
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    #chat-toggle {
+      color: #888;
+      font-size: 12px;
+    }
+    #chat-messages {
+      height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .chat-message {
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .chat-message-sender {
+      color: #667eea;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    .chat-message-text {
+      color: #ddd;
+    }
+    .chat-message-system {
+      color: #888;
+      font-style: italic;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    #chat-input-container {
+      padding: 12px;
+      border-top: 1px solid #444;
+    }
+    #chat-input {
+      width: 100%;
+      padding: 12px 14px;
+      background: #1a1a1a;
+      border: 1px solid #555;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    #chat-input:focus {
+      border-color: #667eea;
+      background: #222;
+    }
+    #chat-input::placeholder {
+      color: #666;
     }
     #room-setup {
       position: fixed;
@@ -808,7 +963,10 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     </button>
 
     <div id="game-ui" style="${hideUI ? 'display: none;' : ''}">
-      <h3 style="margin-bottom: 15px; color: #fff;">Game Info</h3>
+      <div id="game-ui-header">
+        <span id="game-ui-title">ℹ️ Game Info</span>
+        <span id="game-ui-collapse-toggle">▼</span>
+      </div>
       <div class="info-row">
         <span class="info-label">Room:</span>
         <span class="info-value" id="current-room">${prefilledRoom || '-'}</span>
@@ -835,6 +993,23 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
           <pre id="state-display" style="white-space: pre-wrap; word-wrap: break-word;"></pre>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Chat toggle button -->
+  <button id="chat-toggle-btn" style="${hideUI ? 'display: none;' : ''}" title="Toggle Chat">
+    💬
+  </button>
+
+  <!-- Game Chat -->
+  <div id="game-chat" style="${hideUI ? 'display: none;' : ''}">
+    <div id="chat-header">
+      <span id="chat-title">💬 Room Chat</span>
+      <span id="chat-toggle">▼</span>
+    </div>
+    <div id="chat-messages"></div>
+    <div id="chat-input-container">
+      <input type="text" id="chat-input" placeholder="Type a message and press Enter..." maxlength="200" />
     </div>
   </div>
 
@@ -891,25 +1066,44 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       if (e.key === 'Enter') joinRoom();
     });
 
-    // Setup game UI toggle for mobile
+    // Setup game UI toggle
     const gameUIToggle = document.getElementById('game-ui-toggle');
     const gameUI = document.getElementById('game-ui');
+    const gameUIHeader = document.getElementById('game-ui-header');
+    const gameUICollapseToggle = document.getElementById('game-ui-collapse-toggle');
     let gameUICollapsed = false;
+
+    // Function to update toggle button visibility
+    function updateToggleVisibility() {
+      if (gameUICollapsed) {
+        gameUIToggle.classList.add('visible');
+      } else {
+        gameUIToggle.classList.remove('visible');
+      }
+    }
+
+    // Function to toggle game UI
+    function toggleGameUI() {
+      gameUICollapsed = !gameUICollapsed;
+      if (gameUICollapsed) {
+        gameUI.classList.add('collapsed');
+        gameUICollapseToggle.textContent = '▲';
+      } else {
+        gameUI.classList.remove('collapsed');
+        gameUICollapseToggle.textContent = '▼';
+      }
+      updateToggleVisibility();
+    }
 
     // Start collapsed on mobile
     if (window.innerWidth <= 768) {
       gameUICollapsed = true;
       gameUI.classList.add('collapsed');
+      updateToggleVisibility();
     }
 
-    gameUIToggle.addEventListener('click', () => {
-      gameUICollapsed = !gameUICollapsed;
-      if (gameUICollapsed) {
-        gameUI.classList.add('collapsed');
-      } else {
-        gameUI.classList.remove('collapsed');
-      }
-    });
+    gameUIToggle.addEventListener('click', toggleGameUI);
+    gameUIHeader.addEventListener('click', toggleGameUI);
 
     // Setup share button
     document.getElementById('share-btn').addEventListener('click', () => {
@@ -937,6 +1131,82 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         }, 2000);
       });
     });
+
+    // Setup chat functionality
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const chatHeader = document.getElementById('chat-header');
+    const chatToggle = document.getElementById('chat-toggle');
+    const chatToggleBtn = document.getElementById('chat-toggle-btn');
+    let chatCollapsed = false;
+
+    // Function to update chat toggle button visibility
+    function updateChatToggleVisibility() {
+      if (chatCollapsed) {
+        chatToggleBtn.classList.add('visible');
+      } else {
+        chatToggleBtn.classList.remove('visible');
+      }
+    }
+
+    // Add message to chat
+    function addChatMessage(sender, message, isSystem = false) {
+      const messageEl = document.createElement('div');
+      messageEl.className = isSystem ? 'chat-message chat-message-system' : 'chat-message';
+
+      if (isSystem) {
+        messageEl.textContent = message;
+      } else {
+        const senderEl = document.createElement('span');
+        senderEl.className = 'chat-message-sender';
+        senderEl.textContent = sender + ':';
+
+        const textEl = document.createElement('span');
+        textEl.className = 'chat-message-text';
+        textEl.textContent = message;
+
+        messageEl.appendChild(senderEl);
+        messageEl.appendChild(textEl);
+      }
+
+      chatMessages.appendChild(messageEl);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Send chat message
+    function sendChatMessage() {
+      const message = chatInput.value.trim();
+      if (!message || !socket || !currentRoom) return;
+
+      socket.emit('chat_message', {
+        roomId: currentRoom,
+        message: message,
+        username: playerUsername
+      });
+
+      chatInput.value = '';
+    }
+
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendChatMessage();
+    });
+
+    // Toggle chat collapse
+    function toggleChat() {
+      chatCollapsed = !chatCollapsed;
+      const gameChat = document.getElementById('game-chat');
+      if (chatCollapsed) {
+        gameChat.classList.add('collapsed');
+        chatToggle.textContent = '▲';
+      } else {
+        gameChat.classList.remove('collapsed');
+        chatToggle.textContent = '▼';
+      }
+      updateChatToggleVisibility();
+    }
+
+    chatHeader.addEventListener('click', toggleChat);
+    chatToggleBtn.addEventListener('click', toggleChat);
 
     // Setup metadata toggle
     document.getElementById('metadata-header').addEventListener('click', () => {
@@ -1046,6 +1316,14 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         console.error('Server error:', msg);
         alert('Error: ' + msg);
       });
+
+      // Listen for chat messages
+      socket.on('chat_message', ({ sender, message, timestamp }) => {
+        addChatMessage(sender, message);
+      });
+
+      // Add welcome message when joining room
+      addChatMessage('System', 'Welcome to the room! You can chat with other players here.', true);
     }
 
     function updateStateDisplay(state) {
@@ -1762,6 +2040,30 @@ io.on("connection", (socket) => {
     } catch (error) {
       console.error(`Error in game_action for ${socket.id}:`, error);
       socket.emit("error", "Failed to execute action. Please try again.");
+    }
+  });
+
+  // Handle chat messages
+  socket.on("chat_message", ({ roomId, message, username }: { roomId: string, message: string, username: string }) => {
+    try {
+      if (!roomId || !message || !message.trim()) {
+        return;
+      }
+
+      // Sanitize message
+      const sanitizedMessage = message.trim().substring(0, 200);
+      const senderUsername = username || 'Guest';
+
+      console.log(`Chat message in room ${roomId} from ${senderUsername}: ${sanitizedMessage}`);
+
+      // Broadcast to all players in the room
+      io.to(roomId).emit("chat_message", {
+        sender: senderUsername,
+        message: sanitizedMessage,
+        timestamp: Date.now()
+      });
+    } catch (err) {
+      console.error("Error handling chat message:", err);
     }
   });
 
