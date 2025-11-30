@@ -22,7 +22,8 @@ async function initGamesDev() {
         creator_email TEXT,
         play_count INTEGER DEFAULT 0,
         last_played_at TIMESTAMP,
-        preview BOOLEAN DEFAULT false
+        preview BOOLEAN DEFAULT false,
+        tags TEXT[] DEFAULT '{}'::text[]
       )
     `;
 

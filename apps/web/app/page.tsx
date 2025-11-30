@@ -4,6 +4,7 @@ import { Game } from "@/lib/types";
 import { GameCard } from "./components/GameCard";
 import { CommunityGameCard } from "./components/CommunityGameCard";
 import { CreateGameButton } from "./components/CreateGameButton";
+import { SEO_PAGES } from "@/lib/seo-pages";
 
 // Force dynamic to ensure we fetch fresh data
 export const dynamic = "force-dynamic";
@@ -182,6 +183,26 @@ export default async function Home() {
             />
           </div>
         </div>
+
+        {/* SEO landing links footer */}
+        <footer className="w-full mt-16 pt-10 border-t border-gray-900 text-left">
+          <div className="max-w-6xl mx-auto px-0 pb-10">
+            <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+              Explore more
+            </h2>
+            <div className="flex flex-wrap gap-3 text-sm">
+              {SEO_PAGES.map((page) => (
+                <Link
+                  key={page.slug}
+                  href={`/${page.slug}`}
+                  className="px-3 py-1.5 rounded-full bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:border-purple-500 hover:bg-gray-800 transition-colors"
+                >
+                  {page.keyword}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </footer>
       </main>
     </div>
   );

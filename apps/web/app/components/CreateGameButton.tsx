@@ -39,7 +39,7 @@ export function CreateGameButton() {
     <>
       <button
         onClick={handleClick}
-        className="px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-gray-200 transition-colors"
+        className="px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-gray-200 transition-colors cursor-pointer"
       >
         Create a Game
       </button>

@@ -8,7 +8,14 @@ async function main() {
         name TEXT UNIQUE NOT NULL,
         description TEXT,
         code TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW()
+        created_at TIMESTAMP DEFAULT NOW(),
+        creator_username TEXT,
+        creator_id TEXT,
+        creator_email TEXT,
+        play_count INTEGER DEFAULT 0,
+        last_played_at TIMESTAMP,
+        preview BOOLEAN DEFAULT false,
+        tags TEXT[] DEFAULT '{}'::text[]
       );
     `;
     console.log("Table 'games' created or already exists.");

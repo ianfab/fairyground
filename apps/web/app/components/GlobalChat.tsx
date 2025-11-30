@@ -135,16 +135,16 @@ export function GlobalChat() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 bg-purple-600 hover:bg-purple-700 text-white rounded-full p-4 shadow-lg transition-all z-50 flex items-center gap-2"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-purple-600 hover:bg-purple-700 text-white rounded-full p-3 sm:p-4 shadow-lg transition-all z-50 flex items-center gap-2"
         >
-          <MessageCircle className="w-6 h-6" />
-          <span className="font-semibold">Global Chat</span>
+          <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+          <span className="font-semibold text-sm sm:text-base">Global Chat</span>
         </button>
       )}
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-gray-900 border border-gray-800 rounded-xl shadow-2xl flex flex-col z-50">
+        <div className="fixed bottom-0 right-0 left-0 sm:bottom-6 sm:right-6 sm:left-auto w-full sm:w-96 h-[500px] sm:h-[500px] bg-gray-900 border-t sm:border border-gray-800 sm:rounded-xl shadow-2xl flex flex-col z-50">
           {/* Header */}
           <div className="p-4 border-b border-gray-800 flex items-center justify-between">
             <div>

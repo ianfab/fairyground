@@ -43,3 +43,19 @@ body {
   color: transparent;
   -webkit-text-fill-color: transparent;
 }
+
+/* Cascading code animation */
+@keyframes cascade-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: cascade-down 0.3s ease-out;
+}

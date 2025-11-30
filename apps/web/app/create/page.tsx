@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { GAME_TEMPLATES, GameTemplate } from "@/lib/game-templates";
+import { getDefaultTagsForTemplate } from "@/lib/game-tags";
 import { getGameUrl, getGameServerUrl, safeEncodeURIComponent } from "@/lib/config";
-import { AlertCircle, Code, Eye, Send } from "lucide-react";
+import { AlertCircle, ArrowRight, Code, Eye, Link } from "lucide-react";
 import { useAuthInfo, useRedirectFunctions } from "@propelauth/react";
 import dynamic from 'next/dynamic';
-import { SnakeGameWhileWaiting } from "@/app/components/SnakeGameWhileWaiting";
+import { EditingPanel } from "@/app/components/EditingPanel";
 import { AuthModal } from "@/app/components/AuthModal";
 
 const Editor = dynamic(
@@ -15,13 +16,35 @@ const Editor = dynamic(
   { ssr: false }
 );
 
+interface CodeEdit {
+  find: {
+    start_at: string;
+    end_at: string;
+  };
+  replace_with: string;
+}
+
 interface GenerationResultPayload {
-  code: string;
+  code?: string;
   explanation?: string;
   reasoning?: string;
   suggestedName?: string;
   suggestedDescription?: string;
+  edits?: CodeEdit[];
   type?: string;
+}
+
+interface Draft {
+  id: string;
+  user_id: string;
+  template: string;
+  game_description: string;
+  name: string | null;
+  description: string | null;
+  model: string;
+  is_shipped: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export default function CreateGame() {
@@ -54,7 +77,7 @@ export default function CreateGame() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [gameDescription, setGameDescription] = useState("");
-  const [selectedModel, setSelectedModel] = useState("claude-sonnet-4-5-20250929");
+  const [selectedModel, setSelectedModel] = useState("gpt-5");
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -62,30 +85,42 @@ export default function CreateGame() {
   const [generatedCode, setGeneratedCode] = useState("");
   const [explanation, setExplanation] = useState("");
   const [reasoning, setReasoning] = useState("");
-  const [showPreview, setShowPreview] = useState(true);
   const [previewGameName, setPreviewGameName] = useState<string>("");
   const [previewRoomId, setPreviewRoomId] = useState(() => `room-${Math.random().toString(36).substring(7)}`);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Edit mode chat
-  const [isEditMode, setIsEditMode] = useState(false);
+  // New UI state for redesigned experience
+  const [leftPanelView, setLeftPanelView] = useState<'preview' | 'code' | 'editing'>('preview');
+  
+  // Chat state for AI editing
   const [chatMessages, setChatMessages] = useState<Array<{ role: string; content: string; explanation?: string; reasoning?: string }>>([]);
   const [userMessage, setUserMessage] = useState("");
   const [liveModelStream, setLiveModelStream] = useState("");
   const [liveReasoningStream, setLiveReasoningStream] = useState("");
+  const explanationRef = useRef<HTMLDivElement | null>(null);
 
-  // Debug: log stream changes
-  useEffect(() => {
-    if (liveModelStream) {
-      console.log("[State] liveModelStream updated, length:", liveModelStream.length, "first 100 chars:", liveModelStream.substring(0, 100));
-    }
-  }, [liveModelStream]);
+  // // Debug: log stream changes
+  // useEffect(() => {
+  //   if (liveModelStream) {
+  //     console.log("[State] liveModelStream updated, length:", liveModelStream.length, "first 100 chars:", liveModelStream.substring(0, 100));
+  //   }
+  // }, [liveModelStream]);
 
+  // useEffect(() => {
+  //   if (liveReasoningStream) {
+  //     console.log("[State] liveReasoningStream updated, length:", liveReasoningStream.length, "first 100 chars:", liveReasoningStream.substring(0, 100));
+  //   }
+  // }, [liveReasoningStream]);
+
+  // Auto-scroll to explanation when it appears after generation
   useEffect(() => {
-    if (liveReasoningStream) {
-      console.log("[State] liveReasoningStream updated, length:", liveReasoningStream.length, "first 100 chars:", liveReasoningStream.substring(0, 100));
+    if (explanation && generatedCode && !generatingCode && explanationRef.current) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     }
-  }, [liveReasoningStream]);
+  }, [explanation, generatedCode, generatingCode]);
 
   // Debounced code change handler
   const handleCodeChange = useCallback((value: string | undefined) => {
@@ -101,6 +136,49 @@ export default function CreateGame() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [gamesCreated, setGamesCreated] = useState(0);
   const [hasSpecialKey, setHasSpecialKey] = useState(false);
+  const [showNameDescriptionModal, setShowNameDescriptionModal] = useState(false);
+
+  // Drafts state
+  const [drafts, setDrafts] = useState<Draft[]>([]);
+  const [showDraftsDropdown, setShowDraftsDropdown] = useState(false);
+  const [loadingDrafts, setLoadingDrafts] = useState(false);
+
+  // Preload background images for template selection screen
+  useEffect(() => {
+    const images = [
+      '/game-images/chess-default.webp',
+      '/game-images/2d-shooter-default.webp',
+      '/game-images/3d-shooter-default.webp',
+      '/game-images/tetris-default.webp',
+      '/game-images/open-ended-default.webp',
+    ];
+
+    // Preload images
+    images.forEach((src) => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = src;
+      document.head.appendChild(link);
+    });
+  }, []);
+
+  // Close drafts dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showDraftsDropdown) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.drafts-dropdown-container')) {
+          setShowDraftsDropdown(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDraftsDropdown]);
 
   // Check games created count on mount
   useEffect(() => {
@@ -139,6 +217,9 @@ export default function CreateGame() {
         } else {
           setGamesCreated(userGamesCreated);
         }
+
+        // Load drafts for logged-in users
+        loadDrafts();
       } else {
         // For non-logged-in users, use localStorage
         const count = parseInt(localStorage.getItem("createdGamesCount") || "0");
@@ -146,6 +227,85 @@ export default function CreateGame() {
       }
     }
   }, [authLoading, isLoggedIn, user]);
+
+  // Load user's drafts
+  const loadDrafts = async () => {
+    if (!isLoggedIn) return;
+    
+    setLoadingDrafts(true);
+    try {
+      // Pass userId as query param in case server-side auth doesn't work
+      const url = user?.userId ? `/api/drafts?userId=${user.userId}` : "/api/drafts";
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        setDrafts(data.drafts || []);
+      }
+    } catch (error) {
+      console.error("Failed to load drafts:", error);
+    } finally {
+      setLoadingDrafts(false);
+    }
+  };
+
+  // Save draft
+  const saveDraft = async () => {
+    if (!isLoggedIn || !selectedTemplate || !gameDescription) return;
+
+    try {
+      const response = await fetch("/api/drafts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          template: selectedTemplate,
+          gameDescription,
+          name,
+          description,
+          model: selectedModel,
+          userId: user?.userId, // Pass userId as fallback
+        }),
+      });
+
+      if (response.ok) {
+        console.log("Draft saved successfully");
+        // Reload drafts
+        loadDrafts();
+      }
+    } catch (error) {
+      console.error("Failed to save draft:", error);
+    }
+  };
+
+  // Load a draft into the form
+  const loadDraft = (draft: Draft) => {
+    setSelectedTemplate(draft.template as GameTemplate);
+    setGameDescription(draft.game_description);
+    setName(draft.name || "");
+    setDescription(draft.description || "");
+    setSelectedModel(draft.model);
+    setShowDraftsDropdown(false);
+  };
+
+  // Delete a draft
+  const deleteDraft = async (draftId: string) => {
+    try {
+      // Pass userId as query param in case server-side auth doesn't work
+      const url = user?.userId 
+        ? `/api/drafts?id=${draftId}&userId=${user.userId}` 
+        : `/api/drafts?id=${draftId}`;
+      const response = await fetch(url, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        console.log("Draft deleted successfully");
+        // Reload drafts
+        loadDrafts();
+      }
+    } catch (error) {
+      console.error("Failed to delete draft:", error);
+    }
+  };
 
   // Check if user needs to sign up or upgrade
   const checkCanCreate = () => {
@@ -201,6 +361,7 @@ export default function CreateGame() {
   };
 
   const consumeEventStream = async (response: Response): Promise<GenerationResultPayload> => {
+    console.log("[consumeEventStream] Starting stream consumption");
     if (!response.body) {
       throw new Error("Streaming is not supported in this browser.");
     }
@@ -223,8 +384,9 @@ export default function CreateGame() {
             let parsed: any;
             try {
               parsed = JSON.parse(data);
+              console.log("[consumeEventStream] Parsed event:", parsed.type);
             } catch (err) {
-              console.error("Failed to parse stream chunk", err);
+              console.error("Failed to parse stream chunk", err, "chunk:", chunk);
               boundary = buffer.indexOf("\n\n");
               continue;
             }
@@ -233,16 +395,19 @@ export default function CreateGame() {
               case "token":
                 if (parsed.delta) {
                   streamedText += parsed.delta;
+                  console.log("[consumeEventStream] Token delta, total length:", streamedText.length);
                   setLiveModelStream(streamedText);
                 }
                 break;
               case "reasoning":
                 if (parsed.delta) {
                   streamedReasoning += parsed.delta;
+                  console.log("[consumeEventStream] Reasoning delta, total length:", streamedReasoning.length);
                   setLiveReasoningStream(streamedReasoning);
                 }
                 break;
               case "result":
+                console.log("[consumeEventStream] Received result payload");
                 finalPayload = parsed;
                 break;
               case "error":
@@ -258,10 +423,13 @@ export default function CreateGame() {
       while (true) {
         const { value, done } = await reader.read();
         if (value) {
-          buffer += decoder.decode(value, { stream: true });
+          const decoded = decoder.decode(value, { stream: true });
+          console.log("[consumeEventStream] Received chunk, bytes:", value.length, "decoded length:", decoded.length);
+          buffer += decoded;
           processBuffer();
         }
         if (done) {
+          console.log("[consumeEventStream] Stream done");
           buffer += decoder.decode();
           processBuffer();
           break;
@@ -269,6 +437,7 @@ export default function CreateGame() {
       }
     } finally {
       reader.releaseLock();
+      console.log("[consumeEventStream] Stream finished, final payload:", !!finalPayload);
       // Don't clear the streams here - let them stay visible until the next generation
       // setLiveModelStream("");
       // setLiveReasoningStream("");
@@ -314,18 +483,59 @@ export default function CreateGame() {
     return (await response.json()) as GenerationResultPayload;
   };
 
-  const applyGenerationResult = async (
-    result: GenerationResultPayload,
-    options: { mode: "create" | "edit" }
-  ) => {
-    if (!result.code) {
-      throw new Error("Model did not return any code.");
+  const applyEditsToCode = (originalCode: string, edits: CodeEdit[]): string => {
+    let result = originalCode;
+
+    for (const edit of edits) {
+      const { start_at, end_at } = edit.find;
+      if (!start_at || !end_at) continue;
+
+      const startIndex = result.indexOf(start_at);
+      if (startIndex === -1) {
+        console.warn("Edit start_at not found in code:", start_at);
+        continue;
+      }
+
+      const endIndex = result.indexOf(end_at, startIndex + start_at.length);
+      if (endIndex === -1) {
+        console.warn("Edit end_at not found in code:", end_at);
+        continue;
+      }
+
+      const endOfMatch = endIndex + end_at.length;
+      result = result.slice(0, startIndex) + edit.replace_with + result.slice(endOfMatch);
     }
 
+    return result;
+  };
+
+  const applyGenerationResult = async (
+    result: GenerationResultPayload,
+    options: { mode: "create" | "edit"; originalCode?: string }
+  ) => {
     const explanationText = result.explanation || "";
     const reasoningText = result.reasoning || "";
 
-    setGeneratedCode(result.code);
+    let nextCode = generatedCode;
+
+    if (options.mode === "create") {
+      if (!result.code) {
+        throw new Error("Model did not return any code.");
+      }
+      nextCode = result.code;
+    } else {
+      const baseCode = options.originalCode ?? generatedCode;
+
+      if (baseCode && result.edits && result.edits.length > 0) {
+        nextCode = applyEditsToCode(baseCode, result.edits);
+      } else if (result.code) {
+        nextCode = result.code;
+      } else {
+        throw new Error("Model did not return any edits or code.");
+      }
+    }
+
+    setGeneratedCode(nextCode);
     setExplanation(explanationText);
     setReasoning(reasoningText);
 
@@ -341,8 +551,9 @@ export default function CreateGame() {
         result.suggestedName ||
         `preview-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 
-      await shipGameInPreviewMode(previewName, result.suggestedDescription || "", result.code);
-      setShowPreview(true);
+      await shipGameInPreviewMode(previewName, result.suggestedDescription || "", nextCode);
+      // Switch to preview mode
+      setLeftPanelView('preview');
     } else {
       setChatMessages(prev => [
         ...prev,
@@ -355,7 +566,7 @@ export default function CreateGame() {
       ]);
 
       if (previewGameName) {
-        await updatePreviewGame(previewGameName, description || "", result.code);
+        await updatePreviewGame(previewGameName, description || "", nextCode);
         setPreviewRoomId(`room-${Math.random().toString(36).substring(7)}`);
       }
     }
@@ -367,12 +578,25 @@ export default function CreateGame() {
       return;
     }
 
+    // Add logging and guard against duplicate calls
+    console.log("[handleGenerateGame] Called at", new Date().toISOString());
+    
+    // If already generating, don't allow another call
+    if (generatingCode) {
+      console.log("[handleGenerateGame] Already generating, skipping duplicate call");
+      return;
+    }
+
     setGeneratingCode(true);
     setError("");
     setLiveModelStream("");
     setLiveReasoningStream("");
 
+    // Save draft before generating
+    await saveDraft();
+
     try {
+      console.log("[handleGenerateGame] Starting API call");
       const res = await fetch("/api/generate-game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -385,17 +609,21 @@ export default function CreateGame() {
         }),
       });
 
+      console.log("[handleGenerateGame] API call completed");
       const result = await parseLLMResponse(res);
       await applyGenerationResult(result, { mode: "create" });
     } catch (err: any) {
       setError(err.message);
     } finally {
       setGeneratingCode(false);
+      console.log("[handleGenerateGame] Finished at", new Date().toISOString());
     }
   };
 
   const handleEditGame = async () => {
     if (!userMessage.trim() || generatingCode) return;
+
+    console.log("[handleEditGame] Called at", new Date().toISOString());
 
     const newMessage = userMessage.trim();
     setUserMessage("");
@@ -408,6 +636,7 @@ export default function CreateGame() {
     setLiveReasoningStream("");
 
     try {
+      console.log("[handleEditGame] Starting API call");
       const response = await fetch("/api/generate-game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -416,11 +645,13 @@ export default function CreateGame() {
           existingCode: generatedCode,
           model: selectedModel,
           userId: user?.userId,
+          chatHistory: chatMessages, // Pass full conversation history for context
         }),
       });
 
+      console.log("[handleEditGame] API call completed");
       const data = await parseLLMResponse(response);
-      await applyGenerationResult(data, { mode: "edit" });
+      await applyGenerationResult(data, { mode: "edit", originalCode: generatedCode });
     } catch (err: any) {
       setError(err.message || "Failed to generate code");
       setChatMessages(prev => [...prev, {
@@ -429,11 +660,14 @@ export default function CreateGame() {
       }]);
     } finally {
       setGeneratingCode(false);
+      console.log("[handleEditGame] Finished at", new Date().toISOString());
     }
   };
 
   const shipGameInPreviewMode = async (gameName: string, gameDesc: string, code: string) => {
     try {
+      const defaultTags = selectedTemplate ? getDefaultTagsForTemplate(selectedTemplate) : [];
+
       const response = await fetch("/api/games", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -444,7 +678,8 @@ export default function CreateGame() {
           preview: true,
           creatorId: user?.userId,
           creatorEmail: user?.email,
-          creatorUsername: user?.username
+          creatorUsername: user?.username,
+          tags: defaultTags,
         }),
       });
 
@@ -465,6 +700,8 @@ export default function CreateGame() {
 
   const updatePreviewGame = async (gameName: string, gameDesc: string, code: string) => {
     try {
+      const defaultTags = selectedTemplate ? getDefaultTagsForTemplate(selectedTemplate) : [];
+
       const response = await fetch(`/api/games/${safeEncodeURIComponent(gameName)}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -473,6 +710,7 @@ export default function CreateGame() {
           code: code,
           preview: true,
           creatorId: user?.userId,
+          tags: defaultTags,
         }),
       });
 
@@ -486,18 +724,21 @@ export default function CreateGame() {
 
   const handleShipIt = async () => {
     setError("");
+  
+    // If the user hasn't provided both a name and description yet,
+    // prompt them in a popup before proceeding.
+    if (!name.trim() || !description.trim()) {
+      setShowNameDescriptionModal(true);
+      return;
+    }
+  
     setLoading(true);
-
+  
     try {
-      // Require a proper game name before shipping
-      if (!name || !name.trim()) {
-        setError("Please provide a game name before shipping");
-        setLoading(false);
-        return;
-      }
-
       const finalName = name.trim();
+
       const codeToShip = generatedCode || GAME_TEMPLATES[selectedTemplate!].baseCode;
+      const defaultTags = selectedTemplate ? getDefaultTagsForTemplate(selectedTemplate) : [];
 
       // If preview game exists, update it to non-preview
       if (previewGameName) {
@@ -510,6 +751,7 @@ export default function CreateGame() {
             code: codeToShip,
             preview: false,
             creatorId: user?.userId,
+            tags: defaultTags,
           }),
         });
 
@@ -532,13 +774,31 @@ export default function CreateGame() {
             preview: false,
             creatorId: user?.userId,
             creatorEmail: user?.email,
-            creatorUsername: user?.username
+            creatorUsername: user?.username,
+            tags: defaultTags,
           }),
         });
 
         if (!res.ok) {
           const data = await res.json();
           throw new Error(data.error || "Failed to create game");
+        }
+      }
+
+      // Mark all drafts for this game as shipped
+      if (isLoggedIn && selectedTemplate && gameDescription) {
+        try {
+          await fetch('/api/drafts/mark-shipped', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              template: selectedTemplate,
+              gameDescription: gameDescription,
+              userId: user?.userId,
+            }),
+          });
+        } catch (e) {
+          console.error('Failed to mark draft as shipped:', e);
         }
       }
 
@@ -655,7 +915,7 @@ export default function CreateGame() {
               // Map template IDs to background images
               const backgroundImages: Record<GameTemplate, string> = {
                 "chess-variant": "/game-images/chess-default.webp",
-                "2d-shooter": "/game-images/2d-shooter-default.png",
+                "2d-shooter": "/game-images/2d-shooter-default.webp",
                 "3d-shooter": "/game-images/3d-shooter-default.webp",
                 "tetris-duels": "/game-images/tetris-default.webp",
                 "open-ended": "/game-images/open-ended-default.webp",
@@ -711,10 +971,77 @@ export default function CreateGame() {
   }
 
   const template = GAME_TEMPLATES[selectedTemplate];
+  const canPlayAnotherGameWhileWaiting = Boolean(name.trim() && description.trim());
+
+  // Render panel content based on view mode
+  const renderPanelContent = (view: 'preview' | 'code' | 'editing', panelSide: 'left' | 'right') => {
+    if (view === 'preview') {
+      if (generatedCode && previewGameName) {
+        // Use the same room for both previews so they stay in sync,
+        // but give each iframe a distinct preview user ID so they join as separate players.
+        const roomId = previewRoomId;
+        const previewUserId = `preview-${panelSide}-${roomId}`;
+        const searchParams = new URLSearchParams({
+          hideUI: "true",
+          userId: previewUserId,
+          username: panelSide === "left" ? "Preview Player 1" : "Preview Player 2",
+        });
+
+        return (
+          <iframe
+            src={`${getGameServerUrl()}/game/${safeEncodeURIComponent(previewGameName)}/${safeEncodeURIComponent(roomId)}?${searchParams.toString()}`}
+            className="w-full h-full border-0"
+            title={`Game Preview ${panelSide}`}
+            key={`${roomId}-${panelSide}`}
+          />
+        );
+      } else {
+        return (
+          <div className="w-full h-full flex items-center justify-center bg-gray-900/50">
+            {/* <p className="text-gray-500">
+              Preview will appear here
+            </p> */}
+          </div>
+        );
+      }
+    } else if (view === 'code') {
+      return (
+        <Editor
+          height="100%"
+          defaultLanguage="javascript"
+          value={generatedCode || "// Code will appear here after generation..."}
+          onChange={handleCodeChange}
+          theme="vs-dark"
+          options={{
+            fontSize: 13,
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            wordWrap: "on",
+            automaticLayout: true,
+            tabSize: 2,
+            insertSpaces: true,
+            readOnly: false,
+          }}
+        />
+      );
+    } else {
+      // editing view
+      return (
+        <EditingPanel
+          explanation={explanation}
+          reasoning={reasoning}
+          chatMessages={chatMessages}
+          userMessage={userMessage}
+          setUserMessage={setUserMessage}
+          onSendMessage={handleEditGame}
+          generatingCode={generatingCode}
+        />
+      );
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans">
-      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+    <div className="min-h-screen bg-black text-white font-sans relative overflow-hidden">
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
@@ -724,354 +1051,468 @@ export default function CreateGame() {
           onSpecialKeySubmit={handleSpecialKeySubmit}
         />
 
-        {/* Left Pane: Game Description & Generation */}
-        <div className="w-1/2 flex flex-col border-r border-gray-800 p-6 overflow-y-auto">
-        <div className="mb-4">
-          <button
-            onClick={() => setSelectedTemplate(null)}
-            className="text-gray-400 hover:text-white mb-4"
-          >
-            ← Back to templates
-          </button>
-          <h1 className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-            {template.name}
-          </h1>
-          <p className="text-gray-400 text-sm mb-4">{template.description}</p>
-          
-          {template.libraries.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-6">
-              {template.libraries.map((lib) => (
-                <span key={lib} className="px-2 py-1 bg-gray-800 text-gray-300 text-xs rounded">
-                  {lib}
-                </span>
-              ))}
+      <div className="flex flex-col h-[calc(100vh-64px)] relative">
+        {/* Top Section: Dual Panels OR Generation Form */}
+        <div className="flex-1 flex gap-1 min-h-0 p-1">
+          {generatedCode && !generatingCode && !name.trim() ? (
+            // Subtle centered name form shown after first generation and before shipping
+            <div className="flex-1 flex items-center justify-center bg-gray-900 rounded-lg relative z-10">
+              <div className="bg-black/80 border border-gray-800/80 rounded-lg px-6 py-5 shadow-lg max-w-md w-full mx-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-2 h-2 rounded-full ${generatedCode ? "bg-emerald-400" : "bg-emerald-400 animate-pulse"}`} />
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
+                      {generatedCode ? "READY TO SHIP" : "GENERATING YOUR GAME"}
+                    </p>
+                    <h3 className="text-sm font-semibold text-gray-100 mt-1">
+                      Give your creation a name so you can ship it. Description is optional.
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1.5">Game name *</label>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full bg-gray-900/80 border border-gray-700 rounded-md px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
+                      placeholder="my-awesome-game"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1.5">Description (optional)</label>
+                    <input
+                      type="text"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="w-full bg-gray-900/80 border border-gray-700 rounded-md px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
+                      placeholder="A fun multiplayer game..."
+                    />
+                  </div>
+
+                  {description && (
+                    <p className="text-[10px] text-gray-500 text-right pt-1">
+                      Description added
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
+          ) : !generatingCode && !generatedCode ? (
+            <div className="flex-1 flex items-center justify-center rounded-lg relative z-10 overflow-hidden">
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+              >
+                <source src="/veo-demo.webm" type="video/webm" />
+              </video>
+              {/* <div className="bg-black/80 border border-gray-800/80 rounded-lg px-6 py-5 shadow-lg max-w-md w-full mx-4 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full bg-emerald-400 animate-pulse`} />
+                  <div>
+                    <p className="text-md uppercase text-white">
+                      CREATE THE {template?.name} YOU'VE ALWAYS WANTED.
+                    </p>
+                  </div>
+                </div>
+              </div> */}
+            </div>
+          ) : generatingCode && !generatedCode ? (
+            <div className="flex-1 flex items-center justify-center rounded-lg relative z-10 overflow-hidden">
+              {/* Streaming code background */}
+              {(liveModelStream || liveReasoningStream) ? (
+                <div className="absolute inset-0 pointer-events-none opacity-20">
+                  <div className="w-full h-full overflow-hidden p-4">
+                    <pre className="w-full h-full text-[11px] leading-[1.2] text-emerald-400 font-mono whitespace-pre-wrap break-words animate-[scroll-code_20s_linear_infinite]">
+                      {liveReasoningStream} {liveModelStream}
+                    </pre>
+                  </div>
+                </div>
+              ) : 
+              <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            >
+              <source src="/veo-demo.webm" type="video/webm" />
+            </video>
+              }
+
+              <div className="bg-black/80 border border-gray-800/80 rounded-lg px-6 py-5 shadow-lg max-w-md w-full mx-4 relative z-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-white">
+                      GENERATING YOUR GAME...
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">Usually 1-2 minutes...</p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1.5">
+                      Game title
+                    </label>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full bg-gray-900/80 border border-gray-700 rounded-md px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
+                      placeholder="What should we call this game?"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1.5">
+                      Short description
+                    </label>
+                    <input
+                      type="text"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="w-full bg-gray-900/80 border border-gray-700 rounded-md px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
+                      placeholder="A quick sentence about your game..."
+                    />
+                  </div>
+                </div>
+
+                {canPlayAnotherGameWhileWaiting ? (
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  <Link
+                    href={
+                        `${getGameServerUrl()}/game/tetris-battle`
+                    }
+                    target="_blank"
+                    
+                    className={`inline-flex items-center gap-1 text-xs font-medium rounded-md px-3 py-2 transition-opacity bg-gray-800/50 border border-gray-700/50 ${
+                      canPlayAnotherGameWhileWaiting
+                        ? "text-blue-400 hover:text-blue-300 opacity-100 cursor-pointer hover:bg-gray-800/70"
+                        : "text-blue-400 cursor-not-allowed opacity-60"
+                    }`}
+                  >
+                    🎮 Play another game while you wait
+                  </Link>
+                </div>
+                ) : (
+                  <button opacity-60 cursor-not-allowed>
+                      🎮 Play another game while you wait
+                  </button>
+                )}
+              </div>
+            </div>
+          ) :
+          (
+            <>
+              {/* Left Panel - Toggleable */}
+              <div className="flex-1 flex flex-col bg-gray-900 rounded-lg overflow-hidden">
+                {/* Left Panel Controls - Only show after first generation */}
+                {generatedCode && (
+                  <div className="p-2 bg-gray-800/50 border-b border-gray-700 flex gap-1">
+                    <button
+                      onClick={() => setLeftPanelView('preview')}
+                      className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${ 
+                        leftPanelView === 'preview' ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                    >
+                      <Eye className="w-4 h-4 inline mr-1" />
+                      Preview
+                    </button>
+                    <button
+                      onClick={() => setLeftPanelView('code')}
+                      className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
+                        leftPanelView === 'code' ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                    >
+                      <Code className="w-4 h-4 inline mr-1" />
+                      Code
+                    </button>
+                    <button
+                      onClick={() => setLeftPanelView('editing')}
+                      className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
+                        leftPanelView === 'editing' ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                    >
+                      💬 Edit Game
+                    </button>
+                  </div>
+                )}
+                
+                {/* Left Panel Content */}
+                <div className="flex-1 min-h-0">
+                  {renderPanelContent(leftPanelView, 'left')}
+                </div>
+              </div>
+
+              {/* Right Panel - Always Preview */}
+              <div className="flex-1 flex flex-col bg-gray-900 rounded-lg overflow-hidden">
+                {/* Right Panel Header - No toggles, just label */}
+                {generatedCode && (
+                  <div className="p-2 bg-gray-800/50 border-b border-gray-700 text-center">
+                    <span className="text-sm font-medium text-gray-400">
+                      <Eye className="w-4 h-4 inline mr-1" />
+                      Game Preview (Player 2)
+                    </span>
+                  </div>
+                )}
+                
+                {/* Right Panel Content - Always Preview */}
+                <div className="flex-1 min-h-0">
+                  {renderPanelContent('preview', 'right')}
+                </div>
+              </div>
+            </>
           )}
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm text-gray-400 mb-2">Game Name (Unique)</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full bg-gray-900 border border-gray-800 rounded p-3 focus:border-purple-500 focus:outline-none"
-            placeholder="my-awesome-game"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm text-gray-400 mb-2">Short Description</label>
-          <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-gray-900 border border-gray-800 rounded p-3 focus:border-purple-500 focus:outline-none"
-            placeholder="A fun multiplayer game..."
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm text-gray-400 mb-2">AI Model</label>
-          <select
-            value={selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-            className="w-full bg-gray-900 border border-gray-800 rounded p-3 focus:border-purple-500 focus:outline-none"
-          >
-            <option value="gpt-5">GPT-5 (OpenAI) - Default</option>
-            <option value="claude-sonnet-4-5-20250929">Claude Sonnet 4.5 (Anthropic) - Default</option>
-            <option value="gemini-2.5-pro">Gemini 2.5 Pro (Google)</option>
-          </select>
-        </div>
-
-        {!isEditMode ? (
-          <>
-            {/* Collapsible Game Description Input */}
-            <details className="mb-4" open={!generatedCode}>
-              <summary className="cursor-pointer p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-colors list-none flex items-center justify-between mb-4">
-                <span className="font-semibold text-white">Game Description {generatedCode ? "✓" : ""}</span>
-                <svg className="w-4 h-4 text-gray-400 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </summary>
-              
-              <div className="flex-1 flex flex-col mb-4">
-                <label className="block text-sm text-gray-400 mb-2">
-                  Describe Your Game (AI will generate the code)
-                </label>
-                <textarea
-                  value={gameDescription}
-                  onChange={(e) => setGameDescription(e.target.value)}
-                  className="w-full h-40 bg-gray-900 border border-gray-800 rounded p-4 text-sm focus:border-purple-500 focus:outline-none resize-none"
-                  placeholder={template.prompt}
-                  spellCheck={false}
-                />
-              </div>
-
-              <button
-                onClick={handleGenerateGame}
-                disabled={generatingCode || !gameDescription}
-                className="w-full bg-purple-600 text-white px-6 py-3 rounded-full font-bold hover:bg-purple-500 disabled:opacity-50 transition-all mb-4"
-              >
-                {generatingCode ? "Generating Code..." : "Generate Game Code 🤖"}
-              </button>
-            </details>
-
-            {generatingCode && (
-              <div className="mb-4 bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden">
-                <div className="p-4 border-b border-gray-700">
-                  <h3 className="text-sm font-semibold text-green-400 mb-1">Live Model Output</h3>
-                  <p className="text-xs text-gray-400">
-                    Streaming raw text as the model generates it
-                    <span className="ml-2 text-yellow-400 text-xs">
-                      (Stream: {liveModelStream ? `${liveModelStream.length} chars` : 'empty'} | 
-                      Reasoning: {liveReasoningStream ? `${liveReasoningStream.length} chars` : 'empty'})
-                    </span>
-                  </p>
-                </div>
-                {liveModelStream ? (
-                  <div className="p-4 border-b border-gray-700 max-h-48 overflow-y-auto">
-                    <pre className="text-xs text-gray-300 whitespace-pre-wrap font-mono">
-                      {liveModelStream}
-                    </pre>
-                  </div>
-                ) : (
-                  <div className="p-4 border-b border-gray-700 text-xs text-gray-500 italic">
-                    Waiting for model output...
-                  </div>
-                )}
-                {liveReasoningStream ? (
-                  <div className="p-4 max-h-48 overflow-y-auto">
-                    <h4 className="text-xs font-semibold text-blue-400 mb-2">Reasoning</h4>
-                    <pre className="text-xs text-gray-300 whitespace-pre-wrap font-mono">
-                      {liveReasoningStream}
-                    </pre>
-                  </div>
-                ) : (
-                  <div className="p-4 text-xs text-gray-500 italic">
-                    Waiting for reasoning output...
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Model Explanation and Reasoning - Moved to left side */}
-            {(explanation || reasoning) && generatedCode && (
-              <div className="mb-4 bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden">
-                {explanation && (
-                  <div className="p-4 border-b border-gray-700">
-                    <h3 className="text-sm font-semibold text-purple-400 mb-2">✨ AI Explanation</h3>
-                    <p className="text-sm text-gray-300">{explanation}</p>
-                  </div>
-                )}
-                {reasoning && (
-                  <details className="group">
-                    <summary className="cursor-pointer p-4 hover:bg-gray-800/50 transition-colors list-none flex items-center justify-between">
-                      <span className="text-sm font-semibold text-blue-400">🧠 Model Reasoning (Click to expand)</span>
-                      <svg className="w-4 h-4 text-gray-400 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </summary>
-                    <div className="p-4 pt-0 max-h-48 overflow-y-auto">
-                      <pre className="text-xs text-gray-400 whitespace-pre-wrap font-mono">{reasoning}</pre>
-                    </div>
-                  </details>
-                )}
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            {/* Edit Mode Chat Interface */}
-            <div className="flex-1 bg-gray-900/50 rounded-xl border border-gray-800 flex flex-col min-h-0 mb-4">
-              <div className="p-4 border-b border-gray-800">
-                <h2 className="text-lg font-semibold text-white">AI Assistant</h2>
-                <p className="text-sm text-gray-400">Describe what changes you want to make</p>
-              </div>
-
-              {/* Chat Messages */}
-              <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
-                {chatMessages.map((msg, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
-                    <div
-                      className={`max-w-[80%] rounded-lg overflow-hidden ${
-                        msg.role === "user"
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-800 text-gray-100"
-                      }`}
-                    >
-                      <div className="p-3">
-                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                      </div>
-                      {msg.role === "assistant" && msg.reasoning && (
-                        <details className="group border-t border-gray-700">
-                          <summary className="cursor-pointer p-2 px-3 hover:bg-gray-700/50 transition-colors list-none flex items-center justify-between text-xs text-gray-400">
-                            <span>Model Reasoning</span>
-                            <svg className="w-3 h-3 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </summary>
-                          <div className="p-3 pt-2 max-h-32 overflow-y-auto bg-gray-900/50">
-                            <pre className="text-xs text-gray-400 whitespace-pre-wrap font-mono">{msg.reasoning}</pre>
+        {/* Bottom Section: Input / Explanation Area */}
+        <div className="p-4 bg-gray-900/95 backdrop-blur-sm border-t border-gray-700 relative z-10">
+          <div className="max-w-5xl mx-auto">
+            {/* Template Info in Bottom Left */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-4">
+                <button
+                  // onClick={() => setSelectedTemplate(null)}
+                  className="text-sm text-gray-400 hover:text-white transition-colors"
+                >
+                  {template.name}
+                </button>
+            {isLoggedIn && drafts.length > 0 && (
+              <div className="relative drafts-dropdown-container">
+                {!generatedCode && (<button
+                  onClick={() => setShowDraftsDropdown(!showDraftsDropdown)}
+                  className="px-3 py-1.5 bg-gray-800 text-gray-300 text-sm rounded hover:bg-gray-700 transition-colors"
+                >
+                  Load Draft ({drafts.length})
+                </button>)}
+                
+                {/* Drafts Dropdown */}
+                {showDraftsDropdown && (
+                  <div className="absolute right-0 top-full mt-2 w-80 bg-gray-900 border border-gray-700 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+                    <div className="p-2">
+                      {drafts.map((draft) => (
+                        <div
+                          key={draft.id}
+                          className="p-3 hover:bg-gray-800 rounded cursor-pointer group relative"
+                        >
+                          <div onClick={() => loadDraft(draft)}>
+                            <div className="text-sm text-white font-semibold mb-1">
+                              {draft.name || "Untitled Draft"}
+                            </div>
+                            <div className="text-xs text-gray-400 mb-2 line-clamp-2">
+                              {draft.game_description}
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-gray-500">
+                              <span>{GAME_TEMPLATES[draft.template as GameTemplate]?.name || draft.template}</span>
+                              <span>{new Date(draft.updated_at).toLocaleDateString()}</span>
+                            </div>
                           </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteDraft(draft.id);
+                            }}
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+            {/* Main Area: either prompt textarea or AI explanation with actions */}
+            <div className="flex gap-3 items-stretch">
+              {explanation && generatedCode && !generatingCode ? (
+                <>
+                  {/* AI Explanation replaces chat box */}
+                  <div className="flex-1 relative">
+                    <div
+                      ref={explanationRef}
+                      className="h-full bg-black/80 border border-green-500/40 rounded-lg p-4 text-sm overflow-y-auto"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-green-400 text-xs font-semibold tracking-[0.2em] uppercase">
+                          AI GENERATED EXPLANATION
+                        </span>
+                      </div>
+                      <div className="text-gray-200 whitespace-pre-wrap">
+                        {explanation}
+                      </div>
+                      {reasoning && (
+                        <details className="mt-3">
+                          <summary className="cursor-pointer text-[11px] text-emerald-300 hover:text-emerald-200">
+                            🧠 View reasoning
+                          </summary>
+                          <pre className="mt-2 text-[11px] text-emerald-200 whitespace-pre-wrap font-mono max-h-32 overflow-y-auto">
+                            {reasoning}
+                          </pre>
                         </details>
                       )}
                     </div>
                   </div>
-                ))}
-                {generatingCode && (
-                  <div className="flex justify-start">
-                    <div className="bg-gray-800 text-gray-100 rounded-lg p-3">
-                      <p className="text-sm">Generating...</p>
-                    </div>
-                  </div>
-                )}
-              </div>
 
-              {/* Chat Input */}
-              <div className="p-4 border-t border-gray-800">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={userMessage}
-                    onChange={(e) => setUserMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleEditGame()}
-                    placeholder="Describe your changes..."
-                    disabled={generatingCode}
-                    className="flex-1 px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-purple-500"
-                  />
-                  <button
-                    onClick={handleEditGame}
-                    disabled={!userMessage.trim() || generatingCode}
-                    className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <Send className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {error && <div className="text-red-500 mb-4">{error}</div>}
-
-        {generatedCode && !generatingCode && (
-          <div className="mt-auto pt-4 border-t border-gray-800 space-y-3">
-            <button
-              onClick={handleShipIt}
-              disabled={loading || !name || !name.trim()}
-              className="w-full bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-gray-200 disabled:opacity-50 transition-all"
-              title={!name || !name.trim() ? "Please enter a game name first" : "Ship your game"}
-            >
-              {loading ? "Shipping..." : "Ship It 🚀"}
-            </button>
-            <button
-              onClick={() => {
-                setIsEditMode(!isEditMode);
-                if (!isEditMode && chatMessages.length === 0) {
-                  // Add initial message when entering edit mode
-                  setChatMessages([{
-                    role: "assistant",
-                    content: "I'm ready to help you edit the game! Tell me what changes you'd like to make."
-                  }]);
-                }
-              }}
-              className="w-full bg-gray-800 text-white px-8 py-3 rounded-full font-bold hover:bg-gray-700 transition-all"
-            >
-              {isEditMode ? "Exit Edit Mode" : "Edit Game 💬"}
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Right Pane: Game Preview or Code Editor or Snake Game */}
-      <div className="w-1/2 flex flex-col bg-gray-900/50 p-6 overflow-hidden">
-        {generatingCode ? (
-          <SnakeGameWhileWaiting />
-        ) : (
-          <>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-400">
-                {showPreview ? "Game Preview" : "Generated Code"}
-              </h2>
-              {generatedCode && (
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setShowPreview(true)}
-                    className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                      showPreview
-                        ? "bg-purple-600 text-white"
-                        : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                    }`}
-                  >
-                    <Eye className="w-4 h-4" />
-                    Preview
-                  </button>
-                  <button
-                    onClick={() => setShowPreview(false)}
-                    className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                      !showPreview
-                        ? "bg-purple-600 text-white"
-                        : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                    }`}
-                  >
-                    <Code className="w-4 h-4" />
-                    Code
-                  </button>
-                  {showPreview && (
+                  {/* Actions to the right of explanation */}
+                  <div className="flex flex-col gap-2 w-36 shrink-0">
                     <button
-                      onClick={() => {
-                        // Force iframe refresh by changing the room ID
-                        setPreviewRoomId(`room-${Math.random().toString(36).substring(7)}`);
-                      }}
-                      className="px-4 py-2 rounded-lg flex items-center gap-2 bg-gray-800 text-gray-400 hover:bg-gray-700 transition-colors"
-                      title="Refresh game"
+                      onClick={handleShipIt}
+                      disabled={!name.trim() || !generatedCode}
+                      className={`w-full px-3 py-2 rounded-md text-sm font-semibold transition-all cursor-pointer ${
+                        name.trim() && generatedCode
+                          ? "bg-green-600 hover:bg-green-700 text-white"
+                          : "bg-gray-800 text-gray-500 cursor-not-allowed"
+                      }`}
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                      Refresh
+                      🚀 Ship it
+                    </button>
+                    <button
+                      onClick={() => setLeftPanelView("editing")}
+                      className="w-full px-3 py-2 rounded-md text-sm font-semibold bg-gray-800 hover:bg-gray-700 text-gray-100 transition-colors cursor-pointer"
+                    >
+                      ✏️ Edit game
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Textarea with Model Dropdown and Arrow Button overlaid */}
+                  <div className="flex-1 relative">
+                    <textarea
+                      value={gameDescription}
+                      onChange={(e) => setGameDescription(e.target.value)}
+                      placeholder={
+                        !generatedCode
+                          ? "Describe your game... (e.g., 'Make a competitive multiplayer puzzle game where players build towers')"
+                          : "Describe your changes... (e.g., 'Add power-ups' or 'Change the game to be 3 players')"
+                      }
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg p-4 pr-16 pb-12 min-h-[100px] max-h-[250px] focus:border-purple-500 focus:outline-none resize-none"
+                      disabled={generatingCode}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          if (!generatedCode) handleGenerateGame();
+                          else handleEditGame();
+                        }
+                      }}
+                    />
+
+                    {/* Model Dropdown in Bottom Left Corner */}
+                    <div className="absolute left-3 bottom-3">
+                      <select
+                        value={selectedModel}
+                        onChange={(e) => setSelectedModel(e.target.value)}
+                        className="px-3 py-1.5 bg-gray-900/90 border border-gray-600 rounded text-xs focus:border-purple-500 focus:outline-none cursor-pointer hover:bg-gray-900"
+                        disabled={generatingCode}
+                      >
+                        <option value="gpt-5">GPT-5</option>
+                        <option value="claude-sonnet-4-5-20250929">Claude 4.5 Sonnet</option>
+                        <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                      </select>
+                    </div>
+
+                    {/* Arrow Button in Bottom Right Corner */}
+                    <button
+                      onClick={!generatedCode ? handleGenerateGame : handleEditGame}
+                      disabled={!gameDescription.trim() || generatingCode}
+                      className="absolute right-3 top-3 p-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-lg transition-all group cursor-pointer"
+                      title={!generatedCode ? "Generate Game" : "Apply Changes"}
+                    >
+                      <ArrowRight className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* Ship It Button (pre-explanation state) */}
+                  {generatedCode && (
+                    <button
+                      onClick={handleShipIt}
+                      disabled={!name.trim() || !generatedCode}
+                      className={`px-6 py-3 rounded-lg font-semibold transition-all cursor-pointer ${
+                        name.trim() && generatedCode
+                          ? "bg-green-600 hover:bg-green-700 text-white"
+                          : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                      }`}
+                    >
+                      🚀 Ship It
                     </button>
                   )}
-                </div>
+                </>
               )}
             </div>
-            
-            <div className="flex-1 bg-black border border-gray-800 rounded overflow-hidden">
-              {showPreview && generatedCode && previewGameName ? (
-                <iframe
-                  src={`${getGameServerUrl()}/game/${safeEncodeURIComponent(previewGameName)}/${safeEncodeURIComponent(previewRoomId)}?hideUI=true`}
-                  className="w-full h-full border-0"
-                  title="Game Preview"
-                  key={previewRoomId} // Force reload on room change
-                />
-              ) : (
-                <Editor
-                  height="100%"
-                  defaultLanguage="javascript"
-                  value={generatedCode || "// Code will appear here after generation..."}
-                  onChange={handleCodeChange}
-                  theme="vs-dark"
-                  options={{
-                    fontSize: 13,
-                    minimap: { enabled: false },
-                    scrollBeyondLastLine: false,
-                    wordWrap: "on",
-                    automaticLayout: true,
-                    tabSize: 2,
-                    insertSpaces: true,
-                    readOnly: false,
-                  }}
-                />
-              )}
+          </div>
+      </div>
+      </div>
+      
+      {/* Modal to prompt for game name and description before shipping */}
+      {showNameDescriptionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="bg-gray-900 border border-gray-700 rounded-xl px-6 py-5 shadow-xl max-w-md w-full mx-4">
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold text-white">
+                Add a name and description
+              </h2>
+              <p className="mt-1 text-xs text-gray-400">
+                Before you ship your game, give it a clear name and a short description so other players know what it is.
+              </p>
             </div>
-          </>
-        )}
-      </div>
-      </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1.5">
+                  Game name *
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full bg-gray-950 border border-gray-700 rounded-md px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
+                  placeholder="my-awesome-game"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1.5">
+                  Short description *
+                </label>
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full bg-gray-950 border border-gray-700 rounded-md px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
+                  placeholder="A fun multiplayer game where..."
+                />
+              </div>
+            </div>
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowNameDescriptionModal(false)}
+                className="px-3 py-2 rounded-md text-xs font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowNameDescriptionModal(false)}
+                className="px-3 py-2 rounded-md text-xs font-semibold bg-purple-600 hover:bg-purple-700 text-white cursor-pointer disabled:bg-gray-700 disabled:cursor-not-allowed"
+                disabled={!name.trim() || !description.trim()}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

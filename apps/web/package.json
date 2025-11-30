@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && next-sitemap",
     "start": "next start",
     "lint": "eslint"
   },
@@ -19,6 +19,7 @@
     "dotenv": "^17.2.3",
     "lucide-react": "^0.554.0",
     "next": "16.0.3",
+    "next-sitemap": "^4.2.3",
     "openai": "^6.9.1",
     "pg": "^8.16.3",
     "react": "19.2.0",

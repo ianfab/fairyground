@@ -8,7 +8,16 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, description, code, preview = false, creatorId: bodyCreatorId, creatorEmail: bodyCreatorEmail, creatorUsername: bodyCreatorUsername } = body;
+    const {
+      name,
+      description,
+      code,
+      preview = false,
+      creatorId: bodyCreatorId,
+      creatorEmail: bodyCreatorEmail,
+      creatorUsername: bodyCreatorUsername,
+      tags: bodyTags,
+    } = body;
 
     // Try to authenticate using PropelAuth, but allow client-provided info as fallback
     const user = await getUser();
@@ -16,6 +25,10 @@ export async function POST(request: Request) {
     const creatorId = user?.userId || bodyCreatorId;
     const creatorEmail = user?.email || bodyCreatorEmail;
     const creatorUsername = user?.username || bodyCreatorUsername;
+    const tags: string[] | null =
+      Array.isArray(bodyTags) && bodyTags.length > 0
+        ? bodyTags.map((t: unknown) => String(t).trim()).filter(Boolean)
+        : null;
 
     if (!creatorId) {
       return NextResponse.json(
@@ -98,8 +111,15 @@ export async function POST(request: Request) {
     }
 
     const { rows } = await query<Game>(
-      `INSERT INTO ${tableName} (name, description, code, creator_id, creator_email, creator_username, preview) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      name, description, code, creatorId, creatorEmail, creatorUsername, preview
+      `INSERT INTO ${tableName} (name, description, code, creator_id, creator_email, creator_username, preview, tags) VALUES ($1, $2, $3, $4, $5, $6, $7, COALESCE($8, '{}'::text[])) RETURNING *`,
+      name,
+      description,
+      code,
+      creatorId,
+      creatorEmail,
+      creatorUsername,
+      preview,
+      tags
     );
 
     return NextResponse.json(rows[0]);

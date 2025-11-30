@@ -41,7 +41,14 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { name, description, code, preview = false, creatorId: bodyCreatorId } = body;
+    const {
+      name,
+      description,
+      code,
+      preview = false,
+      creatorId: bodyCreatorId,
+      tags: bodyTags,
+    } = body;
 
     // Try to authenticate using PropelAuth, but allow client-provided ID as fallback
     const user = await getUser();
@@ -70,7 +77,7 @@ export async function PUT(
     // Check if user owns the game
     const tableName = getGamesTableName();
     const existing = await query(
-      `SELECT creator_id, preview FROM ${tableName} WHERE name = $1`,
+      `SELECT creator_id, preview, tags FROM ${tableName} WHERE name = $1`,
       oldName
     );
     if (existing.rows.length === 0) {
@@ -87,6 +94,13 @@ export async function PUT(
         { status: 403 }
       );
     }
+
+    // Compute updated tags – default to existing when not explicitly provided
+    const existingTags: string[] | null = (existing.rows[0] as any).tags ?? null;
+    const tags: string[] | null =
+      Array.isArray(bodyTags) && bodyTags.length > 0
+        ? bodyTags.map((t: unknown) => String(t).trim()).filter(Boolean)
+        : existingTags;
 
     // Update the game
     // If name is not provided in the body, use the existing name (oldName)
@@ -107,8 +121,13 @@ export async function PUT(
     }
 
     const { rows } = await query<Game>(
-      `UPDATE ${tableName} SET name = $1, description = $2, code = $3, preview = $4 WHERE name = $5 RETURNING *`,
-      newName, description || '', code, preview, oldName
+      `UPDATE ${tableName} SET name = $1, description = $2, code = $3, preview = $4, tags = COALESCE($5, '{}'::text[]) WHERE name = $6 RETURNING *`,
+      newName,
+      description || "",
+      code,
+      preview,
+      tags,
+      oldName
     );
 
     return NextResponse.json(rows[0]);

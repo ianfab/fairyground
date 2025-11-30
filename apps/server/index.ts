@@ -521,6 +521,7 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     }
     
     const prefilledRoom = roomName || '';
+    const escapedPrefilledRoom = prefilledRoom.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     
     // Determine the home URL based on environment
     const homeUrl = isDevelopment ? 'http://localhost:3000' : 'https://splork.io';
@@ -980,7 +981,7 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
   <div id="room-setup"${prefilledRoom ? ' class="hidden"' : ''}>
     <h1>${game.name}</h1>
     <p style="color: #888; margin: 10px 0;">${game.description || 'Multiplayer Game'}</p>
-    <input type="text" id="room-name" placeholder="Enter room name" value="${prefilledRoom}" />
+    <input type="text" id="room-name" placeholder="Enter room name" value="${escapedPrefilledRoom}" />
     <button id="join-btn">Join Game</button>
     <div id="error-msg"></div>
   </div>
@@ -1059,8 +1060,8 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       <div id="game-over-message">Game Over!</div>
       <div id="game-over-details"></div>
       <div style="margin-top: 20px;">
-        <button id="play-again-btn">🎯 Enter Matchmaking Again</button>
-        <a id="back-to-home-btn" href="${homeUrl}/play/${gameName}" target="_top">← Back to Game Selection</a>
+        <button id="play-again-btn"}>🎯 Enter Matchmaking Again</button>
+        <a id="back-to-home-btn" href="${homeUrl}/play/${gameName}" style="${hideUI ? 'display: none;' : ''}" target="_top">← Back to Game Selection</a>
       </div>
     </div>
   </div>
@@ -1068,6 +1069,7 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const gameName = "${gameName}";
+    const isHideUI = ${hideUI ? 'true' : 'false'};
     let socket;
     let currentRoom;
     let gameInstance;
@@ -1075,24 +1077,33 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     
     // Get player ID and username from URL parameters (set by web app) or fallback to localStorage
     const urlParams = new URLSearchParams(window.location.search);
+    const matchmakingPlayerId = urlParams.get('matchmakingPlayerId');
     let persistentPlayerId = urlParams.get('userId');
     let playerUsername = urlParams.get('username');
-    const matchmakingPlayerId = urlParams.get('matchmakingPlayerId');
 
-    if (!persistentPlayerId) {
-      // Fallback to localStorage for anonymous players
+    if (isHideUI) {
+      // In hideUI/preview mode, always use a fresh ephemeral ID so multiple iframes
+      // from the same browser are treated as distinct players.
+      persistentPlayerId = 'embed-' + Date.now() + '-' + Math.random().toString(36).substring(7);
+      if (!playerUsername) {
+        playerUsername = 'Guest';
+      }
+    } else if (!persistentPlayerId) {
+      // Main play experience: fall back to a stable ID stored in localStorage
       persistentPlayerId = localStorage.getItem('vibechess_player_id');
       if (!persistentPlayerId) {
         persistentPlayerId = 'player-' + Date.now() + '-' + Math.random().toString(36).substring(7);
         localStorage.setItem('vibechess_player_id', persistentPlayerId);
       }
-      playerUsername = 'Guest';
+      if (!playerUsername) {
+        playerUsername = 'Guest';
+      }
     }
 
     console.log('Player ID:', persistentPlayerId, 'Username:', playerUsername, 'Matchmaking ID:', matchmakingPlayerId);
     
     // Auto-join if room is in URL
-    const prefilledRoom = '${prefilledRoom}';
+    const prefilledRoom = ${JSON.stringify(prefilledRoom)};
     if (prefilledRoom) {
       setTimeout(() => {
         document.getElementById('room-name').value = prefilledRoom;
@@ -1162,7 +1173,7 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         return encodeURIComponent(str);
       };
       
-      const shareUrl = window.location.origin + '/game/' + safeEncode('${gameName}') + '/' + safeEncode(roomName);
+      const shareUrl = window.location.origin + '/game/' + safeEncode(${JSON.stringify(gameName)}) + '/' + safeEncode(roomName);
       navigator.clipboard.writeText(shareUrl).then(() => {
         const btn = document.getElementById('share-btn');
         btn.textContent = '✅ Link Copied!';
@@ -1466,9 +1477,15 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       if (state.gameEnded === true) {
         isGameOver = true;
 
-        // Check for winner ID
+        // Check for winner ID and try to map it to a username via playerMetadata
         if (state.gameWinner) {
-          message = 'Player ' + state.gameWinner.substring(0, 8) + '... Wins!';
+          const playerMetadata = state.playerMetadata || {};
+          const winnerMetadata = playerMetadata[state.gameWinner];
+          const winnerName = winnerMetadata && winnerMetadata.username
+            ? winnerMetadata.username
+            : 'Player ' + String(state.gameWinner).substring(0, 8) + '...';
+
+          message = winnerName + ' Wins!';
         } else {
           message = 'Draw!';
         }

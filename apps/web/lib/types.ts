@@ -10,6 +10,7 @@ export interface Game {
   play_count?: number;
   last_played_at?: Date;
   preview?: boolean;
+  tags?: string[] | null;
 }
 
 export interface GameStats {

@@ -6,11 +6,24 @@ import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { getUser } from "@propelauth/nextjs/server/app-router";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
+// Force dynamic rendering and disable response buffering for streaming
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // Define structured output schema
+type CodeEdit = {
+  find: {
+    start_at: string;
+    end_at: string;
+  };
+  replace_with: string;
+};
+
 interface GameGenerationResponse {
-  code: string;
-  explanation: string;
+  code?: string;
+  explanation?: string;
   reasoning?: string;
+  edits?: CodeEdit[];
 }
 
 function extractCode(text: string): string {
@@ -49,17 +62,23 @@ interface OpenAIStreamParams {
   templateBaseCode?: string;
   screenshot?: string;
   effectiveUserId: string;
+  requestId: string;
+  template?: string;
 }
 
 export async function POST(request: Request) {
+  const requestId = Math.random().toString(36).substring(7);
+  console.log(`[Generate Game ${requestId}] ========== REQUEST START at ${new Date().toISOString()} ==========`);
+  
   try {
     // Debug: Log request headers
     const user = await getUser();
-    console.log('[Generate Game] User from getUser():', user ? `Found (${user.userId})` : 'null');
+    console.log(`[Generate Game ${requestId}] User from getUser():`, user ? `Found (${user.userId})` : 'null');
 
-    console.log('[Generate Game] User ID:', user?.userId);
+    console.log(`[Generate Game ${requestId}] User ID:`, user?.userId);
 
-    const { template, description, name, model, existingCode, screenshot, userId } = await request.json();
+    const { template, description, name, model, existingCode, screenshot, userId, chatHistory } = await request.json();
+    console.log(`[Generate Game ${requestId}] Params - template: ${template}, model: ${model}, isEditMode: ${!!existingCode}, hasChatHistory: ${!!chatHistory}`);
 
     const effectiveUserId = user?.userId || userId || '';
     console.log('[Generate Game] Effective User ID:', effectiveUserId);
@@ -105,24 +124,45 @@ export async function POST(request: Request) {
     const selectedModel = model || "claude-sonnet-4-5-20250929";
 
     // Different prompts for edit mode vs new game mode
-    const systemPrompt = isEditMode
-      ? `You are a game developer assistant. Modify the existing game code based on the user's request.
+    let systemPrompt = isEditMode
+      ? `You are a game developer assistant. Modify the existing game code based on the user's request by returning a JSON description of edits, not the full file.
 
 IMPORTANT:
-1. Keep the same structure (initGameClient and serverLogic)
-2. Make ONLY the changes requested by the user
-3. Preserve existing functionality unless specifically asked to change it
-4. Return ONLY the complete modified code, no explanations
-5. The code must be valid JavaScript
+1. Keep the same structure (initGameClient and serverLogic).
+2. Make ONLY the changes requested by the user.
+3. Preserve existing functionality unless specifically asked to change it.
+4. The code must remain valid JavaScript after applying your edits.
+5. Instead of returning the full file, you MUST return a JSON object with this exact shape:
+
+{
+  "explanation": "Brief explanation of what you're doing and why (2-3 sentences)",
+  "edits": [
+    {
+      "find": {
+        "start_at": "function foo() {",
+        "end_at": "}"
+      },
+      "replace_with": "function foo() {\\n  console.log('hi');\\n}"
+    }
+  ]
+}
+
+6. "find.start_at" and "find.end_at" should be short substrings that uniquely identify the start and end of the region to replace.
+7. The actual code in the file may have slightly different spacing, indentation, or line breaks compared to what you see. Be careful with how you space things and do NOT assume the formatting is exactly the same.
+8. Choose robust snippets that are unlikely to change and avoid relying on exact whitespace. Do NOT include leading or trailing spaces or indentation in "start_at" or "end_at"—focus on the core tokens.
+9. "replace_with" must be the complete replacement text for the region between "start_at" and "end_at".
 
 Existing code:
 \`\`\`javascript
 ${existingCode}
-\`\`\`
+\`\`\`${chatHistory && chatHistory.length > 0 ? `
+
+Previous conversation:
+${chatHistory.map((msg: any) => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`).join('\n')}` : ''}
 
 User request: ${description}
 
-Return the complete modified code:`
+Return ONLY the JSON object with "explanation" and "edits".`
       : `You are a game developer. Generate complete, working game code.
 
 ## by default, you do the bare minimum, don't. if you have to generate some pre-written text, generate lots of funny variations, not just a few.
@@ -240,6 +280,7 @@ ${templateConfig?.baseCode || ''}`;
       !selectedModel.startsWith("claude") && !selectedModel.startsWith("gemini");
 
     if (isOpenAIModel) {
+      console.log(`[Generate Game ${requestId}] Using streaming OpenAI response`);
       return streamOpenAIResponse({
         description,
         name,
@@ -250,12 +291,15 @@ ${templateConfig?.baseCode || ''}`;
         templateBaseCode: templateConfig?.baseCode,
         screenshot,
         effectiveUserId,
+        requestId,
+        template
       });
     }
 
-    let generatedCode: string;
+    let generatedCode: string = "";
     let explanation: string = "";
     let reasoning: string = "";
+    let edits: CodeEdit[] = [];
 
     // Route to appropriate LLM based on model selection
     if (selectedModel.startsWith("claude")) {
@@ -264,43 +308,96 @@ ${templateConfig?.baseCode || ''}`;
         apiKey: process.env.ANTHROPIC_API_KEY,
       });
 
-      const message = await anthropic.messages.create(
-        {
-          model: selectedModel,
-          max_tokens: 16000,
-          thinking: {
-            type: "enabled",
-            budget_tokens: 10000
-          },
-          output_format: {
+      const outputFormat = isEditMode
+        ? {
             type: "json_schema",
             schema: {
               type: "object",
               properties: {
                 explanation: {
                   type: "string",
-                  description: "Brief explanation of what you're doing and why (2-3 sentences)"
+                  description:
+                    "Brief explanation of what you're doing and why (2-3 sentences)",
+                },
+                edits: {
+                  type: "array",
+                  description:
+                    "List of targeted edits to apply to the existing code.",
+                  items: {
+                    type: "object",
+                    properties: {
+                      find: {
+                        type: "object",
+                        properties: {
+                          start_at: {
+                            type: "string",
+                            description:
+                              "Short substring marking the start of the region to replace.",
+                          },
+                          end_at: {
+                            type: "string",
+                            description:
+                              "Short substring marking the end of the region to replace.",
+                          },
+                        },
+                        required: ["start_at", "end_at"],
+                        additionalProperties: false,
+                      },
+                      replace_with: {
+                        type: "string",
+                        description:
+                          "Complete replacement text for the region between start_at and end_at.",
+                      },
+                    },
+                    required: ["find", "replace_with"],
+                    additionalProperties: false,
+                  },
+                },
+              },
+              required: ["explanation", "edits"],
+              additionalProperties: false,
+            },
+          }
+        : {
+            type: "json_schema",
+            schema: {
+              type: "object",
+              properties: {
+                explanation: {
+                  type: "string",
+                  description:
+                    "Brief explanation of what you're doing and why (2-3 sentences)",
                 },
                 code: {
                   type: "string",
-                  description: "The complete game code"
-                }
+                  description: "The complete game code",
+                },
               },
               required: ["explanation", "code"],
-              additionalProperties: false
-            }
+              additionalProperties: false,
+            },
+          };
+
+      const message = await anthropic.messages.create(
+        {
+          model: selectedModel,
+          max_tokens: 16000,
+          thinking: {
+            type: "enabled",
+            budget_tokens: 10000,
           },
+          output_format: outputFormat,
           messages: [
             {
               role: "user",
-              content: systemPrompt + "\n\nUser request:\n" + description
-            }
+              content: systemPrompt + "\n\nUser request:\n" + description,
+            },
           ],
         } as any, // Type assertion needed because output_format is in beta
         {
           headers: {
-            "anthropic-beta": "structured-outputs-2025-11-13"
-          }
+            "anthropic-beta": "structured-outputs-2025-11-13",
+          },
         }
       );
 
@@ -314,17 +411,33 @@ ${templateConfig?.baseCode || ''}`;
       const textBlock = message.content.find(block => block.type === "text");
       if (!textBlock || textBlock.type !== "text") {
         console.error("Claude returned no text content, falling back to default");
-        generatedCode = isEditMode ? existingCode : templateConfig?.baseCode || '';
+        if (isEditMode) {
+          generatedCode = existingCode || "";
+        } else {
+          generatedCode = templateConfig?.baseCode || "";
+        }
         explanation = "Error: Model returned no content. Using fallback.";
       } else {
         try {
           const parsed = JSON.parse(textBlock.text) as GameGenerationResponse;
-          generatedCode = parsed.code;
-          explanation = parsed.explanation || "";
+          if (isEditMode) {
+            edits = parsed.edits || [];
+            explanation = parsed.explanation || "";
+          } else {
+            generatedCode = parsed.code || "";
+            explanation = parsed.explanation || "";
+          }
         } catch (e) {
           console.error("Failed to parse Claude structured output:", e);
-          generatedCode = extractCode(textBlock.text);
-          explanation = "Error parsing response, extracted code from text.";
+          if (isEditMode) {
+            const extracted = extractCode(textBlock.text);
+            generatedCode = extracted || existingCode || "";
+            explanation =
+              "Error parsing response, using full code fallback extracted from text.";
+          } else {
+            generatedCode = extractCode(textBlock.text);
+            explanation = "Error parsing response, extracted code from text.";
+          }
         }
       }
 
@@ -333,29 +446,72 @@ ${templateConfig?.baseCode || ''}`;
        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
        
        // Define JSON Schema for structured output
-       const jsonSchema = {
-         type: SchemaType.OBJECT,
-         properties: {
-           explanation: {
-             type: SchemaType.STRING,
-             description: "Brief explanation of what you're doing and why (2-3 sentences)"
-           },
-           code: {
-             type: SchemaType.STRING,
-             description: "The complete game code in the specified format"
+       const jsonSchema = isEditMode
+         ? {
+             type: SchemaType.OBJECT,
+             properties: {
+               explanation: {
+                 type: SchemaType.STRING,
+                 description:
+                   "Brief explanation of what you're doing and why (2-3 sentences)",
+               },
+               edits: {
+                 type: SchemaType.ARRAY,
+                 description:
+                   "List of targeted edits to apply to the existing code.",
+                 items: {
+                   type: SchemaType.OBJECT,
+                   properties: {
+                     find: {
+                       type: SchemaType.OBJECT,
+                       properties: {
+                         start_at: {
+                           type: SchemaType.STRING,
+                           description:
+                             "Short substring marking the start of the region to replace.",
+                         },
+                         end_at: {
+                           type: SchemaType.STRING,
+                           description:
+                             "Short substring marking the end of the region to replace.",
+                         },
+                       },
+                     },
+                     replace_with: {
+                       type: SchemaType.STRING,
+                       description:
+                         "Complete replacement text for the region between start_at and end_at.",
+                     },
+                   },
+                 },
+               },
+             },
+             required: ["explanation", "edits"],
            }
-         },
-         required: ["explanation", "code"]
-       };
+         : {
+             type: SchemaType.OBJECT,
+             properties: {
+               explanation: {
+                 type: SchemaType.STRING,
+                 description:
+                   "Brief explanation of what you're doing and why (2-3 sentences)",
+               },
+               code: {
+                 type: SchemaType.STRING,
+                 description: "The complete game code in the specified format",
+               },
+             },
+             required: ["explanation", "code"],
+           };
        
        const model = genAI.getGenerativeModel({ 
-         model: selectedModel,
-         generationConfig: {
-           temperature: 0.7,
-           maxOutputTokens: 16000,
-           responseMimeType: "application/json",
-           responseSchema: jsonSchema as any // Type assertion needed for schema compatibility
-         }
+       model: selectedModel,
+       generationConfig: {
+       temperature: 0.7,
+       maxOutputTokens: 16000,
+       responseMimeType: "application/json",
+       responseSchema: jsonSchema as any // Type assertion needed for schema compatibility
+       }
        });
  
        // Build parts array with text and optional image
@@ -383,17 +539,33 @@ ${templateConfig?.baseCode || ''}`;
        
        if (!responseText) {
          console.error("Gemini returned no content, falling back to default");
-         generatedCode = isEditMode ? existingCode : templateConfig?.baseCode || '';
+         if (isEditMode) {
+           generatedCode = existingCode || "";
+         } else {
+           generatedCode = templateConfig?.baseCode || "";
+         }
          explanation = "Error: Model returned no content. Using fallback.";
        } else {
          try {
            const parsed = JSON.parse(responseText) as GameGenerationResponse;
-           generatedCode = parsed.code;
-           explanation = parsed.explanation || "";
+           if (isEditMode) {
+             edits = parsed.edits || [];
+             explanation = parsed.explanation || "";
+           } else {
+             generatedCode = parsed.code || "";
+             explanation = parsed.explanation || "";
+           }
          } catch (e) {
            console.error("Failed to parse Gemini structured output:", e);
-           generatedCode = extractCode(responseText);
-           explanation = "Error parsing response, extracted code from text.";
+           if (isEditMode) {
+             const extracted = extractCode(responseText);
+             generatedCode = extracted || existingCode || "";
+             explanation =
+               "Error parsing response, using full code fallback extracted from text.";
+           } else {
+             generatedCode = extractCode(responseText);
+             explanation = "Error parsing response, extracted code from text.";
+           }
          }
        }
 
@@ -404,15 +576,25 @@ ${templateConfig?.baseCode || ''}`;
       );
     }
 
-    // Generate suggested name from description
-    const suggestedName = buildSuggestedName(name, description);
-
     // Log reasoning for debugging
     if (reasoning) {
-      console.log("Model reasoning:", reasoning.substring(0, 500) + (reasoning.length > 500 ? "..." : ""));
+      console.log(`[Generate Game ${requestId}] Model reasoning:`, reasoning.substring(0, 500) + (reasoning.length > 500 ? "..." : ""));
     }
     
-    console.log("Model explanation:", explanation);
+    console.log(`[Generate Game ${requestId}] Model explanation:`, explanation);
+    console.log(`[Generate Game ${requestId}] ========== REQUEST END at ${new Date().toISOString()} ==========`);
+
+    // Edit mode: return edits (preferred) or fallback code
+    if (isEditMode) {
+      return NextResponse.json({
+        ...(edits.length > 0 ? { edits } : { code: generatedCode }),
+        explanation,
+        reasoning: reasoning.substring(0, 1000), // Limit reasoning to first 1000 chars for response
+      });
+    }
+
+    // New game mode: return full code + suggested name/description
+    const suggestedName = buildSuggestedName(name, description);
 
     return NextResponse.json({
       code: generatedCode,
@@ -422,9 +604,10 @@ ${templateConfig?.baseCode || ''}`;
       reasoning: reasoning.substring(0, 1000), // Limit reasoning to first 1000 chars for response
     });
   } catch (error: any) {
-    console.error("Generate game error:", error);
-    console.error("Error stack:", error?.stack);
-    console.error("Error message:", error?.message);
+    console.error(`[Generate Game ${requestId}] ERROR:`, error);
+    console.error(`[Generate Game ${requestId}] Error stack:`, error?.stack);
+    console.error(`[Generate Game ${requestId}] Error message:`, error?.message);
+    console.log(`[Generate Game ${requestId}] ========== REQUEST END (ERROR) at ${new Date().toISOString()} ==========`);
     return NextResponse.json(
       { error: error?.message || "Failed to generate game" },
       { status: 500 }
@@ -443,7 +626,11 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
     templateBaseCode,
     screenshot,
     effectiveUserId,
+    requestId,
+    template
   } = params;
+
+  console.log(`[Generate Game ${requestId}] streamOpenAIResponse started`);
 
   const encoder = new TextEncoder();
 
@@ -492,26 +679,79 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
           },
         ];
 
-        const structuredFormat = {
-          type: "json_schema" as const,
-          name: "game_generation_response",
-          strict: true,
-          schema: {
-            type: "object",
-            properties: {
-              explanation: {
-                type: "string",
-                description: "Brief explanation of what you're doing and why (2-3 sentences)",
+        const structuredFormat = isEditMode
+          ? {
+              type: "json_schema" as const,
+              name: "game_edit_response",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  explanation: {
+                    type: "string",
+                    description:
+                      "Brief explanation of what you're doing and why (2-3 sentences)",
+                  },
+                  edits: {
+                    type: "array",
+                    description:
+                      "List of targeted edits to apply to the existing code.",
+                    items: {
+                      type: "object",
+                      properties: {
+                        find: {
+                          type: "object",
+                          properties: {
+                            start_at: {
+                              type: "string",
+                              description:
+                                "Short substring marking the start of the region to replace.",
+                            },
+                            end_at: {
+                              type: "string",
+                              description:
+                                "Short substring marking the end of the region to replace.",
+                            },
+                          },
+                          required: ["start_at", "end_at"],
+                          additionalProperties: false,
+                        },
+                        replace_with: {
+                          type: "string",
+                          description:
+                            "Complete replacement text for the region between start_at and end_at.",
+                        },
+                      },
+                      required: ["find", "replace_with"],
+                      additionalProperties: false,
+                    },
+                  },
+                },
+                required: ["explanation", "edits"],
+                additionalProperties: false,
               },
-              code: {
-                type: "string",
-                description: "The complete game code",
+            }
+          : {
+              type: "json_schema" as const,
+              name: "game_generation_response",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  explanation: {
+                    type: "string",
+                    description:
+                      "Brief explanation of what you're doing and why (2-3 sentences)",
+                  },
+                  code: {
+                    type: "string",
+                    description: "The complete game code",
+                  },
+                },
+                required: ["explanation", "code"],
+                additionalProperties: false,
               },
-            },
-            required: ["explanation", "code"],
-            additionalProperties: false,
-          },
-        };
+            };
 
         const responseStream = await client.responses.stream({
           model: selectedModel,
@@ -519,7 +759,9 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
           text: {
             format: structuredFormat,
           },
-          reasoning: { effort: "medium"}
+          reasoning: { effort: "medium"},
+          prompt_cache_retention: "24h",
+          prompt_cache_key: `generate-${isEditMode ? "edit" : "new"}-${template}`
         });
 
         let aggregatedJson = "";
@@ -530,7 +772,7 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
             case "response.output_text.delta": {
               if (event.delta) {
                 aggregatedJson += event.delta;
-                console.log("event.delta", event.delta);
+                // console.log("event.delta", event.delta);
                 send({ type: "token", delta: event.delta });
               }
               break;
@@ -538,7 +780,7 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
             case "response.reasoning_text.delta": {
               if (event.delta) {
                 streamedReasoning += event.delta;
-                console.log("streamedReasoning", streamedReasoning);
+                // console.log("streamedReasoning", streamedReasoning);
                 send({ type: "reasoning", delta: event.delta });
               }
               break;
@@ -557,7 +799,9 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
           (finalResponse.output_parsed as GameGenerationResponse | null) ||
           (() => {
             try {
-              return JSON.parse(finalResponse.output_text || aggregatedJson || "") as GameGenerationResponse;
+              return JSON.parse(
+                finalResponse.output_text || aggregatedJson || ""
+              ) as GameGenerationResponse;
             } catch {
               return null;
             }
@@ -565,20 +809,47 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
 
         const fallbackCode = isEditMode ? existingCode || "" : templateBaseCode || "";
 
-        let generatedCode = parsedPayload?.code || "";
+        let generatedCode = "";
         let explanation = parsedPayload?.explanation || "";
-        let reasoning = (parsedPayload?.reasoning || streamedReasoning || "").substring(0, 1000);
+        let reasoning = (parsedPayload?.reasoning || streamedReasoning || "").substring(
+          0,
+          1000
+        );
+        let edits: CodeEdit[] = [];
 
-        if (!generatedCode) {
+        if (isEditMode) {
+          if (parsedPayload?.edits && parsedPayload.edits.length > 0) {
+            edits = parsedPayload.edits;
+          } else {
+            const extracted = extractCode(
+              finalResponse.output_text || aggregatedJson || ""
+            );
+            generatedCode = extracted || fallbackCode;
+            if (!explanation) {
+              explanation = extracted
+                ? "Parsed full code from the model output as fallback."
+                : "Model returned no edits. Using fallback code.";
+            }
+          }
+        } else {
+          generatedCode = parsedPayload?.code || "";
+        }
+
+        if (!isEditMode && !generatedCode) {
           const extracted = extractCode(finalResponse.output_text || aggregatedJson || "");
           generatedCode = extracted || fallbackCode;
           if (!explanation) {
-            explanation = extracted ? "Parsed code directly from the model output." : "Model returned no content. Using fallback.";
+            explanation = extracted
+              ? "Parsed code directly from the model output."
+              : "Model returned no content. Using fallback.";
           }
         }
 
-        if (!generatedCode) {
+        if (!isEditMode && !generatedCode) {
           throw new Error("Model did not return any code.");
+        }
+        if (isEditMode && edits.length === 0 && !generatedCode) {
+          throw new Error("Model did not return any edits or code.");
         }
 
         if (!reasoning && streamedReasoning) {
@@ -593,24 +864,35 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
         }
         console.log("Model explanation:", explanation);
 
-        const resultPayload = {
+        const resultPayload: Record<string, unknown> = {
           type: "result",
-          code: generatedCode,
           explanation,
           reasoning,
-          suggestedName: buildSuggestedName(name, description),
-          suggestedDescription: description.substring(0, 100),
         };
 
+        if (isEditMode) {
+          if (edits.length > 0) {
+            resultPayload.edits = edits;
+          } else {
+            resultPayload.code = generatedCode;
+          }
+        } else {
+          resultPayload.code = generatedCode;
+          resultPayload.suggestedName = buildSuggestedName(name, description);
+          resultPayload.suggestedDescription = description.substring(0, 100);
+        }
+
         send(resultPayload);
+        console.log(`[Generate Game ${requestId}] ========== STREAM END at ${new Date().toISOString()} ==========`);
       } catch (error) {
-        console.error("OpenAI streaming error:", error);
+        console.error(`[Generate Game ${requestId}] OpenAI streaming error:`, error);
         send({
           type: "error",
           error: {
             message: error instanceof Error ? error.message : "Failed to generate game",
           },
         });
+        console.log(`[Generate Game ${requestId}] ========== STREAM END (ERROR) at ${new Date().toISOString()} ==========`);
       } finally {
         controller.close();
       }
@@ -621,7 +903,8 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
+      "Connection": "keep-alive",
+      "X-Accel-Buffering": "no", // Disable buffering for Nginx/Vercel
     },
   });
 }

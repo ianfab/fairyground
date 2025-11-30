@@ -9,6 +9,7 @@ export interface Game {
   creator_username?: string;
   play_count?: number;
   last_played_at?: Date;
+  tags?: string[] | null;
 }
 
 export interface GameStats {
