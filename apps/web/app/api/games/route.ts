@@ -17,6 +17,10 @@ export async function POST(request: Request) {
       creatorEmail: bodyCreatorEmail,
       creatorUsername: bodyCreatorUsername,
       tags: bodyTags,
+      min_players_per_room: bodyMinPlayersPerRoom,
+      max_players_per_room: bodyMaxPlayersPerRoom,
+      has_win_condition: bodyHasWinCondition,
+      can_join_late: bodyCanJoinLate,
     } = body;
 
     // Try to authenticate using PropelAuth, but allow client-provided info as fallback
@@ -29,6 +33,19 @@ export async function POST(request: Request) {
       Array.isArray(bodyTags) && bodyTags.length > 0
         ? bodyTags.map((t: unknown) => String(t).trim()).filter(Boolean)
         : null;
+
+    const minPlayersPerRoom =
+      typeof bodyMinPlayersPerRoom === "number" && Number.isFinite(bodyMinPlayersPerRoom)
+        ? Math.max(1, Math.floor(bodyMinPlayersPerRoom))
+        : 2;
+    const maxPlayersPerRoom =
+      typeof bodyMaxPlayersPerRoom === "number" && Number.isFinite(bodyMaxPlayersPerRoom)
+        ? Math.max(minPlayersPerRoom, Math.floor(bodyMaxPlayersPerRoom))
+        : 2;
+    const hasWinCondition =
+      typeof bodyHasWinCondition === "boolean" ? bodyHasWinCondition : true;
+    const canJoinLate =
+      typeof bodyCanJoinLate === "boolean" ? bodyCanJoinLate : false;
 
     if (!creatorId) {
       return NextResponse.json(
@@ -111,7 +128,22 @@ export async function POST(request: Request) {
     }
 
     const { rows } = await query<Game>(
-      `INSERT INTO ${tableName} (name, description, code, creator_id, creator_email, creator_username, preview, tags) VALUES ($1, $2, $3, $4, $5, $6, $7, COALESCE($8, '{}'::text[])) RETURNING *`,
+      `INSERT INTO ${tableName} (
+        name,
+        description,
+        code,
+        creator_id,
+        creator_email,
+        creator_username,
+        preview,
+        tags,
+        min_players_per_room,
+        max_players_per_room,
+        has_win_condition,
+        can_join_late
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, COALESCE($8, '{}'::text[]), $9, $10, $11, $12
+      ) RETURNING *`,
       name,
       description,
       code,
@@ -119,7 +151,11 @@ export async function POST(request: Request) {
       creatorEmail,
       creatorUsername,
       preview,
-      tags
+      tags,
+      minPlayersPerRoom,
+      maxPlayersPerRoom,
+      hasWinCondition,
+      canJoinLate
     );
 
     return NextResponse.json(rows[0]);

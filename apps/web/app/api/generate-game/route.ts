@@ -24,6 +24,10 @@ interface GameGenerationResponse {
   explanation?: string;
   reasoning?: string;
   edits?: CodeEdit[];
+   min_players_per_room?: number;
+   max_players_per_room?: number;
+   has_win_condition?: boolean;
+   can_join_late?: boolean;
 }
 
 function extractCode(text: string): string {
@@ -300,6 +304,10 @@ ${templateConfig?.baseCode || ''}`;
     let explanation: string = "";
     let reasoning: string = "";
     let edits: CodeEdit[] = [];
+    let minPlayersPerRoom: number | undefined;
+    let maxPlayersPerRoom: number | undefined;
+    let hasWinCondition: boolean | undefined;
+    let canJoinLate: boolean | undefined;
 
     // Route to appropriate LLM based on model selection
     if (selectedModel.startsWith("claude")) {
@@ -372,8 +380,28 @@ ${templateConfig?.baseCode || ''}`;
                   type: "string",
                   description: "The complete game code",
                 },
+                min_players_per_room: {
+                  type: "integer",
+                  description:
+                    "Minimum number of players required to start a room. Default 2.",
+                },
+                max_players_per_room: {
+                  type: "integer",
+                  description:
+                    "Maximum number of players allowed in a single room. Default 2.",
+                },
+                has_win_condition: {
+                  type: "boolean",
+                  description:
+                    "Whether the game has a hard win condition that ends the round (true/false). Default true.",
+                },
+                can_join_late: {
+                  type: "boolean",
+                  description:
+                    "Whether new players are allowed to join a room after it has started (true/false). Default false.",
+                },
               },
-              required: ["explanation", "code"],
+              required: ["explanation", "code", "min_players_per_room", "max_players_per_room", "has_win_condition", "can_join_late"],
               additionalProperties: false,
             },
           };
@@ -426,6 +454,10 @@ ${templateConfig?.baseCode || ''}`;
           } else {
             generatedCode = parsed.code || "";
             explanation = parsed.explanation || "";
+            minPlayersPerRoom = parsed.min_players_per_room;
+            maxPlayersPerRoom = parsed.max_players_per_room;
+            hasWinCondition = parsed.has_win_condition;
+            canJoinLate = parsed.can_join_late;
           }
         } catch (e) {
           console.error("Failed to parse Claude structured output:", e);
@@ -488,7 +520,7 @@ ${templateConfig?.baseCode || ''}`;
              },
              required: ["explanation", "edits"],
            }
-         : {
+             : {
              type: SchemaType.OBJECT,
              properties: {
                explanation: {
@@ -500,8 +532,28 @@ ${templateConfig?.baseCode || ''}`;
                  type: SchemaType.STRING,
                  description: "The complete game code in the specified format",
                },
+               min_players_per_room: {
+                 type: SchemaType.NUMBER,
+                 description:
+                   "Minimum number of players required to start a room. Default 2.",
+               },
+               max_players_per_room: {
+                 type: SchemaType.NUMBER,
+                 description:
+                   "Maximum number of players allowed in a single room. Default 2.",
+               },
+               has_win_condition: {
+                 type: SchemaType.BOOLEAN,
+                 description:
+                   "Whether the game has a hard win condition that ends the round (true/false). Default true.",
+               },
+               can_join_late: {
+                 type: SchemaType.BOOLEAN,
+                 description:
+                   "Whether new players are allowed to join a room after it has started (true/false). Default false.",
+               },
              },
-             required: ["explanation", "code"],
+             required: ["explanation", "code", "min_players_per_room", "max_players_per_room", "has_win_condition", "can_join_late"],
            };
        
        const model = genAI.getGenerativeModel({ 
@@ -554,6 +606,10 @@ ${templateConfig?.baseCode || ''}`;
            } else {
              generatedCode = parsed.code || "";
              explanation = parsed.explanation || "";
+             minPlayersPerRoom = parsed.min_players_per_room;
+             maxPlayersPerRoom = parsed.max_players_per_room;
+             hasWinCondition = parsed.has_win_condition;
+             canJoinLate = parsed.can_join_late;
            }
          } catch (e) {
            console.error("Failed to parse Gemini structured output:", e);
@@ -596,12 +652,26 @@ ${templateConfig?.baseCode || ''}`;
     // New game mode: return full code + suggested name/description
     const suggestedName = buildSuggestedName(name, description);
 
+    // Apply safe defaults if the model did not specify these fields
+    const safeMinPlayers = typeof minPlayersPerRoom === "number" && Number.isFinite(minPlayersPerRoom)
+      ? Math.max(1, Math.floor(minPlayersPerRoom))
+      : 2;
+    const safeMaxPlayers = typeof maxPlayersPerRoom === "number" && Number.isFinite(maxPlayersPerRoom)
+      ? Math.max(safeMinPlayers, Math.floor(maxPlayersPerRoom))
+      : 2;
+    const safeHasWinCondition = typeof hasWinCondition === "boolean" ? hasWinCondition : true;
+    const safeCanJoinLate = typeof canJoinLate === "boolean" ? canJoinLate : false;
+
     return NextResponse.json({
       code: generatedCode,
       suggestedName,
       suggestedDescription: description.substring(0, 100),
       explanation,
       reasoning: reasoning.substring(0, 1000), // Limit reasoning to first 1000 chars for response
+      min_players_per_room: safeMinPlayers,
+      max_players_per_room: safeMaxPlayers,
+      has_win_condition: safeHasWinCondition,
+      can_join_late: safeCanJoinLate,
     });
   } catch (error: any) {
     console.error(`[Generate Game ${requestId}] ERROR:`, error);
@@ -684,7 +754,7 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
               type: "json_schema" as const,
               name: "game_edit_response",
               strict: true,
-              schema: {
+            schema: {
                 type: "object",
                 properties: {
                   explanation: {
@@ -746,9 +816,29 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
                   code: {
                     type: "string",
                     description: "The complete game code",
+                },
+                min_players_per_room: {
+                  type: "integer",
+                  description:
+                    "Minimum number of players required to start a room. Default 2.",
+                },
+                max_players_per_room: {
+                  type: "integer",
+                  description:
+                    "Maximum number of players allowed in a single room. Default 2.",
+                },
+                has_win_condition: {
+                  type: "boolean",
+                  description:
+                    "Whether the game has a hard win condition that ends the round (true/false). Default true.",
+                },
+                can_join_late: {
+                  type: "boolean",
+                  description:
+                    "Whether new players are allowed to join a room after it has started (true/false). Default false.",
                   },
                 },
-                required: ["explanation", "code"],
+                required: ["explanation", "code", "min_players_per_room", "max_players_per_room", "has_win_condition", "can_join_late"],
                 additionalProperties: false,
               },
             };
@@ -816,6 +906,13 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
           1000
         );
         let edits: CodeEdit[] = [];
+        let minPlayersPerRoom: number | undefined =
+          parsedPayload?.min_players_per_room;
+        let maxPlayersPerRoom: number | undefined =
+          parsedPayload?.max_players_per_room;
+        let hasWinCondition: boolean | undefined =
+          parsedPayload?.has_win_condition;
+        let canJoinLate: boolean | undefined = parsedPayload?.can_join_late;
 
         if (isEditMode) {
           if (parsedPayload?.edits && parsedPayload.edits.length > 0) {
@@ -877,9 +974,27 @@ async function streamOpenAIResponse(params: OpenAIStreamParams) {
             resultPayload.code = generatedCode;
           }
         } else {
+          // Apply safe defaults if the model omitted config fields
+          const safeMinPlayers =
+            typeof minPlayersPerRoom === "number" && Number.isFinite(minPlayersPerRoom)
+              ? Math.max(1, Math.floor(minPlayersPerRoom))
+              : 2;
+          const safeMaxPlayers =
+            typeof maxPlayersPerRoom === "number" && Number.isFinite(maxPlayersPerRoom)
+              ? Math.max(safeMinPlayers, Math.floor(maxPlayersPerRoom))
+              : 2;
+          const safeHasWinCondition =
+            typeof hasWinCondition === "boolean" ? hasWinCondition : true;
+          const safeCanJoinLate =
+            typeof canJoinLate === "boolean" ? canJoinLate : false;
+
           resultPayload.code = generatedCode;
           resultPayload.suggestedName = buildSuggestedName(name, description);
           resultPayload.suggestedDescription = description.substring(0, 100);
+          resultPayload.min_players_per_room = safeMinPlayers;
+          resultPayload.max_players_per_room = safeMaxPlayers;
+          resultPayload.has_win_condition = safeHasWinCondition;
+          resultPayload.can_join_late = safeCanJoinLate;
         }
 
         send(resultPayload);

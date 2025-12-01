@@ -15,7 +15,11 @@ async function main() {
         play_count INTEGER DEFAULT 0,
         last_played_at TIMESTAMP,
         preview BOOLEAN DEFAULT false,
-        tags TEXT[] DEFAULT '{}'::text[]
+        tags TEXT[] DEFAULT '{}'::text[],
+        min_players_per_room INTEGER NOT NULL DEFAULT 2,
+        max_players_per_room INTEGER NOT NULL DEFAULT 2,
+        has_win_condition BOOLEAN NOT NULL DEFAULT true,
+        can_join_late BOOLEAN NOT NULL DEFAULT false
       );
     `;
     console.log("Table 'games' created or already exists.");

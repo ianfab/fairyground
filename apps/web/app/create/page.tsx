@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { GAME_TEMPLATES, GameTemplate } from "@/lib/game-templates";
 import { getDefaultTagsForTemplate } from "@/lib/game-tags";
 import { getGameUrl, getGameServerUrl, safeEncodeURIComponent } from "@/lib/config";
-import { AlertCircle, ArrowRight, Code, Eye, Link } from "lucide-react";
+import { AlertCircle, ArrowRight, Code, Eye } from "lucide-react";
 import { useAuthInfo, useRedirectFunctions } from "@propelauth/react";
 import dynamic from 'next/dynamic';
 import { EditingPanel } from "@/app/components/EditingPanel";
@@ -32,6 +33,10 @@ interface GenerationResultPayload {
   suggestedDescription?: string;
   edits?: CodeEdit[];
   type?: string;
+  min_players_per_room?: number;
+  max_players_per_room?: number;
+  has_win_condition?: boolean;
+  can_join_late?: boolean;
 }
 
 interface Draft {
@@ -85,6 +90,10 @@ export default function CreateGame() {
   const [generatedCode, setGeneratedCode] = useState("");
   const [explanation, setExplanation] = useState("");
   const [reasoning, setReasoning] = useState("");
+  const [minPlayersPerRoom, setMinPlayersPerRoom] = useState<number>(2);
+  const [maxPlayersPerRoom, setMaxPlayersPerRoom] = useState<number>(2);
+  const [hasWinCondition, setHasWinCondition] = useState<boolean>(true);
+  const [canJoinLate, setCanJoinLate] = useState<boolean>(false);
   const [previewGameName, setPreviewGameName] = useState<string>("");
   const [previewRoomId, setPreviewRoomId] = useState(() => `room-${Math.random().toString(36).substring(7)}`);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -518,11 +527,31 @@ export default function CreateGame() {
 
     let nextCode = generatedCode;
 
+    // Normalize room configuration from model output (with safe defaults)
+    const nextMinPlayers =
+      typeof result.min_players_per_room === "number" && Number.isFinite(result.min_players_per_room)
+        ? Math.max(1, Math.floor(result.min_players_per_room))
+        : 2;
+    const nextMaxPlayers =
+      typeof result.max_players_per_room === "number" && Number.isFinite(result.max_players_per_room)
+        ? Math.max(nextMinPlayers, Math.floor(result.max_players_per_room))
+        : 2;
+    const nextHasWinCondition =
+      typeof result.has_win_condition === "boolean" ? result.has_win_condition : true;
+    const nextCanJoinLate =
+      typeof result.can_join_late === "boolean" ? result.can_join_late : false;
+
     if (options.mode === "create") {
       if (!result.code) {
         throw new Error("Model did not return any code.");
       }
       nextCode = result.code;
+
+      // Only update config on create; for edit we keep existing values unless model explicitly supports them later
+      setMinPlayersPerRoom(nextMinPlayers);
+      setMaxPlayersPerRoom(nextMaxPlayers);
+      setHasWinCondition(nextHasWinCondition);
+      setCanJoinLate(nextCanJoinLate);
     } else {
       const baseCode = options.originalCode ?? generatedCode;
 
@@ -680,6 +709,10 @@ export default function CreateGame() {
           creatorEmail: user?.email,
           creatorUsername: user?.username,
           tags: defaultTags,
+          min_players_per_room: minPlayersPerRoom,
+          max_players_per_room: maxPlayersPerRoom,
+          has_win_condition: hasWinCondition,
+          can_join_late: canJoinLate,
         }),
       });
 
@@ -711,6 +744,10 @@ export default function CreateGame() {
           preview: true,
           creatorId: user?.userId,
           tags: defaultTags,
+          min_players_per_room: minPlayersPerRoom,
+          max_players_per_room: maxPlayersPerRoom,
+          has_win_condition: hasWinCondition,
+          can_join_late: canJoinLate,
         }),
       });
 
@@ -752,6 +789,10 @@ export default function CreateGame() {
             preview: false,
             creatorId: user?.userId,
             tags: defaultTags,
+            min_players_per_room: minPlayersPerRoom,
+            max_players_per_room: maxPlayersPerRoom,
+            has_win_condition: hasWinCondition,
+            can_join_late: canJoinLate,
           }),
         });
 
@@ -776,6 +817,10 @@ export default function CreateGame() {
             creatorEmail: user?.email,
             creatorUsername: user?.username,
             tags: defaultTags,
+            min_players_per_room: minPlayersPerRoom,
+            max_players_per_room: maxPlayersPerRoom,
+            has_win_condition: hasWinCondition,
+            can_join_late: canJoinLate,
           }),
         });
 
@@ -1184,90 +1229,97 @@ export default function CreateGame() {
                 </div>
 
                 {canPlayAnotherGameWhileWaiting ? (
-                <div className="mt-4 flex items-center justify-between gap-3">
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <Link
+                      href={`${getGameServerUrl()}/game/tetris-battle`}
+                      target="_blank"
+                      className="px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full font-bold text-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl"
+                    >
+                      🎮 Play another game while you wait
+                    </Link>
+                  </div>
+                ) : (
                   <Link
-                    href={
-                        `${getGameServerUrl()}/game/tetris-battle`
-                    }
-                    target="_blank"
-                    
-                    className={`inline-flex items-center gap-1 text-xs font-medium rounded-md px-3 py-2 transition-opacity bg-gray-800/50 border border-gray-700/50 ${
-                      canPlayAnotherGameWhileWaiting
-                        ? "text-blue-400 hover:text-blue-300 opacity-100 cursor-pointer hover:bg-gray-800/70"
-                        : "text-blue-400 cursor-not-allowed opacity-60"
-                    }`}
+                    href={`${getGameServerUrl()}/game/tetris-battle`}
+                    className="px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full font-bold text-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl cursor-not-allowed"
                   >
                     🎮 Play another game while you wait
                   </Link>
-                </div>
-                ) : (
-                  <button opacity-60 cursor-not-allowed>
-                      🎮 Play another game while you wait
-                  </button>
                 )}
               </div>
             </div>
-          ) :
-          (
-            <>
-              {/* Left Panel - Toggleable */}
-              <div className="flex-1 flex flex-col bg-gray-900 rounded-lg overflow-hidden">
-                {/* Left Panel Controls - Only show after first generation */}
-                {generatedCode && (
-                  <div className="p-2 bg-gray-800/50 border-b border-gray-700 flex gap-1">
+          ) : (
+            // Single full-width panel with view toggles
+            <div className="flex-1 flex flex-col bg-gray-900 rounded-lg overflow-hidden">
+              {/* Panel Controls - Only show after first generation */}
+              {generatedCode && (
+                <div className="p-2 bg-gray-800/50 border-b border-gray-700 flex items-center gap-2">
+                  <div className="flex flex-1 gap-1">
                     <button
-                      onClick={() => setLeftPanelView('preview')}
-                      className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${ 
-                        leftPanelView === 'preview' ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      onClick={() => setLeftPanelView("preview")}
+                      className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
+                        leftPanelView === "preview"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                       }`}
                     >
                       <Eye className="w-4 h-4 inline mr-1" />
-                      Preview
+                      Game
                     </button>
                     <button
-                      onClick={() => setLeftPanelView('code')}
+                      onClick={() => setLeftPanelView("code")}
                       className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
-                        leftPanelView === 'code' ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        leftPanelView === "code"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                       }`}
                     >
                       <Code className="w-4 h-4 inline mr-1" />
                       Code
                     </button>
                     <button
-                      onClick={() => setLeftPanelView('editing')}
+                      onClick={() => setLeftPanelView("editing")}
                       className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
-                        leftPanelView === 'editing' ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        leftPanelView === "editing"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                       }`}
                     >
                       💬 Edit Game
                     </button>
                   </div>
-                )}
-                
-                {/* Left Panel Content */}
-                <div className="flex-1 min-h-0">
-                  {renderPanelContent(leftPanelView, 'left')}
-                </div>
-              </div>
 
-              {/* Right Panel - Always Preview */}
-              <div className="flex-1 flex flex-col bg-gray-900 rounded-lg overflow-hidden">
-                {/* Right Panel Header - No toggles, just label */}
-                {generatedCode && (
-                  <div className="p-2 bg-gray-800/50 border-b border-gray-700 text-center">
-                    <span className="text-sm font-medium text-gray-400">
-                      <Eye className="w-4 h-4 inline mr-1" />
-                      Game Preview (Player 2)
-                    </span>
-                  </div>
-                )}
-                
-                {/* Right Panel Content - Always Preview */}
-                <div className="flex-1 min-h-0">
-                  {renderPanelContent('preview', 'right')}
+                  {/* Open second player in new tab */}
+                  {previewGameName && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const roomId = previewRoomId;
+                        const previewUserId = `preview-second-${roomId}`;
+                        const searchParams = new URLSearchParams({
+                          hideUI: "true",
+                          userId: previewUserId,
+                          username: "Preview Player 2",
+                        });
+
+                        const url = `${getGameServerUrl()}/game/${safeEncodeURIComponent(
+                          previewGameName
+                        )}/${safeEncodeURIComponent(roomId)}?${searchParams.toString()}`;
+                        window.open(url, "_blank", "noopener,noreferrer");
+                      }}
+                      className="ml-2 px-4 py-2 rounded-md text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white whitespace-nowrap cursor-pointer"
+                    >
+                      🎮 Open for Player 2
+                    </button>
+                  )}
                 </div>
+              )}
+
+              {/* Panel Content */}
+              <div className="flex-1 min-h-0">
+                {renderPanelContent(leftPanelView, "left")}
               </div>
-            </>
+            </div>
           )}
         </div>
 
@@ -1329,8 +1381,65 @@ export default function CreateGame() {
                 )}
               </div>
             )}
+                        {/* Room configuration controls */}
+            {generatedCode && (<div className="flex flex-wrap gap-4 text-xs text-gray-300">
+              <div className="flex items-center gap-2">
+                <span className="uppercase tracking-[0.15em] text-gray-500">Room config</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-gray-400">Min players</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={16}
+                  value={minPlayersPerRoom}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value || "1", 10);
+                    const nextMin = Math.max(1, Math.min(16, value));
+                    setMinPlayersPerRoom(nextMin);
+                    setMaxPlayersPerRoom((prev) => Math.max(nextMin, prev));
+                  }}
+                  className="w-16 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-gray-400">Max players</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={16}
+                  value={maxPlayersPerRoom}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value || "1", 10);
+                    const raw = Math.max(1, Math.min(16, value));
+                    const nextMax = Math.max(minPlayersPerRoom, raw);
+                    setMaxPlayersPerRoom(nextMax);
+                  }}
+                  className="w-16 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500"
+                />
+              </div>
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={hasWinCondition}
+                  onChange={(e) => setHasWinCondition(e.target.checked)}
+                  className="h-3 w-3 rounded border-gray-600 bg-gray-900 text-purple-500 focus:ring-purple-500"
+                />
+                <span className="text-gray-400">Has win condition</span>
+              </label>
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={canJoinLate}
+                  onChange={(e) => setCanJoinLate(e.target.checked)}
+                  className="h-3 w-3 rounded border-gray-600 bg-gray-900 text-purple-500 focus:ring-purple-500"
+                />
+                <span className="text-gray-400">Allow late join</span>
+              </label>
+            </div>)}
           </div>
         </div>
+
 
             {/* Main Area: either prompt textarea or AI explanation with actions */}
             <div className="flex gap-3 items-stretch">

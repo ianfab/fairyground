@@ -48,6 +48,10 @@ export async function PUT(
       preview = false,
       creatorId: bodyCreatorId,
       tags: bodyTags,
+      min_players_per_room: bodyMinPlayersPerRoom,
+      max_players_per_room: bodyMaxPlayersPerRoom,
+      has_win_condition: bodyHasWinCondition,
+      can_join_late: bodyCanJoinLate,
     } = body;
 
     // Try to authenticate using PropelAuth, but allow client-provided ID as fallback
@@ -77,7 +81,7 @@ export async function PUT(
     // Check if user owns the game
     const tableName = getGamesTableName();
     const existing = await query(
-      `SELECT creator_id, preview, tags FROM ${tableName} WHERE name = $1`,
+      `SELECT creator_id, preview, tags, min_players_per_room, max_players_per_room, has_win_condition, can_join_late FROM ${tableName} WHERE name = $1`,
       oldName
     );
     if (existing.rows.length === 0) {
@@ -96,11 +100,39 @@ export async function PUT(
     }
 
     // Compute updated tags – default to existing when not explicitly provided
-    const existingTags: string[] | null = (existing.rows[0] as any).tags ?? null;
+    const existingRow = existing.rows[0] as any;
+    const existingTags: string[] | null = existingRow.tags ?? null;
     const tags: string[] | null =
       Array.isArray(bodyTags) && bodyTags.length > 0
         ? bodyTags.map((t: unknown) => String(t).trim()).filter(Boolean)
         : existingTags;
+
+    // Compute updated room config – default to existing when not explicitly provided
+    const existingMinPlayers: number =
+      typeof existingRow.min_players_per_room === "number" && Number.isFinite(existingRow.min_players_per_room)
+        ? Math.max(1, Math.floor(existingRow.min_players_per_room))
+        : 2;
+    const existingMaxPlayers: number =
+      typeof existingRow.max_players_per_room === "number" && Number.isFinite(existingRow.max_players_per_room)
+        ? Math.max(existingMinPlayers, Math.floor(existingRow.max_players_per_room))
+        : 2;
+    const existingHasWinCondition: boolean =
+      typeof existingRow.has_win_condition === "boolean" ? existingRow.has_win_condition : true;
+    const existingCanJoinLate: boolean =
+      typeof existingRow.can_join_late === "boolean" ? existingRow.can_join_late : false;
+
+    const minPlayersPerRoom =
+      typeof bodyMinPlayersPerRoom === "number" && Number.isFinite(bodyMinPlayersPerRoom)
+        ? Math.max(1, Math.floor(bodyMinPlayersPerRoom))
+        : existingMinPlayers;
+    const maxPlayersPerRoom =
+      typeof bodyMaxPlayersPerRoom === "number" && Number.isFinite(bodyMaxPlayersPerRoom)
+        ? Math.max(minPlayersPerRoom, Math.floor(bodyMaxPlayersPerRoom))
+        : existingMaxPlayers;
+    const hasWinCondition =
+      typeof bodyHasWinCondition === "boolean" ? bodyHasWinCondition : existingHasWinCondition;
+    const canJoinLate =
+      typeof bodyCanJoinLate === "boolean" ? bodyCanJoinLate : existingCanJoinLate;
 
     // Update the game
     // If name is not provided in the body, use the existing name (oldName)
@@ -121,12 +153,28 @@ export async function PUT(
     }
 
     const { rows } = await query<Game>(
-      `UPDATE ${tableName} SET name = $1, description = $2, code = $3, preview = $4, tags = COALESCE($5, '{}'::text[]) WHERE name = $6 RETURNING *`,
+      `UPDATE ${tableName}
+       SET
+         name = $1,
+         description = $2,
+         code = $3,
+         preview = $4,
+         tags = COALESCE($5, '{}'::text[]),
+         min_players_per_room = $6,
+         max_players_per_room = $7,
+         has_win_condition = $8,
+         can_join_late = $9
+       WHERE name = $10
+       RETURNING *`,
       newName,
       description || "",
       code,
       preview,
       tags,
+      minPlayersPerRoom,
+      maxPlayersPerRoom,
+      hasWinCondition,
+      canJoinLate,
       oldName
     );
 

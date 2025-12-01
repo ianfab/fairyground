@@ -107,6 +107,10 @@ interface Room {
     moves: Record<string, (state: any, ...args: any[]) => void>;
     initialState: any;
   };
+  minPlayersPerRoom: number;
+  maxPlayersPerRoom: number;
+  hasWinCondition: boolean;
+  canJoinLate: boolean;
   tickInterval?: NodeJS.Timeout;
 }
 
@@ -138,7 +142,7 @@ interface MatchmakingRoom {
 const matchmakingRooms = new Map<string, MatchmakingRoom>();
 
 // Function to try to match players
-function tryMatchPlayers() {
+async function tryMatchPlayers() {
   // Group players by game
   const playersByGame = new Map<string, MatchmakingPlayer[]>();
   
@@ -148,46 +152,58 @@ function tryMatchPlayers() {
     playersByGame.set(player.gameName, players);
   });
   
-  // Try to match players for each game
-  playersByGame.forEach((players, gameName) => {
-    while (players.length >= 2) {
-      // Match the two oldest players
-      const player1 = players.shift();
-      const player2 = players.shift();
-      
-      if (!player1 || !player2) break;
-      
+  // Try to match players for each game, respecting min/max players per room
+  for (const [gameName, players] of playersByGame.entries()) {
+    // Oldest first
+    players.sort((a, b) => a.timestamp - b.timestamp);
+
+    const { minPlayers, maxPlayers } = await getRoomConfigForGame(gameName);
+
+    while (players.length >= minPlayers) {
+      const groupSize = Math.min(maxPlayers, players.length);
+      const group: MatchmakingPlayer[] = players.splice(0, groupSize);
+
+      if (group.length < minPlayers) {
+        // Not enough players left to form a valid room
+        break;
+      }
+
       // Generate a unique room ID for the match
       const roomId = `match-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+      const expectedPlayers = new Set<string>();
+      for (const player of group) {
+        expectedPlayers.add(player.playerId);
+      }
 
       // Register the matchmaking room
       matchmakingRooms.set(roomId, {
         roomId,
         gameName,
-        expectedPlayers: new Set([player1.playerId, player2.playerId]),
+        expectedPlayers,
         connectedPlayers: new Set(),
         createdAt: Date.now()
       });
 
-      // Set match results
-      matchmakingResults.set(player1.playerId, {
-        status: 'matched',
-        roomId
-      });
-      matchmakingResults.set(player2.playerId, {
-        status: 'matched',
-        roomId
-      });
+      // Set match results and remove from global queue
+      for (const player of group) {
+        matchmakingResults.set(player.playerId, {
+          status: 'matched',
+          roomId
+        });
 
-      // Remove players from queue
-      const index1 = matchmakingQueue.findIndex(p => p.playerId === player1.playerId);
-      const index2 = matchmakingQueue.findIndex(p => p.playerId === player2.playerId);
-      if (index1 !== -1) matchmakingQueue.splice(index1, 1);
-      if (index2 !== -1) matchmakingQueue.splice(index2, 1);
+        const index = matchmakingQueue.findIndex(p => p.playerId === player.playerId);
+        if (index !== -1) {
+          matchmakingQueue.splice(index, 1);
+        }
+      }
 
-      console.log(`Matched players ${player1.playerId} and ${player2.playerId} for game ${gameName} in room ${roomId}`);
+      console.log(
+        `Matched ${group.length} player(s) for game ${gameName} in room ${roomId}:`,
+        group.map(p => p.playerId).join(", ")
+      );
     }
-  });
+  }
 }
 
 // Periodically clean up stale matchmaking data
@@ -522,6 +538,20 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     
     const prefilledRoom = roomName || '';
     const escapedPrefilledRoom = prefilledRoom.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const rawGame: any = game;
+    const minPlayersPerRoom =
+      typeof rawGame.min_players_per_room === 'number' && Number.isFinite(rawGame.min_players_per_room)
+        ? Math.max(1, Math.floor(rawGame.min_players_per_room))
+        : 2;
+    const maxPlayersPerRoom =
+      typeof rawGame.max_players_per_room === 'number' && Number.isFinite(rawGame.max_players_per_room)
+        ? Math.max(minPlayersPerRoom, Math.floor(rawGame.max_players_per_room))
+        : 2;
+    const hasWinCondition =
+      typeof rawGame.has_win_condition === 'boolean' ? rawGame.has_win_condition : true;
+    const canJoinLate =
+      typeof rawGame.can_join_late === 'boolean' ? rawGame.can_join_late : false;
     
     // Determine the home URL based on environment
     const homeUrl = isDevelopment ? 'http://localhost:3000' : 'https://splork.io';
@@ -975,6 +1005,32 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       background: rgba(255, 255, 255, 0.15);
       transform: translateY(-2px);
     }
+    #waiting-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9000;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    #waiting-overlay-content {
+      text-align: center;
+      padding: 32px 40px;
+      background: rgba(17, 17, 17, 0.95);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    #waiting-overlay-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    #waiting-overlay-text {
+      font-size: 16px;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
@@ -1066,6 +1122,28 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     </div>
   </div>
 
+  <!-- Waiting for Players Overlay -->
+  <div id="waiting-overlay">
+    <div id="waiting-overlay-content">
+      <div id="waiting-overlay-title">
+        Waiting for players<span id="waiting-overlay-dots">.</span>
+      </div>
+      <div id="waiting-overlay-text">
+        <span id="waiting-overlay-message">Waiting for more players to join</span>
+        <span id="waiting-overlay-count"></span>
+      </div>
+      <button
+        id="waiting-share-btn"
+        style="margin-top: 20px; padding: 10px 16px; background: #667eea; color: white; border: none; border-radius: 9999px; cursor: pointer; font-weight: 600;"
+      >
+        📋 Copy Invite Link
+      </button>
+      <div style="margin-top: 8px; font-size: 12px; color: #888;">
+        Share this link with friends so they can join your room.
+      </div>
+    </div>
+  </div>
+
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const gameName = "${gameName}";
@@ -1074,6 +1152,11 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     let currentRoom;
     let gameInstance;
     let isConnected = false;
+  const minPlayersPerRoom = ${minPlayersPerRoom};
+  const maxPlayersPerRoom = ${maxPlayersPerRoom};
+  const hasWinCondition = ${hasWinCondition ? 'true' : 'false'};
+  const canJoinLate = ${canJoinLate ? 'true' : 'false'};
+  let currentPlayerCount = 0;
     
     // Get player ID and username from URL parameters (set by web app) or fallback to localStorage
     const urlParams = new URLSearchParams(window.location.search);
@@ -1156,9 +1239,21 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     gameUIToggle.addEventListener('click', toggleGameUI);
     gameUIHeader.addEventListener('click', toggleGameUI);
 
-    // Setup share button
-    document.getElementById('share-btn').addEventListener('click', () => {
-      const roomName = document.getElementById('current-room').textContent;
+    // Animate waiting overlay dots (., .., ...)
+    const waitingDotsEl = document.getElementById('waiting-overlay-dots');
+    if (waitingDotsEl) {
+      let dotCount = 1;
+      setInterval(() => {
+        dotCount = dotCount % 3 + 1; // cycles 1 → 2 → 3 → 1 ...
+        waitingDotsEl.textContent = '.'.repeat(dotCount);
+      }, 600);
+    }
+
+    // Shared share-link behavior for multiple buttons
+    function copyShareLink(buttonElement) {
+      const roomNameEl = document.getElementById('current-room');
+      if (!roomNameEl) return;
+      const roomName = roomNameEl.textContent;
       
       // Safe encode function to prevent double encoding
       const safeEncode = (str) => {
@@ -1175,13 +1270,24 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
       
       const shareUrl = window.location.origin + '/game/' + safeEncode(${JSON.stringify(gameName)}) + '/' + safeEncode(roomName);
       navigator.clipboard.writeText(shareUrl).then(() => {
-        const btn = document.getElementById('share-btn');
-        btn.textContent = '✅ Link Copied!';
+        const originalText = buttonElement.textContent;
+        buttonElement.textContent = '✅ Link Copied!';
         setTimeout(() => {
-          btn.textContent = '📋 Copy Share Link';
+          buttonElement.textContent = originalText;
         }, 2000);
       });
-    });
+    }
+
+    // Setup share buttons (sidebar + waiting overlay)
+    const shareBtn = document.getElementById('share-btn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', () => copyShareLink(shareBtn));
+    }
+
+    const waitingShareBtn = document.getElementById('waiting-share-btn');
+    if (waitingShareBtn) {
+      waitingShareBtn.addEventListener('click', () => copyShareLink(waitingShareBtn));
+    }
 
     // Setup chat functionality
     const chatMessages = document.getElementById('chat-messages');
@@ -1408,13 +1514,14 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         socketIds = Object.keys(state.playerColors);
       }
 
-      // Only show if we have 2 or more players
+      currentPlayerCount = socketIds.length;
+
+      // Only show ELO display if we have 2 or more players
       if (socketIds.length < 2) {
         playersDisplay.style.display = 'none';
-        return;
+      } else {
+        playersDisplay.style.display = 'flex';
       }
-
-      playersDisplay.style.display = 'flex';
 
       // Fetch ELO data for each player using their persistent ID
       const playerData = await Promise.all(
@@ -1460,6 +1567,20 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
         </div>
         \${index === 0 ? '<div class="vs-text">VS</div>' : ''}
       \`).join('');
+
+      // Update waiting overlay based on player count vs minimum
+      const waitingOverlay = document.getElementById('waiting-overlay');
+      const waitingCount = document.getElementById('waiting-overlay-count');
+      if (!isHideUI && waitingOverlay && minPlayersPerRoom > 0) {
+        if (currentPlayerCount < minPlayersPerRoom) {
+          waitingOverlay.style.display = 'flex';
+          if (waitingCount) {
+            waitingCount.textContent = \` (\${currentPlayerCount}/\${minPlayersPerRoom})\`;
+          }
+        } else {
+          waitingOverlay.style.display = 'none';
+        }
+      }
     }
 
     // Check if game is over and show play again overlay
@@ -1542,6 +1663,14 @@ async function serveGameClient(gameName: string, roomName: string | undefined, r
     });
 
     function emitAction(action, payload) {
+      // Prevent game actions before the minimum number of players have joined
+      if (!isHideUI && minPlayersPerRoom > 0 && currentPlayerCount < minPlayersPerRoom) {
+        console.log(
+          \`Action "\${action}" blocked: waiting for more players (\${currentPlayerCount}/\${minPlayersPerRoom})\`
+        );
+        return;
+      }
+
       if (socket && isConnected && currentRoom) {
         console.log('Emitting action:', action, payload);
         socket.emit('game_action', {
@@ -1647,6 +1776,62 @@ async function incrementPlayCount(gameName: string): Promise<void> {
   }
 }
 
+// Helper to fetch room configuration for a game (for matchmaking)
+async function getRoomConfigForGame(gameName: string): Promise<{
+  minPlayers: number;
+  maxPlayers: number;
+  hasWinCondition: boolean;
+  canJoinLate: boolean;
+}> {
+  // Premade games do not live in the DB; use sensible defaults
+  if (PREMADE_GAMES[gameName as keyof typeof PREMADE_GAMES]) {
+    return {
+      minPlayers: 2,
+      maxPlayers: 2,
+      hasWinCondition: true,
+      canJoinLate: false
+    };
+  }
+
+  try {
+    const tableName = getGamesTableName();
+    const { rows } = await query<Game>(
+      `SELECT min_players_per_room, max_players_per_room, has_win_condition, can_join_late FROM ${tableName} WHERE name = $1`,
+      gameName
+    );
+
+    const raw: any = rows[0] ?? {};
+
+    const minPlayers =
+      typeof raw.min_players_per_room === 'number' && Number.isFinite(raw.min_players_per_room)
+        ? Math.max(1, Math.floor(raw.min_players_per_room))
+        : 2;
+    const maxPlayers =
+      typeof raw.max_players_per_room === 'number' && Number.isFinite(raw.max_players_per_room)
+        ? Math.max(minPlayers, Math.floor(raw.max_players_per_room))
+        : 2;
+    const hasWinCondition =
+      typeof raw.has_win_condition === 'boolean' ? raw.has_win_condition : true;
+    const canJoinLate =
+      typeof raw.can_join_late === 'boolean' ? raw.can_join_late : false;
+
+    return {
+      minPlayers,
+      maxPlayers,
+      hasWinCondition,
+      canJoinLate
+    };
+  } catch (e) {
+    console.error(`Error fetching room config for game ${gameName}:`, e);
+    return {
+      minPlayers: 2,
+      maxPlayers: 2,
+      hasWinCondition: true,
+      canJoinLate: false
+    };
+  }
+}
+
 // API endpoint to list all games
 app.get('/api/games', async (req, res) => {
   try {
@@ -1706,7 +1891,7 @@ app.get('/api/game-stats', async (req, res) => {
 });
 
 // Matchmaking endpoints
-app.post('/api/matchmaking/join', (req, res) => {
+app.post('/api/matchmaking/join', async (req, res) => {
   try {
     const { gameName, playerId } = req.body;
     
@@ -1727,10 +1912,43 @@ app.post('/api/matchmaking/join', (req, res) => {
       return res.json({ message: 'Already matched' });
     }
 
+    // Try to join an existing live room for games that allow late joining
+    const decodedGameName = decodeURIComponent(gameName);
+    try {
+      // Look for an active room for this game that is not full and not ended
+      let targetRoomId: string | null = null;
+      rooms.forEach((room) => {
+        if (
+          room.gameName === decodedGameName &&
+          !room.state?.gameEnded &&
+          room.canJoinLate &&
+          room.players.size < room.maxPlayersPerRoom &&
+          !targetRoomId
+        ) {
+          targetRoomId = room.id;
+        }
+      });
+
+      if (targetRoomId) {
+        matchmakingResults.set(playerId, {
+          status: 'matched',
+          roomId: targetRoomId
+        });
+
+        console.log(
+          `Player ${playerId} joined live room ${targetRoomId} for game ${decodedGameName} via matchmaking`
+        );
+
+        return res.json({ message: 'Joined live game' });
+      }
+    } catch (liveErr) {
+      console.error('Error trying to join live room for matchmaking:', liveErr);
+    }
+
     // Add player to queue
     matchmakingQueue.push({
       playerId,
-      gameName,
+      gameName: decodedGameName,
       timestamp: Date.now()
     });
     
@@ -1740,7 +1958,7 @@ app.post('/api/matchmaking/join', (req, res) => {
     matchmakingResults.set(playerId, { status: 'waiting' });
     
     // Try to match immediately
-    tryMatchPlayers();
+    await tryMatchPlayers();
     
     res.json({ message: 'Joined matchmaking queue' });
   } catch (err) {
@@ -1977,6 +2195,20 @@ io.on("connection", (socket) => {
             moves: Object.keys(logic.moves)
           });
 
+          const rawGame: any = game;
+          const minPlayersPerRoom =
+            typeof rawGame.min_players_per_room === 'number' && Number.isFinite(rawGame.min_players_per_room)
+              ? Math.max(1, Math.floor(rawGame.min_players_per_room))
+              : 2;
+          const maxPlayersPerRoom =
+            typeof rawGame.max_players_per_room === 'number' && Number.isFinite(rawGame.max_players_per_room)
+              ? Math.max(minPlayersPerRoom, Math.floor(rawGame.max_players_per_room))
+              : 2;
+          const hasWinCondition =
+            typeof rawGame.has_win_condition === 'boolean' ? rawGame.has_win_condition : true;
+          const canJoinLate =
+            typeof rawGame.can_join_late === 'boolean' ? rawGame.can_join_late : false;
+
           room = {
             id: roomId,
             gameId: game.id,
@@ -1984,7 +2216,11 @@ io.on("connection", (socket) => {
             state: JSON.parse(JSON.stringify(logic.initialState)),
             players: new Map(),
             persistentPlayerMap: new Map(),
-            logic: logic
+            logic: logic,
+            minPlayersPerRoom,
+            maxPlayersPerRoom,
+            hasWinCondition,
+            canJoinLate
           };
           rooms.set(roomId, room);
           console.log(`Room ${roomId} created successfully`);
@@ -2008,9 +2244,6 @@ io.on("connection", (socket) => {
       console.log(`User ${socket.id} joining existing room: ${roomId}`);
     }
 
-    // Join logic
-    socket.join(roomId);
-    
     let isReconnection = false;
     let oldSocketId: string | undefined;
     
@@ -2038,6 +2271,24 @@ io.on("connection", (socket) => {
       // Update persistent player mapping
       room.persistentPlayerMap.set(persistentPlayerId, socket.id);
     }
+    
+    // Prevent new players from joining a full room (but always allow reconnections)
+    if (!room) {
+      console.error(`Room ${roomId} not found after creation attempt`);
+      socket.emit("error", "Room not available");
+      return;
+    }
+
+    if (!isReconnection && room.players.size >= room.maxPlayersPerRoom) {
+      console.log(
+        `Room ${roomId} is full (${room.players.size}/${room.maxPlayersPerRoom}), rejecting join for ${socket.id}`
+      );
+      socket.emit("error", "Room is full. Please try matchmaking instead.");
+      return;
+    }
+
+    // Join logic
+    socket.join(roomId);
     
     // Add player to room
     room.players.set(socket.id, {

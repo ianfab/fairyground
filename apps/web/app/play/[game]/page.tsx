@@ -1,12 +1,13 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getGameServerUrl, safeEncodeURIComponent } from "@/lib/config";
 import { Matchmaking } from "@/app/components/Matchmaking";
 import { GameLeaderboard } from "@/app/components/GameLeaderboard";
 import { MatchmakingStats } from "@/app/components/MatchmakingStats";
 import { useAuthSafe } from "@/lib/useAuthSafe";
+import type { Game } from "@/lib/types";
 
 export default function GameModePage() {
   const params = useParams();
@@ -15,6 +16,35 @@ export default function GameModePage() {
   const [roomName, setRoomName] = useState("");
   const [showMatchmaking, setShowMatchmaking] = useState(false);
   const authInfo = useAuthSafe();
+  const [gameConfig, setGameConfig] = useState<Partial<Game> | null>(null);
+  const [loadingConfig, setLoadingConfig] = useState(false);
+
+  // Load game configuration so we can pass matchmaking/room settings down
+  useEffect(() => {
+    let cancelled = false;
+    const loadConfig = async () => {
+      try {
+        setLoadingConfig(true);
+        const res = await fetch(`/api/games/${safeEncodeURIComponent(gameName)}`);
+        if (!res.ok) return;
+        const data: Game = await res.json();
+        if (!cancelled) {
+          setGameConfig(data);
+        }
+      } catch (err) {
+        console.error("Failed to load game config:", err);
+      } finally {
+        if (!cancelled) {
+          setLoadingConfig(false);
+        }
+      }
+    };
+
+    loadConfig();
+    return () => {
+      cancelled = true;
+    };
+  }, [gameName]);
 
   const handlePlayWithFriend = () => {
     if (!roomName.trim()) {
@@ -42,7 +72,11 @@ export default function GameModePage() {
     return (
       <Matchmaking 
         gameName={gameName} 
-        onCancel={() => setShowMatchmaking(false)} 
+        onCancel={() => setShowMatchmaking(false)}
+        minPlayersPerRoom={gameConfig?.min_players_per_room}
+        maxPlayersPerRoom={gameConfig?.max_players_per_room}
+        hasWinCondition={gameConfig?.has_win_condition}
+        canJoinLate={gameConfig?.can_join_late}
       />
     );
   }

@@ -10,6 +10,10 @@ export interface Game {
   play_count?: number;
   last_played_at?: Date;
   preview?: boolean;
+  min_players_per_room?: number;
+  max_players_per_room?: number;
+  has_win_condition?: boolean;
+  can_join_late?: boolean;
   tags?: string[] | null;
 }
 

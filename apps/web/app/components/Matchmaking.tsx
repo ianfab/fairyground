@@ -7,18 +7,59 @@ import { useAuthSafe } from "@/lib/useAuthSafe";
 interface MatchmakingProps {
   gameName: string;
   onCancel: () => void;
+  minPlayersPerRoom?: number;
+  maxPlayersPerRoom?: number;
+  hasWinCondition?: boolean;
+  canJoinLate?: boolean;
 }
 
-export function Matchmaking({ gameName, onCancel }: MatchmakingProps) {
+export function Matchmaking({
+  gameName,
+  onCancel,
+  minPlayersPerRoom = 2,
+  maxPlayersPerRoom = 2,
+  hasWinCondition = true,
+  canJoinLate = false,
+}: MatchmakingProps) {
   const [status, setStatus] = useState<'searching' | 'matched' | 'error'>('searching');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const playerIdRef = useRef<string>(crypto.randomUUID());
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const hasJoinedRef = useRef<boolean>(false);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const authInfo = useAuthSafe();
 
   useEffect(() => {
     const playerId = playerIdRef.current;
+
+    // Helper to redirect into the matched game room
+    const redirectToGame = (rawRoomId: string) => {
+      // For late-join into an existing live room we may receive a full room
+      // identifier like "gameName/roomName". Normalize this so the URL path
+      // structure remains /game/:gameName/:roomName.
+      let roomId = rawRoomId;
+      const parts = rawRoomId.split("/");
+      if (parts.length === 2 && parts[0] === gameName) {
+        roomId = parts[1];
+      }
+      const userId = authInfo.user?.userId || '';
+      const username = authInfo.user?.username || authInfo.user?.email || '';
+      let url = `${getGameServerUrl()}/game/${safeEncodeURIComponent(gameName)}/${safeEncodeURIComponent(roomId)}`;
+
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (userId) {
+        params.append('userId', userId);
+        if (username) {
+          params.append('username', username);
+        }
+      }
+      params.append('matchmakingPlayerId', playerId);
+
+      url += `?${params.toString()}`;
+      window.location.href = url;
+    };
 
     // Join matchmaking queue
     const joinQueue = async () => {
@@ -72,25 +113,34 @@ export function Matchmaking({ gameName, onCancel }: MatchmakingProps) {
                 console.log('Audio not supported:', err);
               }
 
-              // Redirect to the game with the matched room
-              setTimeout(() => {
-                const userId = authInfo.user?.userId || '';
-                const username = authInfo.user?.username || authInfo.user?.email || '';
-                let url = `${getGameServerUrl()}/game/${safeEncodeURIComponent(gameName)}/${safeEncodeURIComponent(data.roomId)}`;
-
-                // Build query parameters
-                const params = new URLSearchParams();
-                if (userId) {
-                  params.append('userId', userId);
-                  if (username) {
-                    params.append('username', username);
-                  }
+              // If late-join is allowed for this game, go straight into the match.
+              // Otherwise, wait 5 seconds with a countdown to give more players a chance to join.
+              if (canJoinLate) {
+                setTimeout(() => {
+                  redirectToGame(data.roomId as string);
+                }, 1000);
+              } else {
+                if (countdownRef.current) {
+                  clearInterval(countdownRef.current);
                 }
-                params.append('matchmakingPlayerId', playerId);
 
-                url += `?${params.toString()}`;
-                window.location.href = url;
-              }, 1000);
+                let remaining = 5;
+                setCountdown(remaining);
+
+                countdownRef.current = setInterval(() => {
+                  remaining -= 1;
+                  if (remaining <= 0) {
+                    if (countdownRef.current) {
+                      clearInterval(countdownRef.current);
+                      countdownRef.current = null;
+                    }
+                    setCountdown(0);
+                    redirectToGame(data.roomId as string);
+                  } else {
+                    setCountdown(remaining);
+                  }
+                }, 1000);
+              }
             }
           } catch (error) {
             console.error('Error checking matchmaking status:', error);
@@ -110,6 +160,11 @@ export function Matchmaking({ gameName, onCancel }: MatchmakingProps) {
     return () => {
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current);
+      }
+
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
       }
 
       // Leave queue when component unmounts (user clicked Cancel or navigated back)
@@ -134,6 +189,13 @@ export function Matchmaking({ gameName, onCancel }: MatchmakingProps) {
         body: JSON.stringify({ playerId })
       }).catch(err => console.error('Error leaving queue:', err));
     }
+
+    // Clear any local countdown
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    setCountdown(null);
 
     onCancel();
   };
@@ -168,9 +230,15 @@ export function Matchmaking({ gameName, onCancel }: MatchmakingProps) {
             <div className="text-center">
               <div className="text-5xl mb-4">✅</div>
               <h2 className="text-3xl font-bold mb-4">Match Found!</h2>
-              <p className="text-green-400 mb-8">
-                Loading game...
-              </p>
+              {countdown !== null && !canJoinLate ? (
+                <p className="text-green-400 mb-8">
+                  Starting in {countdown} second{countdown === 1 ? '' : 's'}...
+                </p>
+              ) : (
+                <p className="text-green-400 mb-8">
+                  Loading game...
+                </p>
+              )}
             </div>
           </div>
         </div>
