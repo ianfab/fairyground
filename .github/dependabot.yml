@@ -4,7 +4,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "quarterly"
     groups:
       github-actions:
         patterns:
@@ -35,7 +35,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "quarterly"
     ignore:
       - dependency-name: "fairy-stockfish-nnue.wasm"
       - dependency-name: "ffish-es6"
@@ -46,5 +46,6 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+
 
 
