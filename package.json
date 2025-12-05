@@ -12,12 +12,12 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "chessgroundx": "^10.7.3",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "fairy-stockfish-nnue.wasm": "1.1.10",
     "ffish-es6": "0.7.8",
     "gif.js": "^0.2.0",
     "jszip": "^3.10.1",
-    "mithril": "^2.3.7",
+    "mithril": "^2.3.8",
     "serve": "^14.2.5",
     "ws": "^8.16.0"
   },
@@ -27,9 +27,9 @@
     "clean-css": "^5.3.3",
     "esmify": "^2.1.1",
     "html-minifier": "^4.0.0",
-    "prettier": "^3.2.5",
+    "prettier": "^3.7.3",
     "uglify-js": "^3.19.3",
-    "vercel": "^48.6.7",
+    "vercel": "^48.12.0",
     "watchify": "^4.0.0"
   }
 }
