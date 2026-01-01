@@ -14,7 +14,7 @@ jobs:
       - run: chmod 744 ./release_make/CI.sh
       - run: ./release_make/CI.sh
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: github.event_name != 'pull_request'
         with:
           name: Fairyground-Windows-x86_64
@@ -22,7 +22,7 @@ jobs:
           compression-level: 0
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: github.event_name != 'pull_request'
         with:
           name: Fairyground-Windows-ARM64
@@ -30,7 +30,7 @@ jobs:
           compression-level: 0
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: github.event_name != 'pull_request'
         with:
           name: Fairyground-Linux-x86_64
@@ -38,7 +38,7 @@ jobs:
           compression-level: 0
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: github.event_name != 'pull_request'
         with:
           name: Fairyground-Linux-ARM64
@@ -46,7 +46,7 @@ jobs:
           compression-level: 0
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: github.event_name != 'pull_request'
         with:
           name: Fairyground-Script-AllPlatform
@@ -54,7 +54,7 @@ jobs:
           compression-level: 0
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: github.event_name != 'pull_request'
         with:
           name: Source_Code
