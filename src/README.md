@@ -37,12 +37,12 @@ The following table shows the current build process on file placement and file s
 
 | Source                                                                                                   | Destination                  | Compress? | Mangle? | Note                                                                     |
 | -------------------------------------------------------------------------------------------------------- | ---------------------------- | --------- | ------- | ------------------------------------------------------------------------ |
-| `src\js\*Feature.js`                                                                                     | `public\lib\`                | ✔        | ✔      | Can add more files without changing `package.json`                       |
-| `src\js\*.canvas.worker.js`                                                                              | `public\lib\canvas\`         | ✔        | ✔      | Can add more files without changing `package.json`                       |
-| `src\html\*.html`                                                                                        | `public\`                    | ✔        | ✔      | Can add more files without changing `package.json`                       |
-| `src\js\main.js` & `src\js\move.js` & `src\js\pgn.js` & `src\js\chessgroundtheme.js` & `src\js\image.js` | Merge to `public\bundle.js`  | ✔        | ✔      |                                                                          |
-| `src\js\server.js`                                                                                       | `<root>\server.js`           | ✖        | ✖      | Only used in offline version, so reducing file size does not make sense. |
-| `src\index_page_css.css` & `src\index_page_js.js` & `src\html\advanced.html`                             | Merge to `public\index.html` | ✔        | ✔      |                                                                          |
+| `src\js\*Feature.js`                                                                                     | `public\lib\`                | ✔         | ✔       | Can add more files without changing `package.json`                       |
+| `src\js\*.canvas.worker.js`                                                                              | `public\lib\canvas\`         | ✔         | ✔       | Can add more files without changing `package.json`                       |
+| `src\html\*.html`                                                                                        | `public\`                    | ✔         | ✔       | Can add more files without changing `package.json`                       |
+| `src\js\main.js` & `src\js\move.js` & `src\js\pgn.js` & `src\js\chessgroundtheme.js` & `src\js\image.js` | Merge to `public\bundle.js`  | ✔         | ✔       |                                                                          |
+| `src\js\server.js`                                                                                       | `<root>\server.js`           | ✖         | ✖       | Only used in offline version, so reducing file size does not make sense. |
+| `src\index_page_css.css` & `src\index_page_js.js` & `src\html\advanced.html`                             | Merge to `public\index.html` | ✔         | ✔       |                                                                          |
 
 ### Notes
 
