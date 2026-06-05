@@ -3498,7 +3498,8 @@ function getNotation(
         const variants = ffish.variants().split(" ");
         let ucimoves = ucimovestr.trim();
         if (variants.includes(variant)) {
-          if (ffish.validateFen(startfen, variant, is960) >= 0) {
+          // if (ffish.validateFen(startfen, variant, is960) >= 0)
+          if (1) {
             let tmpboard = new ffish.Board(variant, startfen, is960);
             let moveslist = ucimoves.split(/[ ]+/).reverse();
             let result = "";
