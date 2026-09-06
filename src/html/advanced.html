@@ -4539,6 +4539,13 @@
           if (!typedropdown || !namedropdown) {
             return;
           }
+          // While the board editor is active the board shows the editor's
+          // own state, so leave it, apply the position and re-enter it.
+          const editor = document.getElementById("isboardsetup");
+          const wasediting = editor && editor.checked;
+          if (wasediting) {
+            editor.click();
+          }
           typedropdown.value = type;
           typedropdown.dispatchEvent(new Event("change"));
           if (type != "(default)") {
@@ -4546,7 +4553,20 @@
             namedropdown.dispatchEvent(new Event("change"));
           }
           position_picker_open = false;
-          window.setTimeout(() => m.redraw(), 200);
+          window.setTimeout(() => {
+            if (
+              wasediting &&
+              editor &&
+              !editor.checked &&
+              !board_setup_mode &&
+              !review_mode &&
+              !advanced_time_control &&
+              !engine_match_mode
+            ) {
+              editor.click();
+            }
+            m.redraw();
+          }, 300);
         };
 
         const ICONS = {
