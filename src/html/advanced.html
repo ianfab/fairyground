@@ -4479,6 +4479,7 @@
           movetime: 2,
         };
         let game_games = 1;
+        let game_continue = false;
         // Search limit of the in browser engine per side while a game runs.
         let engine_limit_white = null;
         let engine_limit_black = null;
@@ -4560,6 +4561,7 @@
           undo: "M3 7v6h6M3 13a9 9 0 1 0 3-6.7L3 9",
           gear: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z",
           moon: "M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z",
+          edit: "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z",
           move: "M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20",
           check: "m20 6-11 11-5-5",
           copy: "M20 9h-9a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2zM5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1",
@@ -4884,6 +4886,13 @@
         const startGame = () => {
           newgame_open = false;
           setAnalysisMode(false);
+          if (!game_continue) {
+            // Back to the initial position of the current game.
+            const restart = document.getElementById("restart");
+            if (restart && !restart.disabled) {
+              restart.click();
+            }
+          }
           [
             ["white", game_white],
             ["black", game_black],
@@ -4973,7 +4982,7 @@
             } else if (mover.player == "random") {
               document.getElementById("randommovergo").click();
             }
-          }, 80);
+          }, 250);
         };
 
         const endGame = () => {
@@ -7518,8 +7527,9 @@
                         ) {
                           game.mode = "movetime";
                         } else if (
-                          !isEnginePlayer(game.player) &&
-                          !isClockMode(game.mode)
+                          game.player == "random" ||
+                          (!isEnginePlayer(game.player) &&
+                            !isClockMode(game.mode))
                         ) {
                           game.mode = "infinite";
                         }
@@ -7555,24 +7565,29 @@
                     ],
                   ),
                 ]),
-                m("div.field", [
-                  m("span.label", engine ? "Thinks by" : "Clock"),
-                  m(
-                    "select",
-                    {
-                      onchange: (e) => {
-                        game.mode = e.target.value;
-                      },
-                    },
-                    modeOptions.map(([value, text]) =>
+                game.player == "random"
+                  ? m("div.field", [
+                      m("span.label", "Clock"),
+                      m("p.hint", "Moves instantly, no clock needed."),
+                    ])
+                  : m("div.field", [
+                      m("span.label", engine ? "Thinks by" : "Clock"),
                       m(
-                        "option",
-                        { value, selected: game.mode == value },
-                        text,
+                        "select",
+                        {
+                          onchange: (e) => {
+                            game.mode = e.target.value;
+                          },
+                        },
+                        modeOptions.map(([value, text]) =>
+                          m(
+                            "option",
+                            { value, selected: game.mode == value },
+                            text,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ]),
+                    ]),
               ]),
               limitRow ? m("div.sliders.timecontrol", [limitRow]) : null,
               isClockMode(game.mode) ? timeSliders(side, game.mode, tc) : null,
@@ -7609,8 +7624,26 @@
                 ),
               ]),
               m(
+                "label.toggle",
+                {
+                  title:
+                    "On: the game continues from the position currently shown on the board, keeping the moves played so far. Off: the game starts from the initial position of the current game (the variant's or the chosen start position).",
+                },
+                [
+                  m("input[type=checkbox]", {
+                    checked: game_continue,
+                    onclick: (e) => {
+                      game_continue = e.target.checked;
+                    },
+                  }),
+                  m("span", "Continue from the current position"),
+                ],
+              ),
+              m(
                 "p.hint",
-                "The game starts from the current position of the board. Choose the variant and start position in the top bar first.",
+                game_continue
+                  ? "The game continues from the position on the board."
+                  : "The game starts from the initial position; the moves on the board are cleared. Choose the variant and start position in the top bar.",
               ),
               sideSetup("white", "White", game_white, tc_white),
               sideSetup("black", "Black", game_black, tc_black),

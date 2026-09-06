@@ -1,4 +1,1 @@
-document.addEventListener("onpageload", () => {
-  const pagetitle = document.getElementById("pagetitle");
-  pagetitle.innerText = "Play against Fairy-Stockfish";
-});
+// index.html is the same application as advanced.html.
