@@ -1311,6 +1311,17 @@ main.app {
   width: 100%;
 }
 
+.fenrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fenrow #currentboardfen {
+  flex: 1;
+  min-width: 0;
+}
+
 #currentboardfen {
   font-family: var(--font-mono);
   font-size: 12px;
