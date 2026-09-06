@@ -4350,6 +4350,38 @@
         // Turning it on releases the players and the time control (they
         // are exclusive with analysis) and starts the engine right away;
         // turning it off stops the engine.
+        // Engine resources shown as sliders (lichess style). The hidden
+        // number inputs #threads, #hash and #multipv carry the values that
+        // the engine logic reads.
+        const hashSteps = [4, 8, 16, 32, 64, 128, 256, 512, 1024];
+        const maxThreads = Math.max(
+          1,
+          Math.min(32, navigator.hardwareConcurrency || 1),
+        );
+        let engine_threads = window.crossOriginIsolated
+          ? Math.max(1, Math.min(4, Math.floor(maxThreads / 2)))
+          : 1;
+        let engine_hash_index = 2; // 16 MB
+        let engine_multipv = 1;
+
+        const sliderRow = (label, shown, min, max, value, onchange, help) =>
+          m("div.sliderrow", { title: help }, [
+            m("div.sliderhead", [
+              m("span.label", label),
+              m("span.val", String(shown)),
+            ]),
+            m("input[type=range]", {
+              min: min,
+              max: max,
+              step: 1,
+              value: value,
+              disabled: stockfish_state != "READY",
+              oninput: (e) => {
+                onchange(parseInt(e.target.value));
+              },
+            }),
+          ]);
+
         const analysisBlocked = () =>
           board_setup_mode ||
           engine_match_mode ||
@@ -4908,7 +4940,7 @@
                     ),
                     m(
                       "option",
-                      { value: "SAN" },
+                      { value: "SAN", selected: true },
                       "Standard/Short Algebraic Notation (SAN)",
                     ),
                     m(
@@ -5269,6 +5301,45 @@
                     ],
                   ),
                 ]),
+                m("div.sliders", [
+                  sliderRow(
+                    "Lines",
+                    engine_multipv,
+                    1,
+                    8,
+                    engine_multipv,
+                    (value) => {
+                      engine_multipv = value;
+                    },
+                    "Number of principal variations (engine lines) shown.",
+                  ),
+                  sliderRow(
+                    "Threads",
+                    engine_threads,
+                    1,
+                    maxThreads,
+                    engine_threads,
+                    (value) => {
+                      engine_threads = value;
+                    },
+                    "Parallel search threads of in browser Fairy-Stockfish.",
+                  ),
+                  sliderRow(
+                    "Memory",
+                    hashSteps[engine_hash_index] + " MB",
+                    0,
+                    hashSteps.length - 1,
+                    engine_hash_index,
+                    (value) => {
+                      engine_hash_index = value;
+                    },
+                    "Size of the engine's hash table.",
+                  ),
+                ]),
+                m(
+                  "p.hint",
+                  "Search limits below only apply when the engine plays a side or after Go without analysis. Leave them empty for no limit.",
+                ),
                 m("div.nums", [
                   m("div.field", [
                     m("span.label", "Depth"),
@@ -5301,39 +5372,24 @@
                       min: 1,
                     }),
                   ]),
-                  m("div.field", [
-                    m("span.label", "Threads"),
-                    m("input[type=number]#threads", {
-                      placeholder: "Threads",
-                      title:
-                        "The number of parallel searching threads of in browser Fairy-Stockfish.",
-                      disabled: !is_ready,
-                      min: 1,
-                      max: 512,
-                    }),
-                  ]),
-                  m("div.field", [
-                    m("span.label", "Hash (MB)"),
-                    m("input[type=number]#hash", {
-                      placeholder: "Hash",
-                      title:
-                        "The size in megabytes of the hash table of in browser Fairy-Stockfish.",
-                      disabled: !is_ready,
-                      min: 1,
-                      max: 33554432,
-                    }),
-                  ]),
-                  m("div.field", [
-                    m("span.label", "MultiPV"),
-                    m("input[type=number]#multipv", {
-                      placeholder: "MultiPV",
-                      title:
-                        "The number of principal variations (engine lines, PV) of in browser Fairy-Stockfish.",
-                      disabled: !is_ready,
-                      min: 1,
-                      max: 500,
-                    }),
-                  ]),
+                  m("input[type=number]#threads", {
+                    hidden: true,
+                    value: engine_threads,
+                    min: 1,
+                    max: 512,
+                  }),
+                  m("input[type=number]#hash", {
+                    hidden: true,
+                    value: hashSteps[engine_hash_index],
+                    min: 1,
+                    max: 33554432,
+                  }),
+                  m("input[type=number]#multipv", {
+                    hidden: true,
+                    value: engine_multipv,
+                    min: 1,
+                    max: 500,
+                  }),
                 ]),
                 m("div.row", [
                   m(
