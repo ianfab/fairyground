@@ -2812,7 +2812,17 @@
           let winc = 0;
           let binc = 0;
           if (analysis_mode) {
-            args += " infinite";
+            let analysisargs = "";
+            if ($("#depth").validity.valid && depth > 0) {
+              analysisargs += ` depth ${depth}`;
+            }
+            if ($("#movetime").validity.valid && movetime > 0) {
+              analysisargs += ` movetime ${movetime}`;
+            }
+            if ($("#nodes").validity.valid && nodes > 0) {
+              analysisargs += ` nodes ${nodes}`;
+            }
+            args += analysisargs != "" ? analysisargs : " infinite";
           } else if (advanced_time_control) {
             if (
               white_timer_type == "infinite" &&
@@ -2886,19 +2896,21 @@
             stockfish.postMessage(
               `setoption name Move Overhead value ${timer_interval}`,
             );
-          } else {
-            if (!analysis_mode && $("#depth").validity.valid && depth > 0) {
-              args += ` depth ${depth}`;
-            }
+            // A side without a clock but with a search limit (depth,
+            // nodes, time per move) uses that limit instead.
+            const limitedside = $("#label-stm").innerHTML;
+            const limitargs = sideLimitArgs(limitedside);
             if (
-              !analysis_mode &&
-              $("#movetime").validity.valid &&
-              movetime > 0
+              limitargs != "" &&
+              ((limitedside == "white" && white_timer_type == "infinite") ||
+                (limitedside == "black" && black_timer_type == "infinite"))
             ) {
-              args += ` movetime ${movetime}`;
+              args = limitargs;
             }
-            if (!analysis_mode && $("#nodes").validity.valid && nodes > 0) {
-              args += ` nodes ${nodes}`;
+          } else {
+            const limitargs = sideLimitArgs($("#label-stm").innerHTML);
+            if (limitargs != "") {
+              args += limitargs;
             }
             if (!($("#whitedepth").validity.valid && whitedepthv > 0)) {
               whitedepth = -1;
@@ -4450,11 +4462,26 @@
         let newgame_open = false;
         let engine_debug = false;
         let move_input = "either"; // "either" | "click" | "drag"
-        let app_mode = "analysis"; // "play" | "analysis"
-        let player_white_engine = false;
-        let player_black_engine = false;
-        let player_white_random = false;
-        let player_black_random = false;
+        let app_mode = "analysis"; // "analysis" | "play" | "setup"
+        // Game settings chosen in the "New game" dialog (kept between games).
+        const game_white = {
+          player: "you",
+          mode: "infinite",
+          depth: 8,
+          nodes: 4,
+          movetime: 2,
+        };
+        const game_black = {
+          player: "fsf",
+          mode: "movetime",
+          depth: 8,
+          nodes: 4,
+          movetime: 2,
+        };
+        let game_games = 1;
+        // Search limit of the in browser engine per side while a game runs.
+        let engine_limit_white = null;
+        let engine_limit_black = null;
         let fen_copied = false;
         let variant_picker_open = false;
         let position_picker_open = false;
@@ -4658,7 +4685,7 @@
           100000000,
         ];
         let engine_depth_index = depthSteps.length;
-        let engine_movetime_index = 2; // 0.5 s
+        let engine_movetime_index = movetimeSteps.length;
         let engine_nodes_index = nodesSteps.length;
         // Time control values shown as sliders; the hidden number inputs
         // keep the millisecond values the timer logic reads.
@@ -4792,15 +4819,46 @@
         // play mode. In analysis mode the engine never plays a side, but the
         // settings themselves are kept. Engine matches manage the players
         // on their own and are left alone.
+        const isClockModeValue = (mode) =>
+          mode == "tournament" ||
+          mode == "time per move" ||
+          mode == "hourglass" ||
+          mode == "byoyomi";
+        const isEngineSide = (game) =>
+          game.player == "fsf" || game.player == "ext";
+        const playerName = (game, fallback) => {
+          if (app_mode != "play") {
+            return fallback;
+          }
+          if (game.player == "fsf") {
+            return "Fairy-Stockfish";
+          }
+          if (game.player == "ext") {
+            return "External engine";
+          }
+          if (game.player == "random") {
+            return "Random mover";
+          }
+          return "You";
+        };
+        const playerIcon = (game) =>
+          app_mode == "play" && isEngineSide(game)
+            ? "cpu"
+            : app_mode == "play" && game.player == "random"
+              ? "dice"
+              : "user";
+
+        // The players only take effect while a game runs (play mode). Engine
+        // matches manage the players on their own and are left alone.
         const applyPlayerSettings = () => {
           if (engine_match_mode || during_engine_match) {
             return;
           }
           const active = app_mode == "play";
-          play_white = active && player_white_engine;
-          play_black = active && player_black_engine;
-          random_mover_white = active && player_white_random;
-          random_mover_black = active && player_black_random;
+          play_white = active && isEngineSide(game_white);
+          play_black = active && isEngineSide(game_black);
+          random_mover_white = active && game_white.player == "random";
+          random_mover_black = active && game_black.player == "random";
           [
             ["playwhite", play_white],
             ["playblack", play_black],
@@ -4814,20 +4872,155 @@
           });
         };
 
-        const modeSwitchBlocked = () =>
-          during_play || during_engine_match || review_mode;
+        const sideLimitArgs = (side) => {
+          const limit =
+            side == "white" ? engine_limit_white : engine_limit_black;
+          if (!limit) {
+            return "";
+          }
+          return ` ${limit.type} ${limit.value}`;
+        };
 
-        const setAppMode = (mode) => {
-          if (mode == app_mode || modeSwitchBlocked()) {
+        const startGame = () => {
+          newgame_open = false;
+          setAnalysisMode(false);
+          [
+            ["white", game_white],
+            ["black", game_black],
+          ].forEach(([side, game]) => {
+            const clock = isClockModeValue(game.mode);
+            const modedropdown = document.getElementById(
+              `dropdown-${side}timemode`,
+            );
+            modedropdown.value = clock ? game.mode : "infinite";
+            modedropdown.dispatchEvent(new Event("change"));
+            let limit = null;
+            if (!clock && isEngineSide(game)) {
+              limit =
+                game.mode == "depth"
+                  ? { type: "depth", value: depthSteps[game.depth] }
+                  : game.mode == "nodes"
+                    ? { type: "nodes", value: nodesSteps[game.nodes] }
+                    : { type: "movetime", value: movetimeSteps[game.movetime] };
+            }
+            if (side == "white") {
+              engine_limit_white = limit;
+            } else {
+              engine_limit_black = limit;
+            }
+            // External engines read their limits from these inputs.
+            const external = game.player == "ext";
+            ["depth", "movetime", "nodes"].forEach((type) => {
+              const input = document.getElementById(`${side}${type}`);
+              if (input) {
+                input.value =
+                  external && limit && limit.type == type
+                    ? String(limit.value)
+                    : "";
+              }
+            });
+          });
+          advanced_time_control =
+            isClockModeValue(game_white.mode) ||
+            isClockModeValue(game_black.mode);
+          const advtimebox = document.getElementById("advtimectrl");
+          if (advtimebox) {
+            advtimebox.checked = advanced_time_control;
+          }
+          const bothengines =
+            isEngineSide(game_white) && isEngineSide(game_black);
+          engine_match_mode = bothengines && game_games > 1;
+          const matchbox = document.getElementById("isenginematchmode");
+          if (matchbox) {
+            matchbox.checked = engine_match_mode;
+          }
+          app_mode = "play";
+          applyPlayerSettings();
+          m.redraw();
+          window.setTimeout(() => {
+            if (engine_match_mode) {
+              // Start the engine match directly: the per-side limits chosen
+              // in the dialog replace the old global limit validation.
+              document.getElementById("enginematchgamecount").value =
+                String(game_games);
+              engine_match_game_list = [];
+              play_white = true;
+              play_black = true;
+              during_engine_match = true;
+              engine_match_played_game_count = 0;
+              engine_match_total_game_count = game_games;
+              engine_match_white_wins = 0;
+              engine_match_black_wins = 0;
+              engine_match_draws = 0;
+              document.getElementById("enginematchinfo").innerText =
+                `Games played: 0 | Total games to play: ${engine_match_total_game_count}`;
+              if (advanced_time_control) {
+                document.getElementById("gamestart").click();
+              } else {
+                document.getElementById("set").click();
+              }
+              m.redraw();
+              return;
+            }
+            if (advanced_time_control) {
+              goWithTimeControl();
+              return;
+            }
+            const stm = $("#label-stm").innerText;
+            const mover = stm == "black" ? game_black : game_white;
+            if (isEngineSide(mover)) {
+              startEngineNow();
+            } else if (mover.player == "random") {
+              document.getElementById("randommovergo").click();
+            }
+          }, 80);
+        };
+
+        const endGame = () => {
+          if (during_engine_match) {
+            document.getElementById("stop").click();
+          } else if (during_play) {
+            gameAbort();
+          }
+          force_stop();
+          engine_match_mode = false;
+          const matchbox = document.getElementById("isenginematchmode");
+          if (matchbox) {
+            matchbox.checked = false;
+          }
+          advanced_time_control = false;
+          const advtimebox = document.getElementById("advtimectrl");
+          if (advtimebox) {
+            advtimebox.checked = false;
+          }
+          engine_limit_white = null;
+          engine_limit_black = null;
+          app_mode = "analysis";
+          applyPlayerSettings();
+          m.redraw();
+        };
+
+        const enterSetup = () => {
+          if (app_mode != "analysis") {
             return;
           }
-          app_mode = mode;
-          if (mode == "play") {
-            setAnalysisMode(false);
-          } else {
-            force_stop();
+          setAnalysisMode(false);
+          app_mode = "setup";
+          window.setTimeout(() => {
+            const editor = document.getElementById("isboardsetup");
+            if (editor && !editor.checked && !editor.disabled) {
+              editor.click();
+            }
+            m.redraw();
+          }, 60);
+        };
+
+        const leaveSetup = () => {
+          const editor = document.getElementById("isboardsetup");
+          if (editor && editor.checked) {
+            editor.click();
           }
-          applyPlayerSettings();
+          app_mode = "analysis";
           m.redraw();
         };
 
@@ -4988,35 +5181,6 @@
             m("a.brand", { href: "./index.html", target: "_self" }, [
               m("span.mark", "f"),
               m("span.text", "fairyground"),
-            ]),
-            m("div.seg.pageswitch", [
-              m(
-                "button",
-                {
-                  type: "button",
-                  class: app_mode == "play" ? "on" : "",
-                  disabled: modeSwitchBlocked(),
-                  title: "Play against the engine (player settings apply)",
-                  onclick: () => {
-                    setAppMode("play");
-                  },
-                },
-                "Play",
-              ),
-              m(
-                "button",
-                {
-                  type: "button",
-                  class: app_mode == "analysis" ? "on" : "",
-                  disabled: modeSwitchBlocked(),
-                  title:
-                    "Analysis board (you move both sides, engine analysis available)",
-                  onclick: () => {
-                    setAppMode("analysis");
-                  },
-                },
-                "Analysis",
-              ),
             ]),
             m("div.variantbar#posvariantdiv", [
               m(
@@ -5224,12 +5388,40 @@
                 "button.primary.newgame",
                 {
                   type: "button",
-                  title: "New game: time control and game start",
+                  hidden: app_mode == "setup",
+                  disabled: !is_ready || review_mode || during_engine_match,
+                  title: "New game: players, strength and time control",
                   onclick: () => {
                     newgame_open = true;
                   },
                 },
                 [icon("plus", 16), m("span", "New game")],
+              ),
+              m(
+                "button.ghost.text",
+                {
+                  type: "button",
+                  hidden: app_mode != "analysis",
+                  disabled: !is_ready || review_mode,
+                  title: "Set up a position: board editor, FEN and moves",
+                  onclick: () => {
+                    enterSetup();
+                  },
+                },
+                [icon("edit", 16), "Setup"],
+              ),
+              m(
+                "button.danger",
+                {
+                  type: "button",
+                  hidden: app_mode != "play",
+                  title:
+                    "End the game and return to the analysis board (the moves are kept).",
+                  onclick: () => {
+                    endGame();
+                  },
+                },
+                [icon("stop", 16), m("span", "End game")],
               ),
               m(
                 "a.btn.ghost.text",
@@ -5270,8 +5462,11 @@
           // ---------------- board column ----------------
           const boardcol = m("section.boardcol#boardcol", [
             m("div.playerbar.top", [
-              m("div.avatar", icon("cpu", 16)),
-              m("div", [m("p.name", "Black"), m("p.sub", "Second mover")]),
+              m("div.avatar", icon(playerIcon(game_black), 16)),
+              m("div", [
+                m("p.name", playerName(game_black, "Black")),
+                m("p.sub", "Second mover"),
+              ]),
             ]),
             m(
               "div#timers",
@@ -5295,8 +5490,11 @@
               m("div.cg-wrap.pocket-bottom", [m("div#pocket-bottom")]),
             ]),
             m("div.playerbar.bottom", [
-              m("div.avatar", icon("user", 16)),
-              m("div", [m("p.name", "White"), m("p.sub", "First mover")]),
+              m("div.avatar", icon(playerIcon(game_white), 16)),
+              m("div", [
+                m("p.name", playerName(game_white, "White")),
+                m("p.sub", "First mover"),
+              ]),
             ]),
             m(
               "div#timecontrolduringplay",
@@ -5462,6 +5660,11 @@
               ]),
             ]),
             m("div.boardnotes", [
+              m(
+                "p.hint",
+                { hidden: !(app_mode == "play" && engine_match_mode) },
+                `Engine match: ${engine_match_played_game_count} / ${engine_match_total_game_count} games played · White ${engine_match_white_wins} · Black ${engine_match_black_wins} · Draws ${engine_match_draws}`,
+              ),
               m(
                 "p#reviewmodenote1",
                 { hidden: !review_mode },
@@ -5631,9 +5834,12 @@
           // ---------------- moves tab ----------------
           const movesTab = m(
             "div.tabpanel#tab-moves",
-            { class: active_tab == "moves" ? "on" : "" },
+            {
+              class: active_tab == "moves" ? "on" : "",
+              hidden: app_mode == "setup",
+            },
             [
-              m("div.analysisbar", [
+              m("div.analysisbar", { hidden: app_mode != "analysis" }, [
                 m(
                   "button.analysistoggle",
                   {
@@ -5950,195 +6156,20 @@
           // ---------------- engine tab ----------------
           const engineTab = m(
             "div.tabpanel#tab-engine",
-            { class: active_tab == "engine" ? "on" : "" },
+            {
+              class: active_tab == "engine" ? "on" : "",
+              hidden: app_mode == "setup",
+            },
             [
-              m("div#input2.subsection", { hidden: during_play }, [
-                m("span.sect", "Players"),
-                m("div.playerrow", [
-                  m("span.side", "White"),
-                  m("div.options", [
-                    m(
-                      "label.toggle",
-                      {
-                        title:
-                          "When checked, engine will play as first mover (white).",
-                      },
-                      [
-                        m("input[type=checkbox]#playwhite", {
-                          hidden: true,
-                          checked: play_white,
-                        }),
-                        m("input[type=checkbox]", {
-                          checked: player_white_engine,
-                          disabled:
-                            app_mode != "play" ||
-                            review_mode ||
-                            board_setup_mode ||
-                            engine_match_mode ||
-                            player_white_random,
-                          onclick: (e) => {
-                            player_white_engine = e.target.checked;
-                            applyPlayerSettings();
-                          },
-                        }),
-                        m("span", "Engine"),
-                      ],
-                    ),
-                    m(
-                      "label.toggle",
-                      {
-                        title:
-                          "When checked, random moves will be made when it's first mover (white) to move.",
-                      },
-                      [
-                        m("input[type=checkbox]#randommoverwhite", {
-                          hidden: true,
-                          checked: random_mover_white,
-                        }),
-                        m("input[type=checkbox]", {
-                          checked: player_white_random,
-                          disabled:
-                            app_mode != "play" ||
-                            review_mode ||
-                            board_setup_mode ||
-                            engine_match_mode ||
-                            player_white_engine,
-                          onclick: (e) => {
-                            player_white_random = e.target.checked;
-                            applyPlayerSettings();
-                          },
-                        }),
-                        m("span", "Random mover"),
-                      ],
-                    ),
-                  ]),
-                  m("span.side", "Black"),
-                  m("div.options", [
-                    m(
-                      "label.toggle",
-                      {
-                        title:
-                          "When checked, engine will play as second mover (black).",
-                      },
-                      [
-                        m("input[type=checkbox]#playblack", {
-                          hidden: true,
-                          checked: play_black,
-                        }),
-                        m("input[type=checkbox]", {
-                          checked: player_black_engine,
-                          disabled:
-                            app_mode != "play" ||
-                            review_mode ||
-                            board_setup_mode ||
-                            engine_match_mode ||
-                            player_black_random,
-                          onclick: (e) => {
-                            player_black_engine = e.target.checked;
-                            applyPlayerSettings();
-                          },
-                        }),
-                        m("span", "Engine"),
-                      ],
-                    ),
-                    m(
-                      "label.toggle",
-                      {
-                        title:
-                          "When checked, random moves will be made when it's second mover (black) to move.",
-                      },
-                      [
-                        m("input[type=checkbox]#randommoverblack", {
-                          hidden: true,
-                          checked: random_mover_black,
-                        }),
-                        m("input[type=checkbox]", {
-                          checked: player_black_random,
-                          disabled:
-                            app_mode != "play" ||
-                            review_mode ||
-                            board_setup_mode ||
-                            engine_match_mode ||
-                            player_black_engine,
-                          onclick: (e) => {
-                            player_black_random = e.target.checked;
-                            applyPlayerSettings();
-                          },
-                        }),
-                        m("span", "Random mover"),
-                      ],
-                    ),
-                  ]),
-                ]),
-                m(
-                  "p.hint",
-                  app_mode == "play"
-                    ? "Unchecked sides are played by you on the board."
-                    : "Player settings take effect in Play mode; in Analysis mode you move both sides.",
-                ),
-                m("div.row", [
-                  m(
-                    "button#go.sm",
-                    {
-                      type: "button",
-                      disabled:
-                        !is_ready || analysis_mode || allLimitsInfinite(),
-                      title: analysis_mode
-                        ? "Not needed while analysis is running."
-                        : allLimitsInfinite()
-                          ? "Set a depth, time or node limit first, otherwise the engine would think forever."
-                          : "Let the engine think and move now with the limits above (used when the engine plays a side).",
-                      onclick: () => {
-                        startEngineNow();
-                      },
-                    },
-                    [icon("play", 14), "Engine: move now"],
-                  ),
-                  m(
-                    "button#stop.sm",
-                    {
-                      type: "button",
-                      disabled: !is_ready,
-                      title:
-                        "Immediately stop all engines from thinking (also ends an engine match).",
-                      onclick: () => {
-                        force_stop();
-                        if (fge.first_engine) {
-                          fge.first_engine.ForceStop();
-                        }
-                        if (fge.second_engine) {
-                          fge.second_engine.ForceStop();
-                        }
-                        if (fge.analysis_engine) {
-                          fge.analysis_engine.ForceStop();
-                        }
-                        if (during_engine_match) {
-                          during_engine_match = false;
-                          setTimeout(() => {
-                            if (
-                              window.confirm(
-                                `Played games: ${engine_match_played_game_count}\nFirst engine (WHITE) wins: ${engine_match_white_wins}\nSecond engine (BLACK) wins: ${engine_match_black_wins}\nDraws: ${engine_match_draws}\n\nDo you want to save the PGN of played games?`,
-                              )
-                            ) {
-                              document
-                                .getElementById("saveenginematchgames")
-                                .click();
-                            }
-                          }, 500);
-                        }
-                      },
-                    },
-                    [icon("stop", 14), "Stop engine"],
-                  ),
-                ]),
-                m("div.hr"),
+              m("div.subsection", [
                 m("div.secthead", [
-                  m("span.sect", "Fairy-Stockfish · in browser"),
+                  m("span.sect", "Fairy-Stockfish · analysis"),
                   m("input[type=checkbox]#analysis", {
                     hidden: true,
                     checked: analysis_mode,
                   }),
                 ]),
+
                 m("div.sliders", [
                   sliderRow(
                     "Lines",
@@ -6173,17 +6204,6 @@
                     },
                     "Size of the engine's hash table.",
                   ),
-                  sliderRow(
-                    "Skill level",
-                    engine_skill,
-                    0,
-                    20,
-                    engine_skill,
-                    (value) => {
-                      engine_skill = value;
-                    },
-                    "Playing strength when the engine plays a side (20 = full strength). Analysis always uses full strength.",
-                  ),
                 ]),
                 m("div.sliders", [
                   sliderRow(
@@ -6197,7 +6217,7 @@
                     (value) => {
                       engine_depth_index = value;
                     },
-                    "Maximum search depth. Rightmost: no limit.",
+                    "Stop the analysis at this depth. Rightmost: no limit.",
                   ),
                   sliderRow(
                     "Time",
@@ -6212,7 +6232,7 @@
                     (value) => {
                       engine_movetime_index = value;
                     },
-                    "Maximum thinking time per move. Rightmost: no limit.",
+                    "Stop the analysis after this time. Rightmost: no limit.",
                   ),
                   sliderRow(
                     "Nodes",
@@ -6223,12 +6243,13 @@
                     (value) => {
                       engine_nodes_index = value;
                     },
-                    "Maximum number of searched nodes. Rightmost: no limit.",
+                    "Stop the analysis after this many nodes. Rightmost: no limit.",
                   ),
                 ]),
+
                 m(
                   "p.hint",
-                  "Limits apply when the engine plays a side or moves on request; analysis always runs until it is switched off. With every limit at ∞ the engine thinks until stopped, so set a limit or use the time control when playing against it.",
+                  'These settings apply to the engine analysis. Players, strength and time control of a game are chosen in "New game".',
                 ),
                 m("div.filerow", { hidden: during_play }, [
                   m("span.filename", [
@@ -6243,6 +6264,7 @@
                     onchange: onSelectNnueFile,
                   }),
                 ]),
+                ,
                 m("div.hiddeninputs", [
                   m("input[type=number]#depth", {
                     hidden: true,
@@ -6279,242 +6301,7 @@
                     max: 500,
                   }),
                 ]),
-                m("div.internals", [
-                  m("p#label-stm", { hidden: true }),
-                  m("input#displaymoves", {
-                    placeholder: "Moves displayed on board for analysis",
-                    hidden: true,
-                  }),
-                  m("input[type=number]#displayready", {
-                    placeholder: "Board display update ready status",
-                    hidden: true,
-                  }),
-                  m("input[type=number]#isreviewmode", {
-                    placeholder:
-                      "Stores value to judge whether it is in review mode",
-                    hidden: true,
-                  }),
-                  m("input#gameresult", {
-                    placeholder: "The game result",
-                    hidden: true,
-                    onclick: () => {
-                      displayGameResult();
-                    },
-                  }),
-                  m(
-                    "p#gamestatus",
-                    {
-                      hidden: true,
-                    },
-                    "END",
-                  ),
-                  m("input#engineoutputline", { hidden: true }),
-                  m("input[type=number]#timeoutside", {
-                    placeholder:
-                      "Stores value that the side that run out of time",
-                    hidden: true,
-                  }),
-                  m(
-                    "p#set",
-                    {
-                      onclick: () => {
-                        if (review_mode) {
-                          return;
-                        }
-                        play_move = false;
-                        window.setTimeout(() => {
-                          setFen(false, true);
-                        }, 10);
-                      },
-                      hidden: true,
-                    },
-                    "Set position (internal)",
-                  ),
-                  m(
-                    "p#loadthemes",
-                    {
-                      hidden: true,
-                      onclick: () => {
-                        LoadThemes();
-                        LoadVariantSettings("server", null);
-                        LoadUIThemes();
-                      },
-                    },
-                    "Load Themes (internal)",
-                  ),
-                  m(
-                    "p#initializethemes",
-                    {
-                      hidden: true,
-                      onclick: () => {
-                        setupThemeDropdowns();
-                        changePieces(true);
-                        changeBoard(true);
-                      },
-                    },
-                    "Initialize Themes (internal)",
-                  ),
-                  m(
-                    "p#setupuithemes",
-                    {
-                      hidden: true,
-                      onclick: () => {
-                        setupUIThemeDropdown();
-                        let UserSelectedUITheme = localStorage.getItem(
-                          "UserSelectedUITheme",
-                        );
-                        if (UserSelectedUITheme) {
-                          changeUI(UserSelectedUITheme, false, true);
-                        } else {
-                          // Default to the dark theme when available.
-                          const uidropdown = $("#dropdown-uitheme");
-                          let defaulttheme =
-                            uidropdown[uidropdown.selectedIndex].value;
-                          for (let i = 0; i < uidropdown.length; i++) {
-                            if (uidropdown[i].value == "dark") {
-                              defaulttheme = "dark";
-                              break;
-                            }
-                          }
-                          changeUI(defaulttheme, false, true);
-                        }
-                      },
-                    },
-                    "Initialize UI Themes (internal)",
-                  ),
-                  m(
-                    "p#updatevarianttypedropdown",
-                    {
-                      hidden: true,
-                      onclick: () => {
-                        updateVariantTypeDropdown();
-                      },
-                    },
-                    "Update Variant Type Dropdown (internal)",
-                  ),
-                  m(
-                    "p#copysetfen",
-                    {
-                      hidden: true,
-                      onclick: () => {
-                        copyText($("#fen").value);
-                        // main.js triggers this after a successful "Apply" in the board
-                        // editor: leave the editor so the position is used right away.
-                        if (board_setup_mode) {
-                          window.setTimeout(() => {
-                            const editor =
-                              document.getElementById("isboardsetup");
-                            if (editor && editor.checked) {
-                              editor.click();
-                            }
-                          }, 0);
-                        }
-                      },
-                    },
-                    "Copy Set FEN (internal)",
-                  ),
-                  m(
-                    "p#randommovergo",
-                    {
-                      hidden: true,
-                    },
-                    "Random Mover Go (internal)",
-                  ),
-                  m(
-                    "p#binengineoutputinit",
-                    {
-                      hidden: true,
-                      onclick: () => {
-                        if (fge.first_engine) {
-                          const target =
-                            document.getElementById("whiteengineoutput");
-                          const OutputUpdateThrottleFunction = Throttle(() => {
-                            target.textContent += first_engine_output;
-                            first_engine_output = "";
-                            scrollOutput();
-                          }, throttle_threshold);
-                          fge.first_engine.OutputUpdateCallBack = (
-                            color,
-                            msg,
-                          ) => {
-                            first_engine_output += "◀◀ " + msg + "\n";
-                            OutputUpdateThrottleFunction();
-                          };
-                          fge.first_engine.SendMessageCallBack = (msg) => {
-                            first_engine_output += "\n▶▶ " + msg + "\n\n";
-                            OutputUpdateThrottleFunction();
-                          };
-                          fge.first_engine.OnErrorMessageCallBack = (msg) => {
-                            if (during_play) {
-                              window.alert(msg);
-                            }
-                          };
-                        }
-                        if (fge.second_engine) {
-                          const target =
-                            document.getElementById("blackengineoutput");
-                          const OutputUpdateThrottleFunction = Throttle(() => {
-                            target.textContent += second_engine_output;
-                            second_engine_output = "";
-                            scrollOutput();
-                          }, throttle_threshold);
-                          fge.second_engine.OutputUpdateCallBack = (
-                            color,
-                            msg,
-                          ) => {
-                            second_engine_output += "◀◀ " + msg + "\n";
-                            OutputUpdateThrottleFunction();
-                          };
-                          fge.second_engine.SendMessageCallBack = (msg) => {
-                            second_engine_output += "\n▶▶ " + msg + "\n\n";
-                            OutputUpdateThrottleFunction();
-                          };
-                          fge.second_engine.OnErrorMessageCallBack = (msg) => {
-                            if (during_play) {
-                              window.alert(msg);
-                            }
-                          };
-                        }
-                        if (fge.analysis_engine) {
-                          const target = document.getElementById(
-                            "analysisengineoutput",
-                          );
-                          const outputline =
-                            document.getElementById("engineoutputline");
-                          const OutputUpdateThrottleFunction = Throttle(() => {
-                            target.textContent += analysis_engine_output;
-                            analysis_engine_output = "";
-                            scrollOutput();
-                          }, throttle_threshold);
-                          fge.analysis_engine.OutputUpdateCallBack = (
-                            color,
-                            msg,
-                          ) => {
-                            analysis_engine_output += "◀◀ " + msg + "\n";
-                            OutputUpdateThrottleFunction();
-                          };
-                          fge.analysis_engine.EvaluationUpdateCallBack = (
-                            msg,
-                          ) => {
-                            outputline.value = msg;
-                            outputline.click();
-                          };
-                          fge.analysis_engine.SendMessageCallBack = (msg) => {
-                            analysis_engine_output += "\n▶▶ " + msg + "\n\n";
-                            OutputUpdateThrottleFunction();
-                          };
-                        }
-                        scrollOutput();
-                      },
-                    },
-                    "Binary Engine Output Event Handler Initialization (internal)",
-                  ),
-                  m(
-                    "input#pgnstring",
-                    { hidden: true },
-                    "Advanced PGN Cross Domain Handler (internal)",
-                  ),
-                ]),
+                ,
               ]),
               m("div.hr"),
               m("div.subsection", [
@@ -6665,35 +6452,334 @@
                   ],
                 ),
               ]),
-              m("div.hr"),
-              m("div.subsection", [
-                m("div.secthead", [
-                  m("span.sect", "Engine match"),
-                  m(
-                    "label#label-enginematchmode.toggle",
-                    {
-                      title:
-                        "When checked, the first engine and the second engine will play against each other continuously for some times specified.",
+              ,
+              m("div#input2", { hidden: true }, [
+                m("input[type=checkbox]#playwhite", {
+                  hidden: true,
+                  checked: play_white,
+                }),
+                m("input[type=checkbox]#playblack", {
+                  hidden: true,
+                  checked: play_black,
+                }),
+                m("input[type=checkbox]#randommoverwhite", {
+                  hidden: true,
+                  checked: random_mover_white,
+                }),
+                m("input[type=checkbox]#randommoverblack", {
+                  hidden: true,
+                  checked: random_mover_black,
+                }),
+                m(
+                  "button#go.sm",
+                  {
+                    type: "button",
+                    disabled: !is_ready || analysis_mode || allLimitsInfinite(),
+                    title: analysis_mode
+                      ? "Not needed while analysis is running."
+                      : allLimitsInfinite()
+                        ? "Set a depth, time or node limit first, otherwise the engine would think forever."
+                        : "Let the engine think and move now with the limits above (used when the engine plays a side).",
+                    onclick: () => {
+                      startEngineNow();
                     },
-                    [
-                      m("input[type=checkbox]#isenginematchmode", {
-                        checked: engine_match_mode,
-                        disabled:
-                          !is_ready ||
-                          during_engine_match ||
-                          analysis_mode ||
-                          review_mode ||
-                          board_setup_mode ||
-                          random_mover_white ||
-                          random_mover_black,
-                        onclick: () => {
-                          engine_match_mode = !engine_match_mode;
-                        },
-                      }),
-                      m("span", "Enable"),
-                    ],
+                  },
+                  [icon("play", 14), "Engine: move now"],
+                ),
+                ,
+                m(
+                  "button#stop.sm",
+                  {
+                    type: "button",
+                    disabled: !is_ready,
+                    title:
+                      "Immediately stop all engines from thinking (also ends an engine match).",
+                    onclick: () => {
+                      force_stop();
+                      if (fge.first_engine) {
+                        fge.first_engine.ForceStop();
+                      }
+                      if (fge.second_engine) {
+                        fge.second_engine.ForceStop();
+                      }
+                      if (fge.analysis_engine) {
+                        fge.analysis_engine.ForceStop();
+                      }
+                      if (during_engine_match) {
+                        during_engine_match = false;
+                        setTimeout(() => {
+                          if (
+                            window.confirm(
+                              `Played games: ${engine_match_played_game_count}\nFirst engine (WHITE) wins: ${engine_match_white_wins}\nSecond engine (BLACK) wins: ${engine_match_black_wins}\nDraws: ${engine_match_draws}\n\nDo you want to save the PGN of played games?`,
+                            )
+                          ) {
+                            document
+                              .getElementById("saveenginematchgames")
+                              .click();
+                          }
+                        }, 500);
+                      }
+                    },
+                  },
+                  [icon("stop", 14), "Stop engine"],
+                ),
+                ,
+                m("div.internals", [
+                  m("p#label-stm", { hidden: true }),
+                  m("input#displaymoves", {
+                    placeholder: "Moves displayed on board for analysis",
+                    hidden: true,
+                  }),
+                  m("input[type=number]#displayready", {
+                    placeholder: "Board display update ready status",
+                    hidden: true,
+                  }),
+                  m("input[type=number]#isreviewmode", {
+                    placeholder:
+                      "Stores value to judge whether it is in review mode",
+                    hidden: true,
+                  }),
+                  m("input#gameresult", {
+                    placeholder: "The game result",
+                    hidden: true,
+                    onclick: () => {
+                      displayGameResult();
+                    },
+                  }),
+                  m(
+                    "p#gamestatus",
+                    {
+                      hidden: true,
+                    },
+                    "END",
+                  ),
+                  m("input#engineoutputline", { hidden: true }),
+                  m("input[type=number]#timeoutside", {
+                    placeholder:
+                      "Stores value that the side that run out of time",
+                    hidden: true,
+                  }),
+                  m(
+                    "p#set",
+                    {
+                      onclick: () => {
+                        if (review_mode) {
+                          return;
+                        }
+                        play_move = false;
+                        window.setTimeout(() => {
+                          setFen(false, true);
+                        }, 10);
+                      },
+                      hidden: true,
+                    },
+                    "Set position (internal)",
+                  ),
+                  m(
+                    "p#loadthemes",
+                    {
+                      hidden: true,
+                      onclick: () => {
+                        LoadThemes();
+                        LoadVariantSettings("server", null);
+                        LoadUIThemes();
+                      },
+                    },
+                    "Load Themes (internal)",
+                  ),
+                  m(
+                    "p#initializethemes",
+                    {
+                      hidden: true,
+                      onclick: () => {
+                        setupThemeDropdowns();
+                        changePieces(true);
+                        changeBoard(true);
+                      },
+                    },
+                    "Initialize Themes (internal)",
+                  ),
+                  m(
+                    "p#setupuithemes",
+                    {
+                      hidden: true,
+                      onclick: () => {
+                        setupUIThemeDropdown();
+                        let UserSelectedUITheme = localStorage.getItem(
+                          "UserSelectedUITheme",
+                        );
+                        if (UserSelectedUITheme) {
+                          changeUI(UserSelectedUITheme, false, true);
+                        } else {
+                          // Default to the dark theme when available.
+                          const uidropdown = $("#dropdown-uitheme");
+                          let defaulttheme =
+                            uidropdown[uidropdown.selectedIndex].value;
+                          for (let i = 0; i < uidropdown.length; i++) {
+                            if (uidropdown[i].value == "dark") {
+                              defaulttheme = "dark";
+                              break;
+                            }
+                          }
+                          changeUI(defaulttheme, false, true);
+                        }
+                      },
+                    },
+                    "Initialize UI Themes (internal)",
+                  ),
+                  m(
+                    "p#updatevarianttypedropdown",
+                    {
+                      hidden: true,
+                      onclick: () => {
+                        updateVariantTypeDropdown();
+                      },
+                    },
+                    "Update Variant Type Dropdown (internal)",
+                  ),
+                  m(
+                    "p#copysetfen",
+                    {
+                      hidden: true,
+                      onclick: () => {
+                        copyText($("#fen").value);
+                        // main.js triggers this after a successful "Apply" in the board
+                        // editor: leave the editor so the position is used right away.
+                        if (board_setup_mode) {
+                          window.setTimeout(() => {
+                            const editor =
+                              document.getElementById("isboardsetup");
+                            if (editor && editor.checked) {
+                              editor.click();
+                            }
+                            if (app_mode == "setup") {
+                              app_mode = "analysis";
+                              m.redraw();
+                            }
+                          }, 0);
+                        }
+                      },
+                    },
+                    "Copy Set FEN (internal)",
+                  ),
+                  m(
+                    "p#randommovergo",
+                    {
+                      hidden: true,
+                    },
+                    "Random Mover Go (internal)",
+                  ),
+                  m(
+                    "p#binengineoutputinit",
+                    {
+                      hidden: true,
+                      onclick: () => {
+                        if (fge.first_engine) {
+                          const target =
+                            document.getElementById("whiteengineoutput");
+                          const OutputUpdateThrottleFunction = Throttle(() => {
+                            target.textContent += first_engine_output;
+                            first_engine_output = "";
+                            scrollOutput();
+                          }, throttle_threshold);
+                          fge.first_engine.OutputUpdateCallBack = (
+                            color,
+                            msg,
+                          ) => {
+                            first_engine_output += "◀◀ " + msg + "\n";
+                            OutputUpdateThrottleFunction();
+                          };
+                          fge.first_engine.SendMessageCallBack = (msg) => {
+                            first_engine_output += "\n▶▶ " + msg + "\n\n";
+                            OutputUpdateThrottleFunction();
+                          };
+                          fge.first_engine.OnErrorMessageCallBack = (msg) => {
+                            if (during_play) {
+                              window.alert(msg);
+                            }
+                          };
+                        }
+                        if (fge.second_engine) {
+                          const target =
+                            document.getElementById("blackengineoutput");
+                          const OutputUpdateThrottleFunction = Throttle(() => {
+                            target.textContent += second_engine_output;
+                            second_engine_output = "";
+                            scrollOutput();
+                          }, throttle_threshold);
+                          fge.second_engine.OutputUpdateCallBack = (
+                            color,
+                            msg,
+                          ) => {
+                            second_engine_output += "◀◀ " + msg + "\n";
+                            OutputUpdateThrottleFunction();
+                          };
+                          fge.second_engine.SendMessageCallBack = (msg) => {
+                            second_engine_output += "\n▶▶ " + msg + "\n\n";
+                            OutputUpdateThrottleFunction();
+                          };
+                          fge.second_engine.OnErrorMessageCallBack = (msg) => {
+                            if (during_play) {
+                              window.alert(msg);
+                            }
+                          };
+                        }
+                        if (fge.analysis_engine) {
+                          const target = document.getElementById(
+                            "analysisengineoutput",
+                          );
+                          const outputline =
+                            document.getElementById("engineoutputline");
+                          const OutputUpdateThrottleFunction = Throttle(() => {
+                            target.textContent += analysis_engine_output;
+                            analysis_engine_output = "";
+                            scrollOutput();
+                          }, throttle_threshold);
+                          fge.analysis_engine.OutputUpdateCallBack = (
+                            color,
+                            msg,
+                          ) => {
+                            analysis_engine_output += "◀◀ " + msg + "\n";
+                            OutputUpdateThrottleFunction();
+                          };
+                          fge.analysis_engine.EvaluationUpdateCallBack = (
+                            msg,
+                          ) => {
+                            outputline.value = msg;
+                            outputline.click();
+                          };
+                          fge.analysis_engine.SendMessageCallBack = (msg) => {
+                            analysis_engine_output += "\n▶▶ " + msg + "\n\n";
+                            OutputUpdateThrottleFunction();
+                          };
+                        }
+                        scrollOutput();
+                      },
+                    },
+                    "Binary Engine Output Event Handler Initialization (internal)",
+                  ),
+                  m(
+                    "input#pgnstring",
+                    { hidden: true },
+                    "Advanced PGN Cross Domain Handler (internal)",
                   ),
                 ]),
+                ,
+                m("input[type=checkbox]#isenginematchmode", {
+                  checked: engine_match_mode,
+                  disabled:
+                    !is_ready ||
+                    during_engine_match ||
+                    analysis_mode ||
+                    review_mode ||
+                    board_setup_mode ||
+                    random_mover_white ||
+                    random_mover_black,
+                  onclick: () => {
+                    engine_match_mode = !engine_match_mode;
+                  },
+                }),
+                ,
                 m(
                   "div#enginematch",
                   {
@@ -6907,15 +6993,33 @@
                     ),
                   ],
                 ),
+                ,
               ]),
             ],
           );
 
-          // ---------------- setup tab ----------------
+          // ---------------- setup panel (board editor) ----------------
           const setupTab = m(
             "div.tabpanel#tab-setup",
-            { class: active_tab == "setup" ? "on" : "" },
+            {
+              class: app_mode == "setup" ? "on" : "",
+              hidden: app_mode != "setup",
+            },
             [
+              m("div.secthead", [
+                m("span.sect", "Position"),
+                m(
+                  "button.sm.primary",
+                  {
+                    type: "button",
+                    title: "Leave the board editor and use the position",
+                    onclick: () => {
+                      leaveSetup();
+                    },
+                  },
+                  [icon("check", 14), "Done"],
+                ),
+              ]),
               m("div#input", { hidden: during_play }, [
                 m("span.sect", "Position"),
                 m("div.field", [
@@ -7008,582 +7112,477 @@
                   ),
                 ]),
               ]),
+              ,
               m("div.hr"),
-              m("div.subsection", [
-                m("div.secthead", [
-                  m("span.sect", "Board editor"),
-                  m(
-                    "label#label-boardsetup.toggle",
-                    {
-                      title:
-                        "When checked, the board will enter setup mode where you can edit the position. Uncheck to exit this mode.",
-                    },
-                    [
-                      m("input[type=checkbox]#isboardsetup", {
-                        checked: board_setup_mode,
-                        disabled:
-                          review_mode ||
-                          during_play ||
-                          engine_match_mode ||
-                          during_engine_match,
-                        title:
-                          review_mode ||
-                          during_play ||
-                          engine_match_mode ||
-                          during_engine_match
-                            ? "The board editor is not available during a game, in review mode or during an engine match."
-                            : "Edit the position. This switches analysis, the time control and the moves dialog off.",
-                        onclick: (e) => {
-                          const on = e.target.checked;
-                          if (on) {
-                            // The editor is exclusive with analysis, timed
-                            // games and the moves dialog: switch them off.
-                            setAnalysisMode(false);
-                            advanced_time_control = false;
-                            select_move_dialog = false;
-                            ["advtimectrl", "showmovediv"].forEach((id) => {
-                              const element = document.getElementById(id);
-                              if (element) {
-                                element.checked = false;
-                              }
-                            });
-                          }
-                          board_setup_mode = on;
-                          triggerBoardSetupPieceIdentifier(true);
-                        },
-                      }),
-                      m("span", "Editing"),
-                    ],
-                  ),
-                ]),
-                m("div#boardsetupsettings", { hidden: !board_setup_mode }, [
-                  m("div#boardpiecechange", { disabled: !is_ready }, [
-                    m("div.piecepalette", [
-                      pieceChoices().map((choice) =>
-                        m(
-                          "button.palettebtn",
-                          {
-                            type: "button",
-                            key: choice.value,
-                            class: choice.selected ? "on" : "",
-                            title: choice.title,
-                            onclick: () => {
-                              const dropdown =
-                                document.getElementById("dropdown-setpiece");
-                              dropdown.value = choice.value;
-                              dropdown.dispatchEvent(new Event("change"));
-                            },
+              m("span.sect", "Board editor"),
+              m("label#label-boardsetup", { hidden: true }, [
+                m("input[type=checkbox]#isboardsetup", {
+                  checked: board_setup_mode,
+                  disabled:
+                    review_mode ||
+                    during_play ||
+                    engine_match_mode ||
+                    during_engine_match,
+                  title:
+                    review_mode ||
+                    during_play ||
+                    engine_match_mode ||
+                    during_engine_match
+                      ? "The board editor is not available during a game, in review mode or during an engine match."
+                      : "Edit the position. This switches analysis, the time control and the moves dialog off.",
+                  onclick: (e) => {
+                    const on = e.target.checked;
+                    if (on) {
+                      // The editor is exclusive with analysis, timed
+                      // games and the moves dialog: switch them off.
+                      setAnalysisMode(false);
+                      advanced_time_control = false;
+                      select_move_dialog = false;
+                      ["advtimectrl", "showmovediv"].forEach((id) => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                          element.checked = false;
+                        }
+                      });
+                    }
+                    board_setup_mode = on;
+                    triggerBoardSetupPieceIdentifier(true);
+                  },
+                }),
+                ,
+              ]),
+              m("div#boardsetupsettings", { hidden: !board_setup_mode }, [
+                m("div#boardpiecechange", { disabled: !is_ready }, [
+                  m("div.piecepalette", [
+                    pieceChoices().map((choice) =>
+                      m(
+                        "button.palettebtn",
+                        {
+                          type: "button",
+                          key: choice.value,
+                          class: choice.selected ? "on" : "",
+                          title: choice.title,
+                          onclick: () => {
+                            const dropdown =
+                              document.getElementById("dropdown-setpiece");
+                            dropdown.value = choice.value;
+                            dropdown.dispatchEvent(new Event("change"));
                           },
-                          choice.icon
-                            ? icon(choice.icon, 18)
-                            : m(
-                                "div.palettewrap",
-                                { class: pieceThemeClasses() },
-                                [
-                                  m("div.cg-wrap", [
-                                    m("piece", { class: choice.pieceClass }),
-                                  ]),
-                                ],
-                              ),
-                        ),
-                      ),
-                    ]),
-                    m(
-                      "p.hint",
-                      "Pick a piece, then click a square to place it. Drag pieces to move them, drop them off the board to remove them.",
-                    ),
-                    m(
-                      "select#dropdown-setpiece",
-                      {
-                        hidden: true,
-                        title:
-                          "<move>: Move the pieces on the board.\n<delete>: Click on a square to delete the piece on that square.\n<letter>: Click on a square to place a piece of that letter. If there is a plus ahead, it means the promoted from.",
-                        onchange: () => {
-                          let fakepiece = document.getElementById("fakepiece");
-                          let dropdownsetpiece =
-                            document.getElementById("dropdown-setpiece");
-                          let values = [];
-                          let value =
-                            dropdownsetpiece[dropdownsetpiece.selectedIndex]
-                              .value;
-                          if (value == undefined || value == "") {
-                            return;
-                          }
-                          let chcode = value.charCodeAt(0);
-                          let ch = value.charAt(0);
-                          let promoted = false;
-                          if (value.charAt(0) == "+") {
-                            chcode = value.charCodeAt(1);
-                            ch = value.charAt(1);
-                            promoted = true;
-                          }
-                          if (value == "<move>") {
-                            values.push("move-piece");
-                          } else if (value == "<delete>") {
-                            values.push("delete-piece");
-                          } else if (
-                            value.length > 2 ||
-                            (value.length == 2 && value.charAt(0) != "+")
-                          ) {
-                            return;
-                          } else if (chcode >= 65 && chcode <= 90) {
-                            values.push(
-                              `${promoted ? "p" : ""}${ch.toLowerCase()}-piece`,
-                            );
-                            values.push("white");
-                          } else if (chcode >= 97 && chcode <= 122) {
-                            values.push(`${promoted ? "p" : ""}${ch}-piece`);
-                            values.push("black");
-                          } else if (value == "*") {
-                            values.push("_-piece");
-                            values.push("black");
-                          } else {
-                            return;
-                          }
-                          fakepiece.classList.value = values.join(" ");
                         },
-                      },
-                      [
-                        m("option", { value: "<move>" }, "<move>"),
-                        m("option", { value: "<delete>" }, "<delete>"),
-                        m("option", { value: "b" }, "b"),
-                        m("option", { value: "k" }, "k"),
-                        m("option", { value: "n" }, "n"),
-                        m("option", { value: "p" }, "p"),
-                        m("option", { value: "q" }, "q"),
-                        m("option", { value: "r" }, "r"),
-                        m("option", { value: "B" }, "B"),
-                        m("option", { value: "K" }, "K"),
-                        m("option", { value: "N" }, "N"),
-                        m("option", { value: "P" }, "P"),
-                        m("option", { value: "Q" }, "Q"),
-                        m("option", { value: "R" }, "R"),
-                      ],
-                    ),
-                    m(
-                      "button#addtopocket.sm",
-                      {
-                        type: "button",
-                        disabled: !is_ready,
-                        title:
-                          "Click to add the piece selected in the dropdown to pocket.",
-                      },
-                      "Add to pocket",
-                    ),
-                    m(
-                      "button#clearboard.sm",
-                      {
-                        type: "button",
-                        disabled: !is_ready,
-                        title: "Click to remove all pieces.",
-                      },
-                      "Clear board",
-                    ),
-                    m(
-                      "button#initboardpos.sm",
-                      {
-                        type: "button",
-                        disabled: !is_ready,
-                        title: "Click to set the board to default position.",
-                      },
-                      "Reset board",
-                    ),
-                    m(
-                      "button#validatepos.sm.soft",
-                      {
-                        type: "button",
-                        disabled: !is_ready,
-                        title: "Click to validate this position.",
-                      },
-                      "Validate",
-                    ),
-                    m(
-                      "button#boardsetupcopyfen.sm.primary",
-                      {
-                        type: "button",
-                        disabled: !is_ready,
-                        title:
-                          "Click to set the position, and then uncheck Board Setup to play or analyze.",
-                      },
-                      "Apply",
+                        choice.icon
+                          ? icon(choice.icon, 18)
+                          : m(
+                              "div.palettewrap",
+                              { class: pieceThemeClasses() },
+                              [
+                                m("div.cg-wrap", [
+                                  m("piece", { class: choice.pieceClass }),
+                                ]),
+                              ],
+                            ),
+                      ),
                     ),
                   ]),
-                  m("div#pocketpiecechange", { hidden: true }, [
-                    m("form#pieceinpocket", { disabled: !is_ready }, [
-                      m("table#tablepieceinpocket", [
-                        m("tr", [m("td", "Piece ID"), m("td", "Amount")]),
-                      ]),
-                    ]),
-                  ]),
-                ]),
-                m("div#boardsetupsettings2", { hidden: !board_setup_mode }, [
-                  m("div", [
-                    m("span.label", "Side to move"),
-                    m(
-                      "select#dropdown-sidetomove.sm",
-                      { title: "Select the side to move in this position." },
-                      [
-                        m("option", { value: "First Mover" }, "First Mover"),
-                        m("option", { value: "Second Mover" }, "Second Mover"),
-                      ],
-                    ),
-                  ]),
-                  m("div", [
-                    m(
-                      "label.toggle",
-                      {
-                        title:
-                          "Check if first mover has the right to castle kingside.",
-                      },
-                      [
-                        m("input[type=checkbox]#whitekingsidecastle.box"),
-                        m("span", "White O-O"),
-                      ],
-                    ),
-                    m(
-                      "label.toggle",
-                      {
-                        title:
-                          "Check if first mover has the right to castle queenside.",
-                      },
-                      [
-                        m("input[type=checkbox]#whitequeensidecastle.box"),
-                        m("span", "White O-O-O"),
-                      ],
-                    ),
-                    m(
-                      "label.toggle",
-                      {
-                        title:
-                          "Check if second mover has the right to castle kingside.",
-                      },
-                      [
-                        m("input[type=checkbox]#blackkingsidecastle.box"),
-                        m("span", "Black O-O"),
-                      ],
-                    ),
-                    m(
-                      "label.toggle",
-                      {
-                        title:
-                          "Check if second mover has the right to castle queenside.",
-                      },
-                      [
-                        m("input[type=checkbox]#blackqueensidecastle.box"),
-                        m("span", "Black O-O-O"),
-                      ],
-                    ),
-                  ]),
-                  m("div", [
-                    m("input[type=number]#halfmoveclock", {
-                      placeholder: "Half move clock",
-                      title:
-                        "The number in half move clock, which records the moves that does not capture or is not irreversible for N-move rule.",
-                      min: 0,
-                    }),
-                    m("input[type=number]#whiteremainingchecks", {
-                      placeholder: "White remaining checks",
-                      title:
-                        "The remaining checks of first mover, used in variants that limit check count such as 3 Check.",
-                      min: 1,
-                    }),
-                    m("input[type=number]#blackremainingchecks", {
-                      placeholder: "Black remaining checks",
-                      title:
-                        "The remaining checks of second mover, used in variants that limit check count such as 3 Check.",
-                      min: 1,
-                    }),
-                    m("input[type=number]#currentmovenum", {
-                      placeholder: "Current move number",
-                      title:
-                        "The number of current move in full move format (A turn that both player make a move is 1 full move, 2 half moves).",
-                      min: 1,
-                    }),
-                  ]),
-                  m("div", [
-                    m("input[type=number]#enpassantfile", {
-                      placeholder: "En passant file number",
-                      title: "The file (column) number of en passant square.",
-                      min: 1,
-                      max: 12,
-                    }),
-                    m("input[type=number]#enpassantrank", {
-                      placeholder: "En passant rank number",
-                      title: "The rank (row) number of en passant square.",
-                      min: 1,
-                      max: 10,
-                    }),
-                  ]),
-                  m("div", [
-                    m("input[type=text]#seirwangatingfiles", {
-                      placeholder: "Seirawan gating files (e.g. ABab)",
-                      title:
-                        'The files (e.g. 1st column is a-file, 2nd column is b-file, etc.) where players can perform seirawan gating.\nGateable files for first mover is in upper case and for second mover in lower case.\nExample: "ABcd" means first mover can gate at A and B file while second mover can gate at C and D file.',
-                      maxlength: 9999,
-                    }),
-                  ]),
-                ]),
-              ]),
-              m("div.hr"),
-              m("div#input3.subsection", { hidden: during_play }, [
-                m("span.sect", "Game options"),
-                m(
-                  "label#label-isfischerrandommode.toggle",
-                  {
-                    title:
-                      "When checked, enable fischer random (chess960) mode, which enables fischer random castling rules. This has no effect to variants that do not have castling.",
-                  },
-                  [
-                    m("input[type=checkbox]#isfischerrandommode", {
-                      checked: fischer_random_mode,
-                      disabled:
-                        !is_ready ||
-                        during_engine_match ||
-                        during_play ||
-                        review_mode ||
-                        board_setup_mode,
-                      onclick: () => {
-                        fischer_random_mode = !fischer_random_mode;
-                        document
-                          .getElementById("dropdown-variant")
-                          .dispatchEvent(new Event("change"));
-                      },
-                    }),
-                    m("span", "Fischer random start position"),
-                  ],
-                ),
-                m(
-                  "label#label-advpgnmode.toggle",
-                  {
-                    title:
-                      "(Experimental) When checked, a mini board is shown which displays the position at that time when you click the move in the move list (PV line or move history), and the PGN editing tools are shown in the Moves tab. Uncheck to exit this mode. Note that enabling this mode might make the page become slower, and only enable it if you need it as it's an experimental feature.",
-                  },
-                  [
-                    m("input[type=checkbox]#isadvpgnmode", {
-                      checked: advanced_pgn_mode,
-                      disabled: !is_ready,
-                      onclick: () => {
-                        advanced_pgn_mode = !advanced_pgn_mode;
-                      },
-                    }),
-                    m("span", "Move visualization & PGN tools (experimental)"),
-                  ],
-                ),
-              ]),
-              m("div#gamesettings", [
-                m("div.field", [
-                  m("span.label", "Move input"),
                   m(
-                    "select#moveinput",
+                    "p.hint",
+                    "Pick a piece, then click a square to place it. Drag pieces to move them, drop them off the board to remove them.",
+                  ),
+                  m(
+                    "select#dropdown-setpiece",
                     {
-                      disabled: review_mode,
+                      hidden: true,
                       title:
-                        "How pieces are moved: by dragging, by clicking the piece and then the target square, or either.",
-                      onchange: (e) => {
-                        move_input = e.target.value;
-                        const clickbox =
-                          document.getElementById("clickclickmove");
-                        const dragbox = document.getElementById("dragmove");
-                        clickbox.checked = move_input != "drag";
-                        dragbox.checked = move_input != "click";
-                        clickbox.dispatchEvent(new Event("change"));
-                        dragbox.dispatchEvent(new Event("change"));
+                        "<move>: Move the pieces on the board.\n<delete>: Click on a square to delete the piece on that square.\n<letter>: Click on a square to place a piece of that letter. If there is a plus ahead, it means the promoted from.",
+                      onchange: () => {
+                        let fakepiece = document.getElementById("fakepiece");
+                        let dropdownsetpiece =
+                          document.getElementById("dropdown-setpiece");
+                        let values = [];
+                        let value =
+                          dropdownsetpiece[dropdownsetpiece.selectedIndex]
+                            .value;
+                        if (value == undefined || value == "") {
+                          return;
+                        }
+                        let chcode = value.charCodeAt(0);
+                        let ch = value.charAt(0);
+                        let promoted = false;
+                        if (value.charAt(0) == "+") {
+                          chcode = value.charCodeAt(1);
+                          ch = value.charAt(1);
+                          promoted = true;
+                        }
+                        if (value == "<move>") {
+                          values.push("move-piece");
+                        } else if (value == "<delete>") {
+                          values.push("delete-piece");
+                        } else if (
+                          value.length > 2 ||
+                          (value.length == 2 && value.charAt(0) != "+")
+                        ) {
+                          return;
+                        } else if (chcode >= 65 && chcode <= 90) {
+                          values.push(
+                            `${promoted ? "p" : ""}${ch.toLowerCase()}-piece`,
+                          );
+                          values.push("white");
+                        } else if (chcode >= 97 && chcode <= 122) {
+                          values.push(`${promoted ? "p" : ""}${ch}-piece`);
+                          values.push("black");
+                        } else if (value == "*") {
+                          values.push("_-piece");
+                          values.push("black");
+                        } else {
+                          return;
+                        }
+                        fakepiece.classList.value = values.join(" ");
                       },
                     },
                     [
-                      m(
-                        "option",
-                        { value: "either", selected: move_input == "either" },
-                        "Either",
-                      ),
-                      m(
-                        "option",
-                        { value: "click", selected: move_input == "click" },
-                        "Click two squares",
-                      ),
-                      m(
-                        "option",
-                        { value: "drag", selected: move_input == "drag" },
-                        "Drag",
-                      ),
-                    ],
-                  ),
-                  m("input[type=checkbox]#clickclickmove", {
-                    hidden: true,
-                    checked: move_input != "drag",
-                  }),
-                  m("input[type=checkbox]#dragmove", {
-                    hidden: true,
-                    checked: move_input != "click",
-                  }),
-                ]),
-                m("div.row", [
-                  m("label#label-showmovediv.toggle", [
-                    m("input[type=checkbox]#showmovediv", {
-                      checked: select_move_dialog,
-                      disabled: review_mode || board_setup_mode,
-                      onclick: () => {
-                        select_move_dialog = !select_move_dialog;
-                      },
-                    }),
-                    m("span", "Show moves dialog"),
-                  ]),
-                  helpButton(
-                    "If you cannot make your move on the board (For example, ATAXX drops), you can open this dialog to make the move.",
-                  ),
-                ]),
-                m("div.field", [
-                  m("span.label", "Quick promote / demote"),
-                  m(
-                    "select#dropdown-quickpromotion",
-                    {
-                      disabled: !is_ready || review_mode || board_setup_mode,
-                      title:
-                        "Select an option to make the promotion or demotion automatically if available.",
-                    },
-                    [
-                      m("option", { value: "" }, "<DISABLED>"),
-                      m("option", { value: "a" }, "a"),
+                      m("option", { value: "<move>" }, "<move>"),
+                      m("option", { value: "<delete>" }, "<delete>"),
                       m("option", { value: "b" }, "b"),
-                      m("option", { value: "c" }, "c"),
-                      m("option", { value: "d" }, "d"),
-                      m("option", { value: "e" }, "e"),
-                      m("option", { value: "f" }, "f"),
-                      m("option", { value: "g" }, "g"),
-                      m("option", { value: "h" }, "h"),
-                      m("option", { value: "i" }, "i"),
-                      m("option", { value: "j" }, "j"),
                       m("option", { value: "k" }, "k"),
-                      m("option", { value: "l" }, "l"),
-                      m("option", { value: "m" }, "m"),
                       m("option", { value: "n" }, "n"),
-                      m("option", { value: "o" }, "o"),
                       m("option", { value: "p" }, "p"),
                       m("option", { value: "q" }, "q"),
                       m("option", { value: "r" }, "r"),
-                      m("option", { value: "s" }, "s"),
-                      m("option", { value: "t" }, "t"),
-                      m("option", { value: "u" }, "u"),
-                      m("option", { value: "v" }, "v"),
-                      m("option", { value: "w" }, "w"),
-                      m("option", { value: "x" }, "x"),
-                      m("option", { value: "y" }, "y"),
-                      m("option", { value: "z" }, "z"),
-                      m("option", { value: "+" }, "Promote (+)"),
-                      m("option", { value: "-" }, "Demote (-)"),
-                      m("option", { value: "=" }, "Keep (=)"),
+                      m("option", { value: "B" }, "B"),
+                      m("option", { value: "K" }, "K"),
+                      m("option", { value: "N" }, "N"),
+                      m("option", { value: "P" }, "P"),
+                      m("option", { value: "Q" }, "Q"),
+                      m("option", { value: "R" }, "R"),
                     ],
                   ),
-                ]),
-                m("p.hint.fullrow", [
                   m(
-                    "span.help",
+                    "button#addtopocket.sm",
                     {
-                      onclick: () =>
-                        window.alert(
-                          "A null move is considered as a move that have the same original square and destination square. Double click a square (No matter whether it's empty or not) will make a null move on that square.\nNote:\n1. In most cases passing a turn is equivalent to making a null move on the king.\n2. In Atlantis variant, placing a wall without moving any piece requires to make a null move on the most bottom then the most left piece of your color.\n3. Click <show moves dialog> to see all legal moves if you are not sure how to make a move.",
-                        ),
-                    },
-                    "How to make null moves?",
-                  ),
-                ]),
-              ]),
-              m("div.hr"),
-              m("span.sect", "Visual effect"),
-              m("div#visualeffects", [
-                m("div.field", [
-                  m("span.label", "Effect"),
-                  m(
-                    "select#dropdown-visualeffect",
-                    {
-                      disabled: !is_ready || board_setup_mode,
+                      type: "button",
+                      disabled: !is_ready,
                       title:
-                        "A visual effect is a change on the visibility of the board. Usually it's restricting piece visibility.",
+                        "Click to add the piece selected in the dropdown to pocket.",
                     },
-                    [
-                      m(
-                        "option",
-                        {
-                          value: "<DISABLED>",
-                          title: "No visual effect. The board is shown as is.",
-                        },
-                        "<DISABLED>",
-                      ),
-                      m(
-                        "option",
-                        {
-                          value: "fogofwar",
-                          title:
-                            "Fog of war is a visual effect that can prevent a player from seeing unreachable squares except wall squares.",
-                        },
-                        "Fog Of War",
-                      ),
-                      m(
-                        "option",
-                        {
-                          value: "wargame",
-                          title:
-                            "War game is a visual effect that can prevent a player from seeing opponent's pieces",
-                        },
-                        "War Game",
-                      ),
-                    ],
+                    "Add to pocket",
+                  ),
+                  m(
+                    "button#clearboard.sm",
+                    {
+                      type: "button",
+                      disabled: !is_ready,
+                      title: "Click to remove all pieces.",
+                    },
+                    "Clear board",
+                  ),
+                  m(
+                    "button#initboardpos.sm",
+                    {
+                      type: "button",
+                      disabled: !is_ready,
+                      title: "Click to set the board to default position.",
+                    },
+                    "Reset board",
+                  ),
+                  m(
+                    "button#validatepos.sm.soft",
+                    {
+                      type: "button",
+                      disabled: !is_ready,
+                      title: "Click to validate this position.",
+                    },
+                    "Validate",
+                  ),
+                  m(
+                    "button#boardsetupcopyfen.sm.primary",
+                    {
+                      type: "button",
+                      disabled: !is_ready,
+                      title:
+                        "Click to set the position, and then uncheck Board Setup to play or analyze.",
+                    },
+                    "Apply",
                   ),
                 ]),
-                m("div.field", [
-                  m("span.label", "Perspective"),
-                  m(
-                    "select#dropdown-visualeffectperspective",
-                    {
-                      disabled: !is_ready || board_setup_mode,
-                      title: "Choose the perspective of visual effect.",
-                    },
-                    [
-                      m(
-                        "option",
-                        {
-                          value: "white",
-                          title: "See the board at white's perspective.",
-                        },
-                        "White's View",
-                      ),
-                      m(
-                        "option",
-                        {
-                          value: "black",
-                          title: "See the board at black's perspective.",
-                        },
-                        "Black's View",
-                      ),
-                      m(
-                        "option",
-                        {
-                          value: "alternate",
-                          title:
-                            "See the board at current mover's perspective.",
-                        },
-                        "View Alternately",
-                      ),
-                    ],
-                  ),
+                m("div#pocketpiecechange", { hidden: true }, [
+                  m("form#pieceinpocket", { disabled: !is_ready }, [
+                    m("table#tablepieceinpocket", [
+                      m("tr", [m("td", "Piece ID"), m("td", "Amount")]),
+                    ]),
+                  ]),
                 ]),
               ]),
+              ,
+              m("div#boardsetupsettings2", { hidden: !board_setup_mode }, [
+                m("div", [
+                  m("span.label", "Side to move"),
+                  m(
+                    "select#dropdown-sidetomove.sm",
+                    { title: "Select the side to move in this position." },
+                    [
+                      m("option", { value: "First Mover" }, "First Mover"),
+                      m("option", { value: "Second Mover" }, "Second Mover"),
+                    ],
+                  ),
+                ]),
+                m("div", [
+                  m(
+                    "label.toggle",
+                    {
+                      title:
+                        "Check if first mover has the right to castle kingside.",
+                    },
+                    [
+                      m("input[type=checkbox]#whitekingsidecastle.box"),
+                      m("span", "White O-O"),
+                    ],
+                  ),
+                  m(
+                    "label.toggle",
+                    {
+                      title:
+                        "Check if first mover has the right to castle queenside.",
+                    },
+                    [
+                      m("input[type=checkbox]#whitequeensidecastle.box"),
+                      m("span", "White O-O-O"),
+                    ],
+                  ),
+                  m(
+                    "label.toggle",
+                    {
+                      title:
+                        "Check if second mover has the right to castle kingside.",
+                    },
+                    [
+                      m("input[type=checkbox]#blackkingsidecastle.box"),
+                      m("span", "Black O-O"),
+                    ],
+                  ),
+                  m(
+                    "label.toggle",
+                    {
+                      title:
+                        "Check if second mover has the right to castle queenside.",
+                    },
+                    [
+                      m("input[type=checkbox]#blackqueensidecastle.box"),
+                      m("span", "Black O-O-O"),
+                    ],
+                  ),
+                ]),
+                m("div", [
+                  m("input[type=number]#halfmoveclock", {
+                    placeholder: "Half move clock",
+                    title:
+                      "The number in half move clock, which records the moves that does not capture or is not irreversible for N-move rule.",
+                    min: 0,
+                  }),
+                  m("input[type=number]#whiteremainingchecks", {
+                    placeholder: "White remaining checks",
+                    title:
+                      "The remaining checks of first mover, used in variants that limit check count such as 3 Check.",
+                    min: 1,
+                  }),
+                  m("input[type=number]#blackremainingchecks", {
+                    placeholder: "Black remaining checks",
+                    title:
+                      "The remaining checks of second mover, used in variants that limit check count such as 3 Check.",
+                    min: 1,
+                  }),
+                  m("input[type=number]#currentmovenum", {
+                    placeholder: "Current move number",
+                    title:
+                      "The number of current move in full move format (A turn that both player make a move is 1 full move, 2 half moves).",
+                    min: 1,
+                  }),
+                ]),
+                m("div", [
+                  m("input[type=number]#enpassantfile", {
+                    placeholder: "En passant file number",
+                    title: "The file (column) number of en passant square.",
+                    min: 1,
+                    max: 12,
+                  }),
+                  m("input[type=number]#enpassantrank", {
+                    placeholder: "En passant rank number",
+                    title: "The rank (row) number of en passant square.",
+                    min: 1,
+                    max: 10,
+                  }),
+                ]),
+                m("div", [
+                  m("input[type=text]#seirwangatingfiles", {
+                    placeholder: "Seirawan gating files (e.g. ABab)",
+                    title:
+                      'The files (e.g. 1st column is a-file, 2nd column is b-file, etc.) where players can perform seirawan gating.\nGateable files for first mover is in upper case and for second mover in lower case.\nExample: "ABcd" means first mover can gate at A and B file while second mover can gate at C and D file.',
+                    maxlength: 9999,
+                  }),
+                ]),
+              ]),
+              ,
             ],
           );
 
           // ---------------- console tab ----------------
           const panel = m("section.panel.card#info", [
-            m("div.tabs#outputs", [
+            m("div.tabs#outputs", { hidden: app_mode == "setup" }, [
               tabButton("moves", "Moves", "list"),
               tabButton("engine", "Engine", "cpu"),
-              tabButton("setup", "Setup", "sliders"),
             ]),
             movesTab,
             engineTab,
             setupTab,
           ]);
 
-          // ---------------- new game dialog (time control) ----------------
+          // ---------------- new game dialog ----------------
+          const clockModes = [
+            "tournament",
+            "time per move",
+            "hourglass",
+            "byoyomi",
+          ];
+          const isClockMode = (mode) => clockModes.includes(mode);
+          const isEnginePlayer = (player) => player == "fsf" || player == "ext";
+          const externalAvailable = fge.WebSocketStatus == "CONNECTED";
+          const sideSetup = (side, label, game, tc) => {
+            const engine = isEnginePlayer(game.player);
+            const modeOptions = engine
+              ? [
+                  ["movetime", "Time per move"],
+                  ["depth", "Depth"],
+                  ["nodes", "Nodes"],
+                  ["tournament", "Tournament clock"],
+                  ["hourglass", "Hourglass clock"],
+                  ["byoyomi", "Byo-yomi clock"],
+                ]
+              : [
+                  ["infinite", "No clock"],
+                  ["tournament", "Tournament"],
+                  ["time per move", "Time per move"],
+                  ["hourglass", "Hourglass"],
+                  ["byoyomi", "Byo-yomi"],
+                ];
+            const limitRow =
+              game.mode == "depth"
+                ? sliderRow(
+                    "Depth",
+                    String(depthSteps[game.depth]),
+                    0,
+                    depthSteps.length - 1,
+                    game.depth,
+                    (value) => {
+                      game.depth = value;
+                    },
+                    "Search depth per move.",
+                  )
+                : game.mode == "nodes"
+                  ? sliderRow(
+                      "Nodes",
+                      formatNodes(nodesSteps[game.nodes]),
+                      0,
+                      nodesSteps.length - 1,
+                      game.nodes,
+                      (value) => {
+                        game.nodes = value;
+                      },
+                      "Searched nodes per move.",
+                    )
+                  : game.mode == "movetime"
+                    ? sliderRow(
+                        "Time per move",
+                        formatSeconds(movetimeSteps[game.movetime]),
+                        0,
+                        movetimeSteps.length - 1,
+                        game.movetime,
+                        (value) => {
+                          game.movetime = value;
+                        },
+                        "Thinking time per move.",
+                      )
+                    : null;
+            return m("div.sidesetup", [
+              m("span.sect", label),
+              m("div.nums.two", [
+                m("div.field", [
+                  m("span.label", "Player"),
+                  m(
+                    "select",
+                    {
+                      onchange: (e) => {
+                        game.player = e.target.value;
+                        if (
+                          isEnginePlayer(game.player) &&
+                          !isClockMode(game.mode) &&
+                          game.mode != "depth" &&
+                          game.mode != "nodes"
+                        ) {
+                          game.mode = "movetime";
+                        } else if (
+                          !isEnginePlayer(game.player) &&
+                          !isClockMode(game.mode)
+                        ) {
+                          game.mode = "infinite";
+                        }
+                      },
+                    },
+                    [
+                      m(
+                        "option",
+                        { value: "you", selected: game.player == "you" },
+                        "You",
+                      ),
+                      m(
+                        "option",
+                        { value: "fsf", selected: game.player == "fsf" },
+                        "Fairy-Stockfish",
+                      ),
+                      m(
+                        "option",
+                        { value: "random", selected: game.player == "random" },
+                        "Random mover",
+                      ),
+                      m(
+                        "option",
+                        {
+                          value: "ext",
+                          selected: game.player == "ext",
+                          disabled: !externalAvailable,
+                        },
+                        externalAvailable
+                          ? "External engine"
+                          : "External engine (not connected)",
+                      ),
+                    ],
+                  ),
+                ]),
+                m("div.field", [
+                  m("span.label", engine ? "Thinks by" : "Clock"),
+                  m(
+                    "select",
+                    {
+                      onchange: (e) => {
+                        game.mode = e.target.value;
+                      },
+                    },
+                    modeOptions.map(([value, text]) =>
+                      m(
+                        "option",
+                        { value, selected: game.mode == value },
+                        text,
+                      ),
+                    ),
+                  ),
+                ]),
+              ]),
+              limitRow ? m("div.sliders.timecontrol", [limitRow]) : null,
+              isClockMode(game.mode) ? timeSliders(side, game.mode, tc) : null,
+            ]);
+          };
+          const bothEngines =
+            isEnginePlayer(game_white.player) &&
+            isEnginePlayer(game_black.player);
+          const anyFsf =
+            game_white.player == "fsf" || game_black.player == "fsf";
           const newGameDialog = m(
             "div.backdrop",
             {
@@ -7611,17 +7610,44 @@
               ]),
               m(
                 "p.hint",
-                app_mode == "play"
-                  ? "Variant and start position are chosen in the top bar, the players (you, Fairy-Stockfish, random mover or an external engine) in the Engine tab. Enable the time control below to play a timed game."
-                  : "Timed games are played in Play mode; switch the mode in the top bar to enable the time control.",
+                "The game starts from the current position of the board. Choose the variant and start position in the top bar first.",
               ),
-              m(
-                "label#label-advtimectrl.toggle",
-                {
-                  title:
-                    "When checked, advanced timing system is used to play time controlled games.",
-                },
-                [
+              sideSetup("white", "White", game_white, tc_white),
+              sideSetup("black", "Black", game_black, tc_black),
+              anyFsf
+                ? m("div.sliders.timecontrol", [
+                    sliderRow(
+                      "Skill level",
+                      engine_skill,
+                      0,
+                      20,
+                      engine_skill,
+                      (value) => {
+                        engine_skill = value;
+                      },
+                      "Playing strength of Fairy-Stockfish (20 = full strength).",
+                    ),
+                  ])
+                : null,
+              bothEngines
+                ? m("div.nums.two", [
+                    m("div.field", [
+                      m("span.label", "Number of games (engine match)"),
+                      m("input[type=number]", {
+                        min: 1,
+                        value: game_games,
+                        oninput: (e) => {
+                          game_games = Math.max(
+                            1,
+                            parseInt(e.target.value) || 1,
+                          );
+                        },
+                      }),
+                    ]),
+                  ])
+                : null,
+              m("div.internals", [
+                m("label#label-advtimectrl", [
                   m("input[type=checkbox]#advtimectrl", {
                     checked: advanced_time_control,
                     disabled:
@@ -7645,13 +7671,9 @@
                       }
                     },
                   }),
-                  m("span", "Time control"),
-                ],
-              ),
-              m(
-                "div#advancedtimesettings",
-                { hidden: !advanced_time_control || during_play },
-                [
+                  ,
+                ]),
+                m("div#advancedtimesettings", [
                   m("div#whitetimesettings", [
                     m("p", "White"),
                     m(
@@ -7740,6 +7762,7 @@
                       min: 0,
                     }),
                   ]),
+                  ,
                   m("div#blacktimesettings", [
                     m("p", "Black"),
                     m(
@@ -7829,6 +7852,7 @@
                       min: 0,
                     }),
                   ]),
+                  ,
                   m("div#gamecontrol-start", [
                     m(
                       "p",
@@ -7853,8 +7877,9 @@
                       "What are these parameters?",
                     ),
                   ]),
-                ],
-              ),
+                  ,
+                ]),
+              ]),
               m("div.dialogfoot", [
                 m(
                   "button.ghost",
@@ -7864,12 +7889,13 @@
                       newgame_open = false;
                     },
                   },
-                  "Close",
+                  "Cancel",
                 ),
                 m(
                   "button#gamestart.primary",
                   {
                     type: "button",
+                    hidden: true,
                     disabled:
                       !is_ready ||
                       review_mode ||
@@ -7879,6 +7905,23 @@
                     onclick: () => {
                       newgame_open = false;
                       goWithTimeControl();
+                    },
+                  },
+                  [icon("play", 16), "Start game"],
+                ),
+                ,
+                m(
+                  "button.primary",
+                  {
+                    type: "button",
+                    disabled:
+                      !is_ready ||
+                      review_mode ||
+                      board_setup_mode ||
+                      during_engine_match,
+                    title: "Start the game with these settings.",
+                    onclick: () => {
+                      startGame();
                     },
                   },
                   [icon("play", 16), "Start game"],
@@ -8526,6 +8569,258 @@
                     ),
                   ]),
                 ]),
+              ]),
+
+              m("div.stack", [
+                m("div#input3.subsection", { hidden: during_play }, [
+                  m("span.sect", "Game options"),
+                  m(
+                    "label#label-isfischerrandommode.toggle",
+                    {
+                      title:
+                        "When checked, enable fischer random (chess960) mode, which enables fischer random castling rules. This has no effect to variants that do not have castling.",
+                    },
+                    [
+                      m("input[type=checkbox]#isfischerrandommode", {
+                        checked: fischer_random_mode,
+                        disabled:
+                          !is_ready ||
+                          during_engine_match ||
+                          during_play ||
+                          review_mode ||
+                          board_setup_mode,
+                        onclick: () => {
+                          fischer_random_mode = !fischer_random_mode;
+                          document
+                            .getElementById("dropdown-variant")
+                            .dispatchEvent(new Event("change"));
+                        },
+                      }),
+                      m("span", "Fischer random start position"),
+                    ],
+                  ),
+                  m(
+                    "label#label-advpgnmode.toggle",
+                    {
+                      title:
+                        "(Experimental) When checked, a mini board is shown which displays the position at that time when you click the move in the move list (PV line or move history), and the PGN editing tools are shown in the Moves tab. Uncheck to exit this mode. Note that enabling this mode might make the page become slower, and only enable it if you need it as it's an experimental feature.",
+                    },
+                    [
+                      m("input[type=checkbox]#isadvpgnmode", {
+                        checked: advanced_pgn_mode,
+                        disabled: !is_ready,
+                        onclick: () => {
+                          advanced_pgn_mode = !advanced_pgn_mode;
+                        },
+                      }),
+                      m(
+                        "span",
+                        "Move visualization & PGN tools (experimental)",
+                      ),
+                    ],
+                  ),
+                ]),
+                ,
+                m("div#gamesettings", [
+                  m("div.field", [
+                    m("span.label", "Move input"),
+                    m(
+                      "select#moveinput",
+                      {
+                        disabled: review_mode,
+                        title:
+                          "How pieces are moved: by dragging, by clicking the piece and then the target square, or either.",
+                        onchange: (e) => {
+                          move_input = e.target.value;
+                          const clickbox =
+                            document.getElementById("clickclickmove");
+                          const dragbox = document.getElementById("dragmove");
+                          clickbox.checked = move_input != "drag";
+                          dragbox.checked = move_input != "click";
+                          clickbox.dispatchEvent(new Event("change"));
+                          dragbox.dispatchEvent(new Event("change"));
+                        },
+                      },
+                      [
+                        m(
+                          "option",
+                          { value: "either", selected: move_input == "either" },
+                          "Either",
+                        ),
+                        m(
+                          "option",
+                          { value: "click", selected: move_input == "click" },
+                          "Click two squares",
+                        ),
+                        m(
+                          "option",
+                          { value: "drag", selected: move_input == "drag" },
+                          "Drag",
+                        ),
+                      ],
+                    ),
+                    m("input[type=checkbox]#clickclickmove", {
+                      hidden: true,
+                      checked: move_input != "drag",
+                    }),
+                    m("input[type=checkbox]#dragmove", {
+                      hidden: true,
+                      checked: move_input != "click",
+                    }),
+                  ]),
+                  m("div.row", [
+                    m("label#label-showmovediv.toggle", [
+                      m("input[type=checkbox]#showmovediv", {
+                        checked: select_move_dialog,
+                        disabled: review_mode || board_setup_mode,
+                        onclick: () => {
+                          select_move_dialog = !select_move_dialog;
+                        },
+                      }),
+                      m("span", "Show moves dialog"),
+                    ]),
+                    helpButton(
+                      "If you cannot make your move on the board (For example, ATAXX drops), you can open this dialog to make the move.",
+                    ),
+                  ]),
+                  m("div.field", [
+                    m("span.label", "Quick promote / demote"),
+                    m(
+                      "select#dropdown-quickpromotion",
+                      {
+                        disabled: !is_ready || review_mode || board_setup_mode,
+                        title:
+                          "Select an option to make the promotion or demotion automatically if available.",
+                      },
+                      [
+                        m("option", { value: "" }, "<DISABLED>"),
+                        m("option", { value: "a" }, "a"),
+                        m("option", { value: "b" }, "b"),
+                        m("option", { value: "c" }, "c"),
+                        m("option", { value: "d" }, "d"),
+                        m("option", { value: "e" }, "e"),
+                        m("option", { value: "f" }, "f"),
+                        m("option", { value: "g" }, "g"),
+                        m("option", { value: "h" }, "h"),
+                        m("option", { value: "i" }, "i"),
+                        m("option", { value: "j" }, "j"),
+                        m("option", { value: "k" }, "k"),
+                        m("option", { value: "l" }, "l"),
+                        m("option", { value: "m" }, "m"),
+                        m("option", { value: "n" }, "n"),
+                        m("option", { value: "o" }, "o"),
+                        m("option", { value: "p" }, "p"),
+                        m("option", { value: "q" }, "q"),
+                        m("option", { value: "r" }, "r"),
+                        m("option", { value: "s" }, "s"),
+                        m("option", { value: "t" }, "t"),
+                        m("option", { value: "u" }, "u"),
+                        m("option", { value: "v" }, "v"),
+                        m("option", { value: "w" }, "w"),
+                        m("option", { value: "x" }, "x"),
+                        m("option", { value: "y" }, "y"),
+                        m("option", { value: "z" }, "z"),
+                        m("option", { value: "+" }, "Promote (+)"),
+                        m("option", { value: "-" }, "Demote (-)"),
+                        m("option", { value: "=" }, "Keep (=)"),
+                      ],
+                    ),
+                  ]),
+                  m("p.hint.fullrow", [
+                    m(
+                      "span.help",
+                      {
+                        onclick: () =>
+                          window.alert(
+                            "A null move is considered as a move that have the same original square and destination square. Double click a square (No matter whether it's empty or not) will make a null move on that square.\nNote:\n1. In most cases passing a turn is equivalent to making a null move on the king.\n2. In Atlantis variant, placing a wall without moving any piece requires to make a null move on the most bottom then the most left piece of your color.\n3. Click <show moves dialog> to see all legal moves if you are not sure how to make a move.",
+                          ),
+                      },
+                      "How to make null moves?",
+                    ),
+                  ]),
+                ]),
+                ,
+                m("span.sect", "Visual effect"),
+                m("div#visualeffects", [
+                  m("div.field", [
+                    m("span.label", "Effect"),
+                    m(
+                      "select#dropdown-visualeffect",
+                      {
+                        disabled: !is_ready || board_setup_mode,
+                        title:
+                          "A visual effect is a change on the visibility of the board. Usually it's restricting piece visibility.",
+                      },
+                      [
+                        m(
+                          "option",
+                          {
+                            value: "<DISABLED>",
+                            title:
+                              "No visual effect. The board is shown as is.",
+                          },
+                          "<DISABLED>",
+                        ),
+                        m(
+                          "option",
+                          {
+                            value: "fogofwar",
+                            title:
+                              "Fog of war is a visual effect that can prevent a player from seeing unreachable squares except wall squares.",
+                          },
+                          "Fog Of War",
+                        ),
+                        m(
+                          "option",
+                          {
+                            value: "wargame",
+                            title:
+                              "War game is a visual effect that can prevent a player from seeing opponent's pieces",
+                          },
+                          "War Game",
+                        ),
+                      ],
+                    ),
+                  ]),
+                  m("div.field", [
+                    m("span.label", "Perspective"),
+                    m(
+                      "select#dropdown-visualeffectperspective",
+                      {
+                        disabled: !is_ready || board_setup_mode,
+                        title: "Choose the perspective of visual effect.",
+                      },
+                      [
+                        m(
+                          "option",
+                          {
+                            value: "white",
+                            title: "See the board at white's perspective.",
+                          },
+                          "White's View",
+                        ),
+                        m(
+                          "option",
+                          {
+                            value: "black",
+                            title: "See the board at black's perspective.",
+                          },
+                          "Black's View",
+                        ),
+                        m(
+                          "option",
+                          {
+                            value: "alternate",
+                            title:
+                              "See the board at current mover's perspective.",
+                          },
+                          "View Alternately",
+                        ),
+                      ],
+                    ),
+                  ]),
+                ]),
+                ,
               ]),
               m("div.hr"),
               m("div#pageheader"),
