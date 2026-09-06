@@ -1357,43 +1357,36 @@ main.app {
   border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
-  color: transparent;
-  position: relative;
-  font-size: 0;
-}
-
-#pgn-operations button:before {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  height: 30px;
-  width: 30px;
-  font-family: FontAwesome;
-  font-size: 15px;
   color: var(--muted);
-  cursor: pointer;
-}
-
-#pgn-operations button:after {
-  position: absolute;
-  right: 2px;
-  bottom: 1px;
-  font-family: FontAwesome;
-  font-size: 10px;
-  line-height: 1;
 }
 
 #pgn-operations button:hover {
   background: var(--surface2);
   border-color: var(--border);
-}
-
-#pgn-operations button:hover:before {
   color: var(--text);
 }
 
-#pgn-operations button:disabled:before {
+#pgn-operations button:disabled {
   color: var(--faint);
+}
+
+#pgn-operations .txticon {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+#pgn-operations .when-large,
+#pgn-operations .larger .when-small {
+  display: none;
+}
+
+#pgn-operations .larger .when-large {
+  display: inline-flex;
+}
+
+#pgn-operations span {
+  display: inline-flex;
 }
 
 #pgn-operations .toolgap {
@@ -2414,90 +2407,6 @@ div.popup textarea {
   grid-auto-flow: row;
   grid-gap: 6px 14px;
   grid-template-columns: 1fr 1fr;
-}
-
-/* ---------- pgn operation icons (FontAwesome) ---------- */
-
-#movetree-clear:before {
-  content: "\f1f8";
-}
-#movetree-clearcomments:before {
-  content: "\f0e5";
-}
-#movetree-clearcomments:after {
-  content: "\f00d";
-  color: #f00;
-}
-#movetree-hideshow:before {
-  content: "\f2a8";
-}
-#movetree-removevariations:before {
-  content: "\f0e8";
-}
-#movetree-removevariations:after {
-  content: "\f00d";
-  color: #f00;
-}
-#movetree-settomainbranch:before {
-  content: "\f176";
-}
-#movetree-setasmainline:before {
-  content: "\f02e";
-}
-#movetree-setasmainline:after {
-  content: "\f005";
-  color: gold;
-}
-#movetree-cutbranch:before {
-  content: "\f097";
-}
-#movetree-cropbranch:before {
-  content: "\f124";
-}
-#movetree-cut:before {
-  content: "\f0c4";
-}
-#movetree-crop:before {
-  content: "\f125";
-}
-#movetree-uncomment:before {
-  content: "\f12d";
-}
-#movetree-textbefore:before {
-  content: "\f032";
-}
-#movetree-textafter:before {
-  content: "\f031";
-}
-#movetree-symbol:before {
-  content: "\f292";
-}
-#movetree-undo:before {
-  content: "\f112";
-}
-#movetree-redo:before {
-  content: "\f064";
-}
-#movetree-markers:before {
-  content: "\f041";
-}
-#movetree-termination:before {
-  content: "\f24e";
-}
-#movetree-headers:before {
-  content: "\f1dc";
-}
-#movetree-save:before {
-  content: "\f0c7";
-}
-#movetree-imagesave:before {
-  content: "\f03e";
-}
-#movetree-resize:before {
-  content: "\f065";
-}
-#movetree-resize.larger:before {
-  content: "\f066";
 }
 
 /* ---------- move context menu ---------- */
