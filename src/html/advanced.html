@@ -5225,38 +5225,6 @@
                   icon("chev", 16),
                 ],
               ),
-              m(
-                "button.pickbtn.positionpick",
-                {
-                  type: "button",
-                  disabled:
-                    !is_ready ||
-                    review_mode ||
-                    !positionVariantsFor(currentVariantId()),
-                  title: positionVariantsFor(currentVariantId())
-                    ? "Choose a start position for this variant"
-                    : "This variant has no predefined start positions",
-                  onclick: () => {
-                    position_picker_open = true;
-                  },
-                },
-                [
-                  m("span.picklabel", [
-                    m(
-                      "span.name",
-                      (() => {
-                        const namedropdown = document.getElementById(
-                          "dropdown-posvariantname",
-                        );
-                        return namedropdown && namedropdown.selectedIndex >= 0
-                          ? namedropdown.value
-                          : "Start position";
-                      })(),
-                    ),
-                  ]),
-                  icon("chev", 16),
-                ],
-              ),
               m("div.internals", [
                 m("div.varsel", [
                   m(
@@ -5315,60 +5283,6 @@
                   ),
                 ]),
               ]),
-              m(
-                "button#aboutvariant.iconbtn.ghost",
-                {
-                  type: "button",
-                  disabled: !is_ready || review_mode,
-                  title:
-                    "Variant info\nClick to show the information and the wiki page (if it has, otherwise not shown) of current variant.",
-                  onclick: () => {
-                    let name = getVariantName(
-                      $("#dropdown-variant").value,
-                      true,
-                      false,
-                    );
-                    let description = getVariantDescription(
-                      $("#dropdown-variant").value,
-                      false,
-                    );
-                    let wiki = getVariantWikiPageURL(
-                      $("#dropdown-variant").value,
-                      false,
-                    );
-                    if (description) {
-                      if (wiki) {
-                        if (
-                          window.confirm(
-                            `Variant ${name} (ID: ${$("#dropdown-variant").value}):\n${description}\n\nWiki: ${wiki}\n\nDo you want to visit the wiki page?`,
-                          )
-                        ) {
-                          OpenURL(wiki);
-                        }
-                      } else {
-                        window.alert(
-                          `Variant ${name} (ID: ${$("#dropdown-variant").value}):\n${description}`,
-                        );
-                      }
-                    } else {
-                      window.alert(
-                        "This variant does not provide a description. You can upload a variantsettings.txt yourself to add a description for it.",
-                      );
-                    }
-                  },
-                },
-                icon("info"),
-              ),
-              m(
-                "button#aboutposition.iconbtn.ghost",
-                {
-                  type: "button",
-                  disabled: !is_ready || review_mode,
-                  title:
-                    "Position info\nClick to show the information of current selected custom position (position variant).",
-                },
-                icon("target"),
-              ),
               m(
                 "span.enginestatus",
                 {
@@ -7123,6 +7037,96 @@
                 ]),
               ]),
               ,
+              m("div.hr"),
+              m("span.sect", "Start position"),
+              m("div.row", [
+                m(
+                  "button.pickbtn.positionpick",
+                  {
+                    type: "button",
+                    disabled:
+                      !is_ready ||
+                      review_mode ||
+                      !positionVariantsFor(currentVariantId()),
+                    title: positionVariantsFor(currentVariantId())
+                      ? "Choose a start position for this variant"
+                      : "This variant has no predefined start positions",
+                    onclick: () => {
+                      position_picker_open = true;
+                    },
+                  },
+                  [
+                    m("span.picklabel", [
+                      m(
+                        "span.name",
+                        (() => {
+                          const namedropdown = document.getElementById(
+                            "dropdown-posvariantname",
+                          );
+                          return namedropdown && namedropdown.selectedIndex >= 0
+                            ? namedropdown.value
+                            : "Start position";
+                        })(),
+                      ),
+                    ]),
+                    icon("chev", 16),
+                  ],
+                ),
+                m(
+                  "button#aboutposition.sm",
+                  {
+                    type: "button",
+                    disabled: !is_ready || review_mode,
+                    title:
+                      "Position info\nClick to show the information of current selected custom position (position variant).",
+                  },
+                  [icon("target", 14), "Position info"],
+                ),
+                m(
+                  "button#aboutvariant.sm",
+                  {
+                    type: "button",
+                    disabled: !is_ready || review_mode,
+                    title:
+                      "Variant info\nClick to show the information and the wiki page (if it has, otherwise not shown) of current variant.",
+                    onclick: () => {
+                      let name = getVariantName(
+                        $("#dropdown-variant").value,
+                        true,
+                        false,
+                      );
+                      let description = getVariantDescription(
+                        $("#dropdown-variant").value,
+                        false,
+                      );
+                      let wiki = getVariantWikiPageURL(
+                        $("#dropdown-variant").value,
+                        false,
+                      );
+                      if (description) {
+                        if (wiki) {
+                          if (
+                            window.confirm(
+                              `Variant ${name} (ID: ${$("#dropdown-variant").value}):\n${description}\n\nWiki: ${wiki}\n\nDo you want to visit the wiki page?`,
+                            )
+                          ) {
+                            OpenURL(wiki);
+                          }
+                        } else {
+                          window.alert(
+                            `Variant ${name} (ID: ${$("#dropdown-variant").value}):\n${description}`,
+                          );
+                        }
+                      } else {
+                        window.alert(
+                          "This variant does not provide a description. You can upload a variantsettings.txt yourself to add a description for it.",
+                        );
+                      }
+                    },
+                  },
+                  [icon("info", 14), "Variant info"],
+                ),
+              ]),
               m("div.hr"),
               m("span.sect", "Board editor"),
               m("label#label-boardsetup", { hidden: true }, [
