@@ -1,87 +1,124 @@
 <!doctype html>
-<head>
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      font: inherit;
-    }
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1f7a86" />
+    <title>Resources · fairyground</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+CiAgPGcgc3R5bGU9Im9wYWNpdHk6MTsgZmlsbDpub25lOyBmaWxsLW9wYWNpdHk6MTsgZmlsbC1ydWxlOmV2ZW5vZGQ7IHN0cm9rZTojMDAwMDAwOyBzdHJva2Utd2lkdGg6MS41OyBzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDsgc3Ryb2tlLWRhc2hhcnJheTpub25lOyBzdHJva2Utb3BhY2l0eToxOyI+CiAgICA8cGF0aAogICAgICBkPSJNIDIyLDEwIEMgMzIuNSwxMSAzOC41LDE4IDM4LDM5IEwgMTUsMzkgQyAxNSwzMCAyNSwzMi41IDIzLDE4IgogICAgICBzdHlsZT0iZmlsbDojMDAwMDAwOyBzdHJva2U6IzAwMDAwMDsiIC8+CiAgICA8cGF0aAogICAgICBkPSJNIDI0LDE4IEMgMjQuMzgsMjAuOTEgMTguNDUsMjUuMzcgMTYsMjcgQyAxMywyOSAxMy4xOCwzMS4zNCAxMSwzMSBDIDkuOTU4LDMwLjA2IDEyLjQxLDI3Ljk2IDExLDI4IEMgMTAsMjggMTEuMTksMjkuMjMgMTAsMzAgQyA5LDMwIDUuOTk3LDMxIDYsMjYgQyA2LDI0IDEyLDE0IDEyLDE0IEMgMTIsMTQgMTMuODksMTIuMSAxNCwxMC41IEMgMTMuMjcsOS41MDYgMTMuNSw4LjUgMTMuNSw3LjUgQyAxNC41LDYuNSAxNi41LDEwIDE2LjUsMTAgTCAxOC41LDEwIEMgMTguNSwxMCAxOS4yOCw4LjAwOCAyMSw3IEMgMjIsNyAyMiwxMCAyMiwxMCIKICAgICAgc3R5bGU9ImZpbGw6IzAwMDAwMDsgc3Ryb2tlOiMwMDAwMDA7IiAvPgogICAgPHBhdGgKICAgICAgZD0iTSA5LjUgMjUuNSBBIDAuNSAwLjUgMCAxIDEgOC41LDI1LjUgQSAwLjUgMC41IDAgMSAxIDkuNSAyNS41IHoiCiAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7IHN0cm9rZTojZmZmZmZmOyIgLz4KICAgIDxwYXRoCiAgICAgIGQ9Ik0gMTUgMTUuNSBBIDAuNSAxLjUgMCAxIDEgIDE0LDE1LjUgQSAwLjUgMS41IDAgMSAxICAxNSAxNS41IHoiCiAgICAgIHRyYW5zZm9ybT0ibWF0cml4KDAuODY2LDAuNSwtMC41LDAuODY2LDkuNjkzLC01LjE3MykiCiAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7IHN0cm9rZTojZmZmZmZmOyIgLz4KICAgIDxwYXRoCiAgICAgIGQ9Ik0gMjQuNTUsMTAuNCBMIDI0LjEsMTEuODUgTCAyNC42LDEyIEMgMjcuNzUsMTMgMzAuMjUsMTQuNDkgMzIuNSwxOC43NSBDIDM0Ljc1LDIzLjAxIDM1Ljc1LDI5LjA2IDM1LjI1LDM5IEwgMzUuMiwzOS41IEwgMzcuNDUsMzkuNSBMIDM3LjUsMzkgQyAzOCwyOC45NCAzNi42MiwyMi4xNSAzNC4yNSwxNy42NiBDIDMxLjg4LDEzLjE3IDI4LjQ2LDExLjAyIDI1LjA2LDEwLjUgTCAyNC41NSwxMC40IHogIgogICAgICBzdHlsZT0iZmlsbDojZmZmZmZmOyBzdHJva2U6bm9uZTsiIC8+CiAgPC9nPgo8L3N2Zz4K"
+    />
+    <link rel="stylesheet" href="assets/app.css" />
+    <style>
+      .resources {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 28px 20px 60px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
 
-    html,
-    body {
-      height: 100%;
-    }
+      .resources h1 {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+      }
 
-    main {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      padding: 10px;
-    }
+      .resources h2 {
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-top: 10px;
+      }
 
-    #pagetitle {
-      font-size: 40px;
-      font-family: "Times New Roman", Times, serif, Arial;
-      margin-bottom: 10px;
-      font-style: oblique;
-      font-weight: bold;
-    }
+      .linklist {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
 
-    #hr {
-      border: 1px solid #aaaaaa;
-    }
+      .linklist a {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+        text-decoration: none;
+      }
 
-    .h2 {
-      font-size: 30px;
-      font-family: "Times New Roman", Times, serif, Arial;
-      margin-top: 20px;
-      margin-bottom: 10px;
-      font-style: oblique;
-      font-weight: bold;
-    }
-  </style>
-  <title>Resources</title>
-  <link
-    rel="icon"
-    href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+CiAgPGcgc3R5bGU9Im9wYWNpdHk6MTsgZmlsbDpub25lOyBmaWxsLW9wYWNpdHk6MTsgZmlsbC1ydWxlOmV2ZW5vZGQ7IHN0cm9rZTojMDAwMDAwOyBzdHJva2Utd2lkdGg6MS41OyBzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDsgc3Ryb2tlLWRhc2hhcnJheTpub25lOyBzdHJva2Utb3BhY2l0eToxOyI+CiAgICA8cGF0aAogICAgICBkPSJNIDIyLDEwIEMgMzIuNSwxMSAzOC41LDE4IDM4LDM5IEwgMTUsMzkgQyAxNSwzMCAyNSwzMi41IDIzLDE4IgogICAgICBzdHlsZT0iZmlsbDojMDAwMDAwOyBzdHJva2U6IzAwMDAwMDsiIC8+CiAgICA8cGF0aAogICAgICBkPSJNIDI0LDE4IEMgMjQuMzgsMjAuOTEgMTguNDUsMjUuMzcgMTYsMjcgQyAxMywyOSAxMy4xOCwzMS4zNCAxMSwzMSBDIDkuOTU4LDMwLjA2IDEyLjQxLDI3Ljk2IDExLDI4IEMgMTAsMjggMTEuMTksMjkuMjMgMTAsMzAgQyA5LDMwIDUuOTk3LDMxIDYsMjYgQyA2LDI0IDEyLDE0IDEyLDE0IEMgMTIsMTQgMTMuODksMTIuMSAxNCwxMC41IEMgMTMuMjcsOS41MDYgMTMuNSw4LjUgMTMuNSw3LjUgQyAxNC41LDYuNSAxNi41LDEwIDE2LjUsMTAgTCAxOC41LDEwIEMgMTguNSwxMCAxOS4yOCw4LjAwOCAyMSw3IEMgMjIsNyAyMiwxMCAyMiwxMCIKICAgICAgc3R5bGU9ImZpbGw6IzAwMDAwMDsgc3Ryb2tlOiMwMDAwMDA7IiAvPgogICAgPHBhdGgKICAgICAgZD0iTSA5LjUgMjUuNSBBIDAuNSAwLjUgMCAxIDEgOC41LDI1LjUgQSAwLjUgMC41IDAgMSAxIDkuNSAyNS41IHoiCiAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7IHN0cm9rZTojZmZmZmZmOyIgLz4KICAgIDxwYXRoCiAgICAgIGQ9Ik0gMTUgMTUuNSBBIDAuNSAxLjUgMCAxIDEgIDE0LDE1LjUgQSAwLjUgMS41IDAgMSAxICAxNSAxNS41IHoiCiAgICAgIHRyYW5zZm9ybT0ibWF0cml4KDAuODY2LDAuNSwtMC41LDAuODY2LDkuNjkzLC01LjE3MykiCiAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7IHN0cm9rZTojZmZmZmZmOyIgLz4KICAgIDxwYXRoCiAgICAgIGQ9Ik0gMjQuNTUsMTAuNCBMIDI0LjEsMTEuODUgTCAyNC42LDEyIEMgMjcuNzUsMTMgMzAuMjUsMTQuNDkgMzIuNSwxOC43NSBDIDM0Ljc1LDIzLjAxIDM1Ljc1LDI5LjA2IDM1LjI1LDM5IEwgMzUuMiwzOS41IEwgMzcuNDUsMzkuNSBMIDM3LjUsMzkgQyAzOCwyOC45NCAzNi42MiwyMi4xNSAzNC4yNSwxNy42NiBDIDMxLjg4LDEzLjE3IDI4LjQ2LDExLjAyIDI1LjA2LDEwLjUgTCAyNC41NSwxMC40IHogIgogICAgICBzdHlsZT0iZmlsbDojZmZmZmZmOyBzdHJva2U6bm9uZTsiIC8+CiAgPC9nPgo8L3N2Zz4K"
-  />
-  <base target="_blank" />
-</head>
-<body>
-  <p id="pagetitle">Resources</p>
-  <hr id="hr" />
-  <p class="h2">Websites & Forums</p>
-  <p>
-    Fairy-Stockfish Home Page:
-    <a href="https://fairy-stockfish.github.io/"
-      >https://fairy-stockfish.github.io/</a
-    >
-  </p>
-  <p>
-    Chess Variant Resources & Links:
-    <a href="https://chess-variants.github.io/"
-      >https://chess-variants.github.io/</a
-    >
-  </p>
-  <p>
-    Fairy-Stockfish Discord:
-    <a href="https://discord.gg/FYUGgmCFB4">https://discord.gg/FYUGgmCFB4</a>
-  </p>
-  <p>
-    Fairy-Stockfish Wiki:
-    <a href="https://github.com/fairy-stockfish/Fairy-Stockfish/wiki"
-      >https://github.com/fairy-stockfish/Fairy-Stockfish/wiki</a
-    >
-  </p>
-  <br />
-  <hr id="hr" />
-  <p>For more information you can join Fairy-Stockfish Discord.</p>
-  <p>
-    Fairy-Stockfish Discord:
-    <a href="https://discord.gg/FYUGgmCFB4">https://discord.gg/FYUGgmCFB4</a>
-  </p>
-</body>
+      .linklist a:hover {
+        border-color: var(--border2);
+        background: var(--surface2);
+        text-decoration: none;
+      }
+
+      .linklist a strong {
+        font-weight: 700;
+      }
+
+      .linklist a span {
+        font-size: 12.5px;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        word-break: break-all;
+      }
+    </style>
+    <base target="_blank" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <a class="brand" href="./index.html" target="_self">
+          <span class="mark">f</span>
+          <span class="text">fairyground</span>
+        </a>
+        <nav class="topactions">
+          <a class="btn ghost" href="./index.html" target="_self">Play</a>
+          <a class="btn ghost" href="./advanced.html" target="_self"
+            >Analysis</a
+          >
+          <a class="btn ghost" href="https://github.com/ianfab/fairyground"
+            >GitHub</a
+          >
+        </nav>
+      </header>
+      <section class="resources">
+        <h1>Resources</h1>
+        <h2>Websites &amp; forums</h2>
+        <div class="linklist">
+          <a href="https://fairy-stockfish.github.io/">
+            <strong>Fairy-Stockfish home page</strong>
+            <span>https://fairy-stockfish.github.io/</span>
+          </a>
+          <a href="https://chess-variants.github.io/">
+            <strong>Chess variant resources &amp; links</strong>
+            <span>https://chess-variants.github.io/</span>
+          </a>
+          <a href="https://discord.gg/FYUGgmCFB4">
+            <strong>Fairy-Stockfish Discord</strong>
+            <span>https://discord.gg/FYUGgmCFB4</span>
+          </a>
+          <a href="https://github.com/fairy-stockfish/Fairy-Stockfish/wiki">
+            <strong>Fairy-Stockfish wiki</strong>
+            <span>https://github.com/fairy-stockfish/Fairy-Stockfish/wiki</span>
+          </a>
+        </div>
+        <h2>Questions</h2>
+        <p class="hint">
+          For more information you can join the Fairy-Stockfish Discord:
+          <a href="https://discord.gg/FYUGgmCFB4"
+            >https://discord.gg/FYUGgmCFB4</a
+          >
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

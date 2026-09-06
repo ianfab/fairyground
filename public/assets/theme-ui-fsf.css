@@ -1,47 +1,57 @@
+:root {
+  --bg: #101216;
+  --surface: rgba(24, 27, 33, 0.86);
+  --surface2: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.1);
+  --border2: rgba(255, 255, 255, 0.18);
+  --text: #f0eee8;
+  --muted: #b5b2aa;
+  --faint: #7d7b75;
+  --accent: #e0a43a;
+  --accent-hover: #ecb556;
+  --accent-ink: #1a1408;
+  --accent-soft: rgba(224, 164, 58, 0.18);
+  --accent-soft2: rgba(224, 164, 58, 0.32);
+  --good: #5fb573;
+  --bad: #e06a52;
+  --warn: #d9a03a;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
 #pagebackground {
-  background-image: url('./assets/images/ui/fsf/FSF.avif');
-}
-
-#enginemanagementpopup {
-  background-color: #0000 !important;
-}
-
-#enginemanagementpopup-background {
-  background-image: url('./assets/images/ui/fsf/FSF.avif');
+  background-image: url("./assets/images/ui/fsf/FSF.avif");
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  background-position: center;
 }
 
-#enginesetuppopup {
-  background-color: #0000 !important;
+html {
+  background: transparent;
 }
 
-#enginesetuppopup-background {
-  background-image: url('./assets/images/ui/fsf/FSF.avif');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+.topbar,
+.panel,
+.drawer,
+.dialog {
+  background: var(--surface);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
-#enginesettingspopup {
-  background-color: #0000 !important;
-}
-
-#enginesettingspopup-background {
-  background-image: url('./assets/images/ui/fsf/FSF.avif');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
-
-#loadsavedgamespopup {
-  background-color: #0000 !important;
-}
-
+#enginemanagementpopup-background,
+#enginesetuppopup-background,
+#enginesettingspopup-background,
 #loadsavedgamespopup-background {
-  background-image: url('./assets/images/ui/fsf/FSF.avif');
+  background-image: url("./assets/images/ui/fsf/FSF.avif");
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+#enginemanagementpopup,
+#enginesetuppopup,
+#enginesettingspopup,
+#loadsavedgamespopup {
+  background-color: var(--surface);
 }

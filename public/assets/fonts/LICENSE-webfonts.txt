@@ -1,0 +1,17 @@
+Web fonts bundled with fairyground
+=================================
+
+Manrope (Manrope-latin.woff2, Manrope-latin-ext.woff2)
+  Copyright 2019 The Manrope Project Authors (https://github.com/sharanda/manrope)
+  Licensed under the SIL Open Font License, Version 1.1.
+
+JetBrains Mono (JetBrainsMono-latin.woff2, JetBrainsMono-latin-ext.woff2)
+  Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
+  Licensed under the SIL Open Font License, Version 1.1.
+
+The full license text is available at https://openfontlicense.org/open-font-license-official-text/
+
+FontAwesome (FontAwesome.woff2/.woff/.ttf)
+  Font Awesome Free by Fonticons, Inc., SIL Open Font License 1.1 (font files).
+
+All fonts are served from this site; no third-party font service is contacted.

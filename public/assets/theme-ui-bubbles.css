@@ -1,130 +1,35 @@
-input {
-  background-color: #fff7;
-}
-
-input[type=file] {
-  background: #0000;
-}
-
-input[type=text]:disabled {
-  background: #0000;
-}
-
-input[type=number]:disabled {
-  background: #0000;
-}
-
-input[type=checkbox] {
-  color: white !important;
-  background-color: #fff7 !important;
-}
-
-input[type=checkbox]:hover {
-  color: #fff !important;
-  background-color: #fffb !important;
-}
-
-input[type=checkbox]:checked {
-  color: #fff !important;
-  background-color: #0007 !important;
-}
-
-input[type=checkbox]:checked:hover {
-  color: #fff !important;
-  background-color: #000b !important;
-}
-
-input[type=checkbox]:disabled {
-  color: #000 !important;
-  background-color: #0000 !important;
-  opacity: 1 !important;
-}
-
-input[type=checkbox]:disabled:hover {
-  color: #000 !important;
-  background-color: #0000 !important;
-  opacity: 1 !important;
-}
-
-input[type="date"] {
-  background-color: #fff7;
-}
-
-textarea {
-  background-color: #fff7;
-}
-
-select {
-  background: #eee9 !important;
-}
-
-button {
-  background: #eee9 !important;
-  color: #000 !important;
-}
-
-button:hover {
-    background: #fffb !important;
-}
-
-button:active {
-    background: #0007 !important;
-}
-
-button:disabled {
-    background: #9999 !important;
-    color: #fff !important;
+:root {
+  --bg: #061a2e;
+  --surface: rgba(10, 34, 58, 0.82);
+  --surface2: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.12);
+  --border2: rgba(255, 255, 255, 0.2);
+  --text: #eaf4ff;
+  --muted: #a9c0d8;
+  --faint: #6f89a3;
+  --accent: #4fd1e6;
+  --accent-hover: #6fdcee;
+  --accent-ink: #04202a;
+  --accent-soft: rgba(79, 209, 230, 0.18);
+  --accent-soft2: rgba(79, 209, 230, 0.32);
+  --good: #5fb573;
+  --bad: #e06a52;
+  --warn: #d9a03a;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 #pagebackground {
-  background-image: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
-}
-  
-#enginemanagementpopup {
-  background-color: #0000 !important;
+  background: linear-gradient(180deg, #03101f 0%, #0a2a4a 100%);
 }
 
-#enginemanagementpopup-background {
-  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
+html {
+  background: transparent;
 }
 
-#enginesetuppopup {
-  background-color: #0000 !important;
-}
-
-#enginesetuppopup-background {
-  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
-}
-
-#enginesettingspopup {
-  background-color: #0000 !important;
-}
-
-#enginesettingspopup-background {
-  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
-}
-
-#loadsavedgamespopup {
-  background-color: #0000 !important;
-}
-
-#loadsavedgamespopup-background {
-  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
-}
-
-#chessground-mini-board-wrapper-div {
-  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
-  border: 2px solid white !important;
-}
-
-div.popup, #terminationsettings {
-  color: #000 !important;
-  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
-  border: 2px solid white !important;
-}
-
-#moveselectiondialog {
-  color: #000 !important;
-  background: linear-gradient(to bottom, #caeadb 0%, #51a3c5 100%) !important;
-  border: 2px solid white !important;
+.topbar,
+.panel,
+.drawer,
+.dialog {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
