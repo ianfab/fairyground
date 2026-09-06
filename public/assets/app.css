@@ -641,8 +641,8 @@ input[type="range"]::-moz-range-thumb {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   flex: none;
   cursor: help;
 }
@@ -1383,6 +1383,11 @@ main.app {
   gap: 8px;
 }
 
+.pgntools .toolstoggle {
+  display: none;
+  margin-left: auto;
+}
+
 #pgn-operations {
   display: flex;
   flex-direction: row;
@@ -1568,9 +1573,17 @@ main.app {
 }
 
 #evalinfo {
-  white-space: pre-line;
-  font-size: 12.5px;
+  white-space: normal;
+  font-size: 12px;
   color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.pvmeta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--faint);
+  margin: 0 6px 0 4px;
 }
 
 #pvinfo {
@@ -1603,10 +1616,7 @@ evalnum {
 }
 
 evalnum:after {
-  content: " \f061 ";
-  font-family: FontAwesome;
-  font-size: 12px;
-  color: var(--faint);
+  content: "";
 }
 
 spangameresult,
@@ -2597,6 +2607,61 @@ div.ripple-wrapper {
 
   .boardcol {
     gap: 6px 10px;
+  }
+
+  /* player bars only carry information while a game runs */
+  main.mode-analysis .playerbar,
+  main.mode-setup .playerbar {
+    display: none;
+  }
+
+  .playerbar {
+    min-height: 32px;
+  }
+
+  .playerbar .avatar {
+    width: 24px;
+    height: 24px;
+  }
+
+  .playerbar .sub {
+    display: none;
+  }
+
+  #whitetimer,
+  #blacktimer {
+    min-height: 32px;
+    padding: 2px 10px;
+  }
+
+  /* one row of board navigation */
+  .boardnav {
+    gap: 4px;
+    flex-wrap: nowrap;
+  }
+
+  .navgroup {
+    gap: 4px;
+  }
+
+  .boardnav button {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+
+  .boardnav #currentposition,
+  .boardnav .txt {
+    display: none;
+  }
+
+  /* PGN tools collapsed behind a toggle */
+  .pgntools .toolstoggle {
+    display: inline-flex;
+  }
+
+  #pgn-operations.collapsed {
+    display: none;
   }
 
   #whitetime,

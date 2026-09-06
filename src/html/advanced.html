@@ -4480,6 +4480,7 @@
         };
         let game_games = 1;
         let game_continue = false;
+        let pgn_tools_open = false;
         // Search limit of the in browser engine per side while a game runs.
         let engine_limit_white = null;
         let engine_limit_black = null;
@@ -5242,6 +5243,28 @@
                       ),
                     ),
                   ]),
+                  m(
+                    "span.enginestatus",
+                    {
+                      class: engine_status_class,
+                      title:
+                        stockfish_state == "READY"
+                          ? "Fairy-Stockfish (WebAssembly) is loaded and ready."
+                          : stockfish_state == "FAILED"
+                            ? "Fairy-Stockfish (WebAssembly) failed to load."
+                            : "Loading Fairy-Stockfish (WebAssembly)...",
+                    },
+                    [
+                      m("span.dot"),
+                      m("span.visually-hidden", [
+                        `Fairy-Stockfish ${stockfish_state} `,
+                        m(RequestProgress, {
+                          url: "./lib/stockfish.wasm",
+                          onFinishDownload,
+                        }),
+                      ]),
+                    ],
+                  ),
                   icon("chev", 16),
                 ],
               ),
@@ -5303,28 +5326,6 @@
                   ),
                 ]),
               ]),
-              m(
-                "span.enginestatus",
-                {
-                  class: engine_status_class,
-                  title:
-                    stockfish_state == "READY"
-                      ? "Fairy-Stockfish (WebAssembly) is loaded and ready."
-                      : stockfish_state == "FAILED"
-                        ? "Fairy-Stockfish (WebAssembly) failed to load."
-                        : "Loading Fairy-Stockfish (WebAssembly)...",
-                },
-                [
-                  m("span.dot"),
-                  m("span.visually-hidden", [
-                    `Fairy-Stockfish ${stockfish_state} `,
-                    m(RequestProgress, {
-                      url: "./lib/stockfish.wasm",
-                      onFinishDownload,
-                    }),
-                  ]),
-                ],
-              ),
             ]),
             m("nav.topactions", [
               m(
@@ -5573,7 +5574,7 @@
                     disabled: !is_ready,
                     title: "Click to pass your turn.",
                   },
-                  [icon("skip", 16), "Pass"],
+                  [icon("skip", 16), m("span.txt", "Pass")],
                 ),
                 m(
                   "button#placewall.iconbtn",
@@ -5860,214 +5861,231 @@
                 "div#pgn-operation-container.pgntools",
                 { hidden: !advanced_pgn_mode },
                 [
-                  m("span.label", "PGN tools"),
-                  m("div#pgn-operations", [
+                  m("div.row", [
+                    m("span.label", "PGN tools"),
                     m(
-                      "button#movetree-clear",
+                      "button.sm.ghost.toolstoggle",
                       {
                         type: "button",
-                        title:
-                          "Clear Moves\nClick to clear the variation tree. Your position will be set to the initial position.",
+                        title: "Show or hide the PGN tools",
+                        onclick: () => {
+                          pgn_tools_open = !pgn_tools_open;
+                        },
                       },
-                      icon("trash", 16),
-                    ),
-                    m(
-                      "button#movetree-clearcomments",
-                      {
-                        type: "button",
-                        title:
-                          "Clear Comments\nClick to clear all comments (Text before, text after, symbols).",
-                      },
-                      icon("commentclear", 16),
-                    ),
-                    m(
-                      "button#movetree-hideshow",
-                      {
-                        type: "button",
-                        title:
-                          "Show or Hide Move\nClick to hide/show subsequent moves of current move.",
-                      },
-                      icon("eyeoff", 16),
-                    ),
-                    m(
-                      "button#movetree-removevariations",
-                      {
-                        type: "button",
-                        title:
-                          "Remove Variations\nClick to remove variation moves of current move.",
-                      },
-                      icon("branchx", 16),
-                    ),
-                    m("span.toolgap"),
-                    m(
-                      "button#movetree-settomainbranch",
-                      {
-                        type: "button",
-                        title:
-                          "Promote Move\nClick to set the current move as the main branch of previous move.",
-                      },
-                      icon("arrowup", 16),
-                    ),
-                    m(
-                      "button#movetree-setasmainline",
-                      {
-                        type: "button",
-                        title:
-                          "Promote Branch\nClick to set all the antecedent moves of current move as the main line moves.",
-                      },
-                      icon("chevronsup", 16),
-                    ),
-                    m(
-                      "button#movetree-cutbranch",
-                      {
-                        type: "button",
-                        title:
-                          "Cut Branch\nClick to remove all the moves on the variation branch of current move.",
-                      },
-                      icon("branchcut", 16),
-                    ),
-                    m(
-                      "button#movetree-cropbranch",
-                      {
-                        type: "button",
-                        title:
-                          "Crop Branch\nClick to remove all the moves that are not on the branch of current move.",
-                      },
-                      icon("lineonly", 16),
-                    ),
-                    m(
-                      "button#movetree-cut",
-                      {
-                        type: "button",
-                        title:
-                          "Cut Move\nClick to remove current move and all of its subsequent moves.",
-                      },
-                      icon("x", 16),
-                    ),
-                    m(
-                      "button#movetree-crop",
-                      {
-                        type: "button",
-                        title:
-                          "Crop Move\nClick to remove all antecedent moves of current move and set the initial position to the position before current move.",
-                      },
-                      icon("crop", 16),
-                    ),
-                    m("span.toolgap"),
-                    m(
-                      "button#movetree-uncomment",
-                      {
-                        type: "button",
-                        title:
-                          "Uncomment Move\nClick to remove all texts and symbols of current move.",
-                      },
-                      icon("commentx", 16),
-                    ),
-                    m(
-                      "button#movetree-textbefore",
-                      {
-                        type: "button",
-                        title:
-                          "Set Text Before\nClick to set text before current move.",
-                      },
-                      icon("commentbefore", 16),
-                    ),
-                    m(
-                      "button#movetree-textafter",
-                      {
-                        type: "button",
-                        title:
-                          "Set Text After\nClick to set text after current move.",
-                      },
-                      icon("commentafter", 16),
-                    ),
-                    m(
-                      "button#movetree-symbol",
-                      {
-                        type: "button",
-                        title:
-                          "Set Symbols\nClick to set symbols (e.g. !!,??,!,?) for current move.",
-                      },
-                      m("span.txticon", "!?"),
-                    ),
-                    m(
-                      "button#movetree-markers",
-                      {
-                        type: "button",
-                        title:
-                          "Set Markers\nClick to set the markers (i.e. arrows & strokes) drawn on the main board to current move.",
-                      },
-                      icon("arrowupright", 16),
-                    ),
-                    m(
-                      "button#movetree-termination",
-                      {
-                        type: "button",
-                        title:
-                          "Set Termination\nClick to set result and termination on current move.",
-                      },
-                      icon("flag", 16),
-                    ),
-                    m(
-                      "button#movetree-headers",
-                      {
-                        type: "button",
-                        title:
-                          "Set Game Headers\nClick to set the PGN headers of this game, e.g. Event, Site, Round.",
-                      },
-                      icon("doc", 16),
-                    ),
-                    m("span.toolgap"),
-                    m(
-                      "button#movetree-undo",
-                      {
-                        type: "button",
-                        title:
-                          "Undo\nClick to undo last change made to the variation tree. Making new moves on the main board will clear change history.",
-                      },
-                      icon("undo", 16),
-                    ),
-                    m(
-                      "button#movetree-redo",
-                      {
-                        type: "button",
-                        title:
-                          "Redo\nClick to redo last change made to the variation tree. Making new moves on the main board will clear change history.",
-                      },
-                      icon("redo", 16),
-                    ),
-                    m("span.toolgap"),
-                    m(
-                      "button#movetree-save",
-                      {
-                        type: "button",
-                        title:
-                          "Save\nClick to save whole variation tree to a PGN file.",
-                      },
-                      icon("save", 16),
-                    ),
-                    m(
-                      "button#movetree-imagesave",
-                      {
-                        type: "button",
-                        title:
-                          "Save Board as Image...\nClick to open board image generator.",
-                      },
-                      icon("image", 16),
-                    ),
-                    m(
-                      "button#movetree-resize",
-                      {
-                        type: "button",
-                        title:
-                          "Enlarge PGN Viewer\nClick to make PGN viewer larger.",
-                      },
-                      [
-                        m("span.when-small", icon("expand", 16)),
-                        m("span.when-large", icon("collapse", 16)),
-                      ],
+                      pgn_tools_open ? "Hide" : "Show",
                     ),
                   ]),
+                  m(
+                    "div#pgn-operations",
+                    { class: pgn_tools_open ? "" : "collapsed" },
+                    [
+                      m(
+                        "button#movetree-clear",
+                        {
+                          type: "button",
+                          title:
+                            "Clear Moves\nClick to clear the variation tree. Your position will be set to the initial position.",
+                        },
+                        icon("trash", 16),
+                      ),
+                      m(
+                        "button#movetree-clearcomments",
+                        {
+                          type: "button",
+                          title:
+                            "Clear Comments\nClick to clear all comments (Text before, text after, symbols).",
+                        },
+                        icon("commentclear", 16),
+                      ),
+                      m(
+                        "button#movetree-hideshow",
+                        {
+                          type: "button",
+                          title:
+                            "Show or Hide Move\nClick to hide/show subsequent moves of current move.",
+                        },
+                        icon("eyeoff", 16),
+                      ),
+                      m(
+                        "button#movetree-removevariations",
+                        {
+                          type: "button",
+                          title:
+                            "Remove Variations\nClick to remove variation moves of current move.",
+                        },
+                        icon("branchx", 16),
+                      ),
+                      m("span.toolgap"),
+                      m(
+                        "button#movetree-settomainbranch",
+                        {
+                          type: "button",
+                          title:
+                            "Promote Move\nClick to set the current move as the main branch of previous move.",
+                        },
+                        icon("arrowup", 16),
+                      ),
+                      m(
+                        "button#movetree-setasmainline",
+                        {
+                          type: "button",
+                          title:
+                            "Promote Branch\nClick to set all the antecedent moves of current move as the main line moves.",
+                        },
+                        icon("chevronsup", 16),
+                      ),
+                      m(
+                        "button#movetree-cutbranch",
+                        {
+                          type: "button",
+                          title:
+                            "Cut Branch\nClick to remove all the moves on the variation branch of current move.",
+                        },
+                        icon("branchcut", 16),
+                      ),
+                      m(
+                        "button#movetree-cropbranch",
+                        {
+                          type: "button",
+                          title:
+                            "Crop Branch\nClick to remove all the moves that are not on the branch of current move.",
+                        },
+                        icon("lineonly", 16),
+                      ),
+                      m(
+                        "button#movetree-cut",
+                        {
+                          type: "button",
+                          title:
+                            "Cut Move\nClick to remove current move and all of its subsequent moves.",
+                        },
+                        icon("x", 16),
+                      ),
+                      m(
+                        "button#movetree-crop",
+                        {
+                          type: "button",
+                          title:
+                            "Crop Move\nClick to remove all antecedent moves of current move and set the initial position to the position before current move.",
+                        },
+                        icon("crop", 16),
+                      ),
+                      m("span.toolgap"),
+                      m(
+                        "button#movetree-uncomment",
+                        {
+                          type: "button",
+                          title:
+                            "Uncomment Move\nClick to remove all texts and symbols of current move.",
+                        },
+                        icon("commentx", 16),
+                      ),
+                      m(
+                        "button#movetree-textbefore",
+                        {
+                          type: "button",
+                          title:
+                            "Set Text Before\nClick to set text before current move.",
+                        },
+                        icon("commentbefore", 16),
+                      ),
+                      m(
+                        "button#movetree-textafter",
+                        {
+                          type: "button",
+                          title:
+                            "Set Text After\nClick to set text after current move.",
+                        },
+                        icon("commentafter", 16),
+                      ),
+                      m(
+                        "button#movetree-symbol",
+                        {
+                          type: "button",
+                          title:
+                            "Set Symbols\nClick to set symbols (e.g. !!,??,!,?) for current move.",
+                        },
+                        m("span.txticon", "!?"),
+                      ),
+                      m(
+                        "button#movetree-markers",
+                        {
+                          type: "button",
+                          title:
+                            "Set Markers\nClick to set the markers (i.e. arrows & strokes) drawn on the main board to current move.",
+                        },
+                        icon("arrowupright", 16),
+                      ),
+                      m(
+                        "button#movetree-termination",
+                        {
+                          type: "button",
+                          title:
+                            "Set Termination\nClick to set result and termination on current move.",
+                        },
+                        icon("flag", 16),
+                      ),
+                      m(
+                        "button#movetree-headers",
+                        {
+                          type: "button",
+                          title:
+                            "Set Game Headers\nClick to set the PGN headers of this game, e.g. Event, Site, Round.",
+                        },
+                        icon("doc", 16),
+                      ),
+                      m("span.toolgap"),
+                      m(
+                        "button#movetree-undo",
+                        {
+                          type: "button",
+                          title:
+                            "Undo\nClick to undo last change made to the variation tree. Making new moves on the main board will clear change history.",
+                        },
+                        icon("undo", 16),
+                      ),
+                      m(
+                        "button#movetree-redo",
+                        {
+                          type: "button",
+                          title:
+                            "Redo\nClick to redo last change made to the variation tree. Making new moves on the main board will clear change history.",
+                        },
+                        icon("redo", 16),
+                      ),
+                      m("span.toolgap"),
+                      m(
+                        "button#movetree-save",
+                        {
+                          type: "button",
+                          title:
+                            "Save\nClick to save whole variation tree to a PGN file.",
+                        },
+                        icon("save", 16),
+                      ),
+                      m(
+                        "button#movetree-imagesave",
+                        {
+                          type: "button",
+                          title:
+                            "Save Board as Image...\nClick to open board image generator.",
+                        },
+                        icon("image", 16),
+                      ),
+                      m(
+                        "button#movetree-resize",
+                        {
+                          type: "button",
+                          title:
+                            "Enlarge PGN Viewer\nClick to make PGN viewer larger.",
+                        },
+                        [
+                          m("span.when-small", icon("expand", 16)),
+                          m("span.when-large", icon("collapse", 16)),
+                        ],
+                      ),
+                    ],
+                  ),
                 ],
               ),
               m("div.fenrow", [
@@ -8969,7 +8987,7 @@
             ]),
           ]);
 
-          return m("main.app", [
+          return m("main.app", { class: "mode-" + app_mode }, [
             topbar,
             m("div.layout", [boardcol, panel]),
             m("p#pagetitle", { hidden: true }, "Advanced analysis"),
