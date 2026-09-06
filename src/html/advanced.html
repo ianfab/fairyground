@@ -4363,6 +4363,29 @@
           : 1;
         let engine_hash_index = 2; // 16 MB
         let engine_multipv = 1;
+        // Search limits; the last slider position means "no limit".
+        const depthSteps = [
+          1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 18, 20, 25, 30, 40,
+        ];
+        const movetimeSteps = [
+          100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000, 60000, 120000,
+          300000,
+        ];
+        const nodesSteps = [
+          10000, 50000, 100000, 500000, 1000000, 5000000, 10000000, 50000000,
+          100000000,
+        ];
+        let engine_depth_index = depthSteps.length;
+        let engine_movetime_index = movetimeSteps.length;
+        let engine_nodes_index = nodesSteps.length;
+        const limitValue = (steps, index) =>
+          index >= steps.length ? "" : String(steps[index]);
+        const limitLabel = (steps, index, format) =>
+          index >= steps.length ? "∞" : format(steps[index]);
+        const formatSeconds = (ms) =>
+          ms >= 60000 ? `${ms / 60000} min` : `${ms / 1000} s`;
+        const formatNodes = (n) =>
+          n >= 1000000 ? `${n / 1000000}M` : `${n / 1000}k`;
 
         const sliderRow = (label, shown, min, max, value, onchange, help) =>
           m("div.sliderrow", { title: help }, [
@@ -5336,42 +5359,68 @@
                     "Size of the engine's hash table.",
                   ),
                 ]),
+                m("div.sliders", [
+                  sliderRow(
+                    "Depth",
+                    limitLabel(depthSteps, engine_depth_index, (v) =>
+                      String(v),
+                    ),
+                    0,
+                    depthSteps.length,
+                    engine_depth_index,
+                    (value) => {
+                      engine_depth_index = value;
+                    },
+                    "Maximum search depth. Rightmost: no limit.",
+                  ),
+                  sliderRow(
+                    "Time",
+                    limitLabel(
+                      movetimeSteps,
+                      engine_movetime_index,
+                      formatSeconds,
+                    ),
+                    0,
+                    movetimeSteps.length,
+                    engine_movetime_index,
+                    (value) => {
+                      engine_movetime_index = value;
+                    },
+                    "Maximum thinking time per move. Rightmost: no limit.",
+                  ),
+                  sliderRow(
+                    "Nodes",
+                    limitLabel(nodesSteps, engine_nodes_index, formatNodes),
+                    0,
+                    nodesSteps.length,
+                    engine_nodes_index,
+                    (value) => {
+                      engine_nodes_index = value;
+                    },
+                    "Maximum number of searched nodes. Rightmost: no limit.",
+                  ),
+                ]),
                 m(
                   "p.hint",
-                  "Search limits below only apply when the engine plays a side or after Go without analysis. Leave them empty for no limit.",
+                  "Limits apply when the engine plays a side or moves on request; analysis always runs until it is switched off. With every limit at ∞ the engine thinks until stopped, so set a limit or use the time control when playing against it.",
                 ),
-                m("div.nums", [
-                  m("div.field", [
-                    m("span.label", "Depth"),
-                    m("input[type=number]#depth", {
-                      placeholder: "Depth",
-                      title:
-                        "The maximum depth in browser Fairy-Stockfish is allowed to search.",
-                      disabled: !is_ready || analysis_mode,
-                      min: 1,
-                      max: 255,
-                    }),
-                  ]),
-                  m("div.field", [
-                    m("span.label", "Move time (ms)"),
-                    m("input[type=number]#movetime", {
-                      placeholder: "Movetime",
-                      title:
-                        "The time in milliseconds that in browser Fairy-Stockfish can think at most.",
-                      disabled: !is_ready || analysis_mode,
-                      min: 0,
-                    }),
-                  ]),
-                  m("div.field", [
-                    m("span.label", "Nodes"),
-                    m("input[type=number]#nodes", {
-                      placeholder: "Nodes",
-                      title:
-                        "The number of moves that in browser Fairy-Stockfish should search.",
-                      disabled: !is_ready || analysis_mode,
-                      min: 1,
-                    }),
-                  ]),
+                m("div.hiddeninputs", [
+                  m("input[type=number]#depth", {
+                    hidden: true,
+                    value: limitValue(depthSteps, engine_depth_index),
+                    min: 1,
+                    max: 255,
+                  }),
+                  m("input[type=number]#movetime", {
+                    hidden: true,
+                    value: limitValue(movetimeSteps, engine_movetime_index),
+                    min: 0,
+                  }),
+                  m("input[type=number]#nodes", {
+                    hidden: true,
+                    value: limitValue(nodesSteps, engine_nodes_index),
+                    min: 1,
+                  }),
                   m("input[type=number]#threads", {
                     hidden: true,
                     value: engine_threads,
@@ -5393,12 +5442,12 @@
                 ]),
                 m("div.row", [
                   m(
-                    "button#go.primary",
+                    "button#go.sm",
                     {
                       type: "button",
                       disabled: !is_ready,
                       title:
-                        "Click to tell the corresponding engine to start thinking.",
+                        "Let the engine think and move now with the settings above (used when the engine plays a side).",
                       onclick: () => {
                         if ($("#advtimectrl").checked == true) {
                           $("#advtimectrl").click();
@@ -5412,15 +5461,15 @@
                         }, 10);
                       },
                     },
-                    [icon("play", 16), "Go"],
+                    [icon("play", 14), "Engine: move now"],
                   ),
                   m(
-                    "button#stop",
+                    "button#stop.sm",
                     {
                       type: "button",
                       disabled: !is_ready,
                       title:
-                        "Click to immediately stop all engines from thinking.",
+                        "Immediately stop all engines from thinking (also ends an engine match).",
                       onclick: () => {
                         force_stop();
                         if (fge.first_engine) {
@@ -5448,7 +5497,7 @@
                         }
                       },
                     },
-                    [icon("stop", 16), "Stop"],
+                    [icon("stop", 14), "Stop engine"],
                   ),
                 ]),
                 m("div.internals", [
@@ -5538,13 +5587,17 @@
                         if (UserSelectedUITheme) {
                           changeUI(UserSelectedUITheme, false, true);
                         } else {
-                          changeUI(
-                            $("#dropdown-uitheme")[
-                              $("#dropdown-uitheme").selectedIndex
-                            ].value,
-                            false,
-                            true,
-                          );
+                          // Default to the dark theme when available.
+                          const uidropdown = $("#dropdown-uitheme");
+                          let defaulttheme =
+                            uidropdown[uidropdown.selectedIndex].value;
+                          for (let i = 0; i < uidropdown.length; i++) {
+                            if (uidropdown[i].value == "dark") {
+                              defaulttheme = "dark";
+                              break;
+                            }
+                          }
+                          changeUI(defaulttheme, false, true);
                         }
                       },
                     },

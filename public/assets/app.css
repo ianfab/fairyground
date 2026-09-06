@@ -34,6 +34,7 @@
   --control-h: 40px;
   --topbar-h: 60px;
   --surface-alpha: 1;
+  color-scheme: light;
 }
 
 *,
@@ -392,9 +393,10 @@ select.sm {
   padding-right: 30px;
 }
 
-select option {
-  color: initial;
-  background: initial;
+select option,
+select optgroup {
+  color: var(--text);
+  background: var(--surface);
   font-weight: normal;
 }
 
