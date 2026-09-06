@@ -6911,7 +6911,7 @@ function updatePGNDivision(forceupdate = false) {
 function updateChessground(showresult) {
   const boardfenval = board.fen();
   const boardfenvallist = boardfenval.split(" ");
-  currentBoardFen.textContent = `Current Board FEN:  ${boardfenval}`;
+  currentBoardFen.textContent = boardfenval;
 
   if (boardfenvallist.length == 7) {
     const checknums = boardfenvallist[4].split("+");

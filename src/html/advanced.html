@@ -6137,6 +6137,7 @@
                 ],
               ),
               m("div.fenrow", [
+                m("span.label", "FEN"),
                 m("p#currentboardfen"),
                 m(
                   "button.sm.iconbtn",
@@ -6144,9 +6145,9 @@
                     type: "button",
                     title: "Copy the current FEN to the clipboard",
                     onclick: () => {
-                      const text =
-                        document.getElementById("currentboardfen").textContent;
-                      const fen = text.substring(text.indexOf(":") + 1).trim();
+                      const fen = document
+                        .getElementById("currentboardfen")
+                        .textContent.trim();
                       copyText(fen);
                       fen_copied = true;
                       window.setTimeout(() => {
