@@ -1756,6 +1756,45 @@ spangameresultmini {
   min-width: 120px;
 }
 
+.piecepalette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 0 0 100%;
+}
+
+.palettebtn {
+  width: 44px;
+  height: 44px;
+  padding: 3px;
+  border-color: var(--border);
+}
+
+.palettebtn.on {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.palettewrap,
+.palettewrap .cg-wrap {
+  width: 100%;
+  height: 100%;
+}
+
+.palettewrap .cg-wrap {
+  position: relative;
+}
+
+.palettewrap piece {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 #pocketpiecechange table {
   border-collapse: collapse;
   font-size: 13px;

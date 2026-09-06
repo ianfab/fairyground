@@ -4532,6 +4532,7 @@
           undo: "M3 7v6h6M3 13a9 9 0 1 0 3-6.7L3 9",
           gear: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z",
           moon: "M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z",
+          move: "M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20",
           check: "m20 6-11 11-5-5",
           copy: "M20 9h-9a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2zM5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1",
           arrowup: "M12 19V5M5 12l7-7 7 7",
@@ -4829,6 +4830,70 @@
           m.redraw();
         };
 
+        // Board editor piece palette: mirrors the options of the (hidden)
+        // #dropdown-setpiece select, which main.js fills per variant.
+        const pieceThemeClasses = () => {
+          const container = document.getElementById(
+            "chessground-container-div",
+          );
+          if (!container) {
+            return "";
+          }
+          return [...container.classList]
+            .filter(
+              (c) =>
+                !/^board\d+x\d+$/.test(c) && c != "pockets" && c != "inner",
+            )
+            .join(" ");
+        };
+        const pieceChoices = () => {
+          const dropdown = document.getElementById("dropdown-setpiece");
+          if (!dropdown) {
+            return [];
+          }
+          const choices = [];
+          for (let i = 0; i < dropdown.length; i++) {
+            const value = dropdown[i].value;
+            const selected = dropdown.selectedIndex == i;
+            if (value == "<move>") {
+              choices.push({
+                value,
+                selected,
+                icon: "move",
+                title: "Move pieces",
+              });
+            } else if (value == "<delete>") {
+              choices.push({
+                value,
+                selected,
+                icon: "trash",
+                title: "Delete pieces",
+              });
+            } else if (value == "*") {
+              choices.push({
+                value,
+                selected,
+                icon: "wall",
+                title: "Wall square",
+              });
+            } else {
+              const promoted = value.charAt(0) == "+";
+              const letter = promoted ? value.charAt(1) : value.charAt(0);
+              if (!letter) {
+                continue;
+              }
+              const white = letter == letter.toUpperCase();
+              choices.push({
+                value,
+                selected,
+                title: `${promoted ? "Promoted " : ""}${white ? "white" : "black"} ${letter}`,
+                pieceClass: `${promoted ? "p" : ""}${letter.toLowerCase()}-piece ${white ? "white" : "black"}`,
+              });
+            }
+          }
+          return choices;
+        };
+
         const analysisBlocked = () =>
           app_mode != "analysis" ||
           board_setup_mode ||
@@ -4861,6 +4926,7 @@
           const analysischeckbox = document.getElementById("analysis");
           if (analysischeckbox) {
             analysischeckbox.checked = on;
+            analysischeckbox.dispatchEvent(new Event("change"));
           }
           if (on) {
             window.setTimeout(() => {
@@ -6067,27 +6133,10 @@
                 m("div.hr"),
                 m("div.secthead", [
                   m("span.sect", "Fairy-Stockfish · in browser"),
-                  m(
-                    "label#label-analysis.toggle",
-                    {
-                      title:
-                        "When checked, interactive analysis mode is enabled and will use analysis binary engine (if loaded, otherwise in browser Fairy-Stockfish) to think on the position infinitely.",
-                    },
-                    [
-                      m("input[type=checkbox]#analysis", {
-                        checked: analysis_mode,
-                        disabled:
-                          board_setup_mode ||
-                          engine_match_mode ||
-                          during_play ||
-                          during_engine_match,
-                        onclick: (e) => {
-                          setAnalysisMode(e.target.checked);
-                        },
-                      }),
-                      m("span", "Infinite analysis"),
-                    ],
-                  ),
+                  m("input[type=checkbox]#analysis", {
+                    hidden: true,
+                    checked: analysis_mode,
+                  }),
                 ]),
                 m("div.sliders", [
                   sliderRow(
@@ -6997,9 +7046,44 @@
                 ]),
                 m("div#boardsetupsettings", { hidden: !board_setup_mode }, [
                   m("div#boardpiecechange", { disabled: !is_ready }, [
+                    m("div.piecepalette", [
+                      pieceChoices().map((choice) =>
+                        m(
+                          "button.palettebtn",
+                          {
+                            type: "button",
+                            key: choice.value,
+                            class: choice.selected ? "on" : "",
+                            title: choice.title,
+                            onclick: () => {
+                              const dropdown =
+                                document.getElementById("dropdown-setpiece");
+                              dropdown.value = choice.value;
+                              dropdown.dispatchEvent(new Event("change"));
+                            },
+                          },
+                          choice.icon
+                            ? icon(choice.icon, 18)
+                            : m(
+                                "div.palettewrap",
+                                { class: pieceThemeClasses() },
+                                [
+                                  m("div.cg-wrap", [
+                                    m("piece", { class: choice.pieceClass }),
+                                  ]),
+                                ],
+                              ),
+                        ),
+                      ),
+                    ]),
+                    m(
+                      "p.hint",
+                      "Pick a piece, then click a square to place it. Drag pieces to move them, drop them off the board to remove them.",
+                    ),
                     m(
                       "select#dropdown-setpiece",
                       {
+                        hidden: true,
                         title:
                           "<move>: Move the pieces on the board.\n<delete>: Click on a square to delete the piece on that square.\n<letter>: Click on a square to place a piece of that letter. If there is a plus ahead, it means the promoted from.",
                         onchange: () => {
