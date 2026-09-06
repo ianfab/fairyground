@@ -75,16 +75,6 @@ try {
     .replace(EOLMatcher, "\n");
   let index_page_css = fs.readFileSync("./src/index_page_css.css", "utf8");
   let index_page_js = fs.readFileSync("./src/index_page_js.js", "utf8");
-  advpage = advpage
-    .replace(
-      "<title>Fairy-Stockfish playground</title>",
-      "<title>Play against Fairy-Stockfish</title>",
-    )
-    .replace(
-      /let( +)advanced_time_control( *)=( *)false/,
-      "let advanced_time_control = true",
-    )
-    .replace(/let( +)play_black( *)=( *)false/, "let play_black = true");
   let htmlseg = GetHeadAndBodyOfHTML(advpage);
   let headerendpos = htmlseg.head_end_index;
   let index_page =

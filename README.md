@@ -4,6 +4,8 @@ This is an attempt to have a simple demo and playground for [Fairy-Stockfish](ht
 
 You can see it deployed at: [https://fairyground.vercel.app/](https://fairyground.vercel.app/)
 
+The site is a progressive web app with a responsive layout for desktop and mobile: it can be installed from the browser ("Install app" / "Add to home screen") and keeps working offline once the engine and assets have been cached. The user interface is styled by `public/assets/app.css`; UI themes in `public/assets/theme-ui-*.css` only override its design tokens.
+
 ## Usage
 
 To get a one-click-to-run version, you can download the executables in the [Latest Build Actions](https://github.com/ianfab/fairyground/actions/workflows/ci.yml?query=event%3Apush+event%3Aworkflow_dispatch) section. (Requires logging in to GitHub)

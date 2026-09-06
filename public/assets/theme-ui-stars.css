@@ -1,232 +1,36 @@
+:root {
+  color-scheme: dark;
+  --bg: #05060d;
+  --surface: rgba(14, 16, 30, 0.84);
+  --surface2: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.12);
+  --border2: rgba(255, 255, 255, 0.2);
+  --text: #f1f0fa;
+  --muted: #b3b1c9;
+  --faint: #737188;
+  --accent: #b18cff;
+  --accent-hover: #c3a4ff;
+  --accent-ink: #160b2e;
+  --accent-soft: rgba(177, 140, 255, 0.18);
+  --accent-soft2: rgba(177, 140, 255, 0.32);
+  --good: #5fb573;
+  --bad: #e06a52;
+  --warn: #d9a03a;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+#pagebackground {
+  background: radial-gradient(ellipse at top, #141633 0%, #05060d 70%);
+}
+
 html {
-    color: #fff !important;
-    background: #000 !important;
+  background: transparent;
 }
 
-::selection {
-    background-color: #6495edaa;
-}
-
-input {
-    color: #fff;
-    background: #0000;
-}
-
-input[type=file] {
-    background: #0000;
-}
-
-input[type=text]:disabled {
-    background: #ccc7;
-}
-
-input[type=number]:disabled {
-    background: #ccc7;
-}
-
-input[type=checkbox] {
-  color: #fff !important;
-  background-color: #0000 !important;
-}
-
-input[type=checkbox]:hover {
-  color: #fff !important;
-  background-color: #8887 !important;
-}
-
-input[type=checkbox]:checked {
-  color: #fff !important;
-  background-color: #5557 !important;
-}
-
-input[type=checkbox]:checked:hover {
-  color: #fff !important;
-  background-color: #8887 !important;
-}
-
-input[type=checkbox]:disabled {
-  color: #000 !important;
-  background-color: #ccc7 !important;
-  opacity: 1 !important;
-}
-
-input[type=checkbox]:disabled:hover {
-  color: #000 !important;
-  background-color: #ccc7 !important;
-  opacity: 1 !important;
-}
-
-input[type="date"] {
-    color: #fff !important;
-    background-color: #000 !important;
-}
-
-textarea {
-    color: #fff !important;
-}
-
-select {
-    color: #fff;
-    background: #555 !important;
-}
-
-button {
-    background: #555 !important;
-}
-
-button:hover {
-    background: #777 !important;
-}
-
-button:active {
-    background: #000 !important;
-}
-
-button:disabled {
-    background: #999 !important;
-    color: #000 !important;
-}
-
-input::-webkit-input-placeholder {
-    color: #aaa;
-}
-
-input::-moz-placeholder {
-    color: #aaa;
-}
-
-input:-ms-input-placeholder {
-    color: #aaa;
-}
-
-input::-ms-input-placeholder {
-    color: #aaa;
-}
-
-input::placeholder {
-    color: #aaa;
-    opacity: 1;
-}
-
-spangameresult, spangameresultmini {
-    color: #fff !important;
-}
-
-table {
-    border-color: #fff !important;
-}
-
-caption {
-    border-color: #fff !important;
-}
-
-th {
-    border-color: #fff !important;
-}
-
-td {
-    border-color: #fff !important;
-}
-
-a {
-    color: ghostwhite;
-}
-
-a:visited {
-    color: mediumpurple;
-}
-
-.position-display-label:hover {
-    background-color: #fff !important;
-    color: #000 !important;
-}
-
-#pgndiv .position-display-label.current-move {
-    background-color: #fff !important;
-    color: #000 !important;
-}
-
-#pgn-operations button {
-    background-color: #0000 !important;
-    color: #0000 !important;
-}
-
-#pgn-operations button:before {
-    color: #fff !important;
-}
-
-#pgn-operations button:hover:before {
-    background-color: #fff !important;
-    color: #000 !important;
-}
-
-#pgn-operations button:disabled:before {
-    background-color: #0000 !important;
-    color: #888 !important;
-}
-
-#pgn-operations button:active:before {
-    background-color: #fff !important;
-    color: #888 !important;
-}
-
-#timers {
-    background-color: rgba(255, 255, 255, 0.5) !important;
-}
-
-#pvinfo {
-    border-top: 4px solid #fff !important;
-    border-left: 4px solid #fff !important;
-    border-right: 4px solid #fff !important;
-    border-bottom: 4px solid #fff !important;
-}
-
-#pvinfo hr {
-    border: 1px solid #fff !important;
-}
-
-evalnum:after {
-    color: #fff !important;
-}
-
-#chessground-mini-board-wrapper-div {
-    background-color: #000 !important;
-    border: 2px solid #fff !important;
-}
-
-div.popup, #terminationsettings {
-    background-color: #000;
-    border: 2px solid #ddd;
-}
-
-#enginemanagementpopup {
-  background-color: #0000 !important;
-}
-
-#enginesetuppopup {
-  background-color: #0000 !important;
-}
-
-#enginesettingspopup {
-  background-color: #0000 !important;
-}
-
-#loadsavedgamespopup {
-  background-color: #0000 !important;
-}
-
-#enginemanagementpopup-background {
-  background-color: #000 !important;
-}
-
-#enginesetuppopup-background {
-  background-color: #000 !important;
-}
-
-#enginesettingspopup-background {
-  background-color: #000 !important;
-}
-
-#loadsavedgamespopup-background {
-  background-color: #000 !important;
+.topbar,
+.panel,
+.drawer,
+.dialog {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
