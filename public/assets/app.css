@@ -1999,16 +1999,6 @@ spangameresultmini {
   color: var(--muted);
 }
 
-#links {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  font-size: 12.5px;
-  color: var(--muted);
-  margin-top: auto;
-  padding-top: 12px;
-}
-
 #pageheader {
   display: none;
 }
