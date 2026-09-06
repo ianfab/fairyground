@@ -1996,6 +1996,7 @@
         let during_play = false;
         let select_move_dialog = false;
         let in_browser_fsf_hash = 16;
+        let in_browser_fsf_skill = 20;
         let random_mover_white = false;
         let random_mover_black = false;
         let advanced_pgn_mode = true;
@@ -2954,6 +2955,15 @@
             stockfish.postMessage(
               `setoption name MultiPV value ${multipleprincipalvariation}`,
             );
+          }
+          // Skill level only applies when the engine plays; analysis always
+          // uses full strength.
+          const skilllevel = analysis_mode ? 20 : engine_skill;
+          if (skilllevel != in_browser_fsf_skill) {
+            stockfish.postMessage(
+              `setoption name Skill Level value ${skilllevel}`,
+            );
+            in_browser_fsf_skill = skilllevel;
           }
           stockfish.postMessage(`isready`);
 
@@ -4627,6 +4637,9 @@
           : 1;
         let engine_hash_index = 2; // 16 MB
         let engine_multipv = 1;
+        let engine_skill = 20;
+        const isAnalysisPage = () =>
+          /advanced\.html$/i.test(window.location.pathname);
         // Search limits; the last slider position means "no limit".
         const depthSteps = [
           1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 18, 20, 25, 30, 40,
@@ -4879,6 +4892,28 @@
             m("a.brand", { href: "./index.html", target: "_self" }, [
               m("span.mark", "f"),
               m("span.text", "fairyground"),
+            ]),
+            m("nav.seg.pageswitch", [
+              m(
+                "a",
+                {
+                  href: "./index.html",
+                  target: "_self",
+                  class: isAnalysisPage() ? "" : "on",
+                  title: "Play against the engine",
+                },
+                "Play",
+              ),
+              m(
+                "a",
+                {
+                  href: "./advanced.html",
+                  target: "_self",
+                  class: isAnalysisPage() ? "on" : "",
+                  title: "Analysis board",
+                },
+                "Analysis",
+              ),
             ]),
             m("div.variantbar#posvariantdiv", [
               m(
@@ -6020,6 +6055,17 @@
                       engine_hash_index = value;
                     },
                     "Size of the engine's hash table.",
+                  ),
+                  sliderRow(
+                    "Skill level",
+                    engine_skill,
+                    0,
+                    20,
+                    engine_skill,
+                    (value) => {
+                      engine_skill = value;
+                    },
+                    "Playing strength when the engine plays a side (20 = full strength). Analysis always uses full strength.",
                   ),
                 ]),
                 m("div.sliders", [

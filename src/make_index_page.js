@@ -81,8 +81,8 @@ try {
       "<title>Play against Fairy-Stockfish</title>",
     )
     .replace(
-      /let( +)advanced_time_control( *)=( *)false/,
-      "let advanced_time_control = true",
+      /let( +)engine_movetime_index( *)=( *)movetimeSteps\.length/,
+      "let engine_movetime_index = 2",
     )
     .replace(/let( +)play_black( *)=( *)false/, "let play_black = true");
   let htmlseg = GetHeadAndBodyOfHTML(advpage);

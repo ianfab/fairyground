@@ -742,6 +742,37 @@ main.app {
   font-size: 16px;
 }
 
+.pageswitch {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--r);
+  background: var(--surface2);
+}
+
+.pageswitch a {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.pageswitch a:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.pageswitch a.on {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
 .variantbar {
   display: flex;
   align-items: center;
