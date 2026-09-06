@@ -1810,6 +1810,30 @@
         window.setTimeout(() => {
           updateBoardSize(true);
         }, 50);
+        // Clicking a move in the move list displays that position on the
+        // main board (the same navigation as the previous/next buttons).
+        const movelist = document.getElementById("label-pgn");
+        if (movelist) {
+          movelist.addEventListener("click", (event) => {
+            const element = event.target.closest(".position-display-label");
+            if (!element || element.moves === undefined) {
+              return;
+            }
+            const moveinput = document.getElementById("move");
+            const setposition = document.getElementById("setpos");
+            if (!moveinput || !setposition || setposition.disabled) {
+              return;
+            }
+            moveinput.value = element.moves;
+            setposition.click();
+            // The move list click also opens the preview mini board; the
+            // main board now shows the position, so close the preview.
+            const miniboard = document.getElementById("chessground-mini");
+            if (miniboard && !miniboard.locked) {
+              miniboard.style.display = "none";
+            }
+          });
+        }
       });
 
       const App = () => {
@@ -1833,7 +1857,7 @@
         let in_browser_fsf_hash = 16;
         let random_mover_white = false;
         let random_mover_black = false;
-        let advanced_pgn_mode = false;
+        let advanced_pgn_mode = true;
         let white_start_time = 0;
         let black_start_time = 0;
         let white_remaining_time = 0;
@@ -4273,6 +4297,7 @@
         let active_tab = "moves";
         let settings_open = false;
         let newgame_open = false;
+        let engine_debug = false;
 
         const ICONS = {
           first: "M19 20 9 12l10-8v16zM5 19V5",
@@ -4512,6 +4537,23 @@
           during_play ||
           during_engine_match;
 
+        // Start the engine with the current settings (the former "Go").
+        const startEngineNow = () => {
+          if (stockfish_state != "READY") {
+            return;
+          }
+          if ($("#advtimectrl").checked == true) {
+            $("#advtimectrl").click();
+          }
+          if (board_setup_mode) {
+            return;
+          }
+          document.getElementById("setpos").click();
+          window.setTimeout(() => {
+            go(false, false);
+          }, 10);
+        };
+
         const setAnalysisMode = (on) => {
           if (on == analysis_mode) {
             return;
@@ -4542,9 +4584,8 @@
               }
             });
             window.setTimeout(() => {
-              const gobutton = document.getElementById("go");
-              if (gobutton && !gobutton.disabled && analysis_mode) {
-                gobutton.click();
+              if (analysis_mode) {
+                startEngineNow();
               }
             }, 50);
           } else {
@@ -4984,6 +5025,159 @@
             ]),
           ]);
 
+          const consoleTab = m(
+            "div.enginedebug#tab-console",
+            { hidden: !engine_debug },
+            [
+              m("div#output2", { onupdate: scrollOutput }, [
+                m("pre#fsfoutput", engineoutput),
+                m(
+                  "pre#whiteengineoutput",
+                  { hidden: true },
+                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.\n\n",
+                ),
+                m(
+                  "pre#blackengineoutput",
+                  { hidden: true },
+                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.\n\n",
+                ),
+                m(
+                  "pre#analysisengineoutput",
+                  { hidden: true },
+                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.\n\n",
+                ),
+              ]),
+              m("div#enginecmddiv", [
+                m(
+                  "select#targetengine",
+                  {
+                    title:
+                      "Select the console of the engine. This is the target engine of the command sent, and the engine that sends the message above.",
+                    onchange: () => {
+                      let index = $("#targetengine").selectedIndex;
+                      if (index == 0) {
+                        document.getElementById("fsfoutput").hidden = false;
+                        document.getElementById("whiteengineoutput").hidden =
+                          true;
+                        document.getElementById("blackengineoutput").hidden =
+                          true;
+                        document.getElementById("analysisengineoutput").hidden =
+                          true;
+                      } else if (index == 1) {
+                        document.getElementById("fsfoutput").hidden = true;
+                        document.getElementById("whiteengineoutput").hidden =
+                          false;
+                        document.getElementById("blackengineoutput").hidden =
+                          true;
+                        document.getElementById("analysisengineoutput").hidden =
+                          true;
+                      } else if (index == 2) {
+                        document.getElementById("fsfoutput").hidden = true;
+                        document.getElementById("whiteengineoutput").hidden =
+                          true;
+                        document.getElementById("blackengineoutput").hidden =
+                          false;
+                        document.getElementById("analysisengineoutput").hidden =
+                          true;
+                      } else if (index == 3) {
+                        document.getElementById("fsfoutput").hidden = true;
+                        document.getElementById("whiteengineoutput").hidden =
+                          true;
+                        document.getElementById("blackengineoutput").hidden =
+                          true;
+                        document.getElementById("analysisengineoutput").hidden =
+                          false;
+                      }
+                    },
+                  },
+                  [
+                    m(
+                      "option",
+                      { value: "DEFAULT" },
+                      "In browser Fairy-Stockfish",
+                    ),
+                    m("option", { value: "WHITE" }, "1st binary engine"),
+                    m("option", { value: "BLACK" }, "2nd binary engine"),
+                    m(
+                      "option",
+                      { value: "ANALYSIS" },
+                      "Analysis binary engine",
+                    ),
+                  ],
+                ),
+                m(
+                  "label#label-clearlogonstartthinking.toggle",
+                  {
+                    title:
+                      "When checked, automatically clear the console of the binary engine when it starts thinking.",
+                  },
+                  [
+                    m("input[type=checkbox]#clearlogonstartthinking", {
+                      disabled: !is_ready,
+                      checked: clear_log,
+                      onclick: () => {
+                        clear_log = !clear_log;
+                      },
+                    }),
+                    m("span", "Clear log when thinking starts"),
+                  ],
+                ),
+                m(
+                  "button.sm",
+                  {
+                    type: "button",
+                    title: "Click to clear the consoles of the binary engines.",
+                    onclick: () => {
+                      first_engine_output = "";
+                      second_engine_output = "";
+                      analysis_engine_output = "";
+                      document.getElementById("whiteengineoutput").textContent =
+                        "";
+                      document.getElementById("blackengineoutput").textContent =
+                        "";
+                      document.getElementById(
+                        "analysisengineoutput",
+                      ).textContent = "";
+                      scrollOutput();
+                    },
+                  },
+                  [icon("trash", 14), "Clear logs"],
+                ),
+                m("input[type=text]#enginecmd", {
+                  placeholder: "Send command to engine...",
+                  title: "The command to send to the engine.",
+                  maxlength: 9999,
+                  disabled: !is_ready || during_play,
+                  onkeyup: (e) => {
+                    if (e.keyCode != 13) {
+                      e.redraw = false;
+                      return;
+                    }
+                    if (during_play) {
+                      return;
+                    }
+                    sendCommandToEngine();
+                  },
+                }),
+                m(
+                  "button#sendenginecmd.primary",
+                  {
+                    type: "button",
+                    disabled: during_play,
+                    title: "Click to send the command.",
+                    onclick: () => {
+                      if (during_play) {
+                        return;
+                      }
+                      sendCommandToEngine();
+                    },
+                  },
+                  [icon("send", 16), "Send"],
+                ),
+              ]),
+            ],
+          );
+
           // ---------------- moves tab ----------------
           const movesTab = m(
             "div.tabpanel#tab-moves",
@@ -5039,11 +5233,29 @@
                   },
                   [icon("book", 14), "PGN/EPD library"],
                 ),
+                m("span", { style: "flex: 1;" }),
+                m(
+                  "label.toggle",
+                  {
+                    title:
+                      "Show the engine console (raw UCI communication) below the move list.",
+                  },
+                  [
+                    m("input[type=checkbox]#enginedebug", {
+                      checked: engine_debug,
+                      onclick: (e) => {
+                        engine_debug = e.target.checked;
+                      },
+                    }),
+                    m("span", "Engine debug"),
+                  ],
+                ),
               ]),
               m("p#positioninfo", ""),
               m("p#checkcounts"),
               m("p#label-pgn"),
               m("p#currentboardfen"),
+              consoleTab,
               m(
                 "div#pgn-operation-container.pgntools",
                 { hidden: !advanced_pgn_mode },
@@ -5288,16 +5500,7 @@
                           ? "Set a depth, time or node limit first, otherwise the engine would think forever."
                           : "Let the engine think and move now with the limits above (used when the engine plays a side).",
                       onclick: () => {
-                        if ($("#advtimectrl").checked == true) {
-                          $("#advtimectrl").click();
-                        }
-                        if (board_setup_mode) {
-                          return;
-                        }
-                        document.getElementById("setpos").click();
-                        setTimeout(() => {
-                          go(false, false);
-                        }, 10);
+                        startEngineNow();
                       },
                     },
                     [icon("play", 14), "Engine: move now"],
@@ -6674,170 +6877,15 @@
           );
 
           // ---------------- console tab ----------------
-          const consoleTab = m(
-            "div.tabpanel#tab-console",
-            { class: active_tab == "console" ? "on" : "" },
-            [
-              m("div#output2", { onupdate: scrollOutput }, [
-                m("pre#fsfoutput", engineoutput),
-                m(
-                  "pre#whiteengineoutput",
-                  { hidden: true },
-                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.\n\n",
-                ),
-                m(
-                  "pre#blackengineoutput",
-                  { hidden: true },
-                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.\n\n",
-                ),
-                m(
-                  "pre#analysisengineoutput",
-                  { hidden: true },
-                  "This is the console where you can see the message communication.\nLines start with ▶▶ are the messages sent to the engine.\nLines start with ◀◀ are the messages received from the engine.\n\n",
-                ),
-              ]),
-              m("div#enginecmddiv", [
-                m(
-                  "select#targetengine",
-                  {
-                    title:
-                      "Select the console of the engine. This is the target engine of the command sent, and the engine that sends the message above.",
-                    onchange: () => {
-                      let index = $("#targetengine").selectedIndex;
-                      if (index == 0) {
-                        document.getElementById("fsfoutput").hidden = false;
-                        document.getElementById("whiteengineoutput").hidden =
-                          true;
-                        document.getElementById("blackengineoutput").hidden =
-                          true;
-                        document.getElementById("analysisengineoutput").hidden =
-                          true;
-                      } else if (index == 1) {
-                        document.getElementById("fsfoutput").hidden = true;
-                        document.getElementById("whiteengineoutput").hidden =
-                          false;
-                        document.getElementById("blackengineoutput").hidden =
-                          true;
-                        document.getElementById("analysisengineoutput").hidden =
-                          true;
-                      } else if (index == 2) {
-                        document.getElementById("fsfoutput").hidden = true;
-                        document.getElementById("whiteengineoutput").hidden =
-                          true;
-                        document.getElementById("blackengineoutput").hidden =
-                          false;
-                        document.getElementById("analysisengineoutput").hidden =
-                          true;
-                      } else if (index == 3) {
-                        document.getElementById("fsfoutput").hidden = true;
-                        document.getElementById("whiteengineoutput").hidden =
-                          true;
-                        document.getElementById("blackengineoutput").hidden =
-                          true;
-                        document.getElementById("analysisengineoutput").hidden =
-                          false;
-                      }
-                    },
-                  },
-                  [
-                    m(
-                      "option",
-                      { value: "DEFAULT" },
-                      "In browser Fairy-Stockfish",
-                    ),
-                    m("option", { value: "WHITE" }, "1st binary engine"),
-                    m("option", { value: "BLACK" }, "2nd binary engine"),
-                    m(
-                      "option",
-                      { value: "ANALYSIS" },
-                      "Analysis binary engine",
-                    ),
-                  ],
-                ),
-                m(
-                  "label#label-clearlogonstartthinking.toggle",
-                  {
-                    title:
-                      "When checked, automatically clear the console of the binary engine when it starts thinking.",
-                  },
-                  [
-                    m("input[type=checkbox]#clearlogonstartthinking", {
-                      disabled: !is_ready,
-                      checked: clear_log,
-                      onclick: () => {
-                        clear_log = !clear_log;
-                      },
-                    }),
-                    m("span", "Clear log when thinking starts"),
-                  ],
-                ),
-                m(
-                  "button.sm",
-                  {
-                    type: "button",
-                    title: "Click to clear the consoles of the binary engines.",
-                    onclick: () => {
-                      first_engine_output = "";
-                      second_engine_output = "";
-                      analysis_engine_output = "";
-                      document.getElementById("whiteengineoutput").textContent =
-                        "";
-                      document.getElementById("blackengineoutput").textContent =
-                        "";
-                      document.getElementById(
-                        "analysisengineoutput",
-                      ).textContent = "";
-                      scrollOutput();
-                    },
-                  },
-                  [icon("trash", 14), "Clear logs"],
-                ),
-                m("input[type=text]#enginecmd", {
-                  placeholder: "Send command to engine...",
-                  title: "The command to send to the engine.",
-                  maxlength: 9999,
-                  disabled: !is_ready || during_play,
-                  onkeyup: (e) => {
-                    if (e.keyCode != 13) {
-                      e.redraw = false;
-                      return;
-                    }
-                    if (during_play) {
-                      return;
-                    }
-                    sendCommandToEngine();
-                  },
-                }),
-                m(
-                  "button#sendenginecmd.primary",
-                  {
-                    type: "button",
-                    disabled: during_play,
-                    title: "Click to send the command.",
-                    onclick: () => {
-                      if (during_play) {
-                        return;
-                      }
-                      sendCommandToEngine();
-                    },
-                  },
-                  [icon("send", 16), "Send"],
-                ),
-              ]),
-            ],
-          );
-
           const panel = m("section.panel.card#info", [
             m("div.tabs#outputs", [
               tabButton("moves", "Moves", "list"),
               tabButton("engine", "Engine", "cpu"),
               tabButton("setup", "Setup", "sliders"),
-              tabButton("console", "Console", "terminal"),
             ]),
             movesTab,
             engineTab,
             setupTab,
-            consoleTab,
           ]);
 
           // ---------------- new game dialog (time control) ----------------

@@ -1622,10 +1622,16 @@ spangameresultmini {
   grid-column: 1 / -1;
 }
 
-/* console tab */
+/* engine console (Moves tab, behind the debug switch) */
+
+.enginedebug {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
 #output2 {
-  height: 360px;
+  height: 260px;
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px 12px;
