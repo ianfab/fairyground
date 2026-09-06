@@ -4449,6 +4449,7 @@
         let settings_open = false;
         let newgame_open = false;
         let engine_debug = false;
+        let move_input = "either"; // "either" | "click" | "drag"
         let app_mode = "analysis"; // "play" | "analysis"
         let player_white_engine = false;
         let player_black_engine = false;
@@ -7370,19 +7371,52 @@
                 ),
               ]),
               m("div#gamesettings", [
-                m(
-                  "label.toggle",
-                  {
-                    title:
-                      "When checked, you can also make a move by clicking the piece and then clicking the target square.",
-                  },
-                  [
-                    m("input[type=checkbox]#clickclickmove", {
+                m("div.field", [
+                  m("span.label", "Move input"),
+                  m(
+                    "select#moveinput",
+                    {
                       disabled: review_mode,
-                    }),
-                    m("span", "Click-click move"),
-                  ],
-                ),
+                      title:
+                        "How pieces are moved: by dragging, by clicking the piece and then the target square, or either.",
+                      onchange: (e) => {
+                        move_input = e.target.value;
+                        const clickbox =
+                          document.getElementById("clickclickmove");
+                        const dragbox = document.getElementById("dragmove");
+                        clickbox.checked = move_input != "drag";
+                        dragbox.checked = move_input != "click";
+                        clickbox.dispatchEvent(new Event("change"));
+                        dragbox.dispatchEvent(new Event("change"));
+                      },
+                    },
+                    [
+                      m(
+                        "option",
+                        { value: "either", selected: move_input == "either" },
+                        "Either",
+                      ),
+                      m(
+                        "option",
+                        { value: "click", selected: move_input == "click" },
+                        "Click two squares",
+                      ),
+                      m(
+                        "option",
+                        { value: "drag", selected: move_input == "drag" },
+                        "Drag",
+                      ),
+                    ],
+                  ),
+                  m("input[type=checkbox]#clickclickmove", {
+                    hidden: true,
+                    checked: move_input != "drag",
+                  }),
+                  m("input[type=checkbox]#dragmove", {
+                    hidden: true,
+                    checked: move_input != "click",
+                  }),
+                ]),
                 m("div.row", [
                   m("label#label-showmovediv.toggle", [
                     m("input[type=checkbox]#showmovediv", {

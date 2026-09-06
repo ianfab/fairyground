@@ -185,6 +185,7 @@ const dropdownPositionVariantName = document.getElementById(
 const buttonAboutPosition = document.getElementById("aboutposition");
 const positionInformation = document.getElementById("positioninfo");
 const clickClickMove = document.getElementById("clickclickmove");
+const dragMove = document.getElementById("dragmove");
 const positionVariantTxt = document.getElementById("posvariant-txt");
 const quickPromotionPiece = document.getElementById("dropdown-quickpromotion");
 const buttonPassMove = document.getElementById("passmove");
@@ -1875,6 +1876,7 @@ function initBoard(variant) {
       },
     },
     draggable: {
+      enabled: dragMove.checked || isBoardSetup.checked,
       showGhost: true,
     },
     selectable: {
@@ -2071,6 +2073,7 @@ function redrawChessground(customFEN) {
       },
     },
     draggable: {
+      enabled: dragMove.checked || isBoardSetup.checked,
       showGhost: true,
     },
     selectable: {
@@ -4465,6 +4468,7 @@ new Module().then((loadedModule) => {
           dests: EmptyMap,
         },
         draggable: {
+          enabled: true,
           deleteOnDropOff: true,
         },
       });
@@ -4548,6 +4552,7 @@ new Module().then((loadedModule) => {
           dests: EmptyMap,
         },
         draggable: {
+          enabled: true,
           deleteOnDropOff: true,
         },
       });
@@ -4619,6 +4624,14 @@ new Module().then((loadedModule) => {
   };
 
   positionVariantTxt.onchange = onSelectPositionVariantsFile;
+
+  dragMove.onchange = function () {
+    chessground.set({
+      draggable: {
+        enabled: dragMove.checked || isBoardSetup.checked,
+      },
+    });
+  };
 
   clickClickMove.onchange = function () {
     if (clickClickMove.checked == true) {
@@ -6346,6 +6359,7 @@ function disableBoardMove() {
       color: undefined,
     },
     draggable: {
+      enabled: dragMove.checked,
       deleteOnDropOff: false,
     },
   });
@@ -6358,6 +6372,7 @@ function enableBoardMove() {
       dests: getDests(board),
     },
     draggable: {
+      enabled: dragMove.checked || isBoardSetup.checked,
       deleteOnDropOff: isBoardSetup.checked,
     },
   });
