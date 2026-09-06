@@ -51,3 +51,9 @@ The following table shows the current build process on file placement and file s
 2. When using debug builds like `npm run debug-build` on Linux/macOS or `npm run debug-buildwithcmd` on Windows, compression and mangling are both disabled for all files.
 
 3. Using debug builds is faster in building process and do not mess up variable names which makes it better to develop. Using normal builds like `npm run build` on Linux/macOS or `npm run buildwithcmd` on Windows take longer time to build but the file size are much smaller which can reduce network flow.
+
+### Workspace layout
+
+`src/js/WorkspaceFeature.js` arranges the existing Mithril controls into the shared play and analysis workspace before mounting. It preserves control IDs, handlers and visibility states. Like the other feature scripts, the build copies it into `public/lib`.
+
+`public/assets/workspace.css` styles the responsive workspace and imports `legacy-controls.css` in a lower-priority cascade layer. The latter contains the original control and dialog styles. Keep the layer import in the external stylesheet: the current HTML minifier does not support inline cascade layers. UI theme styles remain outside this layer.

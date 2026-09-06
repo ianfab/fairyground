@@ -1,0 +1,2474 @@
+:root {
+  --console-font:
+    ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
+    monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+}
+
+@font-face {
+  font-family: "FontAwesome";
+  src:
+    url("./fonts/FontAwesome.woff2") format("woff2"),
+    url("./fonts/FontAwesome.woff") format("woff"),
+    url("./fonts/FontAwesome.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  transition-property: background-color, color;
+  transition-duration: 0.5s, 0.2s;
+  transition-timing-function: linear, linear;
+  transition-delay: 0s;
+}
+
+html {
+  background: white;
+  color: black;
+}
+
+#root {
+  font-size: 16px;
+}
+
+main {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+div {
+  transition-property: background-color, color;
+  transition-duration: 0.5s, 0.2s;
+  transition-timing-function: linear, linear;
+  transition-delay: 0s;
+}
+
+/* div.ripple-wrapper {
+    background: #0000;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.5;
+    transition: opacity 1s ease;
+  }
+
+  div.ripple-wrapper.ripple-fade-out {
+    opacity: 0;
+  } */
+
+div.ripple-wrapper {
+  display: none;
+}
+
+button:before {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 25px;
+  height: 25px;
+  background-color: #0078d7;
+  color: white;
+  font-family: FontAwesome;
+  font-size: 14px;
+  border: 2px solid #000;
+}
+
+/* span.ripple-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: #fff;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    opacity: 1;
+    transition: width 1s ease, height 1s ease;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+  } */
+
+.backgroundimg {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.pagebackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: none;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: top left;
+  overflow: hidden;
+  z-index: -100;
+}
+
+.pagebackgroundcanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: none;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: top left;
+  overflow: hidden;
+  z-index: -50;
+}
+
+.background-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.timer-active {
+  box-shadow: 0px 0px 5px 5px #f00;
+}
+
+.time-exceeded {
+  color: red;
+}
+
+.time-exceeded:before {
+  content: "\f017";
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 35px;
+  height: 35px;
+  background-color: crimson;
+  color: white;
+  font-family: FontAwesome;
+  font-size: 20px;
+  border: 4px solid #000;
+  transform: translate(-20%, -20%);
+}
+
+.position-display-label {
+  cursor: pointer;
+}
+
+.position-display-label:hover {
+  background-color: black;
+  color: white;
+}
+
+.splitter.mainline {
+  width: 100%;
+}
+
+.inaccessable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.delete-piece:before {
+  content: "\f1f8";
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  background-color: crimson;
+  color: white;
+  font-family: FontAwesome;
+  font-size: 60px;
+  border: 10px solid #000;
+}
+
+.move-piece:before {
+  content: "\f047";
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  background-color: grey;
+  color: white;
+  font-family: FontAwesome;
+  font-size: 60px;
+  border: 10px solid #000;
+}
+
+.ripple {
+  position: relative;
+}
+
+input[type="checkbox"] {
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+  border: 2px solid #ddd;
+  overflow: hidden;
+  vertical-align: middle;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  font: normal normal normal 14px/1 FontAwesome;
+  outline: 0;
+  background: 0 0;
+  background-color: white;
+  margin-left: 5px;
+}
+
+input[type="checkbox"]:hover {
+  color: #000;
+  background-color: #ddd;
+}
+
+input[type="checkbox"]:checked {
+  color: #fff;
+  background-color: #000;
+}
+
+input[type="checkbox"]:hover:checked {
+  color: #fff;
+  background-color: #777;
+}
+
+input[type="checkbox"]:checked:after {
+  content: "\f00c";
+  font-size: 15px;
+  text-align: center;
+  line-height: 17px;
+}
+
+input[type="checkbox"]:disabled {
+  color: #000;
+  background-color: rgba(176, 176, 176, 0.2);
+}
+
+input[type="checkbox"]:disabled:hover {
+  color: #000;
+  background-color: rgba(176, 176, 176, 0.2);
+}
+
+input[type="date"] {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+textarea {
+  background-color: #0000;
+  border: 1px solid #ddd;
+  padding: 3px;
+}
+
+#tempbackground1,
+#tempbackground2 {
+  transition: opacity 1s ease-in-out 0s;
+  background-color: #0000;
+  opacity: 0;
+}
+
+#tempbackground1.show,
+#tempbackground2.show {
+  opacity: 1;
+}
+
+#pagetitle {
+  font-size: 40px;
+  font-family: "Times New Roman", Times, serif, Arial;
+  margin-bottom: 10px;
+  font-style: oblique;
+  font-weight: bold;
+}
+
+#input {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+  margin-bottom: 10px;
+}
+
+#input2 {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+  margin-bottom: 10px;
+}
+
+#input3 {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+  margin-bottom: 10px;
+}
+
+#visualeffects {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 5px;
+  margin-bottom: 10px;
+}
+
+#visualeffects select {
+  min-width: 120px;
+  height: 25px;
+  background: #eee;
+}
+
+#gamesettings {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+  margin-bottom: 10px;
+}
+
+#gamesettings button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-left: 6px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+#gamesettings button:hover {
+  background: #aaa;
+}
+
+#gamesettings button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#gamesettings button:active {
+  background: #000;
+}
+
+#input #fen {
+  width: 50%;
+  min-width: 450px;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+}
+
+#input #move {
+  width: 10%;
+  min-width: 100px;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+}
+
+#input2 #movetime {
+  width: 5%;
+  min-width: 75px;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-right: 0;
+}
+
+#input2 #movetime:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#input2 #depth {
+  width: 5%;
+  min-width: 75px;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-right: 0;
+}
+
+#input2 #depth:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#input2 #nodes {
+  width: 5%;
+  min-width: 75px;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-right: 0;
+}
+
+#input2 #nodes:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#input2 #threads {
+  width: 5%;
+  min-width: 75px;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-right: 0;
+}
+
+#input2 #threads:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#input2 #hash {
+  width: 5%;
+  min-width: 75px;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-right: 0;
+}
+
+#input2 #hash:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#input2 #multipv {
+  width: 5%;
+  min-width: 75px;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-right: 0;
+}
+
+#input2 #multipv:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#input button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+#input button:hover {
+  background: #aaa;
+}
+
+#input button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#input button:active {
+  background: #000;
+}
+
+#input2 button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+#input2 button:hover {
+  background: #aaa;
+}
+
+#input2 button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#input2 button:active {
+  background: #000;
+}
+
+#movecontrol button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 6px;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+#movecontrol button:hover {
+  background: #aaa;
+}
+
+#movecontrol button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#movecontrol button:active {
+  background: #000;
+}
+
+#movecontrol #gotomovenum {
+  width: 200px;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+}
+
+#movecontrol #gotomovenum:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#controls button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 5px;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+#controls button:hover {
+  background: #aaa;
+}
+
+#controls button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#controls button:active {
+  background: #000;
+}
+
+#boardcoordinate {
+  width: 300px;
+  background: #eee;
+  margin-left: 10px;
+  margin-top: 5px;
+}
+
+#gamesettings #dropdown-quickpromotion {
+  width: 120px;
+  background: #eee;
+  margin-left: 10px;
+}
+
+#dropdown-boardtheme {
+  min-width: 100px;
+  background: #eee;
+  margin-right: 5px;
+}
+
+#dropdown-piecetheme {
+  min-width: 100px;
+  background: #eee;
+  margin-right: 5px;
+}
+
+#dropdown-uitheme {
+  min-width: 100px;
+  background: #eee;
+  margin-right: 5px;
+}
+
+#misc {
+  margin-bottom: 10px;
+}
+
+#misc button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-left: 6px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+#misc button:hover {
+  background: #aaa;
+}
+
+#misc button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#misc button:active {
+  background: #000;
+}
+
+#outputs {
+  display: flex;
+  flex: 1 1 auto;
+  margin-top: 10px;
+  width: 100%;
+  height: fit-content;
+}
+
+#outputs.vertical {
+  position: static;
+  flex-direction: column;
+  flex-flow: column;
+}
+
+#movecontrol {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+#binengineinput {
+  margin-bottom: 10px;
+}
+
+#binengineinput button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 5px;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+#binengineinput button:hover {
+  background: #aaa;
+}
+
+#binengineinput button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#binengineinput button:active {
+  background: #000;
+}
+
+#binengineinput input {
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+}
+
+#binengineinput input:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#binengineinput #whiteenginesettings {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+}
+
+#binengineinput #blackenginesettings {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+}
+
+#binengineinput #analysisenginesettings {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+}
+
+#posvariantdiv {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+  margin-bottom: 10px;
+}
+
+#posvariantdiv #dropdown-variant {
+  width: 150px;
+  min-height: 25px;
+  background: #eee;
+  margin-left: 5px;
+}
+
+#posvariantdiv #dropdown-varianttype {
+  width: 150px;
+  min-height: 25px;
+  background: #eee;
+  margin-left: 5px;
+}
+
+#posvariantdiv #dropdown-posvarianttype {
+  min-width: 120px;
+  max-width: 150px;
+  min-height: 25px;
+  background: #eee;
+  margin-left: 5px;
+}
+
+#posvariantdiv #dropdown-posvariantname {
+  min-width: 120px;
+  max-width: 150px;
+  min-height: 25px;
+  background: #eee;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+#posvariantdiv button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+#posvariantdiv button:hover {
+  background: #aaa;
+}
+
+#posvariantdiv button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#posvariantdiv button:active {
+  background: #000;
+}
+
+#controls {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+#info {
+  padding: 10px;
+  margin-left: 10px;
+  font-size: 16px;
+  height: fit-content;
+}
+
+#info #sannotation {
+  background: #eee;
+  margin-bottom: 5px;
+  height: 25px;
+}
+
+#info #timecontrolduringplay {
+  padding: 10px;
+  margin-left: 20px;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+#info #timecontrolduringplay button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 6px;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+#info #timecontrolduringplay button:hover {
+  background: #aaa;
+}
+
+#info #timecontrolduringplay button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#info #timecontrolduringplay button:active {
+  background: #000;
+}
+
+#currentboardfen {
+  height: 60px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+  box-shadow: inset 1px 1px 2px #eee;
+  font-size: 16px;
+}
+
+#label-pgn {
+  height: 120px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+  box-shadow: inset 1px 1px 2px #eee;
+  font-size: 16px;
+}
+
+#label-pgn.larger {
+  height: 360px;
+}
+
+#pgndiv {
+  display: flex;
+  flex-direction: row;
+  flex-flow: row;
+  gap: 10px 10px;
+  flex-wrap: wrap;
+}
+
+#pgndiv .text-after,
+#pgndiv .text-before {
+  font-style: italic;
+  white-space: pre-wrap;
+}
+
+#pgndiv .needs-attention-sign {
+  background-color: #fef6d5;
+  color: #e96725;
+  cursor: default;
+}
+
+#pgndiv .position-display-label.current-move {
+  text-decoration: underline;
+  background-color: #000;
+  color: #fff;
+}
+
+#pgndiv .position-display-label.current-move:hover {
+  text-decoration: none;
+}
+
+#pgndiv .position-display-label {
+  font-weight: bold;
+}
+
+#pgndiv .result {
+  color: #fff;
+  background-color: #f00;
+  font-weight: bold;
+}
+
+#pgndiv .hide-subsequent-moves-sign {
+  color: #6495ed;
+  background-color: #e0eeff;
+  cursor: pointer;
+}
+
+#pgndiv .marked-result {
+  color: #dc362e;
+  background-color: #fcebeb;
+  cursor: default;
+}
+
+#pgn-operations {
+  display: flex;
+  flex-direction: row;
+  flex-flow: row;
+  flex-wrap: wrap;
+  gap: 0px 10px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+#pgn-operations button {
+  height: 25px;
+  width: 25px;
+  background-color: #0000;
+  color: #0000;
+}
+
+#pgn-operations button:before {
+  height: 25px;
+  width: 25px;
+  font-size: 18px;
+  border: none;
+  background-color: #0000;
+  color: #000;
+  cursor: pointer;
+}
+
+#pgn-operations button:after {
+  position: relative;
+  top: -25px;
+  left: 0;
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: right;
+  align-items: flex-end;
+  height: 25px;
+  width: 25px;
+  font-size: 14px;
+  border: none;
+  background-color: #0000;
+  font-family: FontAwesome;
+  border: none;
+  padding: 1px;
+  z-index: 1;
+  cursor: pointer;
+}
+
+#pgn-operations button:hover:before {
+  background-color: #000;
+  color: #fff;
+}
+
+#pgn-operations button:disabled:before {
+  background-color: #0000;
+  color: #888;
+}
+
+#pgn-operations button:active:before {
+  background-color: #000;
+  color: #888;
+}
+
+#output2 {
+  height: 420px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+  box-shadow: inset 1px 1px 2px #eee;
+  font-size: 16px;
+}
+
+#pocket-top {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+#pocket-top.no-inital-pocket-piece {
+  display: none;
+}
+
+#pocket-top.no-inital-pocket-piece.has-hidden-pocket-piece {
+  display: flex;
+}
+
+#pocket-top-mini {
+  display: flex;
+}
+
+#pocket-bottom {
+  display: flex;
+  margin-top: 20px;
+}
+
+#pocket-bottom.no-inital-pocket-piece {
+  display: none;
+}
+
+#pocket-bottom.no-inital-pocket-piece.has-hidden-pocket-piece {
+  display: flex;
+}
+
+#pocket-bottom-mini {
+  display: flex;
+}
+
+#links a {
+  margin: 20px;
+  font-size: 20px;
+  text-decoration: none;
+}
+
+#linkdivhr {
+  border: 1px solid #aaa;
+  margin-bottom: 5px;
+}
+
+#info #timers {
+  width: 620px;
+  height: 145px;
+  border: 2px solid #eee;
+  background-color: rgba(118, 118, 118, 0.3);
+  overflow: hidden;
+  margin-bottom: 5px;
+  padding: 10px 10px 10px 10px;
+}
+
+#info #timers.vertical {
+  width: 314px;
+  height: 284px;
+}
+
+#info #timers #whitetimer {
+  float: left;
+  width: 290px;
+  height: 120px;
+  border: 2px solid #000;
+  color: black;
+  background-color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+#info #timers.vertical #whitetimer {
+  float: none;
+}
+
+#info #timers #blacktimer {
+  float: right;
+  width: 290px;
+  height: 120px;
+  border: 2px solid #fff;
+  color: white;
+  background-color: black;
+  text-align: center;
+  overflow: hidden;
+}
+
+#info #timers.vertical #blacktimer {
+  float: none;
+  margin-top: 20px;
+}
+
+#info #checkcounts {
+  margin-bottom: 5px;
+}
+
+#info #enginecmddiv {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+  margin-bottom: 10px;
+}
+
+#info #enginecmddiv #enginecmd {
+  width: 500px;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+}
+
+#info #enginecmddiv button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+#info #enginecmddiv button:hover {
+  background: #aaa;
+}
+
+#info #enginecmddiv button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#info #enginecmddiv button:active {
+  background: #000;
+}
+
+#info #enginecmddiv #targetengine {
+  width: 150px;
+  background: #eee;
+}
+
+#blacktime {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-size: 50px;
+  font-weight: bold;
+  font-family: "Times New Roman", Georgia, Serif, Arial;
+}
+
+#whitetime {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-size: 50px;
+  font-weight: bold;
+  font-family: "Times New Roman", Georgia, Serif, Arial;
+}
+
+#boardsetupsettings {
+  margin-bottom: 10px;
+}
+
+#boardsetupsettings #boardpiecechange {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+#boardsetupsettings #boardpiecechange #dropdown-setpiece {
+  width: 120px;
+  background: #eee;
+}
+
+#boardsetupsettings #boardpiecechange button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+#boardsetupsettings #boardpiecechange button:hover {
+  background: #aaa;
+}
+
+#boardsetupsettings #boardpiecechange button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#boardsetupsettings #boardpiecechange button:active {
+  background: #000;
+}
+
+#boardsetupsettings2 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+#boardsetupsettings2 #dropdown-sidetomove {
+  width: 120px;
+  background: #eee;
+}
+
+#boardsetupsettings2 #halfmoveclock {
+  width: 25%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-right: 0;
+}
+
+#boardsetupsettings2 #halfmoveclock:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#boardsetupsettings2 #whiteremainingchecks {
+  width: 25%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-right: 0;
+}
+
+#boardsetupsettings2 #whiteremainingchecks:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#boardsetupsettings2 #blackremainingchecks {
+  width: 25%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-right: 0;
+}
+
+#boardsetupsettings2 #blackremainingchecks:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#boardsetupsettings2 #currentmovenum {
+  width: 25%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+}
+
+#boardsetupsettings2 #currentmovenum:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#boardsetupsettings2 #enpassantfile {
+  width: 35%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-right: 0;
+}
+
+#boardsetupsettings2 #enpassantfile:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#boardsetupsettings2 #enpassantrank {
+  width: 35%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+}
+
+#boardsetupsettings2 #enpassantrank:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#boardsetupsettings2 #seirwangatingfiles {
+  width: 60%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+}
+
+#enginematch {
+  margin-bottom: 10px;
+}
+
+#enginematch button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+#enginematch button:hover {
+  background: #aaa;
+}
+
+#enginematch button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#enginematch button:active {
+  background: #000;
+}
+
+#enginematch #enginematchgamecount {
+  min-width: 150px;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+}
+
+#enginematch #enginematchgamecount:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#enginematch #enginematchsettings {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 5px;
+  margin-bottom: 5px;
+}
+
+#enginematch #enginematchinfo {
+  font-weight: bold;
+}
+
+#advancedtimesettings {
+  margin-bottom: 10px;
+}
+
+#advancedtimesettings #whitetimesettings {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+  margin-bottom: 10px;
+}
+
+#advancedtimesettings #whitetimesettings #dropdown-whitetimemode {
+  margin-left: 10px;
+  width: 120px;
+  background: #eee;
+}
+
+#advancedtimesettings #whitetimesettings #whitestarttime {
+  width: 15%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+}
+
+#advancedtimesettings #whitetimesettings #whitestarttime:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#advancedtimesettings #whitetimesettings #whitetimegain {
+  width: 15%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-left: 0;
+}
+
+#advancedtimesettings #whitetimesettings #whitetimegain:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#advancedtimesettings #whitetimesettings #whitebyoyomitime {
+  width: 15%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-left: 0;
+}
+
+#advancedtimesettings #whitetimesettings #whitebyoyomitime:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#advancedtimesettings #whitetimesettings #whitebyoyomiperiodcount {
+  width: 15%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-left: 0;
+}
+
+#advancedtimesettings #whitetimesettings #whitebyoyomiperiodcount:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#advancedtimesettings #whitetimesettings #whitetimemargin {
+  width: 15%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-left: 0;
+}
+
+#advancedtimesettings #whitetimesettings #whitetimemargin:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#advancedtimesettings #blacktimesettings {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+  margin-bottom: 10px;
+}
+
+#advancedtimesettings #blacktimesettings #dropdown-blacktimemode {
+  margin-left: 10px;
+  width: 120px;
+  background: #eee;
+}
+
+#advancedtimesettings #blacktimesettings #blackstarttime {
+  width: 15%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+}
+
+#advancedtimesettings #blacktimesettings #blackstarttime:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#advancedtimesettings #blacktimesettings #blacktimegain {
+  width: 15%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-left: 0;
+}
+
+#advancedtimesettings #blacktimesettings #blacktimegain:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#advancedtimesettings #blacktimesettings #blackbyoyomitime {
+  width: 15%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-left: 0;
+}
+
+#advancedtimesettings #blacktimesettings #blackbyoyomitime:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#advancedtimesettings #blacktimesettings #blackbyoyomiperiodcount {
+  width: 15%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-left: 0;
+}
+
+#advancedtimesettings #blacktimesettings #blackbyoyomiperiodcount:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#advancedtimesettings #blacktimesettings #blacktimemargin {
+  width: 15%;
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  border-left: 0;
+}
+
+#advancedtimesettings #blacktimesettings #blacktimemargin:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+#advancedtimesettings #gamecontrol-start {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+  margin-bottom: 10px;
+}
+
+#advancedtimesettings #gamecontrol-start #gamestart {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  font-size: 24px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+#advancedtimesettings #gamecontrol-start #gamestart:hover {
+  background: #aaa;
+}
+
+#advancedtimesettings #gamecontrol-start #gamestart:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#advancedtimesettings #gamecontrol-start #gamestart:active {
+  background: #000;
+}
+
+#evalbar {
+  width: 400px;
+  height: 30px;
+  overflow: hidden;
+  border-radius: 10px;
+  border-color: grey;
+  border-width: 2px;
+  border-style: solid;
+  background-color: black;
+  position: relative;
+}
+
+#evalbar.xiangqi {
+  background-color: black;
+}
+
+#evalbar.shogi {
+  background-color: white;
+}
+
+#evalbar.janggi {
+  background-color: blue;
+}
+
+#evalbar.round {
+  width: 90px;
+  height: 90px;
+  border-radius: 45px;
+}
+
+#evalbar #evalbarprogress {
+  float: left;
+  height: 100%;
+  width: 50%;
+  background-color: white;
+}
+
+#evalbar.xiangqi #evalbarprogress {
+  background-color: red;
+}
+
+#evalbar.shogi #evalbarprogress {
+  background-color: black;
+}
+
+#evalbar.janggi #evalbarprogress {
+  background-color: red;
+}
+
+#evalbar #cp {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  color: orange;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 25px;
+  font-weight: bold;
+  font-family: Arial, "Times New Roman", Georgia, Serif;
+}
+
+#evalbar.shogi #cp {
+  color: orange;
+}
+
+#evalbar.xiangqi #cp {
+  color: white;
+}
+
+#evalbar.janggi #cp {
+  color: white;
+}
+
+#evalbar.round #cp {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#evalinfo {
+  white-space: pre-line;
+}
+
+#pvinfo {
+  white-space: pre-line;
+  border-top: 4px solid black;
+  border-left: 4px solid black;
+  border-right: 4px solid black;
+  border-bottom: 4px solid black;
+  margin-top: 5px;
+}
+
+#pvinfo hr {
+  border: 1px solid black;
+}
+
+.multipv-miniboard-pvline-moves {
+  display: flex;
+  flex-direction: row;
+  flex-flow: row;
+  gap: 10px 10px;
+  flex-wrap: wrap;
+}
+
+evalnum {
+  font-weight: 900;
+  font-family: Arial, "Times New Roman", Georgia, Serif;
+  color: orange;
+}
+
+evalnum:after {
+  content: " \f061 ";
+  font-family: FontAwesome;
+  font-size: 16px;
+  color: black;
+}
+
+#evaluation {
+  margin-bottom: 10px;
+}
+
+spangameresult,
+spangameresultmini {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-size: 1px;
+  transition:
+    font-size 0.5s linear,
+    opacity 0.5s linear;
+  font-weight: bold;
+  font-family: "Times New Roman", Georgia, Serif, Arial;
+  white-space: nowrap;
+}
+
+#moveselectiondialog {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 700px;
+  padding: 10px;
+  background-color: #000000;
+  color: #ffffff;
+  border: 2px solid #ddd;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+  z-index: 999;
+}
+
+#moveselectiondialog input[type="checkbox"] {
+  border: 2px solid #ddd;
+}
+
+#moveselectiondialog button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+#moveselectiondialog button:hover {
+  background: #aaa;
+}
+
+#moveselectiondialog button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#moveselectiondialog button:active {
+  background: #000;
+}
+
+#moveselectiondialog #moveslectdiv {
+  display: flex;
+  flex-direction: row;
+}
+
+#moveselectiondialog #movefilters {
+  display: flex;
+  flex-direction: column;
+}
+
+#moveselectiondialog #availablemovelist {
+  width: 150px;
+  background: #eee;
+  margin-right: 5px;
+}
+
+#movesearchfilter {
+  border: 1px solid #ddd;
+  width: 150px;
+}
+
+#separatormoveselectiondialog {
+  border: dashed #ffffff;
+}
+
+#separatorsearchresult {
+  border: double #ffffff;
+}
+
+#fsfoutput {
+  font-family: var(--console-font);
+}
+
+#whiteengineoutput {
+  font-family: var(--console-font);
+}
+
+#whiteunsupportedvariant {
+  color: red;
+  font-weight: bold;
+}
+
+#blackengineoutput {
+  font-family: var(--console-font);
+}
+
+#blackunsupportedvariant {
+  color: red;
+  font-weight: bold;
+}
+
+#analysisengineoutput {
+  font-family: var(--console-font);
+}
+
+#analysisunsupportedvariant {
+  color: red;
+  font-weight: bold;
+}
+
+#enginesettingspopup {
+  display: none;
+  position: fixed;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-color: white;
+  border-radius: 5px;
+  overflow: scroll;
+}
+
+#enginesettingspopup-background {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+#enginesettingspopup div {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+}
+
+#enginesettingspopup button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-left: 6px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+#enginesettingspopup button:hover {
+  background: #aaa;
+}
+
+#enginesettingspopup button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#enginesettingspopup button:active {
+  background: #000;
+}
+
+#enginesettingspopup input[type="text"] {
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+#enginesettingspopup input[type="number"] {
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+#enginesettingspopup select {
+  min-width: 120px;
+  background: #eee;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+#enginemanagementpopup {
+  display: none;
+  position: fixed;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-color: white;
+  border-radius: 5px;
+  overflow: scroll;
+}
+
+#enginemanagementpopup-background {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+#enginemanagementpopup div {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+}
+
+#enginemanagementpopup button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-left: 6px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+#enginemanagementpopup button:hover {
+  background: #aaa;
+}
+
+#enginemanagementpopup button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#enginemanagementpopup button:active {
+  background: #000;
+}
+
+#enginemanagementpopup input[type="text"] {
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+#enginemanagementpopup input[type="number"] {
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+#enginemanagementpopup select {
+  min-width: 120px;
+  background: #eee;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+#enginesetuppopup {
+  display: none;
+  position: fixed;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-color: white;
+  border-radius: 5px;
+  overflow: scroll;
+}
+
+#enginesetuppopup-background {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+#enginesetuppopup div {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+}
+
+#enginesetuppopup button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-left: 6px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+#enginesetuppopup button:hover {
+  background: #aaa;
+}
+
+#enginesetuppopup button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#enginesetuppopup button:active {
+  background: #000;
+}
+
+#enginesetuppopup input[type="text"] {
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  margin-left: 6px;
+  margin-right: 6px;
+  min-width: 300px;
+}
+
+#enginesetuppopup input[type="number"] {
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  margin-left: 6px;
+  margin-right: 6px;
+  min-width: 300px;
+}
+
+#enginesetuppopup select {
+  min-width: 120px;
+  background: #eee;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+#loadsavedgamespopup {
+  display: none;
+  position: fixed;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-color: white;
+  border-radius: 5px;
+  overflow: scroll;
+}
+
+#loadsavedgamespopup-background {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+#loadsavedgamespopup div {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px 0px;
+}
+
+#loadsavedgamespopup button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-left: 6px;
+  margin-right: 6px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  cursor: pointer;
+}
+
+#loadsavedgamespopup button:hover {
+  background: #aaa;
+}
+
+#loadsavedgamespopup button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+#loadsavedgamespopup button:active {
+  background: #000;
+}
+
+#loadsavedgamespopup input[type="text"] {
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+#loadsavedgamespopup input[type="number"] {
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+#loadsavedgamespopup select {
+  min-width: 120px;
+  background: #eee;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+#moveselectiondialog input {
+  border: 1px solid #ddd;
+}
+
+#chessground-mini {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  flex-flow: row;
+  row-gap: 10px;
+  top: -10000px;
+  left: -10000px;
+  z-index: 20;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background: rgba(0, 0, 0, 0);
+}
+
+#chessground-mini-board-wrapper-div {
+  padding: 10px;
+  height: fit-content;
+  width: fit-content;
+  background-color: white;
+  border: 2px solid black;
+  touch-action: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#chessground-mini-board-operation-div {
+  display: flex;
+  flex-direction: column;
+  flex-flow: column;
+}
+
+#chessground-mini-container-div {
+  pointer-events: none;
+}
+
+#chessground-mini-board-operation-div button {
+  background: rgba(0, 0, 0, 0);
+  display: block;
+}
+
+#chessground-mini-board-operation-div button:before {
+  width: 50px;
+  height: 50px;
+  font-size: 28px;
+  border: 4px solid black;
+}
+
+#boardsetuppieceidentifier {
+  position: fixed;
+  display: none;
+  z-index: 19;
+  opacity: 0.7;
+  pointer-events: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#fakewrap {
+  width: 100px;
+  height: 100px;
+}
+
+#fakepiece {
+  width: 100px;
+  height: 100px;
+}
+
+div.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60vw;
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  z-index: 998;
+  overflow-y: auto;
+  border: 2px solid #ddd;
+  padding: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+div.popup.hidden {
+  display: none;
+}
+
+div.popup > div,
+#terminationsettings > div {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+div.popup p.title {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+}
+
+div.popup button,
+#terminationsettings button {
+  display: inline-block;
+  padding: 3px 6px 3px 6px;
+  background: #888;
+  color: #fff;
+  font-weight: bold;
+  margin-left: 6px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+div.popup button:hover,
+#terminationsettings button:hover {
+  background: #aaa;
+}
+
+div.popup button:disabled,
+#terminationsettings button:disabled {
+  background: #ccc;
+  color: #000;
+}
+
+div.popup button:active,
+#terminationsettings button:active {
+  background: #000;
+}
+
+div.popup select,
+#terminationsettings select {
+  min-width: 100px;
+  background: #eee;
+}
+
+div.popup input[type="number"] {
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  width: 100px;
+}
+
+div.popup input[type="number"]:invalid {
+  background: #ff9e9e;
+  border: 3px solid #f00;
+}
+
+div.popup input[type="text"] {
+  padding: 2px 0 2px 6px;
+  border: 1px solid #ddd;
+  width: 250px;
+}
+
+#terminationsettings {
+  position: absolute;
+  padding: 5px;
+  width: max-content;
+  height: max-content;
+  overflow: hidden;
+  top: -10000px;
+  left: -10000px;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  z-index: 10;
+  overflow: hidden;
+  border: 2px solid #ddd;
+  padding: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+#terminationsettings p {
+  text-wrap: nowrap;
+}
+
+#statuscommentarysymbols {
+  display: grid;
+  grid-auto-flow: row;
+  grid-gap: 5px;
+  grid-template-columns: 1fr 1fr;
+  justify-items: stretch;
+  align-items: start;
+}
+
+#pgntextinput {
+  min-height: 60%;
+  min-width: 100%;
+  max-width: 100%;
+}
+
+#themedetectorcontainer {
+  position: absolute;
+  top: -999px;
+  left: -999px;
+  width: 100px;
+  height: 100px;
+  z-index: -1000;
+  display: none;
+}
+
+#setpos:before {
+  content: "\f046";
+}
+
+#reset:before {
+  content: "\f052";
+}
+
+#undo:before {
+  content: "\f053";
+}
+
+#restart:before {
+  content: "\f01e";
+}
+
+#go:before {
+  content: "\f04b";
+}
+
+#stop:before {
+  content: "\f04d";
+}
+
+#passmove:before {
+  content: "\f021";
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)";
+  -webkit-transform: scale(-1, 1);
+  -ms-transform: scale(-1, 1);
+  transform: scale(-1, 1);
+  filter: none;
+}
+
+#placewall:before {
+  content: "\f067";
+}
+
+#initialposition:before {
+  content: "\f049";
+}
+
+#finalposition:before {
+  content: "\f050";
+}
+
+#currentposition:before {
+  content: "\f11e";
+}
+
+#previousposition:before {
+  content: "\f048";
+}
+
+#nextposition:before {
+  content: "\f051";
+}
+
+#specifiedposition:before {
+  content: "\f06e";
+}
+
+#starthere:before {
+  content: "\f044";
+}
+
+#button-flip:before {
+  content: "\f079";
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";
+  -webkit-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+  filter: none;
+}
+
+#lockminiboard:before {
+  background-color: #0078d7;
+  content: "\f13e";
+  cursor: pointer;
+}
+
+.locked #lockminiboard:before {
+  background-color: #ff4500;
+  content: "\f023";
+}
+
+#pinminiboard:before {
+  background-color: #228b22;
+  content: "\f0f6";
+  cursor: pointer;
+}
+
+.pinned #pinminiboard:before {
+  background-color: #663399;
+  content: "\f2d0";
+}
+
+#setpositiontomainboard:before {
+  background-color: #ffd700;
+  content: "\f002";
+  cursor: pointer;
+}
+
+#setpositiontomainboard:disabled:before {
+  color: #000;
+}
+
+#closeminiboard:before {
+  background-color: #dc143c;
+  content: "\f00d";
+  cursor: pointer;
+}
+
+#movetree-clear:before {
+  content: "\f1f8";
+}
+
+#movetree-clearcomments:before {
+  content: "\f0e5";
+}
+
+#movetree-clearcomments:after {
+  content: "\f00d";
+  color: #f00;
+}
+
+#movetree-hideshow:before {
+  content: "\f2a8";
+}
+
+#movetree-removevariations:before {
+  content: "\f0e8";
+}
+
+#movetree-removevariations:after {
+  content: "\f00d";
+  color: #f00;
+}
+
+#movetree-settomainbranch:before {
+  content: "\f176";
+}
+
+#movetree-setasmainline:before {
+  content: "\f02e";
+}
+
+#movetree-setasmainline:after {
+  content: "\f005";
+  color: gold;
+}
+
+#movetree-cutbranch:before {
+  content: "\f097";
+}
+
+#movetree-cropbranch:before {
+  content: "\f124";
+}
+
+#movetree-cut:before {
+  content: "\f0c4";
+}
+
+#movetree-crop:before {
+  content: "\f125";
+}
+
+#movetree-uncomment:before {
+  content: "\f12d";
+}
+
+#movetree-textbefore:before {
+  content: "\f032";
+}
+
+#movetree-textafter:before {
+  content: "\f031";
+}
+
+#movetree-symbol:before {
+  content: "\f292";
+}
+
+#movetree-undo:before {
+  content: "\f112";
+}
+
+#movetree-redo:before {
+  content: "\f064";
+}
+
+#movetree-markers:before {
+  content: "\f041";
+}
+
+#movetree-termination:before {
+  content: "\f24e";
+}
+
+#movetree-headers:before {
+  content: "\f1dc";
+}
+
+#movetree-save:before {
+  content: "\f0c7";
+}
+
+#movetree-imagesave:before {
+  content: "\f03e";
+}
+
+#movetree-resize:before {
+  content: "\f065";
+}
+
+#movetree-resize.larger:before {
+  content: "\f066";
+}

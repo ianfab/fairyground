@@ -101,3 +101,12 @@
 #binengineinput {
   display: none !important;
 }
+
+.analysis-only {
+  display: none !important;
+}
+
+.workspace-field:has(#whitetimemargin),
+.workspace-field:has(#blacktimemargin) {
+  display: none !important;
+}

@@ -1,0 +1,652 @@
+/* Keep legacy controls below the workspace without passing layers through the HTML minifier. */
+@import url("./legacy-controls.css") layer(legacy);
+
+/* Shared play/analysis workspace. UI themes can still supply their own colors. */
+:root {
+  --workspace-accent: #246b56;
+  --workspace-line: #dce3df;
+  --workspace-muted: #64736c;
+}
+html {
+  background: #f3f5f2;
+  color: #24342d;
+}
+#root {
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 14px;
+}
+#root main.workspace {
+  height: auto;
+  min-height: 100%;
+  max-width: 1240px;
+  margin: auto;
+  padding: 24px 32px 40px;
+  gap: 20px;
+}
+#root #pageheader {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.workspace-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 750;
+  font-size: 23px;
+  letter-spacing: -1px;
+  text-decoration: none;
+  color: inherit;
+}
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 42px;
+  background: var(--workspace-accent);
+  color: white;
+  border-radius: 12px;
+  font-size: 30px;
+}
+#root #pagetitle {
+  font: inherit;
+  font-size: 13px;
+  font-style: normal;
+  margin: 0;
+  color: var(--workspace-muted);
+}
+#root #links {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 0 auto;
+  padding: 0;
+}
+#root #links a {
+  font: inherit;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  text-transform: capitalize;
+}
+#root #links a:hover,
+#root #links a[aria-current="page"] {
+  background: #e0eae3;
+  color: #20513f;
+}
+#root #linkdivhr {
+  display: none;
+}
+#root .variant-panel,
+#root .game-panel,
+#root #info,
+#root .board-surface,
+#root .workspace-section {
+  background: #fff;
+  border: 1px solid var(--workspace-line);
+  border-radius: 14px;
+  box-shadow: 0 3px 12px #1c3b2a05;
+}
+#root .variant-panel {
+  padding: 16px 20px;
+}
+#root #posvariantdiv {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+#root #posvariantdiv p {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--workspace-muted);
+}
+#root #outputs,
+#root #outputs.vertical {
+  display: grid;
+  grid-template-columns: minmax(0, 680px) minmax(300px, 1fr);
+  gap: 20px;
+  margin: 0;
+  width: 100%;
+  align-items: start;
+}
+#root .board-surface {
+  padding: 18px;
+  min-width: 0;
+  container-type: inline-size;
+}
+#root .board-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+#root .workspace-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+#root .game-panel,
+#root #info {
+  padding: 18px;
+  margin: 0;
+  min-width: 0;
+}
+#root .workspace h2 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  letter-spacing: -0.2px;
+}
+#root .board-toolbar h2 {
+  margin: 0;
+}
+#root
+  .workspace
+  :is(
+    button,
+    select,
+    input:not([type="checkbox"]):not([type="range"]),
+    textarea
+  ) {
+  border: 1px solid var(--workspace-line);
+  border-radius: 7px;
+  min-height: 36px;
+  font-size: 13px;
+  max-width: 100%;
+  margin: 0;
+}
+#root
+  .workspace
+  :is(input:not([type="checkbox"]):not([type="range"]), select, textarea) {
+  padding: 7px 9px;
+  background: #f8faf8;
+  color: #24342d;
+}
+#root .workspace button {
+  padding: 7px 12px;
+  background: #edf2ee;
+  color: #304c3d;
+  font-weight: 600;
+  cursor: pointer;
+}
+#root .workspace button:hover:not(:disabled) {
+  background: #dde9e0;
+  border-color: #aabeb0;
+}
+#root .workspace :is(button, input, select):disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+#root
+  .workspace
+  :is(button, input, select, textarea, summary, a):focus-visible {
+  outline: 3px solid #3e997a;
+  outline-offset: 3px;
+}
+#root .workspace :is(#gamestart, #go, #setpos) {
+  background: var(--workspace-accent);
+  border-color: var(--workspace-accent);
+  color: white;
+}
+#root .workspace :is(#gamestart, #go, #setpos):hover:not(:disabled) {
+  background: #194e3e;
+}
+#root #gamestart {
+  width: 100%;
+  min-height: 42px;
+}
+#root .workspace button:before {
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+}
+#root .workspace label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 32px;
+  margin: 0;
+}
+#root .workspace input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--workspace-accent);
+  flex-shrink: 0;
+  margin: 0;
+}
+#root
+  :is(
+    #input,
+    #input2,
+    #input3,
+    #gamesettings,
+    #visualeffects,
+    #controls > div,
+    #movecontrol,
+    #gamecontrol-start
+  ) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+}
+#root #input2 {
+  margin-bottom: 12px;
+}
+#root #input {
+  margin-top: 16px;
+  border-top: 1px solid var(--workspace-line);
+  padding-top: 16px;
+}
+#root #input p {
+  width: 100%;
+  font-size: 12px;
+  font-weight: 600;
+}
+#root #fen,
+#root #move {
+  flex: 1 1 100%;
+  width: 100%;
+}
+#root #movecontrol {
+  margin-top: 16px;
+}
+#root #advancedtimesettings {
+  margin: 0;
+}
+#root #advancedtimesettings .workspace-section {
+  box-shadow: none;
+  margin-bottom: 12px;
+}
+#root :is(#whitetimesettings, #blacktimesettings) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+}
+#root :is(#whitetimesettings, #blacktimesettings) p {
+  width: 100%;
+  font-size: 12px;
+  font-weight: 650;
+}
+#root :is(#whitetimesettings, #blacktimesettings) input {
+  width: calc(50% - 4px);
+  min-width: 0;
+}
+#root :is(#whitetimesettings, #blacktimesettings) select {
+  width: 100%;
+}
+#root #gamecontrol-start p {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--workspace-muted);
+}
+#root #timers,
+#root #timers.vertical {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 0;
+}
+#root :is(#whitetimer, #blacktimer) {
+  min-width: 0;
+  width: auto;
+  border-radius: 9px;
+  padding: 10px;
+  margin: 0;
+}
+#root :is(#whitetime, #blacktime) {
+  font:
+    600 28px ui-monospace,
+    monospace;
+  font-variant-numeric: tabular-nums;
+}
+#root
+  :is(
+    #positioninfo,
+    #evalinfo,
+    #pvinfo,
+    #currentboardfen,
+    #label-pgn,
+    #pgn-operations,
+    #enginecmddiv,
+    #output2
+  ) {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+#root #positioninfo {
+  font-size: 13px;
+  line-height: 1.6;
+}
+#root #label-pgn {
+  line-height: 1.8;
+  max-height: 320px;
+  overflow: auto;
+}
+#root #currentboardfen {
+  font: 11px/1.6 var(--console-font);
+  margin-top: 10px;
+  user-select: all;
+}
+#root #output2 {
+  max-height: 220px;
+  min-height: 0;
+}
+#root #info > .workspace-section {
+  box-shadow: none;
+  margin-top: 12px;
+}
+#root .workspace-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+#root .workspace-section summary {
+  cursor: pointer;
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 650;
+  user-select: none;
+}
+#root .workspace-section summary::marker {
+  color: var(--workspace-accent);
+}
+#root .section-content {
+  padding: 0 16px 16px;
+}
+#root .section-content > div + div {
+  margin-top: 12px;
+}
+#root #controls {
+  margin: 0;
+}
+#root #misc {
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 0;
+}
+#root #misc > div {
+  margin-bottom: 12px;
+}
+#root #misc input {
+  display: block;
+  width: 100%;
+}
+#root .workspace-field {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: calc(50% - 8px);
+  margin: 4px;
+}
+#root .workspace-field span {
+  font-size: 12px;
+  color: var(--workspace-muted);
+}
+#root .workspace-field input {
+  width: 100%;
+}
+#root #chessground-container-div {
+  --workspace-edge: min(640px, 100cqw);
+  margin: 0 auto;
+  width: fit-content;
+}
+#root #chessground-container-div .cg-wrap {
+  width: calc(
+    var(--workspace-edge) * var(--workspace-files) / var(--workspace-units)
+  );
+  height: calc(
+    var(--workspace-edge) * var(--workspace-ranks) / var(--workspace-units)
+  );
+}
+/* Pocket wrappers keep their existing content-driven height. */
+#root #chessground-container-div .cg-wrap:is(.pocket-top, .pocket-bottom) {
+  height: auto;
+}
+#root .workspace [hidden] {
+  display: none !important;
+}
+@media (max-width: 1000px) {
+  #root main.workspace {
+    padding: 18px;
+  }
+  #root #outputs,
+  #root #outputs.vertical {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #root .board-surface {
+    width: 100%;
+    max-width: 680px;
+    justify-self: center;
+  }
+  #root .workspace-sidebar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+@media (max-width: 600px) {
+  #root main.workspace {
+    padding: 12px;
+    gap: 12px;
+  }
+  #root #pageheader {
+    gap: 12px;
+  }
+  #root #pagetitle {
+    margin-left: auto;
+    max-width: 140px;
+    text-align: right;
+  }
+  #root #links {
+    width: 100%;
+    margin: 0;
+  }
+  #root #links a {
+    flex: 1;
+    text-align: center;
+    padding: 9px 6px;
+  }
+  #root .variant-panel,
+  #root .board-surface,
+  #root .game-panel,
+  #root #info {
+    padding: 12px;
+  }
+  #root #posvariantdiv select {
+    flex: 1 1 120px;
+    min-width: 0;
+    max-width: 100%;
+  }
+  #root .workspace-sidebar,
+  #root .workspace-options {
+    display: flex;
+    flex-direction: column;
+  }
+  #root .workspace-sidebar > *,
+  #root .workspace-options > * {
+    width: 100%;
+  }
+  #root .workspace :is(button, select) {
+    min-height: 40px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #root *,
+  #root *::before,
+  #root *::after {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
+}
+html:has(.workspace) {
+  background: #f3f5f2;
+  color: #24342d;
+}
+html[data-workspace-theme]:not([data-workspace-theme="defaultui"]):not(
+    [data-workspace-theme="light"]
+  )
+  #root
+  :is(.variant-panel, .game-panel, #info, .board-surface, .workspace-section) {
+  background: transparent;
+  border-color: color-mix(in srgb, currentColor 25%, transparent);
+}
+html[data-workspace-theme]:not([data-workspace-theme="defaultui"]):not(
+    [data-workspace-theme="light"]
+  )
+  #root
+  :is(
+    #pagetitle,
+    .workspace-field span,
+    #gamecontrol-start p,
+    #posvariantdiv p
+  ) {
+  color: inherit;
+}
+
+#root #timers {
+  width: 100%;
+  padding: 0;
+  background: transparent;
+}
+#root .variant-panel:has(#posvariantdiv[hidden]) {
+  display: none;
+}
+#root #gamecontrol-start > details {
+  width: 100%;
+  border: 0;
+  margin: 0;
+}
+#root #gamecontrol-start > details summary {
+  padding: 6px 0;
+  color: var(--workspace-muted);
+  font-weight: 400;
+  font-size: 12px;
+}
+#root #gamecontrol-start > details .section-content {
+  padding: 8px 0 0;
+}
+#root :is(#whitetimesettings, #blacktimesettings) .workspace-field {
+  width: calc(50% - 4px);
+  margin: 0;
+}
+#root :is(#whitetimesettings, #blacktimesettings) .workspace-field input {
+  width: 100%;
+}
+#root #timers {
+  border: 0;
+}
+#root #whitetimer {
+  border: 1px solid var(--workspace-line);
+  background: #f2f5f1;
+  color: #253d30;
+}
+#root #blacktimer {
+  border: 1px solid #253d30;
+  background: #253d30;
+  color: white;
+}
+#root #info #timers :is(#whitetimetype, #blacktimetype) {
+  font-size: 11px;
+  opacity: 0.65;
+}
+#root #posvariantdiv .position-options {
+  margin-left: auto;
+  box-shadow: none;
+  border: 0;
+}
+#root #posvariantdiv .position-options[open] {
+  flex-basis: 100%;
+}
+#root #posvariantdiv .position-options .section-content {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 12px 0 0;
+}
+#root #posvariantdiv .position-options summary {
+  padding: 8px;
+}
+#root .game-panel > .workspace-section {
+  margin-bottom: 12px;
+  box-shadow: none;
+}
+#root #dropdown-variant {
+  min-width: 190px;
+}
+@media (max-width: 600px) {
+  #root #posvariantdiv .position-options {
+    margin-left: 0;
+  }
+}
+#root #links a {
+  margin: 0;
+  min-width: 0;
+}
+#root #input :is(#fen, #move) {
+  min-width: 0;
+}
+#root #timers,
+#root #timers.vertical {
+  height: auto;
+}
+#root :is(#whitetimer, #blacktimer) {
+  height: auto;
+  min-height: 88px;
+  float: none;
+}
+/* Empty pocket visibility must outrank chessground.css's unlayered .pocket rule. */
+#root :is(#pocket-top, #pocket-bottom).no-inital-pocket-piece {
+  display: none;
+}
+#root
+  :is(
+    #pocket-top,
+    #pocket-bottom
+  ).no-inital-pocket-piece.has-hidden-pocket-piece {
+  display: flex;
+}
+#root #label-pgn:empty {
+  display: none;
+}
+#root #evalinfo {
+  font: 12px/1.6 var(--console-font);
+  color: var(--workspace-muted);
+  padding: 12px 0;
+}
+#root #pvinfo {
+  border: 1px solid var(--workspace-line);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+#root #evalbar {
+  border: 1px solid var(--workspace-line);
+  border-radius: 7px;
+}
+/* Keep the whole board in view on short desktop windows. Mobile uses its width. */
+@media (min-width: 1001px) {
+  #root #chessground-container-div {
+    --workspace-edge: min(640px, 100cqw, max(360px, calc(100svh - 300px)));
+  }
+}
