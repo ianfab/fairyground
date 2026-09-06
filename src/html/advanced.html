@@ -48,6 +48,24 @@
     <link rel="stylesheet" href="assets/theme-backgrounds.css" />
     <link rel="stylesheet" href="assets/theme-default.css" />
     <link rel="stylesheet" href="assets/app.css" />
+    <script>
+      // Load the saved (or default dark) UI theme before the first paint so
+      // the page does not flash light before the theme system starts.
+      (function () {
+        var theme = null;
+        try {
+          theme = localStorage.getItem("UserSelectedUITheme");
+        } catch (e) {}
+        if (!theme || !/^[A-Za-z0-9_-]+$/.test(theme)) {
+          theme = "dark";
+        }
+        document.write(
+          '<link id="early-ui-theme" rel="stylesheet" href="assets/theme-ui-' +
+            theme +
+            '.css" />',
+        );
+      })();
+    </script>
     <base target="_blank" />
   </head>
 
@@ -1586,6 +1604,12 @@
           }
           currentuicss = HTMLStyleElementObject;
           document.head.appendChild(currentuicss);
+          // The theme stylesheet loaded early in <head> (to avoid a light
+          // flash before the theme system starts) is no longer needed.
+          const earlytheme = document.getElementById("early-ui-theme");
+          if (earlytheme) {
+            earlytheme.remove();
+          }
           const htmlComputedStyleAfter =
             window.getComputedStyle(pagebackground);
           const BGAfter = htmlComputedStyleAfter.backgroundImage;
