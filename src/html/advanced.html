@@ -6397,6 +6397,17 @@
                       hidden: true,
                       onclick: () => {
                         copyText($("#fen").value);
+                        // main.js triggers this after a successful "Apply" in the board
+                        // editor: leave the editor so the position is used right away.
+                        if (board_setup_mode) {
+                          window.setTimeout(() => {
+                            const editor =
+                              document.getElementById("isboardsetup");
+                            if (editor && editor.checked) {
+                              editor.click();
+                            }
+                          }, 0);
+                        }
                       },
                     },
                     "Copy Set FEN (internal)",
