@@ -1736,6 +1736,17 @@ spangameresultmini {
   flex: 1 1 140px;
 }
 
+.sliders.timecontrol {
+  flex: 0 0 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#whitetimesettings .sliderrow input,
+#blacktimesettings .sliderrow input {
+  flex: none;
+  height: 4px;
+}
+
 #gamecontrol-start {
   display: flex;
   flex-wrap: wrap;

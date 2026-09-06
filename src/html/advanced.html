@@ -4378,6 +4378,107 @@
         let engine_depth_index = depthSteps.length;
         let engine_movetime_index = movetimeSteps.length;
         let engine_nodes_index = nodesSteps.length;
+        // Time control values shown as sliders; the hidden number inputs
+        // keep the millisecond values the timer logic reads.
+        const startTimeSteps = [
+          15000, 30000, 60000, 120000, 180000, 300000, 600000, 900000, 1200000,
+          1800000, 2700000, 3600000, 5400000, 7200000,
+        ];
+        const incrementSteps = [
+          0, 1000, 2000, 3000, 5000, 10000, 15000, 20000, 30000, 60000,
+        ];
+        const byoyomiSteps = [5000, 10000, 15000, 20000, 30000, 45000, 60000];
+        const marginSteps = [0, 100, 200, 500, 1000, 2000, 5000];
+        const tc_white = {
+          start: 5,
+          gain: 3,
+          byoyomi: 4,
+          periods: 3,
+          margin: 0,
+        };
+        const tc_black = {
+          start: 5,
+          gain: 3,
+          byoyomi: 4,
+          periods: 3,
+          margin: 0,
+        };
+        const formatClock = (ms) => {
+          if (ms >= 60000) {
+            const minutes = ms / 60000;
+            return `${Number.isInteger(minutes) ? minutes : minutes.toFixed(1)} min`;
+          }
+          return `${ms / 1000} s`;
+        };
+        const timeSliders = (side, mode, tc) =>
+          m("div.sliders.timecontrol", { hidden: mode == "infinite" }, [
+            sliderRow(
+              mode == "time per move" ? "Time per move" : "Start time",
+              formatClock(startTimeSteps[tc.start]),
+              0,
+              startTimeSteps.length - 1,
+              tc.start,
+              (value) => {
+                tc.start = value;
+              },
+              "The time at the beginning of the game.",
+            ),
+            mode == "tournament"
+              ? sliderRow(
+                  "Increment",
+                  formatClock(incrementSteps[tc.gain]),
+                  0,
+                  incrementSteps.length - 1,
+                  tc.gain,
+                  (value) => {
+                    tc.gain = value;
+                  },
+                  "Time added after every move.",
+                )
+              : null,
+            mode == "byoyomi"
+              ? sliderRow(
+                  "Byo-yomi period",
+                  formatClock(byoyomiSteps[tc.byoyomi]),
+                  0,
+                  byoyomiSteps.length - 1,
+                  tc.byoyomi,
+                  (value) => {
+                    tc.byoyomi = value;
+                  },
+                  "Length of each byo-yomi period.",
+                )
+              : null,
+            mode == "byoyomi"
+              ? sliderRow(
+                  "Periods",
+                  tc.periods,
+                  1,
+                  10,
+                  tc.periods,
+                  (value) => {
+                    tc.periods = value;
+                  },
+                  "Number of byo-yomi periods.",
+                )
+              : null,
+            sliderRow(
+              "Timeout margin",
+              formatClock(marginSteps[tc.margin]),
+              0,
+              marginSteps.length - 1,
+              tc.margin,
+              (value) => {
+                tc.margin = value;
+              },
+              "The time may be exceeded by this much before the side loses on time.",
+            ),
+          ]);
+
+        const allLimitsInfinite = () =>
+          engine_depth_index >= depthSteps.length &&
+          engine_movetime_index >= movetimeSteps.length &&
+          engine_nodes_index >= nodesSteps.length;
         const limitValue = (steps, index) =>
           index >= steps.length ? "" : String(steps[index]);
         const limitLabel = (steps, index, format) =>
@@ -4911,18 +5012,6 @@
                     ]),
                   ],
                 ),
-                m(
-                  "button.sm.ghost",
-                  {
-                    type: "button",
-                    title:
-                      "Engine settings: depth, threads, hash, MultiPV, players",
-                    onclick: () => {
-                      active_tab = "engine";
-                    },
-                  },
-                  [icon("sliders", 14), "Engine settings"],
-                ),
               ]),
               m("div#evaluation", { hidden: !analysis_mode }, [
                 m("div#evalbar", [m("p#cp", "0.00"), m("div#evalbarprogress")]),
@@ -4930,119 +5019,6 @@
                 m("p#pvinfo", ""),
               ]),
               m("div.row", [
-                m(
-                  "select#sannotation.sm",
-                  {
-                    style: "flex: 1 1 200px;",
-                    title:
-                      "Select the move notation system that is used in move history and engine principal variations.",
-                    onchange: () => {
-                      const dropdownnotation =
-                        document.getElementById("sannotation");
-                      const evalbar = document.getElementById("evalbar");
-                      const value =
-                        dropdownnotation[dropdownnotation.selectedIndex].value;
-                      evalbar.classList.remove("xiangqi");
-                      evalbar.classList.remove("shogi");
-                      evalbar.classList.remove("janggi");
-                      if (/xiangqi|ucci/i.test(value)) {
-                        evalbar.classList.add("xiangqi");
-                      } else if (/shogi|usi/i.test(value)) {
-                        evalbar.classList.add("shogi");
-                      } else if (/janggi/i.test(value)) {
-                        evalbar.classList.add("janggi");
-                      }
-                    },
-                  },
-                  [
-                    m("option", { value: "" }, "--Select Notation System--"),
-                    m(
-                      "option",
-                      { value: "DEFAULT" },
-                      "Standard/Short Algebraic Notation Without Piece Type Omission (DEFAULT)",
-                    ),
-                    m(
-                      "option",
-                      { value: "SAN", selected: true },
-                      "Standard/Short Algebraic Notation (SAN)",
-                    ),
-                    m(
-                      "option",
-                      { value: "LAN" },
-                      "Long Algebraic Notation (LAN)",
-                    ),
-                    m(
-                      "option",
-                      { value: "SHOGI_HOSKING" },
-                      "Shogi Hosking Notation (SHOGI_HOSKING)",
-                    ),
-                    m(
-                      "option",
-                      { value: "SHOGI_HODGES" },
-                      "Shogi George Hodges Notation (SHOGI_HODGES)",
-                    ),
-                    m(
-                      "option",
-                      { value: "SHOGI_HODGES_NUMBER" },
-                      "Shogi George Hodges Number-only Notation (SHOGI_HODGES_NUMBER)",
-                    ),
-                    m(
-                      "option",
-                      { value: "JANGGI" },
-                      "Janggi Notation (JANGGI)",
-                    ),
-                    m(
-                      "option",
-                      { value: "XIANGQI_WXF" },
-                      "World Xiangqi Federation Notation (XIANGQI_WXF)",
-                    ),
-                    m(
-                      "option",
-                      { value: "THAI_SAN" },
-                      "Thai Standard/Short Algebraic Notation (THAI_SAN)",
-                    ),
-                    m(
-                      "option",
-                      { value: "THAI_LAN" },
-                      "Thai Long Algebraic Notation (THAI_LAN)",
-                    ),
-                    m(
-                      "option",
-                      { value: "FEN" },
-                      "Forsyth–Edwards Notation (Fairy-Stockfish) (FEN)",
-                    ),
-                    m(
-                      "option",
-                      { value: "PGN" },
-                      "Portable Game Notation (PGN)",
-                    ),
-                    m(
-                      "option",
-                      { value: "EPD" },
-                      "Extended Position Description (EPD)",
-                    ),
-                    m(
-                      "option",
-                      { value: "FEN+UCIMOVE" },
-                      "Forsyth–Edwards Notation (Fairy-Stockfish) and UCI Moves (FEN+UCIMOVE)",
-                    ),
-                    m(
-                      "option",
-                      { value: "FEN+USIMOVE" },
-                      "Forsyth–Edwards Notation (Fairy-Stockfish) and USI Moves (FEN+USIMOVE)",
-                    ),
-                    m(
-                      "option",
-                      { value: "FEN+UCCIMOVE" },
-                      "Forsyth–Edwards Notation (Fairy-Stockfish) and UCCI (CECP) Moves (FEN+UCCIMOVE)",
-                    ),
-                    m(
-                      "option",
-                      { value: "SFEN+USIMOVE" },
-                      "Shogi Forsyth–Edwards Notation and USI Moves (SFEN+USIMOVE)",
-                    ),
-                  ],
-                ),
                 m(
                   "button.sm",
                   {
@@ -5299,6 +5275,70 @@
                   "p.hint",
                   "Unchecked sides are played by you on the board. Turning on infinite analysis switches both sides to you and disables the time control.",
                 ),
+                m("div.row", [
+                  m(
+                    "button#go.sm",
+                    {
+                      type: "button",
+                      disabled:
+                        !is_ready || analysis_mode || allLimitsInfinite(),
+                      title: analysis_mode
+                        ? "Not needed while analysis is running."
+                        : allLimitsInfinite()
+                          ? "Set a depth, time or node limit first, otherwise the engine would think forever."
+                          : "Let the engine think and move now with the limits above (used when the engine plays a side).",
+                      onclick: () => {
+                        if ($("#advtimectrl").checked == true) {
+                          $("#advtimectrl").click();
+                        }
+                        if (board_setup_mode) {
+                          return;
+                        }
+                        document.getElementById("setpos").click();
+                        setTimeout(() => {
+                          go(false, false);
+                        }, 10);
+                      },
+                    },
+                    [icon("play", 14), "Engine: move now"],
+                  ),
+                  m(
+                    "button#stop.sm",
+                    {
+                      type: "button",
+                      disabled: !is_ready,
+                      title:
+                        "Immediately stop all engines from thinking (also ends an engine match).",
+                      onclick: () => {
+                        force_stop();
+                        if (fge.first_engine) {
+                          fge.first_engine.ForceStop();
+                        }
+                        if (fge.second_engine) {
+                          fge.second_engine.ForceStop();
+                        }
+                        if (fge.analysis_engine) {
+                          fge.analysis_engine.ForceStop();
+                        }
+                        if (during_engine_match) {
+                          during_engine_match = false;
+                          setTimeout(() => {
+                            if (
+                              window.confirm(
+                                `Played games: ${engine_match_played_game_count}\nFirst engine (WHITE) wins: ${engine_match_white_wins}\nSecond engine (BLACK) wins: ${engine_match_black_wins}\nDraws: ${engine_match_draws}\n\nDo you want to save the PGN of played games?`,
+                              )
+                            ) {
+                              document
+                                .getElementById("saveenginematchgames")
+                                .click();
+                            }
+                          }, 500);
+                        }
+                      },
+                    },
+                    [icon("stop", 14), "Stop engine"],
+                  ),
+                ]),
                 m("div.hr"),
                 m("div.secthead", [
                   m("span.sect", "Fairy-Stockfish · in browser"),
@@ -5439,66 +5479,6 @@
                     min: 1,
                     max: 500,
                   }),
-                ]),
-                m("div.row", [
-                  m(
-                    "button#go.sm",
-                    {
-                      type: "button",
-                      disabled: !is_ready,
-                      title:
-                        "Let the engine think and move now with the settings above (used when the engine plays a side).",
-                      onclick: () => {
-                        if ($("#advtimectrl").checked == true) {
-                          $("#advtimectrl").click();
-                        }
-                        if (board_setup_mode) {
-                          return;
-                        }
-                        document.getElementById("setpos").click();
-                        setTimeout(() => {
-                          go(false, false);
-                        }, 10);
-                      },
-                    },
-                    [icon("play", 14), "Engine: move now"],
-                  ),
-                  m(
-                    "button#stop.sm",
-                    {
-                      type: "button",
-                      disabled: !is_ready,
-                      title:
-                        "Immediately stop all engines from thinking (also ends an engine match).",
-                      onclick: () => {
-                        force_stop();
-                        if (fge.first_engine) {
-                          fge.first_engine.ForceStop();
-                        }
-                        if (fge.second_engine) {
-                          fge.second_engine.ForceStop();
-                        }
-                        if (fge.analysis_engine) {
-                          fge.analysis_engine.ForceStop();
-                        }
-                        if (during_engine_match) {
-                          during_engine_match = false;
-                          setTimeout(() => {
-                            if (
-                              window.confirm(
-                                `Played games: ${engine_match_played_game_count}\nFirst engine (WHITE) wins: ${engine_match_white_wins}\nSecond engine (BLACK) wins: ${engine_match_black_wins}\nDraws: ${engine_match_draws}\n\nDo you want to save the PGN of played games?`,
-                              )
-                            ) {
-                              document
-                                .getElementById("saveenginematchgames")
-                                .click();
-                            }
-                          }, 500);
-                        }
-                      },
-                    },
-                    [icon("stop", 14), "Stop engine"],
-                  ),
                 ]),
                 m("div.internals", [
                   m("p#label-stm", { hidden: true }),
@@ -6987,57 +6967,30 @@
                         ),
                       ],
                     ),
+                    timeSliders("white", white_timer_type, tc_white),
                     m("input[type=number]#whitestarttime", {
-                      placeholder: "Start time (ms)",
-                      title: "The time at beginning in milliseconds.",
-                      disabled:
-                        !is_ready ||
-                        review_mode ||
-                        white_timer_type == "infinite",
-                      hidden: white_timer_type == "infinite",
+                      hidden: true,
+                      value: startTimeSteps[tc_white.start],
                       min: 1,
                     }),
                     m("input[type=number]#whitetimegain", {
-                      placeholder: "Time gain (ms)",
-                      title:
-                        "Get a time increment in milliseconds after every move.",
-                      disabled:
-                        !is_ready ||
-                        review_mode ||
-                        white_timer_type != "tournament",
-                      hidden: white_timer_type != "tournament",
+                      hidden: true,
+                      value: incrementSteps[tc_white.gain],
                       min: 0,
                     }),
                     m("input[type=number]#whitebyoyomitime", {
-                      placeholder: "Byoyomi period length (ms)",
-                      title:
-                        "The duration in milliseconds of every byoyomi period.",
-                      disabled:
-                        !is_ready ||
-                        review_mode ||
-                        white_timer_type != "byoyomi",
-                      hidden: white_timer_type != "byoyomi",
+                      hidden: true,
+                      value: byoyomiSteps[tc_white.byoyomi],
                       min: 1,
                     }),
                     m("input[type=number]#whitebyoyomiperiodcount", {
-                      placeholder: "Byoyomi period count",
-                      title: "The count of byoyomi periods.",
-                      disabled:
-                        !is_ready ||
-                        review_mode ||
-                        white_timer_type != "byoyomi",
-                      hidden: white_timer_type != "byoyomi",
+                      hidden: true,
+                      value: tc_white.periods,
                       min: 1,
                     }),
                     m("input[type=number]#whitetimemargin", {
-                      placeholder: "Timeout margin (ms)",
-                      title:
-                        "The time can be exceeded by this many milliseconds before running out of time.",
-                      disabled:
-                        !is_ready ||
-                        review_mode ||
-                        white_timer_type == "infinite",
-                      hidden: white_timer_type == "infinite",
+                      hidden: true,
+                      value: marginSteps[tc_white.margin],
                       min: 0,
                     }),
                   ]),
@@ -7103,57 +7056,30 @@
                         ),
                       ],
                     ),
+                    timeSliders("black", black_timer_type, tc_black),
                     m("input[type=number]#blackstarttime", {
-                      placeholder: "Start time (ms)",
-                      title: "The time at beginning in milliseconds.",
-                      disabled:
-                        !is_ready ||
-                        review_mode ||
-                        black_timer_type == "infinite",
-                      hidden: black_timer_type == "infinite",
+                      hidden: true,
+                      value: startTimeSteps[tc_black.start],
                       min: 1,
                     }),
                     m("input[type=number]#blacktimegain", {
-                      placeholder: "Time gain (ms)",
-                      title:
-                        "Get a time increment in milliseconds after every move.",
-                      disabled:
-                        !is_ready ||
-                        review_mode ||
-                        black_timer_type != "tournament",
-                      hidden: black_timer_type != "tournament",
+                      hidden: true,
+                      value: incrementSteps[tc_black.gain],
                       min: 0,
                     }),
                     m("input[type=number]#blackbyoyomitime", {
-                      placeholder: "Byoyomi period length (ms)",
-                      title:
-                        "The duration in milliseconds of every byoyomi period.",
-                      disabled:
-                        !is_ready ||
-                        review_mode ||
-                        black_timer_type != "byoyomi",
-                      hidden: black_timer_type != "byoyomi",
+                      hidden: true,
+                      value: byoyomiSteps[tc_black.byoyomi],
                       min: 1,
                     }),
                     m("input[type=number]#blackbyoyomiperiodcount", {
-                      placeholder: "Byoyomi period count",
-                      title: "The count of byoyomi periods.",
-                      disabled:
-                        !is_ready ||
-                        review_mode ||
-                        black_timer_type != "byoyomi",
-                      hidden: black_timer_type != "byoyomi",
+                      hidden: true,
+                      value: tc_black.periods,
                       min: 1,
                     }),
                     m("input[type=number]#blacktimemargin", {
-                      placeholder: "Timeout margin (ms)",
-                      title:
-                        "The time can be exceeded by this many milliseconds before running out of time.",
-                      disabled:
-                        !is_ready ||
-                        review_mode ||
-                        black_timer_type == "infinite",
-                      hidden: black_timer_type == "infinite",
+                      hidden: true,
+                      value: marginSteps[tc_black.margin],
                       min: 0,
                     }),
                   ]),
@@ -7355,6 +7281,126 @@
                   ]),
                 ]),
                 m("div", [
+                  m("div.setting", [
+                    m("span", "Move notation"),
+                    m(
+                      "select#sannotation.sm",
+                      {
+                        title:
+                          "Select the move notation system that is used in move history and engine principal variations.",
+                        onchange: () => {
+                          const dropdownnotation =
+                            document.getElementById("sannotation");
+                          const evalbar = document.getElementById("evalbar");
+                          const value =
+                            dropdownnotation[dropdownnotation.selectedIndex]
+                              .value;
+                          evalbar.classList.remove("xiangqi");
+                          evalbar.classList.remove("shogi");
+                          evalbar.classList.remove("janggi");
+                          if (/xiangqi|ucci/i.test(value)) {
+                            evalbar.classList.add("xiangqi");
+                          } else if (/shogi|usi/i.test(value)) {
+                            evalbar.classList.add("shogi");
+                          } else if (/janggi/i.test(value)) {
+                            evalbar.classList.add("janggi");
+                          }
+                        },
+                      },
+                      [
+                        m(
+                          "option",
+                          { value: "" },
+                          "--Select Notation System--",
+                        ),
+                        m(
+                          "option",
+                          { value: "DEFAULT" },
+                          "Standard/Short Algebraic Notation Without Piece Type Omission (DEFAULT)",
+                        ),
+                        m(
+                          "option",
+                          { value: "SAN", selected: true },
+                          "Standard/Short Algebraic Notation (SAN)",
+                        ),
+                        m(
+                          "option",
+                          { value: "LAN" },
+                          "Long Algebraic Notation (LAN)",
+                        ),
+                        m(
+                          "option",
+                          { value: "SHOGI_HOSKING" },
+                          "Shogi Hosking Notation (SHOGI_HOSKING)",
+                        ),
+                        m(
+                          "option",
+                          { value: "SHOGI_HODGES" },
+                          "Shogi George Hodges Notation (SHOGI_HODGES)",
+                        ),
+                        m(
+                          "option",
+                          { value: "SHOGI_HODGES_NUMBER" },
+                          "Shogi George Hodges Number-only Notation (SHOGI_HODGES_NUMBER)",
+                        ),
+                        m(
+                          "option",
+                          { value: "JANGGI" },
+                          "Janggi Notation (JANGGI)",
+                        ),
+                        m(
+                          "option",
+                          { value: "XIANGQI_WXF" },
+                          "World Xiangqi Federation Notation (XIANGQI_WXF)",
+                        ),
+                        m(
+                          "option",
+                          { value: "THAI_SAN" },
+                          "Thai Standard/Short Algebraic Notation (THAI_SAN)",
+                        ),
+                        m(
+                          "option",
+                          { value: "THAI_LAN" },
+                          "Thai Long Algebraic Notation (THAI_LAN)",
+                        ),
+                        m(
+                          "option",
+                          { value: "FEN" },
+                          "Forsyth–Edwards Notation (Fairy-Stockfish) (FEN)",
+                        ),
+                        m(
+                          "option",
+                          { value: "PGN" },
+                          "Portable Game Notation (PGN)",
+                        ),
+                        m(
+                          "option",
+                          { value: "EPD" },
+                          "Extended Position Description (EPD)",
+                        ),
+                        m(
+                          "option",
+                          { value: "FEN+UCIMOVE" },
+                          "Forsyth–Edwards Notation (Fairy-Stockfish) and UCI Moves (FEN+UCIMOVE)",
+                        ),
+                        m(
+                          "option",
+                          { value: "FEN+USIMOVE" },
+                          "Forsyth–Edwards Notation (Fairy-Stockfish) and USI Moves (FEN+USIMOVE)",
+                        ),
+                        m(
+                          "option",
+                          { value: "FEN+UCCIMOVE" },
+                          "Forsyth–Edwards Notation (Fairy-Stockfish) and UCCI (CECP) Moves (FEN+UCCIMOVE)",
+                        ),
+                        m(
+                          "option",
+                          { value: "SFEN+USIMOVE" },
+                          "Shogi Forsyth–Edwards Notation and USI Moves (SFEN+USIMOVE)",
+                        ),
+                      ],
+                    ),
+                  ]),
                   m("div.setting", [
                     m("span", "Coordinates"),
                     m(
