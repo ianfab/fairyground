@@ -1812,6 +1812,80 @@
         }, 50);
         // Clicking a move in the move list displays that position on the
         // main board (the same navigation as the previous/next buttons).
+        // Context menu (right click / long press) on a move with the PGN tools,
+        // similar to the lichess analysis board. The move is made the current
+        // move first, then the chosen tool button is clicked.
+        const moveMenuItems = [
+          ["movetree-settomainbranch", "Promote variation"],
+          ["movetree-setasmainline", "Make main line"],
+          ["movetree-cut", "Delete from here"],
+          ["movetree-cutbranch", "Delete this variation"],
+          ["movetree-removevariations", "Delete other variations"],
+          ["movetree-crop", "Start game here"],
+          ["movetree-cropbranch", "Keep only this line"],
+          ["movetree-hideshow", "Hide / show following moves"],
+          ["movetree-textbefore", "Comment before move"],
+          ["movetree-textafter", "Comment after move"],
+          ["movetree-symbol", "Symbols (!, ?, …)"],
+          ["movetree-markers", "Save board markers"],
+          ["movetree-termination", "Result / termination"],
+          ["movetree-uncomment", "Remove comments"],
+        ];
+        const moveMenu = document.createElement("div");
+        moveMenu.id = "movecontextmenu";
+        moveMenu.className = "ctxmenu";
+        moveMenu.hidden = true;
+        moveMenuItems.forEach(([id, label]) => {
+          const item = document.createElement("button");
+          item.type = "button";
+          item.textContent = label;
+          item.addEventListener("click", (event) => {
+            event.stopPropagation();
+            moveMenu.hidden = true;
+            const tool = document.getElementById(id);
+            if (tool && !tool.disabled) {
+              tool.click();
+            }
+          });
+          moveMenu.appendChild(item);
+        });
+        document.body.appendChild(moveMenu);
+        const hideMoveMenu = () => {
+          moveMenu.hidden = true;
+        };
+        document.addEventListener("click", hideMoveMenu);
+        document.addEventListener("keydown", (event) => {
+          if (event.key == "Escape") {
+            hideMoveMenu();
+          }
+        });
+        window.addEventListener("scroll", hideMoveMenu, true);
+        const openMoveMenu = (element, x, y) => {
+          const moveinput = document.getElementById("move");
+          const setposition = document.getElementById("setpos");
+          if (!moveinput || !setposition || setposition.disabled) {
+            return;
+          }
+          moveinput.value = element.moves;
+          setposition.click();
+          const miniboard = document.getElementById("chessground-mini");
+          if (miniboard && !miniboard.locked) {
+            miniboard.style.display = "none";
+          }
+          moveMenu.hidden = false;
+          const rect = moveMenu.getBoundingClientRect();
+          const left = Math.max(
+            8,
+            Math.min(x, window.innerWidth - rect.width - 8),
+          );
+          const top = Math.max(
+            8,
+            Math.min(y, window.innerHeight - rect.height - 8),
+          );
+          moveMenu.style.left = `${left}px`;
+          moveMenu.style.top = `${top}px`;
+        };
+        let longPressTimer = null;
         const movelist = document.getElementById("label-pgn");
         if (movelist) {
           movelist.addEventListener("click", (event) => {
@@ -1832,6 +1906,49 @@
             if (miniboard && !miniboard.locked) {
               miniboard.style.display = "none";
             }
+          });
+          movelist.addEventListener("contextmenu", (event) => {
+            const element = event.target.closest(".position-display-label");
+            if (!element || element.moves === undefined) {
+              return;
+            }
+            event.preventDefault();
+            if (longPressTimer) {
+              window.clearTimeout(longPressTimer);
+              longPressTimer = null;
+            }
+            openMoveMenu(element, event.clientX, event.clientY);
+          });
+          movelist.addEventListener(
+            "touchstart",
+            (event) => {
+              const element = event.target.closest(".position-display-label");
+              if (
+                !element ||
+                element.moves === undefined ||
+                event.touches.length != 1
+              ) {
+                return;
+              }
+              const touch = event.touches[0];
+              longPressTimer = window.setTimeout(() => {
+                longPressTimer = null;
+                openMoveMenu(element, touch.clientX, touch.clientY);
+              }, 500);
+            },
+            { passive: true },
+          );
+          ["touchend", "touchmove", "touchcancel"].forEach((name) => {
+            movelist.addEventListener(
+              name,
+              () => {
+                if (longPressTimer) {
+                  window.clearTimeout(longPressTimer);
+                  longPressTimer = null;
+                }
+              },
+              { passive: true },
+            );
           });
         }
       });

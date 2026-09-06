@@ -2500,6 +2500,41 @@ div.popup textarea {
   content: "\f066";
 }
 
+/* ---------- move context menu ---------- */
+
+.ctxmenu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 220px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.ctxmenu button {
+  height: 36px;
+  justify-content: flex-start;
+  border-color: transparent;
+  background: transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.ctxmenu button:hover {
+  background: var(--surface2);
+}
+
+#label-pgn .position-display-label {
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
 /* ---------- legacy hooks kept for compatibility ---------- */
 
 .ripple {
