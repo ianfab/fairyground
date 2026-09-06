@@ -6415,13 +6415,33 @@
                       m("input[type=checkbox]#isboardsetup", {
                         checked: board_setup_mode,
                         disabled:
-                          analysis_mode ||
                           review_mode ||
-                          advanced_time_control ||
-                          select_move_dialog ||
-                          engine_match_mode,
-                        onclick: () => {
-                          board_setup_mode = !board_setup_mode;
+                          during_play ||
+                          engine_match_mode ||
+                          during_engine_match,
+                        title:
+                          review_mode ||
+                          during_play ||
+                          engine_match_mode ||
+                          during_engine_match
+                            ? "The board editor is not available during a game, in review mode or during an engine match."
+                            : "Edit the position. This switches analysis, the time control and the moves dialog off.",
+                        onclick: (e) => {
+                          const on = e.target.checked;
+                          if (on) {
+                            // The editor is exclusive with analysis, timed
+                            // games and the moves dialog: switch them off.
+                            setAnalysisMode(false);
+                            advanced_time_control = false;
+                            select_move_dialog = false;
+                            ["advtimectrl", "showmovediv"].forEach((id) => {
+                              const element = document.getElementById(id);
+                              if (element) {
+                                element.checked = false;
+                              }
+                            });
+                          }
+                          board_setup_mode = on;
                           triggerBoardSetupPieceIdentifier(true);
                         },
                       }),
