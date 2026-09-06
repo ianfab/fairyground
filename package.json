@@ -11,7 +11,7 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "chessgroundx": "^10.7.4",
+    "chessgroundx": "^10.7.5",
     "express": "^5.2.1",
     "fairy-stockfish-nnue.wasm": "1.1.12",
     "ffish-es6": "0.7.10",
@@ -19,7 +19,7 @@
     "jszip": "^3.10.1",
     "mithril": "^2.3.8",
     "serve": "^14.2.6",
-    "ws": "^8.20.0"
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "browser-resolve": "^2.0.0",
@@ -27,9 +27,9 @@
     "clean-css": "^5.3.3",
     "esmify": "^2.1.1",
     "html-minifier": "^4.0.0",
-    "prettier": "^3.8.1",
+    "prettier": "^3.9.4",
     "uglify-js": "^3.19.3",
-    "vercel": "^50.38.2",
+    "vercel": "^54.18.7",
     "watchify": "^4.0.0"
   }
 }
