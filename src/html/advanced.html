@@ -4346,6 +4346,57 @@
 
         const isDarkUITheme = (id) => /dark|stars|bubbles/i.test(id || "");
 
+        // Switch infinite analysis on or off from anywhere in the UI.
+        // Turning it on releases the players and the time control (they
+        // are exclusive with analysis) and starts the engine right away;
+        // turning it off stops the engine.
+        const analysisBlocked = () =>
+          board_setup_mode ||
+          engine_match_mode ||
+          during_play ||
+          during_engine_match;
+
+        const setAnalysisMode = (on) => {
+          if (on == analysis_mode) {
+            return;
+          }
+          analysis_mode = on;
+          const analysischeckbox = document.getElementById("analysis");
+          if (analysischeckbox) {
+            analysischeckbox.checked = on;
+          }
+          if (on) {
+            play_white = false;
+            play_black = false;
+            random_mover_white = false;
+            random_mover_black = false;
+            advanced_time_control = false;
+            // Sync the DOM immediately so that code reading the checkboxes
+            // before the next redraw sees the new state.
+            [
+              "playwhite",
+              "playblack",
+              "randommoverwhite",
+              "randommoverblack",
+              "advtimectrl",
+            ].forEach((id) => {
+              const element = document.getElementById(id);
+              if (element) {
+                element.checked = false;
+              }
+            });
+            window.setTimeout(() => {
+              const gobutton = document.getElementById("go");
+              if (gobutton && !gobutton.disabled && analysis_mode) {
+                gobutton.click();
+              }
+            }, 50);
+          } else {
+            force_stop();
+          }
+          m.redraw();
+        };
+
         const toggleDarkMode = () => {
           const dropdown = document.getElementById("dropdown-uitheme");
           if (!dropdown) {
@@ -4782,6 +4833,42 @@
             "div.tabpanel#tab-moves",
             { class: active_tab == "moves" ? "on" : "" },
             [
+              m("div.analysisbar", [
+                m(
+                  "button.analysistoggle",
+                  {
+                    type: "button",
+                    class: analysis_mode ? "on" : "",
+                    disabled: !is_ready || analysisBlocked(),
+                    "aria-pressed": analysis_mode ? "true" : "false",
+                    title: analysisBlocked()
+                      ? "Analysis is not available during a timed game, an engine match or while editing the board."
+                      : "Toggle engine analysis of the current position.",
+                    onclick: () => {
+                      setAnalysisMode(!analysis_mode);
+                    },
+                  },
+                  [
+                    m("span.sw"),
+                    m("span.lbl", [
+                      icon("cpu", 16),
+                      analysis_mode ? "Engine analysis on" : "Engine analysis",
+                    ]),
+                  ],
+                ),
+                m(
+                  "button.sm.ghost",
+                  {
+                    type: "button",
+                    title:
+                      "Engine settings: depth, threads, hash, MultiPV, players",
+                    onclick: () => {
+                      active_tab = "engine";
+                    },
+                  },
+                  [icon("sliders", 14), "Engine settings"],
+                ),
+              ]),
               m("div#evaluation", { hidden: !analysis_mode }, [
                 m("div#evalbar", [m("p#cp", "0.00"), m("div#evalbarprogress")]),
                 m("p#evalinfo", ""),
@@ -5174,31 +5261,8 @@
                           engine_match_mode ||
                           during_play ||
                           during_engine_match,
-                        onclick: () => {
-                          analysis_mode = !analysis_mode;
-                          if (analysis_mode) {
-                            // Analysis is exclusive with engine/random players
-                            // and timed games: switch those off automatically.
-                            play_white = false;
-                            play_black = false;
-                            random_mover_white = false;
-                            random_mover_black = false;
-                            advanced_time_control = false;
-                            // Sync the DOM immediately so that code reading
-                            // the checkboxes before the next redraw sees it.
-                            [
-                              "playwhite",
-                              "playblack",
-                              "randommoverwhite",
-                              "randommoverblack",
-                              "advtimectrl",
-                            ].forEach((id) => {
-                              const element = document.getElementById(id);
-                              if (element) {
-                                element.checked = false;
-                              }
-                            });
-                          }
+                        onclick: (e) => {
+                          setAnalysisMode(e.target.checked);
                         },
                       }),
                       m("span", "Infinite analysis"),
