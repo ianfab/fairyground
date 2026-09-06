@@ -80,11 +80,11 @@ try {
       "<title>Fairy-Stockfish playground</title>",
       "<title>Play against Fairy-Stockfish</title>",
     )
+    .replace(/let( +)app_mode( *)=( *)"analysis"/, 'let app_mode = "play"')
     .replace(
-      /let( +)engine_movetime_index( *)=( *)movetimeSteps\.length/,
-      "let engine_movetime_index = 2",
-    )
-    .replace(/let( +)play_black( *)=( *)false/, "let play_black = true");
+      /let( +)player_black_engine( *)=( *)false/,
+      "let player_black_engine = true",
+    );
   let htmlseg = GetHeadAndBodyOfHTML(advpage);
   let headerendpos = htmlseg.head_end_index;
   let index_page =

@@ -4449,6 +4449,11 @@
         let settings_open = false;
         let newgame_open = false;
         let engine_debug = false;
+        let app_mode = "analysis"; // "play" | "analysis"
+        let player_white_engine = false;
+        let player_black_engine = false;
+        let player_white_random = false;
+        let player_black_random = false;
         let fen_copied = false;
         let variant_picker_open = false;
         let position_picker_open = false;
@@ -4638,8 +4643,6 @@
         let engine_hash_index = 2; // 16 MB
         let engine_multipv = 1;
         let engine_skill = 20;
-        const isAnalysisPage = () =>
-          /advanced\.html$/i.test(window.location.pathname);
         // Search limits; the last slider position means "no limit".
         const depthSteps = [
           1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 18, 20, 25, 30, 40,
@@ -4653,7 +4656,7 @@
           100000000,
         ];
         let engine_depth_index = depthSteps.length;
-        let engine_movetime_index = movetimeSteps.length;
+        let engine_movetime_index = 2; // 0.5 s
         let engine_nodes_index = nodesSteps.length;
         // Time control values shown as sliders; the hidden number inputs
         // keep the millisecond values the timer logic reads.
@@ -4783,7 +4786,51 @@
             }),
           ]);
 
+        // The player settings (who plays which side) only take effect in
+        // play mode. In analysis mode the engine never plays a side, but the
+        // settings themselves are kept. Engine matches manage the players
+        // on their own and are left alone.
+        const applyPlayerSettings = () => {
+          if (engine_match_mode || during_engine_match) {
+            return;
+          }
+          const active = app_mode == "play";
+          play_white = active && player_white_engine;
+          play_black = active && player_black_engine;
+          random_mover_white = active && player_white_random;
+          random_mover_black = active && player_black_random;
+          [
+            ["playwhite", play_white],
+            ["playblack", play_black],
+            ["randommoverwhite", random_mover_white],
+            ["randommoverblack", random_mover_black],
+          ].forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) {
+              element.checked = value;
+            }
+          });
+        };
+
+        const modeSwitchBlocked = () =>
+          during_play || during_engine_match || review_mode;
+
+        const setAppMode = (mode) => {
+          if (mode == app_mode || modeSwitchBlocked()) {
+            return;
+          }
+          app_mode = mode;
+          if (mode == "play") {
+            setAnalysisMode(false);
+          } else {
+            force_stop();
+          }
+          applyPlayerSettings();
+          m.redraw();
+        };
+
         const analysisBlocked = () =>
+          app_mode != "analysis" ||
           board_setup_mode ||
           engine_match_mode ||
           during_play ||
@@ -4794,7 +4841,7 @@
           if (stockfish_state != "READY") {
             return;
           }
-          if ($("#advtimectrl").checked == true) {
+          if (!analysis_mode && $("#advtimectrl").checked == true) {
             $("#advtimectrl").click();
           }
           if (board_setup_mode) {
@@ -4816,25 +4863,6 @@
             analysischeckbox.checked = on;
           }
           if (on) {
-            play_white = false;
-            play_black = false;
-            random_mover_white = false;
-            random_mover_black = false;
-            advanced_time_control = false;
-            // Sync the DOM immediately so that code reading the checkboxes
-            // before the next redraw sees the new state.
-            [
-              "playwhite",
-              "playblack",
-              "randommoverwhite",
-              "randommoverblack",
-              "advtimectrl",
-            ].forEach((id) => {
-              const element = document.getElementById(id);
-              if (element) {
-                element.checked = false;
-              }
-            });
             window.setTimeout(() => {
               if (analysis_mode) {
                 startEngineNow();
@@ -4880,6 +4908,7 @@
 
         const view = () => {
           const is_ready = stockfish_state == "READY";
+          applyPlayerSettings();
           const engine_status_class =
             stockfish_state == "READY"
               ? "ready"
@@ -4893,24 +4922,31 @@
               m("span.mark", "f"),
               m("span.text", "fairyground"),
             ]),
-            m("nav.seg.pageswitch", [
+            m("div.seg.pageswitch", [
               m(
-                "a",
+                "button",
                 {
-                  href: "./index.html",
-                  target: "_self",
-                  class: isAnalysisPage() ? "" : "on",
-                  title: "Play against the engine",
+                  type: "button",
+                  class: app_mode == "play" ? "on" : "",
+                  disabled: modeSwitchBlocked(),
+                  title: "Play against the engine (player settings apply)",
+                  onclick: () => {
+                    setAppMode("play");
+                  },
                 },
                 "Play",
               ),
               m(
-                "a",
+                "button",
                 {
-                  href: "./advanced.html",
-                  target: "_self",
-                  class: isAnalysisPage() ? "on" : "",
-                  title: "Analysis board",
+                  type: "button",
+                  class: app_mode == "analysis" ? "on" : "",
+                  disabled: modeSwitchBlocked(),
+                  title:
+                    "Analysis board (you move both sides, engine analysis available)",
+                  onclick: () => {
+                    setAppMode("analysis");
+                  },
                 },
                 "Analysis",
               ),
@@ -5170,18 +5206,22 @@
               m("div.avatar", icon("cpu", 16)),
               m("div", [m("p.name", "Black"), m("p.sub", "Second mover")]),
             ]),
-            m("div#timers", { hidden: !advanced_time_control }, [
-              m("div#whitetimer", [
-                m("p", "White Time"),
-                m("p#whitetime", "--"),
-                m("p#whitetimetype", "infinite"),
-              ]),
-              m("div#blacktimer", [
-                m("p", "Black Time"),
-                m("p#blacktime", "--"),
-                m("p#blacktimetype", "infinite"),
-              ]),
-            ]),
+            m(
+              "div#timers",
+              { hidden: !advanced_time_control || app_mode != "play" },
+              [
+                m("div#whitetimer", [
+                  m("p", "White Time"),
+                  m("p#whitetime", "--"),
+                  m("p#whitetimetype", "infinite"),
+                ]),
+                m("div#blacktimer", [
+                  m("p", "Black Time"),
+                  m("p#blacktime", "--"),
+                  m("p#blacktimetype", "infinite"),
+                ]),
+              ],
+            ),
             m("div#chessground-container-div.defaultboard.default.board8x8", [
               m("div.cg-wrap.pocket-top", [m("div#pocket-top")]),
               m("div#chessground-board"),
@@ -5534,9 +5574,12 @@
                     class: analysis_mode ? "on" : "",
                     disabled: !is_ready || analysisBlocked(),
                     "aria-pressed": analysis_mode ? "true" : "false",
-                    title: analysisBlocked()
-                      ? "Analysis is not available during a timed game, an engine match or while editing the board."
-                      : "Toggle engine analysis of the current position.",
+                    title:
+                      app_mode != "analysis"
+                        ? "Switch to Analysis in the top bar to analyse."
+                        : analysisBlocked()
+                          ? "Analysis is not available during a timed game, an engine match or while editing the board."
+                          : "Toggle engine analysis of the current position.",
                     onclick: () => {
                       setAnalysisMode(!analysis_mode);
                     },
@@ -5855,14 +5898,20 @@
                       },
                       [
                         m("input[type=checkbox]#playwhite", {
+                          hidden: true,
                           checked: play_white,
+                        }),
+                        m("input[type=checkbox]", {
+                          checked: player_white_engine,
                           disabled:
-                            analysis_mode ||
+                            app_mode != "play" ||
                             review_mode ||
                             board_setup_mode ||
-                            random_mover_white,
-                          onclick: () => {
-                            play_white = !play_white;
+                            engine_match_mode ||
+                            player_white_random,
+                          onclick: (e) => {
+                            player_white_engine = e.target.checked;
+                            applyPlayerSettings();
                           },
                         }),
                         m("span", "Engine"),
@@ -5876,15 +5925,20 @@
                       },
                       [
                         m("input[type=checkbox]#randommoverwhite", {
+                          hidden: true,
                           checked: random_mover_white,
+                        }),
+                        m("input[type=checkbox]", {
+                          checked: player_white_random,
                           disabled:
-                            analysis_mode ||
+                            app_mode != "play" ||
                             review_mode ||
                             board_setup_mode ||
-                            play_white ||
-                            engine_match_mode,
-                          onclick: () => {
-                            random_mover_white = !random_mover_white;
+                            engine_match_mode ||
+                            player_white_engine,
+                          onclick: (e) => {
+                            player_white_random = e.target.checked;
+                            applyPlayerSettings();
                           },
                         }),
                         m("span", "Random mover"),
@@ -5901,14 +5955,20 @@
                       },
                       [
                         m("input[type=checkbox]#playblack", {
+                          hidden: true,
                           checked: play_black,
+                        }),
+                        m("input[type=checkbox]", {
+                          checked: player_black_engine,
                           disabled:
-                            analysis_mode ||
+                            app_mode != "play" ||
                             review_mode ||
                             board_setup_mode ||
-                            random_mover_black,
-                          onclick: () => {
-                            play_black = !play_black;
+                            engine_match_mode ||
+                            player_black_random,
+                          onclick: (e) => {
+                            player_black_engine = e.target.checked;
+                            applyPlayerSettings();
                           },
                         }),
                         m("span", "Engine"),
@@ -5922,15 +5982,20 @@
                       },
                       [
                         m("input[type=checkbox]#randommoverblack", {
+                          hidden: true,
                           checked: random_mover_black,
+                        }),
+                        m("input[type=checkbox]", {
+                          checked: player_black_random,
                           disabled:
-                            analysis_mode ||
+                            app_mode != "play" ||
                             review_mode ||
                             board_setup_mode ||
-                            play_black ||
-                            engine_match_mode,
-                          onclick: () => {
-                            random_mover_black = !random_mover_black;
+                            engine_match_mode ||
+                            player_black_engine,
+                          onclick: (e) => {
+                            player_black_random = e.target.checked;
+                            applyPlayerSettings();
                           },
                         }),
                         m("span", "Random mover"),
@@ -5940,7 +6005,9 @@
                 ]),
                 m(
                   "p.hint",
-                  "Unchecked sides are played by you on the board. Turning on infinite analysis switches both sides to you and disables the time control.",
+                  app_mode == "play"
+                    ? "Unchecked sides are played by you on the board."
+                    : "Player settings take effect in Play mode; in Analysis mode you move both sides.",
                 ),
                 m("div.row", [
                   m(
@@ -7415,7 +7482,9 @@
               ]),
               m(
                 "p.hint",
-                "Variant and start position are chosen in the top bar, the players (you, Fairy-Stockfish, random mover or an external engine) in the Engine tab. Enable the time control below to play a timed game; this switches infinite analysis off.",
+                app_mode == "play"
+                  ? "Variant and start position are chosen in the top bar, the players (you, Fairy-Stockfish, random mover or an external engine) in the Engine tab. Enable the time control below to play a timed game."
+                  : "Timed games are played in Play mode; switch the mode in the top bar to enable the time control.",
               ),
               m(
                 "label#label-advtimectrl.toggle",
@@ -7427,6 +7496,7 @@
                   m("input[type=checkbox]#advtimectrl", {
                     checked: advanced_time_control,
                     disabled:
+                      app_mode != "play" ||
                       review_mode ||
                       board_setup_mode ||
                       during_play ||
@@ -7672,7 +7742,10 @@
                   {
                     type: "button",
                     disabled:
-                      !is_ready || review_mode || !advanced_time_control,
+                      !is_ready ||
+                      review_mode ||
+                      !advanced_time_control ||
+                      app_mode != "play",
                     title: "Click to start a game in advanced timing system.",
                     onclick: () => {
                       newgame_open = false;
