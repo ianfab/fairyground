@@ -776,6 +776,144 @@ main.app {
   max-width: 220px;
 }
 
+.pickbtn {
+  height: 38px;
+  padding: 0 10px 0 10px;
+  gap: 10px;
+  max-width: 100%;
+}
+
+.pickbtn .picklabel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+  min-width: 0;
+}
+
+.pickbtn .picklabel .name {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.pickbtn .picklabel .type {
+  font-size: 10.5px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.pickbtn.positionpick .picklabel .name {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.dialog.picker {
+  width: min(640px, 100%);
+  height: min(680px, calc(100vh - 32px));
+  gap: 12px;
+}
+
+.dialog.picker #variantsearch {
+  width: 100%;
+  height: 44px;
+  font-size: 15px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 15px;
+  font-size: 12.5px;
+  background: var(--surface2);
+  border-color: transparent;
+  color: var(--muted);
+}
+
+.chip.on {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-soft2);
+}
+
+.pickerlist {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 4px;
+}
+
+.pickerlist .groupsect {
+  padding: 10px 6px 4px;
+}
+
+.pickrow {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  height: auto;
+  min-height: 44px;
+  padding: 8px 12px;
+  text-align: left;
+  white-space: normal;
+  border-color: transparent;
+  background: transparent;
+  font-weight: 500;
+}
+
+.pickrow:hover {
+  background: var(--surface2);
+}
+
+.pickrow.on {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft2);
+}
+
+.pickrow .rowhead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pickrow .rowhead .name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.pickrow .rowhead .id {
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+.pickrow .rowhead .pill {
+  height: 20px;
+  font-size: 10.5px;
+  margin-left: auto;
+}
+
+.pickrow .desc {
+  font-size: 12.5px;
+  color: var(--muted);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
 .topactions {
   display: flex;
   align-items: center;
@@ -2414,21 +2552,18 @@ div.ripple-wrapper {
     flex: 1 1 100%;
   }
 
-  .varsel:first-child {
+  .pickbtn.variantpick {
     flex: 1 1 100%;
+    justify-content: flex-start;
   }
 
-  .varsel {
+  .pickbtn.positionpick {
     flex: 1 1 200px;
+    justify-content: flex-start;
   }
 
-  .varsel select:first-child {
-    max-width: 42%;
-  }
-
-  .varsel select:last-child {
+  .pickbtn .picklabel .name {
     max-width: none;
-    flex: 1;
   }
 
   .topactions .btn.text,

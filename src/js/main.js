@@ -411,6 +411,10 @@ const FriendlyGameTerminationNames = [
 ];
 let ffishnotationobjects = null;
 var PositionVariantsDirectory = new Map();
+// Read access for the UI (variant picker): Map<positiontype, Map<name, game>>
+window.fairyground.GetPositionVariants = function (variant) {
+  return PositionVariantsDirectory.get(variant);
+};
 let EmptyMap = new Map();
 let ffish = null;
 let board = null;

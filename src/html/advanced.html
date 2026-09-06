@@ -4298,6 +4298,70 @@
         let settings_open = false;
         let newgame_open = false;
         let engine_debug = false;
+        let variant_picker_open = false;
+        let position_picker_open = false;
+        let variant_search = "";
+        let variant_filter = "";
+
+        const NOT_CLASSIFIED = "<|NC|>";
+        const currentVariantId = () => {
+          const dropdown = document.getElementById("dropdown-variant");
+          return dropdown ? dropdown.value : "";
+        };
+        const variantDisplayName = (id) =>
+          id == "" ? "Chess" : getVariantName(id, true, false);
+        const variantTypeLabel = (type) =>
+          type == NOT_CLASSIFIED || !type ? "Other" : type;
+        const positionVariantsFor = (id) => {
+          if (!window.fairyground || !window.fairyground.GetPositionVariants) {
+            return undefined;
+          }
+          const key =
+            (id == "" ? "chess" : id) + (fischer_random_mode ? "960" : "");
+          return window.fairyground.GetPositionVariants(key);
+        };
+        const selectVariant = (id) => {
+          const typedropdown = document.getElementById("dropdown-varianttype");
+          const variantdropdown = document.getElementById("dropdown-variant");
+          if (!typedropdown || !variantdropdown) {
+            return;
+          }
+          let present = false;
+          for (let i = 0; i < variantdropdown.length; i++) {
+            if (variantdropdown[i].value == id) {
+              present = true;
+              break;
+            }
+          }
+          if (!present) {
+            typedropdown.value = "";
+            updateVariantDropdown();
+          }
+          changing_variant_type = false;
+          variantdropdown.value = id;
+          variantdropdown.dispatchEvent(new Event("change"));
+          variant_picker_open = false;
+          window.setTimeout(() => m.redraw(), 200);
+        };
+        const selectPosition = (type, name) => {
+          const typedropdown = document.getElementById(
+            "dropdown-posvarianttype",
+          );
+          const namedropdown = document.getElementById(
+            "dropdown-posvariantname",
+          );
+          if (!typedropdown || !namedropdown) {
+            return;
+          }
+          typedropdown.value = type;
+          typedropdown.dispatchEvent(new Event("change"));
+          if (type != "(default)") {
+            namedropdown.value = name;
+            namedropdown.dispatchEvent(new Event("change"));
+          }
+          position_picker_open = false;
+          window.setTimeout(() => m.redraw(), 200);
+        };
 
         const ICONS = {
           first: "M19 20 9 12l10-8v16zM5 19V5",
@@ -4311,6 +4375,8 @@
           undo: "M3 7v6h6M3 13a9 9 0 1 0 3-6.7L3 9",
           gear: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z",
           moon: "M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z",
+          chev: "m6 9 6 6 6-6",
+          grid: "M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z",
           github:
             "M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.3 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5 5 0 0 0 19.9 1s-1.2-.3-3.9 1.5a13.4 13.4 0 0 0-7 0C6.3.7 5.1 1 5.1 1A5 5 0 0 0 5 4.8a5.4 5.4 0 0 0-1.5 3.8c0 5.4 3.3 6.6 6.4 7a3.4 3.4 0 0 0-.9 2.6V22",
           play: "m6 4 14 8-14 8V4z",
@@ -4642,59 +4708,128 @@
               m("span.text", "fairyground"),
             ]),
             m("div.variantbar#posvariantdiv", [
-              m("div.varsel", [
-                m(
-                  "select#dropdown-varianttype",
-                  {
-                    disabled: !is_ready || review_mode || board_setup_mode,
-                    title:
-                      "The available types or categories of variants are shown in this list. Select one to see available variants in next dropdown.",
-                    onchange: (e) => {
-                      changing_variant_type = true;
-                      $("#dropdown-variant").dispatchEvent(new Event("change"));
-                    },
-                  },
-                  [
-                    m("option", { value: "" }, "(all)"),
-                    m("option", { value: "<|NC|>" }, "(not classified)"),
-                  ],
-                ),
-                m(
-                  "select#dropdown-variant",
-                  {
-                    disabled: !is_ready || review_mode || board_setup_mode,
-                    title:
-                      "The available variants of the selected type are shown in this list. Select one to start a game of that variant.",
-                    onchange: (e) => {
-                      if (changing_variant_type) {
-                        updateVariantDropdown();
-                        changing_variant_type = false;
+              m(
+                "button.pickbtn.variantpick",
+                {
+                  type: "button",
+                  disabled: !is_ready || review_mode || board_setup_mode,
+                  title: "Choose the chess variant",
+                  onclick: () => {
+                    variant_picker_open = true;
+                    variant_search = "";
+                    window.setTimeout(() => {
+                      const field = document.getElementById("variantsearch");
+                      if (field) {
+                        field.focus();
                       }
-                      setVariant();
+                    }, 30);
+                  },
+                },
+                [
+                  icon("grid", 18),
+                  m("span.picklabel", [
+                    m("span.name", variantDisplayName(currentVariantId())),
+                    m(
+                      "span.type",
+                      variantTypeLabel(
+                        currentVariantId() == ""
+                          ? getVariantType("chess")
+                          : getVariantType(currentVariantId()),
+                      ),
+                    ),
+                  ]),
+                  icon("chev", 16),
+                ],
+              ),
+              m(
+                "button.pickbtn.positionpick",
+                {
+                  type: "button",
+                  disabled:
+                    !is_ready ||
+                    review_mode ||
+                    !positionVariantsFor(currentVariantId()),
+                  title: positionVariantsFor(currentVariantId())
+                    ? "Choose a start position for this variant"
+                    : "This variant has no predefined start positions",
+                  onclick: () => {
+                    position_picker_open = true;
+                  },
+                },
+                [
+                  m("span.picklabel", [
+                    m(
+                      "span.name",
+                      (() => {
+                        const namedropdown = document.getElementById(
+                          "dropdown-posvariantname",
+                        );
+                        return namedropdown && namedropdown.selectedIndex >= 0
+                          ? namedropdown.value
+                          : "Start position";
+                      })(),
+                    ),
+                  ]),
+                  icon("chev", 16),
+                ],
+              ),
+              m("div.internals", [
+                m("div.varsel", [
+                  m(
+                    "select#dropdown-varianttype",
+                    {
+                      disabled: !is_ready || review_mode || board_setup_mode,
+                      title:
+                        "The available types or categories of variants are shown in this list. Select one to see available variants in next dropdown.",
+                      onchange: (e) => {
+                        changing_variant_type = true;
+                        $("#dropdown-variant").dispatchEvent(
+                          new Event("change"),
+                        );
+                      },
                     },
-                  },
-                  [m("option", { value: "" }, "(default)")],
-                ),
-              ]),
-              m("div.varsel", [
-                m(
-                  "select#dropdown-posvarianttype",
-                  {
-                    disabled: !is_ready || review_mode,
-                    title:
-                      "The available types or categories of custom positions of this variant are shown in this list. Select one to see available positions in next dropdown.",
-                  },
-                  [m("option", { value: "(default)" }, "(default)")],
-                ),
-                m(
-                  "select#dropdown-posvariantname",
-                  {
-                    disabled: !is_ready || review_mode,
-                    title:
-                      "The available custom positions of the selected type are shown in this list. Select one to set the position.",
-                  },
-                  [],
-                ),
+                    [
+                      m("option", { value: "" }, "(all)"),
+                      m("option", { value: "<|NC|>" }, "(not classified)"),
+                    ],
+                  ),
+                  m(
+                    "select#dropdown-variant",
+                    {
+                      disabled: !is_ready || review_mode || board_setup_mode,
+                      title:
+                        "The available variants of the selected type are shown in this list. Select one to start a game of that variant.",
+                      onchange: (e) => {
+                        if (changing_variant_type) {
+                          updateVariantDropdown();
+                          changing_variant_type = false;
+                        }
+                        setVariant();
+                      },
+                    },
+                    [m("option", { value: "" }, "(default)")],
+                  ),
+                ]),
+                m("div.varsel", [
+                  m(
+                    "select#dropdown-posvarianttype",
+                    {
+                      disabled: !is_ready || review_mode,
+                      title:
+                        "The available types or categories of custom positions of this variant are shown in this list. Select one to see available positions in next dropdown.",
+                    },
+                    [m("option", { value: "(default)" }, "(default)")],
+                  ),
+                  m(
+                    "select#dropdown-posvariantname",
+                    {
+                      disabled: !is_ready || review_mode,
+                      title:
+                        "The available custom positions of the selected type are shown in this list. Select one to set the position.",
+                    },
+                    [],
+                  ),
+                ]),
               ]),
               m(
                 "button#aboutvariant.iconbtn.ghost",
@@ -7219,6 +7354,227 @@
             ]),
           );
 
+          // ---------------- variant picker ----------------
+          const variantList = (() => {
+            const query = variant_search.trim().toLowerCase();
+            const items = [];
+            allvariants.forEach((id) => {
+              const type = getVariantType(id);
+              if (variant_filter != "" && type != variant_filter) {
+                return;
+              }
+              const name = getVariantName(id, true, false) || id;
+              const description = getVariantDescription(id, false) || "";
+              let score = 0;
+              if (query != "") {
+                const lowername = name.toLowerCase();
+                if (lowername.startsWith(query)) {
+                  score = 0;
+                } else if (lowername.includes(query)) {
+                  score = 1;
+                } else if (id.toLowerCase().includes(query)) {
+                  score = 2;
+                } else if (description.toLowerCase().includes(query)) {
+                  score = 3;
+                } else {
+                  return;
+                }
+              }
+              items.push({ id, name, type, description, score });
+            });
+            items.sort(
+              (a, b) => a.score - b.score || a.name.localeCompare(b.name),
+            );
+            return items;
+          })();
+          const variantTypesForFilter = (() => {
+            const types = varianttypes.slice();
+            if (
+              allvariants.some((id) => getVariantType(id) == NOT_CLASSIFIED)
+            ) {
+              types.push(NOT_CLASSIFIED);
+            }
+            return types;
+          })();
+          const variantPicker = m(
+            "div.backdrop",
+            {
+              hidden: !variant_picker_open,
+              onclick: (e) => {
+                if (e.target === e.currentTarget) {
+                  variant_picker_open = false;
+                }
+              },
+            },
+            m("div.dialog.card.picker", [
+              m("div.dialoghead", [
+                m("h2", "Variant"),
+                m(
+                  "button.iconbtn.ghost",
+                  {
+                    type: "button",
+                    title: "Close",
+                    onclick: () => {
+                      variant_picker_open = false;
+                    },
+                  },
+                  icon("x"),
+                ),
+              ]),
+              m("input[type=search]#variantsearch", {
+                placeholder: "Search variants…",
+                value: variant_search,
+                oninput: (e) => {
+                  variant_search = e.target.value;
+                },
+                onkeydown: (e) => {
+                  if (e.key == "Enter" && variantList.length > 0) {
+                    selectVariant(variantList[0].id);
+                  } else if (e.key == "Escape") {
+                    variant_picker_open = false;
+                  }
+                },
+              }),
+              m("div.chips", [
+                m(
+                  "button.chip",
+                  {
+                    type: "button",
+                    class: variant_filter == "" ? "on" : "",
+                    onclick: () => {
+                      variant_filter = "";
+                    },
+                  },
+                  "All",
+                ),
+                variantTypesForFilter.map((type) =>
+                  m(
+                    "button.chip",
+                    {
+                      type: "button",
+                      class: variant_filter == type ? "on" : "",
+                      onclick: () => {
+                        variant_filter = type;
+                      },
+                    },
+                    variantTypeLabel(type),
+                  ),
+                ),
+              ]),
+              m("div.pickerlist", [
+                variantList.length == 0
+                  ? m("p.hint", "No variant matches.")
+                  : variantList.map((item) =>
+                      m(
+                        "button.pickrow",
+                        {
+                          type: "button",
+                          key: item.id,
+                          class:
+                            item.id == currentVariantId() ||
+                            (currentVariantId() == "" && item.id == "chess")
+                              ? "on"
+                              : "",
+                          onclick: () => {
+                            selectVariant(item.id);
+                          },
+                        },
+                        [
+                          m("span.rowhead", [
+                            m("span.name", item.name),
+                            m("span.id.mono", item.id),
+                            m("span.pill", variantTypeLabel(item.type)),
+                          ]),
+                          item.description
+                            ? m("span.desc", item.description)
+                            : null,
+                        ],
+                      ),
+                    ),
+              ]),
+            ]),
+          );
+
+          // ---------------- position picker ----------------
+          const positionGroups = (() => {
+            const directory = positionVariantsFor(currentVariantId());
+            const groups = [];
+            if (directory) {
+              directory.forEach((names, type) => {
+                const entries = [];
+                names.forEach((game, name) => {
+                  entries.push({ name, description: game.Description || "" });
+                });
+                groups.push({ type, entries });
+              });
+            }
+            return groups;
+          })();
+          const positionPicker = m(
+            "div.backdrop",
+            {
+              hidden: !position_picker_open,
+              onclick: (e) => {
+                if (e.target === e.currentTarget) {
+                  position_picker_open = false;
+                }
+              },
+            },
+            m("div.dialog.card.picker", [
+              m("div.dialoghead", [
+                m("h2", "Start position"),
+                m(
+                  "button.iconbtn.ghost",
+                  {
+                    type: "button",
+                    title: "Close",
+                    onclick: () => {
+                      position_picker_open = false;
+                    },
+                  },
+                  icon("x"),
+                ),
+              ]),
+              m("div.pickerlist", [
+                m(
+                  "button.pickrow",
+                  {
+                    type: "button",
+                    onclick: () => {
+                      selectPosition("(default)", "");
+                    },
+                  },
+                  [
+                    m("span.rowhead", [
+                      m("span.name", "Default start position"),
+                    ]),
+                  ],
+                ),
+                positionGroups.map((group) => [
+                  m("span.sect.groupsect", group.type),
+                  group.entries.map((entry) =>
+                    m(
+                      "button.pickrow",
+                      {
+                        type: "button",
+                        key: group.type + "/" + entry.name,
+                        onclick: () => {
+                          selectPosition(group.type, entry.name);
+                        },
+                      },
+                      [
+                        m("span.rowhead", [m("span.name", entry.name)]),
+                        entry.description
+                          ? m("span.desc", entry.description)
+                          : null,
+                      ],
+                    ),
+                  ),
+                ]),
+              ]),
+            ]),
+          );
+
           // ---------------- settings drawer ----------------
           const settingsDrawer = m("div", { hidden: !settings_open }, [
             m("div.drawerbackdrop", {
@@ -7750,6 +8106,8 @@
             m("div.layout", [boardcol, panel]),
             m("p#pagetitle", { hidden: true }, "Advanced analysis"),
             newGameDialog,
+            variantPicker,
+            positionPicker,
             settingsDrawer,
             m("div#moveselectiondialog", { hidden: !select_move_dialog }, [
               m("div#moveslectdiv", [
