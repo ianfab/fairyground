@@ -5153,7 +5153,10 @@
                     ),
                   ]),
                 ]),
-                m("p.hint", "Unchecked sides are played by you on the board."),
+                m(
+                  "p.hint",
+                  "Unchecked sides are played by you on the board. Turning on infinite analysis switches both sides to you and disables the time control.",
+                ),
                 m("div.hr"),
                 m("div.secthead", [
                   m("span.sect", "Fairy-Stockfish · in browser"),
@@ -5167,15 +5170,35 @@
                       m("input[type=checkbox]#analysis", {
                         checked: analysis_mode,
                         disabled:
-                          play_white ||
-                          play_black ||
-                          advanced_time_control ||
                           board_setup_mode ||
-                          random_mover_white ||
-                          random_mover_black ||
-                          engine_match_mode,
+                          engine_match_mode ||
+                          during_play ||
+                          during_engine_match,
                         onclick: () => {
                           analysis_mode = !analysis_mode;
+                          if (analysis_mode) {
+                            // Analysis is exclusive with engine/random players
+                            // and timed games: switch those off automatically.
+                            play_white = false;
+                            play_black = false;
+                            random_mover_white = false;
+                            random_mover_black = false;
+                            advanced_time_control = false;
+                            // Sync the DOM immediately so that code reading
+                            // the checkboxes before the next redraw sees it.
+                            [
+                              "playwhite",
+                              "playblack",
+                              "randommoverwhite",
+                              "randommoverblack",
+                              "advtimectrl",
+                            ].forEach((id) => {
+                              const element = document.getElementById(id);
+                              if (element) {
+                                element.checked = false;
+                              }
+                            });
+                          }
                         },
                       }),
                       m("span", "Infinite analysis"),
