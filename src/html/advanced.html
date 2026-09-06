@@ -6715,7 +6715,7 @@
               ]),
               m(
                 "p.hint",
-                "Variant and start position are chosen in the top bar, the players (you, Fairy-Stockfish, random mover or an external engine) in the Engine tab. Enable the time control below to play a timed game.",
+                "Variant and start position are chosen in the top bar, the players (you, Fairy-Stockfish, random mover or an external engine) in the Engine tab. Enable the time control below to play a timed game; this switches infinite analysis off.",
               ),
               m(
                 "label#label-advtimectrl.toggle",
@@ -6727,12 +6727,23 @@
                   m("input[type=checkbox]#advtimectrl", {
                     checked: advanced_time_control,
                     disabled:
-                      analysis_mode ||
                       review_mode ||
                       board_setup_mode ||
+                      during_play ||
                       during_engine_match,
                     onclick: () => {
                       advanced_time_control = !advanced_time_control;
+                      if (advanced_time_control && analysis_mode) {
+                        // Timed games are exclusive with infinite analysis:
+                        // stop the analysis and switch it off.
+                        analysis_mode = false;
+                        const analysischeckbox =
+                          document.getElementById("analysis");
+                        if (analysischeckbox) {
+                          analysischeckbox.checked = false;
+                        }
+                        force_stop();
+                      }
                     },
                   }),
                   m("span", "Time control"),
