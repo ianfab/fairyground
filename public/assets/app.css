@@ -732,14 +732,7 @@ main.app {
 .brand .mark {
   width: 30px;
   height: 30px;
-  border-radius: 9px;
-  background: var(--accent);
-  color: var(--accent-ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 16px;
+  display: block;
 }
 
 .pageswitch {
