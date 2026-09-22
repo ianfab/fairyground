@@ -6938,6 +6938,10 @@ function updateChessground(showresult) {
   const boardfenval = board.fen();
   const boardfenvallist = boardfenval.split(" ");
   currentBoardFen.textContent = boardfenval;
+  // Let the page keep the shareable URL in sync with the board.
+  if (typeof window.fairyground.OnBoardStateChanged == "function") {
+    window.fairyground.OnBoardStateChanged();
+  }
 
   if (boardfenvallist.length == 7) {
     const checknums = boardfenvallist[4].split("+");
