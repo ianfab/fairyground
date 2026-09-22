@@ -1,47 +1,53 @@
+:root {
+  --bg: #ece7dd;
+  --surface: rgba(255, 253, 248, 0.88);
+  --surface2: rgba(0, 0, 0, 0.05);
+  --border: rgba(0, 0, 0, 0.08);
+  --border2: rgba(0, 0, 0, 0.16);
+  --text: #221e18;
+  --muted: #6a6358;
+  --faint: #9d968a;
+  --accent: #8a5a2b;
+  --accent-hover: #74491f;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(138, 90, 43, 0.14);
+  --accent-soft2: rgba(138, 90, 43, 0.26);
+}
+
 #pagebackground {
-  background-image: url('./assets/images/ui/chess/chess.avif');
-}
-
-#enginemanagementpopup {
-  background-color: #0000 !important;
-}
-
-#enginemanagementpopup-background {
-  background-image: url('./assets/images/ui/chess/chess.avif');
+  background-image: url("./assets/images/ui/chess/chess.avif");
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  background-position: center;
 }
 
-#enginesetuppopup {
-  background-color: #0000 !important;
+html {
+  background: transparent;
 }
 
-#enginesetuppopup-background {
-  background-image: url('./assets/images/ui/chess/chess.avif');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+.topbar,
+.panel,
+.drawer,
+.dialog {
+  background: var(--surface);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
-#enginesettingspopup {
-  background-color: #0000 !important;
-}
-
-#enginesettingspopup-background {
-  background-image: url('./assets/images/ui/chess/chess.avif');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
-
-#loadsavedgamespopup {
-  background-color: #0000 !important;
-}
-
+#enginemanagementpopup-background,
+#enginesetuppopup-background,
+#enginesettingspopup-background,
 #loadsavedgamespopup-background {
-  background-image: url('./assets/images/ui/chess/chess.avif');
+  background-image: url("./assets/images/ui/chess/chess.avif");
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+#enginemanagementpopup,
+#enginesetuppopup,
+#enginesettingspopup,
+#loadsavedgamespopup {
+  background-color: var(--surface);
 }

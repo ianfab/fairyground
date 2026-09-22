@@ -185,6 +185,7 @@ const dropdownPositionVariantName = document.getElementById(
 const buttonAboutPosition = document.getElementById("aboutposition");
 const positionInformation = document.getElementById("positioninfo");
 const clickClickMove = document.getElementById("clickclickmove");
+const dragMove = document.getElementById("dragmove");
 const positionVariantTxt = document.getElementById("posvariant-txt");
 const quickPromotionPiece = document.getElementById("dropdown-quickpromotion");
 const buttonPassMove = document.getElementById("passmove");
@@ -216,6 +217,32 @@ const buttonhighlightmove = document.getElementById("highlightmove");
 const searchresultinfo = document.getElementById("searchresultinfo");
 const dropdownNotationSystem = document.getElementById("sannotation");
 const pRandomMoverGo = document.getElementById("randommovergo");
+
+// Compact number formatting for the engine statistics (1.2M, 850k).
+function formatCount(value) {
+  const n = parseInt(value);
+  if (isNaN(n)) {
+    return "?";
+  }
+  if (n >= 1000000000) {
+    return `${(n / 1000000000).toFixed(1)}G`;
+  }
+  if (n >= 1000000) {
+    return `${(n / 1000000).toFixed(1)}M`;
+  }
+  if (n >= 1000) {
+    return `${(n / 1000).toFixed(0)}k`;
+  }
+  return String(n);
+}
+
+function formatSecondsShort(milliseconds) {
+  const n = parseInt(milliseconds);
+  if (isNaN(n)) {
+    return "?";
+  }
+  return `${(n / 1000).toFixed(1)}s`;
+}
 const dropdownBoardCoordinate = document.getElementById("boardcoordinate");
 const checkboxFischerRandom = document.getElementById("isfischerrandommode");
 const checkBoxInnerCoordinate = document.getElementById(
@@ -411,6 +438,10 @@ const FriendlyGameTerminationNames = [
 ];
 let ffishnotationobjects = null;
 var PositionVariantsDirectory = new Map();
+// Read access for the UI (variant picker): Map<positiontype, Map<name, game>>
+window.fairyground.GetPositionVariants = function (variant) {
+  return PositionVariantsDirectory.get(variant);
+};
 let EmptyMap = new Map();
 let ffish = null;
 let board = null;
@@ -548,7 +579,7 @@ class MultiplePrincipalVariationMiniBoardHandler {
       }
     }
     selected.IsValid = true;
-    selected.HeaderString = `${PrincipalVariationNumber == 1 ? "" : "<hr />"}Principal Variation ${PrincipalVariationNumber}: (Depth: Average ${Depth > -1 ? Depth : "❓"} Max ${SelectiveDepth > -1 ? SelectiveDepth : "❓"}) <evalnum>${evaluation}</evalnum> `;
+    selected.HeaderString = `${PrincipalVariationNumber == 1 ? "" : "<hr />"}<evalnum>${evaluation}</evalnum><span class="pvmeta">d${Depth > -1 ? Depth : "?"}/${SelectiveDepth > -1 ? SelectiveDepth : "?"}</span> `;
     selected.Variant = VariantID;
     selected.Is960 = Is960;
     selected.FEN = CurrentBoardFEN;
@@ -1871,6 +1902,7 @@ function initBoard(variant) {
       },
     },
     draggable: {
+      enabled: dragMove.checked || isBoardSetup.checked,
       showGhost: true,
     },
     selectable: {
@@ -2067,6 +2099,7 @@ function redrawChessground(customFEN) {
       },
     },
     draggable: {
+      enabled: dragMove.checked || isBoardSetup.checked,
       showGhost: true,
     },
     selectable: {
@@ -4461,6 +4494,7 @@ new Module().then((loadedModule) => {
           dests: EmptyMap,
         },
         draggable: {
+          enabled: true,
           deleteOnDropOff: true,
         },
       });
@@ -4544,6 +4578,7 @@ new Module().then((loadedModule) => {
           dests: EmptyMap,
         },
         draggable: {
+          enabled: true,
           deleteOnDropOff: true,
         },
       });
@@ -4615,6 +4650,14 @@ new Module().then((loadedModule) => {
   };
 
   positionVariantTxt.onchange = onSelectPositionVariantsFile;
+
+  dragMove.onchange = function () {
+    chessground.set({
+      draggable: {
+        enabled: dragMove.checked || isBoardSetup.checked,
+      },
+    });
+  };
 
   clickClickMove.onchange = function () {
     if (clickClickMove.checked == true) {
@@ -4888,7 +4931,7 @@ new Module().then((loadedModule) => {
               showevalnum = multipvrecord[k][1].toFixed(2).toString();
             }
           }
-          pvinfostr += `${k > 0 ? "<hr />" : ""}Principal Variation ${k + 1}: (Depth: Average ${multipvrecord[k][5] > -1 ? multipvrecord[k][5] : "❓"} Max ${multipvrecord[k][6] > -1 ? multipvrecord[k][6] : "❓"}) <evalnum>${showevalnum}</evalnum> ${getNotation(
+          pvinfostr += `${k > 0 ? "<hr />" : ""}<evalnum>${showevalnum}</evalnum><span class="pvmeta">d${multipvrecord[k][5] > -1 ? multipvrecord[k][5] : "?"}/${multipvrecord[k][6] > -1 ? multipvrecord[k][6] : "?"}</span> ${getNotation(
             dropdownNotationSystem[dropdownNotationSystem.selectedIndex].value,
             board.variant(),
             board.fen(),
@@ -4918,7 +4961,7 @@ new Module().then((loadedModule) => {
       }
       let maxdepth = Math.max(...depthlist);
       let maxseldepth = Math.max(...seldepthlist);
-      evalinfo.innerText = `Depth (Average): ${maxdepth > 0 ? maxdepth : "❓"}\nSelective Depth (Max): ${maxseldepth > 0 ? maxseldepth : "❓"}\nNodes: ${nodeinfo}\nNodes Per Second: ${npsinfo}\nTime: ${timeinfo}`;
+      evalinfo.innerText = `depth ${maxdepth > 0 ? maxdepth : "❓"}/${maxseldepth > 0 ? maxseldepth : "❓"} · ${formatCount(nodeinfo)} nodes · ${formatCount(npsinfo)} n/s · ${formatSecondsShort(timeinfo)}`;
     } else if (text.includes("bestmove")) {
       let textparselist = text.split(" ");
       if (board.turn()) {
@@ -6342,6 +6385,7 @@ function disableBoardMove() {
       color: undefined,
     },
     draggable: {
+      enabled: dragMove.checked,
       deleteOnDropOff: false,
     },
   });
@@ -6354,6 +6398,7 @@ function enableBoardMove() {
       dests: getDests(board),
     },
     draggable: {
+      enabled: dragMove.checked || isBoardSetup.checked,
       deleteOnDropOff: isBoardSetup.checked,
     },
   });
@@ -6892,7 +6937,7 @@ function updatePGNDivision(forceupdate = false) {
 function updateChessground(showresult) {
   const boardfenval = board.fen();
   const boardfenvallist = boardfenval.split(" ");
-  currentBoardFen.textContent = `Current Board FEN:  ${boardfenval}`;
+  currentBoardFen.textContent = boardfenval;
 
   if (boardfenvallist.length == 7) {
     const checknums = boardfenvallist[4].split("+");
