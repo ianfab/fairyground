@@ -4575,16 +4575,15 @@
         // ---------------------------------------------------------------
         // Deep links
         //
-        // The query string carries the variant and the position, so that a
+        // The query string can carry the variant and the position, so that a
         // board can be shared and reopened exactly as it is:
         //   ?variant=<id>&fen=<FEN>&moves=<UCI moves>&chess960=1
-        // It is read once on startup and kept up to date afterwards with
-        // history.replaceState(), so the address bar always is a share link.
+        // It is read once on startup. The address bar is left alone after
+        // that; the share button builds the link when it is clicked.
         // ---------------------------------------------------------------
         const SHARE_URL_MAX_LENGTH = 1800;
         let url_state_applied = false;
         let share_copied = false;
-        let url_sync_pending = false;
 
         const readUrlState = () => {
           const params = new URLSearchParams(window.location.search);
@@ -4650,39 +4649,11 @@
             : withmoves;
         };
 
-        const syncUrl = () => {
-          if (!url_state_applied || url_sync_pending) {
-            return;
-          }
-          // replaceState is rate limited by browsers, so coalesce the calls
-          // that a running game or an engine match produces.
-          url_sync_pending = true;
-          window.setTimeout(() => {
-            url_sync_pending = false;
-            const url = buildShareUrl();
-            if (url != window.location.href) {
-              try {
-                window.history.replaceState(null, "", url);
-              } catch (e) {
-                console.warn("Cannot update the address bar:", e);
-              }
-            }
-          }, 500);
-        };
-
         const applyUrlState = () => {
           if (url_state_applied) {
             return;
           }
           url_state_applied = true;
-          // Not every variant switch redraws the board, so follow the
-          // controls that carry the URL state as well.
-          ["dropdown-variant", "isfischerrandommode"].forEach((id) => {
-            const element = document.getElementById(id);
-            if (element) {
-              element.addEventListener("change", () => syncUrl());
-            }
-          });
           const state = readUrlState();
           if (state.variant != "" && !allvariants.includes(state.variant)) {
             console.warn(
@@ -4698,7 +4669,6 @@
             selectVariant(state.variant);
           }
           if (state.fen == "" && state.moves == "") {
-            syncUrl();
             return;
           }
           // Changing the variant reloads the board, so set the position once
@@ -4716,14 +4686,7 @@
             if (!setpos.disabled) {
               setpos.click();
             }
-            syncUrl();
           }, 300);
-        };
-
-        // main.js calls this on every board change so that the address bar
-        // follows the board.
-        window.fairyground.OnBoardStateChanged = () => {
-          syncUrl();
         };
 
         const shareBoard = () => {
