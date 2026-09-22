@@ -104,7 +104,7 @@ If you want to use fairyground to test your experimental Fairy-Stockfish build, 
 
 7. Go to fairyground root directory (The directory containing this README), open your console and run `npm run build` (Linux/macOS) or `npm run buildwithcmd` (Windows).
 
-8. Run `node server.js` in the console, and then go to [http://localhost:5015/public/advanced.html](http://localhost:5015/public/advanced.html).
+8. Run `node server.js` in the console, and then go to [http://localhost:5015/public/](http://localhost:5015/public/).
 
 9. The page displayed now is using your version of Fairy-Stockfish, and you can begin your test.
 
