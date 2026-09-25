@@ -102,6 +102,7 @@ andersanti|Chess Variants|Anders Anti-Chess|Anti-Chess but you can pass your tur
 4x5chess|Chess Variants|Chess 4×5|4×5 version of Chess.|
 4x6chess|Chess Variants|Chess 4×6|4×6 version of Chess.|
 5x6chess|Chess Variants|Chess 5×6|5×6 version of Chess.|
+georgian|Chess Variants|Georgian Chess|Historical chess from Georgia where the queen moves as an amazon (queen + knight), without castling and en passant.|
 
 # Makruk Variants: Variants based on Makruk
 makruk|Makruk Variants|Makruk|Thai Chess. A game closely resembling the original Chaturanga. Similar to Chess but with a different queen and bishop.|https://en.wikipedia.org/wiki/Makruk
@@ -115,6 +116,7 @@ makhouse|Makruk Variants|Makruk House|Hybrid variant of Makruk and Crazyhouse.|
 
 # Shogi Variants: Variants based on Shogi
 shogi|Shogi Variants|Shogi|Japanese Chess, the standard 9×9 version played today with drops and promotions.|https://en.wikipedia.org/wiki/Shogi
+checkshogi|Shogi Variants|Check Shogi|Shogi where the first player to give check wins.|
 minishogi|Shogi Variants|Mini Shogi|5×5 Shogi for more compact and faster games. There are no knights or lances.|https://en.wikipedia.org/wiki/Minishogi
 kyotoshogi|Shogi Variants|Kyoto Shogi|A wild Shogi variant on a 5×5 board where pieces flip into a different piece after each move.|https://en.wikipedia.org/wiki/Kyoto_shogi
 dobutsu|Shogi Variants|Dobutsu Shogi|3×4 game with cute animals, designed to teach children how to play Shogi.|https://en.wikipedia.org/wiki/D%C5%8Dbutsu_sh%C5%8Dgi
