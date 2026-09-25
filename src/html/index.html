@@ -2068,6 +2068,7 @@
         let engine_list = [];
 
         document.addEventListener("gameend", (event) => {
+          finishGame(event.detail.result, event.detail.reason);
           if (engine_match_mode && during_engine_match) {
             if (event.detail.result == "1-0") {
               engine_match_white_wins++;
@@ -3669,22 +3670,20 @@
             white_remaining_time = 0;
             $("#timeoutside").value = 1;
             $("#whitetime").innerHTML = "Out Of Time";
-            document.dispatchEvent(
-              new CustomEvent("gameend", {
-                detail: { result: "0-1", reason: "time forfeit" },
-              }),
-            );
           } else if (side == "BLACK") {
             black_remaining_time = 0;
             $("#timeoutside").value = 2;
             $("#blacktime").innerHTML = "Out Of Time";
-            document.dispatchEvent(
-              new CustomEvent("gameend", {
-                detail: { result: "1-0", reason: "time forfeit" },
-              }),
-            );
           }
           gameEnd();
+          document.dispatchEvent(
+            new CustomEvent("gameend", {
+              detail: {
+                result: side == "WHITE" ? "0-1" : "1-0",
+                reason: "time forfeit",
+              },
+            }),
+          );
         };
 
         const gameEnd = () => {
@@ -4490,6 +4489,12 @@
         let engine_debug = false;
         let move_input = "either"; // "either" | "click" | "drag"
         let app_mode = "analysis"; // "analysis" | "play" | "setup"
+        // Whether the game of play mode has ended, and how. This is the single
+        // source of truth for the game end: the header buttons, the abort
+        // button and the result display are all derived from it, and it is
+        // only changed by startGame(), finishGame() and endGame().
+        let game_over = false;
+        let game_outcome = null; // { result, reason } once the game is over
         // Game settings chosen in the "New game" dialog (kept between games).
         const game_white = {
           player: "you",
@@ -5034,13 +5039,14 @@
               ? "dice"
               : "user";
 
-        // The players only take effect while a game runs (play mode). Engine
-        // matches manage the players on their own and are left alone.
+        // The players only take effect while a game runs (play mode, until
+        // the game is over). Engine matches manage the players on their own
+        // and are left alone.
         const applyPlayerSettings = () => {
           if (engine_match_mode || during_engine_match) {
             return;
           }
-          const active = app_mode == "play";
+          const active = gameRunning();
           play_white = active && isEngineSide(game_white);
           play_black = active && isEngineSide(game_black);
           random_mover_white = active && game_white.player == "random";
@@ -5058,6 +5064,52 @@
           });
         };
 
+        const gameRunning = () => app_mode == "play" && !game_over;
+
+        // Ends the running game: stops the clock and all engines and records
+        // the outcome. The moves stay on the board. Games of an engine match
+        // are handled by the match itself; the match as a whole ends through
+        // the stop button.
+        const finishGame = (result, reason) => {
+          if (!gameRunning() || during_engine_match) {
+            return;
+          }
+          if (during_play) {
+            gameAbort();
+          }
+          force_stop();
+          game_over = true;
+          game_outcome = { result: result, reason: reason };
+          m.redraw();
+        };
+
+        const abortGame = () => {
+          if (during_engine_match) {
+            document.getElementById("stop").click();
+          } else {
+            finishGame("*", "aborted");
+          }
+        };
+
+        const outcomeText = (outcome) => {
+          if (outcome.reason == "aborted") {
+            return "Game aborted";
+          }
+          if (outcome.reason == "engine match finished") {
+            return "Engine match finished";
+          }
+          const winner = {
+            "1-0": "White wins",
+            "0-1": "Black wins",
+            "1/2-1/2": "Draw",
+          }[outcome.result];
+          if (!winner) {
+            return "Game over";
+          }
+          const suffix = outcome.reason == "time forfeit" ? " on time" : "";
+          return `${outcome.result} · ${winner}${suffix}`;
+        };
+
         const sideLimitArgs = (side) => {
           const limit =
             side == "white" ? engine_limit_white : engine_limit_black;
@@ -5070,12 +5122,18 @@
         const startGame = () => {
           newgame_open = false;
           setAnalysisMode(false);
-          if (!game_continue) {
-            // Back to the initial position of the current game.
-            const restart = document.getElementById("restart");
-            if (restart && !restart.disabled) {
-              restart.click();
-            }
+          // A previous game that is still running ends first.
+          abortGame();
+          game_over = false;
+          game_outcome = null;
+          // Either back to the initial position of the current game, or
+          // re-set the current position, which also clears the clock state
+          // of a previous game (e.g. a time forfeit).
+          const setup = document.getElementById(
+            game_continue ? "setpos" : "restart",
+          );
+          if (setup && !setup.disabled) {
+            setup.click();
           }
           [
             ["white", game_white],
@@ -5131,6 +5189,9 @@
           applyPlayerSettings();
           m.redraw();
           window.setTimeout(() => {
+            if (!gameRunning()) {
+              return;
+            }
             if (engine_match_mode) {
               // Start the engine match directly: the per-side limits chosen
               // in the dialog replace the old global limit validation.
@@ -5155,6 +5216,11 @@
               m.redraw();
               return;
             }
+            // A game continued from a finished position is over at once.
+            if ($("#label-stm").innerText == "undefined") {
+              finishGame($("#gameresult").value, "normal");
+              return;
+            }
             if (advanced_time_control) {
               goWithTimeControl();
               return;
@@ -5170,12 +5236,9 @@
         };
 
         const endGame = () => {
-          if (during_engine_match) {
-            document.getElementById("stop").click();
-          } else if (during_play) {
-            gameAbort();
-          }
-          force_stop();
+          abortGame();
+          game_over = false;
+          game_outcome = null;
           engine_match_mode = false;
           const matchbox = document.getElementById("isenginematchmode");
           if (matchbox) {
@@ -5523,17 +5586,25 @@
                 [icon("edit", 16), "Setup"],
               ),
               m(
-                "button.danger",
+                "span.pill.gameoutcome#gameoutcome",
+                { hidden: app_mode != "play" || !game_over },
+                game_outcome ? outcomeText(game_outcome) : "",
+              ),
+              m(
+                game_over ? "button.soft" : "button.danger",
                 {
                   type: "button",
                   hidden: app_mode != "play",
-                  title:
-                    "End the game and return to the analysis board (the moves are kept).",
+                  title: game_over
+                    ? "Return to the analysis board (the moves are kept)."
+                    : "End the game and return to the analysis board (the moves are kept).",
                   onclick: () => {
                     endGame();
                   },
                 },
-                [icon("stop", 16), m("span", "End game")],
+                game_over
+                  ? [icon("cpu", 16), m("span", "Analyze")]
+                  : [icon("stop", 16), m("span", "End game")],
               ),
               m(
                 "a.btn.ghost.text",
@@ -5610,7 +5681,7 @@
             ]),
             m(
               "div#timecontrolduringplay",
-              { hidden: !advanced_time_control || !during_play },
+              { hidden: !advanced_time_control || !gameRunning() },
               [
                 m(
                   "button#addtimeforwhite.sm",
@@ -5640,10 +5711,11 @@
                   "button#gameabort.sm.danger",
                   {
                     type: "button",
-                    title: "Exit current advanced timing system based game.",
+                    title:
+                      "Stop the clock and end the game without a result (the moves are kept).",
                     onclick: () => {
                       if (confirm("Are you sure to abort the game?")) {
-                        gameAbort();
+                        abortGame();
                       }
                     },
                   },
@@ -6647,6 +6719,7 @@
                       }
                       if (during_engine_match) {
                         during_engine_match = false;
+                        finishGame("*", "engine match finished");
                         setTimeout(() => {
                           if (
                             window.confirm(
@@ -7124,7 +7197,7 @@
                         "Save games as PGN",
                       ),
                       helpButton(
-                        'You can let the engines play against each other (Supports binary engines, based on your settings) for a certain count of games automatically and Fairyground will collect the statistics on win/draw/loss counts for you to test variant balance or engine strength.\nYou need to setup time settings first, e.g. depth/move time/nodes controlled moving or use advanced time control. All the matches uses that setting after you click <Start Engine Match>.\nYou can click <Stop> to exit this mode at any time. If you use advanced time control, abort game first and then click <Stop>.\nThis will not swap sides, so if you want to let engines play each side, you can let them play N games and then swap side manually to play another N games.\nDo not do unnecessary things like setting FEN or changing variant during the match, otherwise something unexpected may happen.\nNote: If the match stops unexpectedly, then it usually indicates an engine crash. Check the console (Press Ctrl+Shift+I and select "Console" to see it) to see what\'s going on.',
+                        'You can let the engines play against each other (Supports binary engines, based on your settings) for a certain count of games automatically and Fairyground will collect the statistics on win/draw/loss counts for you to test variant balance or engine strength.\nYou need to setup time settings first, e.g. depth/move time/nodes controlled moving or use advanced time control. All the matches uses that setting after you click <Start Engine Match>.\nYou can click <Stop> to exit this mode at any time.\nThis will not swap sides, so if you want to let engines play each side, you can let them play N games and then swap side manually to play another N games.\nDo not do unnecessary things like setting FEN or changing variant during the match, otherwise something unexpected may happen.\nNote: If the match stops unexpectedly, then it usually indicates an engine crash. Check the console (Press Ctrl+Shift+I and select "Console" to see it) to see what\'s going on.',
                       ),
                     ]),
                     m(
