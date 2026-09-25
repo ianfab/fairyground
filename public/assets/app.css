@@ -882,6 +882,35 @@ main.app {
   padding: 10px 6px 4px;
 }
 
+.pickitem {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.pickitem .pickrow {
+  flex: 1;
+  min-width: 0;
+}
+
+button.favbtn {
+  flex: none;
+  color: var(--faint);
+}
+
+button.favbtn.on {
+  color: var(--warn);
+}
+
+.favbtn.on svg,
+.chip.on svg {
+  fill: currentColor;
+}
+
+.chip {
+  gap: 5px;
+}
+
 .pickrow {
   display: flex;
   flex-direction: column;

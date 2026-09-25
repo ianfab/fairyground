@@ -4583,6 +4583,37 @@
         let ini_engine_chain = Promise.resolve();
 
         const NOT_CLASSIFIED = "<|NC|>";
+        const NOT_SUPPORTED = "(not supported)";
+        // Variant picker filter for the favorite variants.
+        const FAVORITES_FILTER = "<|FAV|>";
+        const FAVORITES_STORAGE_KEY = "FavoriteVariants";
+        const favorite_variants = new Set(
+          (() => {
+            try {
+              const stored = JSON.parse(
+                localStorage.getItem(FAVORITES_STORAGE_KEY),
+              );
+              return Array.isArray(stored) ? stored : [];
+            } catch (e) {
+              return [];
+            }
+          })(),
+        );
+        const toggleFavorite = (id) => {
+          if (favorite_variants.has(id)) {
+            favorite_variants.delete(id);
+          } else {
+            favorite_variants.add(id);
+          }
+          try {
+            localStorage.setItem(
+              FAVORITES_STORAGE_KEY,
+              JSON.stringify([...favorite_variants]),
+            );
+          } catch (e) {
+            console.warn("Cannot store the favorite variants:", e);
+          }
+        };
         const currentVariantId = () => {
           const dropdown = document.getElementById("dropdown-variant");
           return dropdown ? dropdown.value : "";
@@ -5391,6 +5422,7 @@
             "M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6",
           terminal: "m4 17 6-6-6-6M12 19h8",
           code: "m16 18 6-6-6-6M8 6l-6 6 6 6",
+          star: "M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5-5.9-3.2-5.9 3.2 1.2-6.5-4.8-4.6 6.6-.9z",
           wall: "M3 3h18v18H3zM3 9h18M3 15h18M9 9v6M15 3v6M15 15v6",
           skip: "m5 4 10 8-10 8V4zM19 5v14",
           user: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
@@ -9309,7 +9341,11 @@
                 return;
               }
               const type = getVariantType(id);
-              if (variant_filter != "" && type != variant_filter) {
+              if (variant_filter == FAVORITES_FILTER) {
+                if (!favorite_variants.has(id)) {
+                  return;
+                }
+              } else if (variant_filter != "" && type != variant_filter) {
                 return;
               }
               const name = getVariantName(id, true, false) || id;
@@ -9336,14 +9372,24 @@
             );
             return items;
           })();
+          // Own categories first, the remaining ones last.
           const variantTypesForFilter = (() => {
-            const types = varianttypes.slice();
+            const first = [MY_VARIANTS_TYPE];
+            const last = [NOT_CLASSIFIED, NOT_SUPPORTED];
+            const present = varianttypes.slice();
             if (
               allvariants.some((id) => getVariantType(id) == NOT_CLASSIFIED)
             ) {
-              types.push(NOT_CLASSIFIED);
+              present.push(NOT_CLASSIFIED);
             }
-            return types;
+            return first
+              .filter((type) => present.includes(type))
+              .concat(
+                present.filter(
+                  (type) => !first.includes(type) && !last.includes(type),
+                ),
+                last.filter((type) => present.includes(type)),
+              );
           })();
           const variantPicker = m(
             "div.backdrop",
@@ -9420,6 +9466,17 @@
                   },
                   "All",
                 ),
+                m(
+                  "button.chip",
+                  {
+                    type: "button",
+                    class: variant_filter == FAVORITES_FILTER ? "on" : "",
+                    onclick: () => {
+                      variant_filter = FAVORITES_FILTER;
+                    },
+                  },
+                  [icon("star", 12), "Favorites"],
+                ),
                 variantTypesForFilter.map((type) =>
                   m(
                     "button.chip",
@@ -9436,33 +9493,57 @@
               ]),
               m("div.pickerlist", [
                 variantList.length == 0
-                  ? m("p.hint", "No variant matches.")
+                  ? m(
+                      "p.hint",
+                      variant_filter == FAVORITES_FILTER &&
+                        variant_search.trim() == ""
+                        ? "No favorites yet. Mark variants with the star to find them here."
+                        : "No variant matches.",
+                    )
                   : variantList.map((item) =>
-                      m(
-                        "button.pickrow",
-                        {
-                          type: "button",
-                          key: item.id,
-                          class:
-                            item.id == currentVariantId() ||
-                            (currentVariantId() == "" && item.id == "chess")
-                              ? "on"
-                              : "",
-                          onclick: () => {
-                            selectVariant(item.id);
+                      m("div.pickitem", { key: item.id }, [
+                        m(
+                          "button.pickrow",
+                          {
+                            type: "button",
+                            class:
+                              item.id == currentVariantId() ||
+                              (currentVariantId() == "" && item.id == "chess")
+                                ? "on"
+                                : "",
+                            onclick: () => {
+                              selectVariant(item.id);
+                            },
                           },
-                        },
-                        [
-                          m("span.rowhead", [
-                            m("span.name", item.name),
-                            m("span.id.mono", item.id),
-                            m("span.pill", variantTypeLabel(item.type)),
-                          ]),
-                          item.description
-                            ? m("span.desc", item.description)
-                            : null,
-                        ],
-                      ),
+                          [
+                            m("span.rowhead", [
+                              m("span.name", item.name),
+                              m("span.id.mono", item.id),
+                              m("span.pill", variantTypeLabel(item.type)),
+                            ]),
+                            item.description
+                              ? m("span.desc", item.description)
+                              : null,
+                          ],
+                        ),
+                        m(
+                          "button.iconbtn.ghost.favbtn",
+                          {
+                            type: "button",
+                            class: favorite_variants.has(item.id) ? "on" : "",
+                            title: favorite_variants.has(item.id)
+                              ? "Remove from favorites"
+                              : "Add to favorites",
+                            "aria-pressed": favorite_variants.has(item.id)
+                              ? "true"
+                              : "false",
+                            onclick: () => {
+                              toggleFavorite(item.id);
+                            },
+                          },
+                          icon("star", 16),
+                        ),
+                      ]),
                     ),
               ]),
             ]),
