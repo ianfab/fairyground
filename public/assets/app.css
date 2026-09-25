@@ -286,7 +286,8 @@ button.iconbtn,
   padding: 0;
 }
 
-button.sm {
+button.sm,
+.btn.sm {
   height: 32px;
   padding: 0 10px;
   font-size: 12.5px;
@@ -1306,6 +1307,250 @@ main.app {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+/* variant editor tab */
+
+#variantini {
+  min-width: 0;
+}
+
+#variantini .cm-editor {
+  height: 340px;
+  resize: vertical;
+  overflow: hidden;
+  min-height: 160px;
+}
+
+.inistatus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.inistatus.ok {
+  color: var(--good);
+}
+
+.inistatus.warn {
+  color: var(--warn);
+}
+
+.inistatus.error {
+  color: var(--bad);
+}
+
+.inimessages {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 180px;
+  overflow: auto;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface2);
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+
+.inimessages li.ok {
+  color: var(--good);
+  font-weight: 700;
+}
+
+.inimessages li.error {
+  color: var(--bad);
+}
+
+.inimessages li.warn {
+  color: var(--warn);
+}
+
+.inimessages li.clickable {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.inimessages li.clickable:hover {
+  text-decoration: underline;
+}
+
+.inicontext {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface2);
+}
+
+.inihelp {
+  flex: 1 1 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.inihelphead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.inihelp .hint,
+.inioption .hint {
+  overflow-wrap: anywhere;
+}
+
+.key {
+  font-weight: 700;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.betzapreview {
+  flex: 0 1 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.betzaboard {
+  display: grid;
+  grid-template-columns: repeat(var(--betza-size), minmax(0, 1fr));
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.betzasq {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+}
+
+.betzaboard .betzasq.light {
+  background: var(--surface);
+}
+
+.betzaboard .betzasq.dark {
+  background: var(--border);
+}
+
+.betzasq.quiet::after,
+.betzasq.both::after {
+  content: "";
+  width: 36%;
+  height: 36%;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.betzasq.capture::before,
+.betzasq.both::before {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  border: 2px solid var(--bad);
+}
+
+.betzasq.hop::after {
+  opacity: 0.6;
+}
+
+.betzaboard .betzasq.piece {
+  background: var(--accent-soft2);
+}
+
+.betzalegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.betzalegend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.betzalegend .betzasq {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+}
+
+.inioptionlist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 280px;
+  overflow: auto;
+}
+
+button.inioption {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  height: auto;
+  padding: 8px 10px;
+  text-align: left;
+  white-space: normal;
+  font-weight: 400;
+}
+
+.inioption .rowhead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.inioption .desc {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.myvariants {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.myvariant {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 4px 4px 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+
+.myvariant .spacer {
+  flex: 1;
 }
 
 /* moves tab */
