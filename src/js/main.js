@@ -466,6 +466,8 @@ var multipvminiboardtimer = null;
 // Gating (e.g., duck move) click selection state
 var gatingPending = false;
 var gatingContext = null;
+// Open promotion/gating choice on the board, see showPromotionChoice()
+var promotionChoice = null;
 // Timer event correction after popup dialogs
 var timerElapsePreviousPlayer = false;
 // Spacebar best-move globals
@@ -2074,6 +2076,7 @@ function rerenderChessgroundPockets(falsefen) {
 }
 
 function redrawChessground(customFEN) {
+  closePromotionChoice();
   let fenBoard = "";
   if (customFEN) {
     fenBoard = customFEN;
@@ -5928,10 +5931,161 @@ function isCapture(board, move) {
   return false;
 }
 
+// Describe a promotion, demotion or gating option of a move for showPromotionChoice()
+// option: a piece letter, "+" (promote), "-" (demote) or "=" (keep)
+// piece: the chessgroundx piece that is moved or dropped
+// uci: the move with the option applied (without any gating move after ",")
+function describePromotionOption(option, piece, uci, legalmoves) {
+  const legalmove = legalmoves.find((m) => m.split(",")[0] == uci);
+  const san = legalmove ? board.sanMove(legalmove) : uci;
+  let result = null;
+  if (piece) {
+    // Promoted roles are prefixed with "p", e.g. "pp-piece" for a tokin
+    const promoted = piece.role.indexOf("-") == 2;
+    let role = piece.role;
+    if (option == "+") {
+      role = promoted ? role : "p" + role;
+    } else if (option == "-") {
+      role = promoted ? role.substring(1) : role;
+    } else if (option != "=") {
+      role = util.roleOf(option);
+    }
+    result = { role: role, color: piece.color };
+  }
+  return {
+    value: option,
+    piece: result,
+    label: san,
+    // In SAN a gated piece is written after "/", e.g. "Nc3/H"
+    gating: /^[a-z]$/.test(option) && san.split(",")[0].includes("/"),
+  };
+}
+
+// Let the player pick one of several promotion or gating options on top of the board.
+// choices: list of { value, piece, label }, a null piece shows an empty choice
+// anchor: chessgroundx key of the square the choices start from
+// callback: called with the value of the chosen option, or null if cancelled
+function showPromotionChoice(choices, anchor, callback) {
+  closePromotionChoice();
+  const container = chessgroundEl.querySelector("cg-container");
+  if (!container) {
+    callback(null);
+    return;
+  }
+  // Offer keeping the piece unchanged last, furthest from the anchor square
+  choices = choices
+    .filter((c) => c.value != "=")
+    .concat(choices.filter((c) => c.value == "="));
+  const orientation = chessground.state.orientation;
+  const width = chessground.state.dimensions.width;
+  const height = chessground.state.dimensions.height;
+  const pos = util.key2pos(anchor);
+  const col = orientation == "white" ? pos[0] : width - 1 - pos[0];
+  const row = orientation == "white" ? height - 1 - pos[1] : pos[1];
+  const count = choices.length;
+  const cells = [];
+  if (count <= height) {
+    // Stack the choices from the anchor square towards the board center
+    const step = row < height / 2 ? 1 : -1;
+    const first =
+      step > 0 ? Math.min(row, height - count) : Math.max(row, count - 1);
+    for (let i = 0; i < count; i++) {
+      cells.push([col, first + step * i]);
+    }
+  } else {
+    // Too many choices for one file, show them as a grid in the center
+    let cols = Math.min(width, Math.ceil(Math.sqrt(count)));
+    if (Math.ceil(count / cols) > height) {
+      cols = Math.min(width, Math.ceil(count / height));
+    }
+    const rows = Math.ceil(count / cols);
+    const left = Math.floor((width - cols) / 2);
+    const top = Math.floor((height - rows) / 2);
+    for (let i = 0; i < count; i++) {
+      cells.push([left + (i % cols), top + Math.floor(i / cols)]);
+    }
+  }
+
+  const overlay = document.createElement("div");
+  overlay.className = "promotion-choice";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-label", "Choose a move option");
+  const select = (value) => {
+    closePromotionChoice();
+    callback(value);
+  };
+  const buttons = choices.map((choice, i) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "promotion-choice-option";
+    button.title = choice.label;
+    button.setAttribute("aria-label", choice.label);
+    button.style.left = `${(cells[i][0] * 100) / width}%`;
+    button.style.top = `${(cells[i][1] * 100) / height}%`;
+    button.style.width = `${100 / width}%`;
+    button.style.height = `${100 / height}%`;
+    if (choice.piece) {
+      const pieceEl = document.createElement("piece");
+      pieceEl.className = util.pieceClasses(choice.piece, orientation);
+      button.appendChild(pieceEl);
+    } else {
+      button.classList.add("empty");
+    }
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      select(choice.value);
+    });
+    overlay.appendChild(button);
+    return button;
+  });
+  overlay.addEventListener("click", () => select(null));
+  // Keep chessground and the page from handling presses on the overlay
+  ["mousedown", "touchstart", "contextmenu"].forEach((type) =>
+    overlay.addEventListener(type, (event) => event.stopPropagation()),
+  );
+  const onKeyDown = (event) => {
+    if (!overlay.isConnected) {
+      closePromotionChoice();
+      return;
+    }
+    let value = null;
+    if (event.key == "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      select(null);
+      return;
+    } else if (
+      event.key.length == 1 &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.altKey
+    ) {
+      value = choices.find((c) => c.value == event.key.toLowerCase());
+    }
+    if (value) {
+      event.preventDefault();
+      event.stopPropagation();
+      select(value.value);
+    }
+  };
+  document.addEventListener("keydown", onKeyDown, true);
+  container.appendChild(overlay);
+  promotionChoice = { overlay: overlay, onKeyDown: onKeyDown };
+  buttons[0].focus({ preventScroll: true });
+}
+
+function closePromotionChoice() {
+  if (!promotionChoice) {
+    return;
+  }
+  promotionChoice.overlay.remove();
+  document.removeEventListener("keydown", promotionChoice.onKeyDown, true);
+  promotionChoice = null;
+}
+
 function afterChessgroundMove(orig, dest, metadata) {
   // Auto promote to queen for now
   let promotion = quickPromotionPiece.value;
-  let gating = "";
   let i = 0;
 
   if (isBoardSetup.checked) {
@@ -6020,37 +6174,46 @@ function afterChessgroundMove(orig, dest, metadata) {
     choice = promotion;
     console.log(`Using quick promotion: ${promotion}`);
   } else if (possiblepromotions.length > 1) {
-    //if there are more than one option
-    while (true) {
-      choice = prompt(
-        `There are multiple chioces that you can keep/promote/demote your moved piece. They are\n${possiblepromotions}\n, where + means promote, - means demote, = means keep, letters mean target pawn promotion piece (e.g. q means pawn can promote to q piece which means queen in most times). Now please enter your choice: `,
-        "",
-      );
-      if (choice == null) {
-        afterMove(null, false);
-        return;
-      }
-      if (choice.length == 0 || choice.length > 1) {
-        alert(
-          `Bad input: ${choice} . You should enter exactly one character among ${possiblepromotions}.`,
-        );
-        continue;
-      }
-      if (possiblepromotions.includes(choice)) {
-        break;
-      } else {
-        alert(
-          `Bad input: ${choice} . You should enter exactly one character among ${possiblepromotions}.`,
-        );
-        continue;
-      }
+    //if there are more than one option, let the player pick one on the board
+    const piece = chessground.state.boardState.pieces.get(dest);
+    const choices = possiblepromotions.map((option) =>
+      describePromotionOption(
+        option,
+        piece,
+        move + (option == "=" ? "" : option),
+        legalmoves,
+      ),
+    );
+    // Gating pieces (e.g. seirawan) appear on the origin square of the move
+    const gating = choices.some((c) => c.gating);
+    if (gating) {
+      choices.forEach((c) => {
+        if (c.value == "=") {
+          c.piece = null;
+          c.label = `${c.label} (no gating)`;
+        }
+      });
     }
+    showPromotionChoice(choices, gating ? orig : dest, (selected) => {
+      if (selected == null) {
+        afterMove(null, false);
+      } else {
+        finishChessgroundMove(move, capture, selected, possiblegatings);
+      }
+    });
+    return;
   } else if (possiblepromotions.length == 1) {
     //if there is only one option
     choice = possiblepromotions[0];
   } else {
     console.log("Did you make an illegal move? Why is there no legal action?");
   }
+  finishChessgroundMove(move, capture, choice, possiblegatings);
+}
+
+function finishChessgroundMove(move, capture, choice, possiblegatings) {
+  let promotion = "";
+  let gating = "";
   console.log(`final move choice: ${choice}`);
 
   if (choice == null || choice == undefined) {
@@ -6135,6 +6298,13 @@ function afterChessgroundDrop(piece, dest, metadata) {
   let promotion = quickPromotionPiece.value;
   let i = 0;
 
+  // A pocket piece was dropped while a choice was still open
+  if (promotionChoice) {
+    closePromotionChoice();
+    afterMove(null, false);
+    return;
+  }
+
   if (isBoardSetup.checked) {
     chessground.set({
       movable: {
@@ -6193,37 +6363,37 @@ function afterChessgroundDrop(piece, dest, metadata) {
     choice = promotion;
     console.log(`Using quick promotion: ${promotion}`);
   } else if (possiblepromotions.length > 1) {
-    //if there are more than one option
-    while (true) {
-      choice = prompt(
-        `There are multiple chioces that you can keep/promote your dropped piece. They are\n${possiblepromotions}\n, where + means promote, = means keep. Now please enter your choice: `,
-        "",
-      );
-      if (choice == null) {
-        afterMove(null, false);
-        return;
-      }
-      if (choice.length == 0 || choice.length > 1) {
-        alert(
-          `Bad input: ${choice} . You should enter exactly one character among ${possiblepromotions}.`,
-        );
-        continue;
-      }
-      if (possiblepromotions.includes(choice)) {
-        break;
-      } else {
-        alert(
-          `Bad input: ${choice} . You should enter exactly one character among ${possiblepromotions}.`,
-        );
-        continue;
-      }
-    }
+    //if there are more than one option, let the player pick one on the board
+    showPromotionChoice(
+      possiblepromotions.map((option) =>
+        describePromotionOption(
+          option,
+          piece,
+          (option == "=" ? "" : option) + move,
+          legalmoves,
+        ),
+      ),
+      dest,
+      (selected) => {
+        if (selected == null) {
+          afterMove(null, false);
+        } else {
+          finishChessgroundDrop(move, selected);
+        }
+      },
+    );
+    return;
   } else if (possiblepromotions.length == 1) {
     //if there is only one option
     choice = possiblepromotions[0];
   } else {
     console.log("Did you make an illegal drop? Why is there no legal action?");
   }
+  finishChessgroundDrop(move, choice);
+}
+
+function finishChessgroundDrop(move, choice) {
+  let promotion = "";
   console.log(`final choice: ${choice}`);
 
   if (choice == null) {
@@ -6935,6 +7105,7 @@ function updatePGNDivision(forceupdate = false) {
 }
 
 function updateChessground(showresult) {
+  closePromotionChoice();
   const boardfenval = board.fen();
   const boardfenvallist = boardfenval.split(" ");
   currentBoardFen.textContent = boardfenval;
