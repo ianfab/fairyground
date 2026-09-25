@@ -4584,6 +4584,7 @@
 
         const NOT_CLASSIFIED = "<|NC|>";
         const NOT_SUPPORTED = "(not supported)";
+        const PSEUDO_VARIANTS = "Pseudo Variants";
         // Variant picker filter for the favorite variants.
         const FAVORITES_FILTER = "<|FAV|>";
         const FAVORITES_STORAGE_KEY = "FavoriteVariants";
@@ -9367,15 +9368,20 @@
               }
               items.push({ id, name, type, description, score });
             });
+            // Pseudo variants (named by piece symbols) are listed last.
+            const last = (item) => (item.type == PSEUDO_VARIANTS ? 1 : 0);
             items.sort(
-              (a, b) => a.score - b.score || a.name.localeCompare(b.name),
+              (a, b) =>
+                last(a) - last(b) ||
+                a.score - b.score ||
+                a.name.localeCompare(b.name),
             );
             return items;
           })();
           // Own categories first, the remaining ones last.
           const variantTypesForFilter = (() => {
             const first = [MY_VARIANTS_TYPE];
-            const last = [NOT_CLASSIFIED, NOT_SUPPORTED];
+            const last = [PSEUDO_VARIANTS, NOT_CLASSIFIED, NOT_SUPPORTED];
             const present = varianttypes.slice();
             if (
               allvariants.some((id) => getVariantType(id) == NOT_CLASSIFIED)
