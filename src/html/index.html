@@ -1763,9 +1763,34 @@
         }
         const pockets = container.classList.contains("pockets");
         const maxdim = pockets ? 512 : 640;
-        const largest = Math.max(files, ranks);
-        const w0 = (maxdim * files) / largest;
-        const h0 = (maxdim * ranks) / largest;
+        // Board themes with non-square squares (e.g. shogi boards) define
+        // their natural size in CSS, which the inline size below overrides.
+        // Read it without the inline size to keep the theme's aspect ratio,
+        // otherwise the board background is cropped and no longer lines up
+        // with the pieces. The chessground default of 640x640 means square
+        // squares. The max-width is lifted as well, since on narrow screens
+        // it would clamp the natural width and distort the ratio.
+        const inlinewidth = wrap.style.width;
+        const inlineheight = wrap.style.height;
+        wrap.style.width = "";
+        wrap.style.height = "";
+        wrap.style.maxWidth = "none";
+        const wrapstyle = window.getComputedStyle(wrap);
+        const naturalwidth = parseFloat(wrapstyle.width);
+        const naturalheight = parseFloat(wrapstyle.height);
+        wrap.style.width = inlinewidth;
+        wrap.style.height = inlineheight;
+        wrap.style.maxWidth = "";
+        let aspect = ranks / files;
+        if (
+          naturalwidth > 0 &&
+          naturalheight > 0 &&
+          !(naturalwidth == 640 && naturalheight == 640)
+        ) {
+          aspect = naturalheight / naturalwidth;
+        }
+        const w0 = aspect > 1 ? maxdim / aspect : maxdim;
+        const h0 = aspect > 1 ? maxdim : maxdim * aspect;
         const columnstyle = window.getComputedStyle(column);
         const avail =
           column.clientWidth -
