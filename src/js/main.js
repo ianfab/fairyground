@@ -7,6 +7,7 @@ import * as moveutil from "./move.js";
 import * as pgnutil from "./pgn.js";
 import * as imageutil from "./image.js";
 import * as themeutil from "./chessgroundtheme.js";
+import * as myvariants from "./myVariants.js";
 
 const divMain = document.getElementsByTagName("main")[0];
 const variantsIni = document.getElementById("variants-ini");
@@ -442,6 +443,8 @@ var PositionVariantsDirectory = new Map();
 window.fairyground.GetPositionVariants = function (variant) {
   return PositionVariantsDirectory.get(variant);
 };
+// Used by the variant editor of the UI.
+window.fairyground.MyVariants = myvariants;
 let EmptyMap = new Map();
 let ffish = null;
 let board = null;
@@ -3828,6 +3831,11 @@ new Module().then((loadedModule) => {
   ffish = loadedModule;
   console.log("ffish.js initialized!");
   window.ffishlib = loadedModule; //Used in dev tools for debugging purposes and transfer to <script>
+  // Variants saved in the variant editor. The UI loads them into the engine.
+  const savedvariants = myvariants.loadLibrary();
+  if (savedvariants.length > 0) {
+    ffish.loadVariantConfig(myvariants.libraryText(savedvariants));
+  }
   initBoard(dropdownVariant.value);
   soundMove.volume = rangeVolume.value;
   soundCapture.volume = rangeVolume.value;

@@ -4217,6 +4217,12 @@
                 window.stockfish = _stockfish;
                 stockfish_state = "READY";
                 stockfish.addMessageListener((line) => {
+                  if (
+                    ini_engine_quiet &&
+                    !/^(info |bestmove|option |id |uciok|readyok)/.test(line)
+                  ) {
+                    return;
+                  }
                   if (line.startsWith("option")) {
                     if (line.startsWith("option name UCI_Variant")) {
                       allvariants = line
@@ -4265,7 +4271,10 @@
                   }
                   m.redraw();
                 });
-                getVariants();
+                whenBundleReady(() => {
+                  loadMyVariantsIntoEngine();
+                  getVariants();
+                });
               },
               (err) => {
                 console.error(err);
@@ -4521,8 +4530,91 @@
         let position_picker_open = false;
         let variant_search = "";
         let variant_filter = "";
+        // Variant editor: variant definitions in the variants.ini format are
+        // edited with live diagnostics, tried out under temporary names and
+        // saved to "My variants" under their real names.
+        const INI_STORAGE_KEY = "VariantEditorIni";
+        const INI_TEMPLATE = [
+          "# Define variants in the variants.ini format of Fairy-Stockfish.",
+          "# Press Ctrl+Space for suggestions. Documentation:",
+          "# https://github.com/fairy-stockfish/Fairy-Stockfish/wiki/Variant-configuration",
+          "",
+          "# 6x6 chess with an archbishop (bishop + knight) instead of bishops.",
+          "[minicapa:chess]",
+          "maxRank = 6",
+          "maxFile = f",
+          "bishop = -",
+          "archbishop = a",
+          "startFen = rnaqkr/pppppp/6/6/PPPPPP/RNAQKR w - - 0 1",
+          "promotionRegionWhite = *6",
+          "promotionRegionBlack = *1",
+          "promotionPieceTypes = qarn",
+          "doubleStep = false",
+          "castling = false",
+          "pieceToCharTable = -",
+          "",
+        ].join("\n");
+        const MY_VARIANTS_TYPE = "My variants";
+        let ini_text = (() => {
+          try {
+            const stored = localStorage.getItem(INI_STORAGE_KEY);
+            return stored != null ? stored : INI_TEMPLATE;
+          } catch (e) {
+            return INI_TEMPLATE;
+          }
+        })();
+        let ini_editor = null; // controller of the CodeMirror editor
+        let ini_editor_state = "idle"; // "idle" | "loading" | "ready" | "failed"
+        let ini_busy = false;
+        let ini_messages = []; // [{ kind: "ok" | "error" | "info", text }]
+        let ini_diagnostics = null; // live diagnostics, null until checked
+        let ini_context = null; // option at the cursor
+        let ini_preview = null; // Betza preview of the piece at the cursor
+        let ini_option_search = "";
+        let ini_try_counter = 0;
+        // Temporary variants of "Try": id -> name, and the latest id per name.
+        const ini_drafts = new Map();
+        const ini_latest_draft = new Map();
+        // Saved variants whose changed definition is used after a reload.
+        const ini_pending_reload = new Set();
+        // Hides the output of variant loading and checking from the engine
+        // console.
+        let ini_engine_quiet = false;
+        let ini_engine_chain = Promise.resolve();
 
         const NOT_CLASSIFIED = "<|NC|>";
+        const NOT_SUPPORTED = "(not supported)";
+        const PSEUDO_VARIANTS = "Pseudo Variants";
+        // Variant picker filter for the favorite variants.
+        const FAVORITES_FILTER = "<|FAV|>";
+        const FAVORITES_STORAGE_KEY = "FavoriteVariants";
+        const favorite_variants = new Set(
+          (() => {
+            try {
+              const stored = JSON.parse(
+                localStorage.getItem(FAVORITES_STORAGE_KEY),
+              );
+              return Array.isArray(stored) ? stored : [];
+            } catch (e) {
+              return [];
+            }
+          })(),
+        );
+        const toggleFavorite = (id) => {
+          if (favorite_variants.has(id)) {
+            favorite_variants.delete(id);
+          } else {
+            favorite_variants.add(id);
+          }
+          try {
+            localStorage.setItem(
+              FAVORITES_STORAGE_KEY,
+              JSON.stringify([...favorite_variants]),
+            );
+          } catch (e) {
+            console.warn("Cannot store the favorite variants:", e);
+          }
+        };
         const currentVariantId = () => {
           const dropdown = document.getElementById("dropdown-variant");
           return dropdown ? dropdown.value : "";
@@ -4561,6 +4653,538 @@
           variantdropdown.dispatchEvent(new Event("change"));
           variant_picker_open = false;
           window.setTimeout(() => m.redraw(), 200);
+        };
+
+        const variantEditorApi = () =>
+          window.fairyground && window.fairyground.VariantEditor;
+        const myVariantsApi = () =>
+          window.fairyground && window.fairyground.MyVariants;
+        const myVariants = () =>
+          myVariantsApi() ? myVariantsApi().loadLibrary() : [];
+        const isMyVariant = (id) => myVariants().some((e) => e.name == id);
+        // Shows a variant of the editor in the variant picker.
+        const registerEditorVariant = (id, name, description) => {
+          const index = variantsettings[0].indexOf(id);
+          if (index >= 0) {
+            variantsettings[2][index] = name;
+            variantsettings[3][index] = description;
+            return;
+          }
+          variantsettings[0].push(id);
+          variantsettings[1].push(MY_VARIANTS_TYPE);
+          variantsettings[2].push(name);
+          variantsettings[3].push(description);
+          variantsettings[4].push("");
+        };
+
+        // Loads the saved variants into the engine. ffish.js loads them in
+        // main.js.
+        const loadMyVariantsIntoEngine = () => {
+          const entries = myVariants();
+          if (entries.length == 0) {
+            return;
+          }
+          const filename = "/fairyground-my-variants.ini";
+          stockfish.FS.writeFile(
+            filename,
+            myVariantsApi().libraryText(entries),
+          );
+          stockfish.postMessage(`load ${filename}`);
+          entries.forEach((entry) =>
+            registerEditorVariant(
+              entry.name,
+              entry.name,
+              "Saved in the variant editor.",
+            ),
+          );
+        };
+        // The saved variants are read by bundle.js, which may still load.
+        const whenBundleReady = (callback) => {
+          if (myVariantsApi() || document.readyState != "loading") {
+            callback();
+          } else {
+            document.addEventListener("DOMContentLoaded", () => callback(), {
+              once: true,
+            });
+          }
+        };
+
+        // Runs engine commands for the variant editor one after another.
+        const queueEngineTask = (task) => {
+          ini_engine_chain = ini_engine_chain.then(task, task);
+          return ini_engine_chain;
+        };
+        // Checks a variants.ini with the engine and returns its messages, or
+        // null if the engine is not available.
+        const checkIniWithEngine = (text) =>
+          queueEngineTask(
+            () =>
+              new Promise((resolve) => {
+                if (stockfish_state != "READY" || !stockfish) {
+                  resolve(null);
+                  return;
+                }
+                const filename = "/fairyground-variant-check.ini";
+                const output = [];
+                let timer = null;
+                const listener = (line) => {
+                  if (line == "readyok") {
+                    done();
+                  } else if (!/^(info|bestmove) /.test(line)) {
+                    output.push(line);
+                  }
+                };
+                const done = () => {
+                  window.clearTimeout(timer);
+                  stockfish.removeMessageListener(listener);
+                  ini_engine_quiet = false;
+                  resolve(output);
+                };
+                stockfish.FS.writeFile(filename, text);
+                ini_engine_quiet = true;
+                stockfish.addMessageListener(listener);
+                stockfish.postMessage(`check ${filename}`);
+                stockfish.postMessage(`isready`);
+                timer = window.setTimeout(done, 3000);
+              }),
+          );
+        // Loads a variants.ini into ffish.js and the engine. Resolves when
+        // the engine reported its updated list of variants.
+        const loadIniIntoEngine = (text, filename) =>
+          queueEngineTask(
+            () =>
+              new Promise((resolve) => {
+                const ffish = window.ffishlib;
+                if (stockfish_state != "READY" || !stockfish || !ffish) {
+                  resolve(false);
+                  return;
+                }
+                try {
+                  ffish.loadVariantConfig(text);
+                  stockfish.FS.writeFile(filename, text);
+                } catch (e) {
+                  console.error(e);
+                  resolve(false);
+                  return;
+                }
+                const listener = (line) => {
+                  if (line == "uciok") {
+                    stockfish.removeMessageListener(listener);
+                    ini_engine_quiet = false;
+                    resolve(true);
+                  }
+                };
+                ini_engine_quiet = true;
+                stockfish.addMessageListener(listener);
+                stockfish.postMessage(`load ${filename}`);
+                getVariants();
+              }),
+          );
+        const isLoadedVariant = (id) =>
+          allvariants.includes(id) &&
+          window.ffishlib &&
+          window.ffishlib.variants().split(" ").includes(id);
+
+        const setIniText = (text) => {
+          ini_text = text;
+          try {
+            localStorage.setItem(INI_STORAGE_KEY, text);
+          } catch (e) {
+            console.warn("Cannot store the variant definition:", e);
+          }
+        };
+        const setEditorText = (text) => {
+          setIniText(text);
+          if (ini_editor) {
+            ini_editor.setText(text);
+          }
+        };
+        const editorHasUnsavedText = () => {
+          const api = variantEditorApi();
+          if (!api || ini_text.trim() == "" || ini_text == INI_TEMPLATE) {
+            return false;
+          }
+          const saved = new Map(myVariants().map((e) => [e.name, e.text]));
+          const sections = api.sectionTexts(ini_text);
+          return (
+            sections.length == 0 ||
+            sections.some((s) => saved.get(s.name) != s.text)
+          );
+        };
+        // Problems with the name of a variant that the engine does not know.
+        const iniNameProblem = (name) => {
+          if (
+            allvariants.includes(name) &&
+            !isMyVariant(name) &&
+            !ini_drafts.has(name)
+          ) {
+            return `There is a built-in variant named ${name}. Use another name to save it to My variants.`;
+          }
+          return null;
+        };
+        const iniErrorCount = () =>
+          ini_diagnostics
+            ? ini_diagnostics.filter((d) => d.severity == "error").length
+            : 0;
+        // The variant to show after loading: the one at the cursor, or the
+        // last one.
+        const variantToShow = (names) => {
+          const current = ini_editor ? ini_editor.currentSection() : null;
+          return names.includes(current) ? current : names[names.length - 1];
+        };
+
+        // Loads the variants of the editor under temporary names and shows
+        // one of them on the board.
+        const tryIni = async (keepmessages) => {
+          const api = variantEditorApi();
+          if (ini_busy || !api) {
+            return;
+          }
+          const sections = api.parseIni(ini_text).sections;
+          if (sections.length == 0) {
+            ini_messages = [
+              {
+                kind: "error",
+                text: "No variant found. Start a variant with a section header like [myvariant:chess].",
+              },
+            ];
+            return;
+          }
+          ini_busy = true;
+          if (keepmessages !== true) {
+            ini_messages = [];
+          }
+          const n = ++ini_try_counter;
+          const ids = new Map();
+          const text = api.renameSections(ini_text, (name) => {
+            const id = `${name}-try${n}`;
+            ids.set(name, id);
+            return id;
+          });
+          const loaded = await loadIniIntoEngine(
+            text,
+            `/fairyground-try-${n}.ini`,
+          );
+          const shown = [];
+          ids.forEach((id, name) => {
+            if (loaded && isLoadedVariant(id)) {
+              ini_drafts.set(id, name);
+              ini_latest_draft.set(name, id);
+              registerEditorVariant(
+                id,
+                `${name} (draft)`,
+                "Draft from the variant editor.",
+              );
+              shown.push(name);
+            } else {
+              ini_messages.push({
+                kind: "error",
+                text: `${name} could not be loaded. See the problems above.`,
+              });
+            }
+          });
+          if (shown.length > 0) {
+            const name = variantToShow(shown);
+            ini_messages.push({
+              kind: "ok",
+              text: `Trying ${name} on the board.`,
+            });
+            // The engine resets the variant after updating the variant
+            // list, so select it once that has settled.
+            window.setTimeout(() => {
+              selectVariant(ini_latest_draft.get(name));
+              ini_busy = false;
+              m.redraw();
+            }, 50);
+          } else {
+            ini_busy = false;
+          }
+          m.redraw();
+        };
+
+        // Saves the variants of the editor to My variants and loads them
+        // under their names.
+        const saveIniToMyVariants = async () => {
+          const api = variantEditorApi();
+          const library = myVariantsApi();
+          if (ini_busy || !api || !library) {
+            return;
+          }
+          const sections = api.sectionTexts(ini_text);
+          if (sections.length == 0) {
+            ini_messages = [
+              {
+                kind: "error",
+                text: "No variant found. Start a variant with a section header like [myvariant:chess].",
+              },
+            ];
+            return;
+          }
+          const names = sections.map((s) => s.name);
+          const invalid = sections.filter(
+            (s, i) =>
+              s.name == "" ||
+              /\s/.test(s.name) ||
+              names.indexOf(s.name) != i ||
+              iniNameProblem(s.name),
+          );
+          if (invalid.length > 0) {
+            ini_messages = invalid.map((s) => ({
+              kind: "error",
+              text:
+                iniNameProblem(s.name) ||
+                `Cannot save the variant "${s.name}": use a unique name without spaces.`,
+            }));
+            return;
+          }
+          if (
+            iniErrorCount() > 0 &&
+            !window.confirm(
+              "The definition has errors. Save it to My variants anyway?",
+            )
+          ) {
+            return;
+          }
+          ini_busy = true;
+          ini_messages = [];
+          const entries = library.loadLibrary();
+          const fresh = [];
+          const changed = [];
+          sections.forEach((section) => {
+            const index = entries.findIndex((e) => e.name == section.name);
+            const unchanged = index >= 0 && entries[index].text == section.text;
+            if (index >= 0) {
+              entries[index] = section;
+            } else {
+              entries.push(section);
+            }
+            if (!allvariants.includes(section.name)) {
+              fresh.push(section);
+            } else if (!unchanged || ini_pending_reload.has(section.name)) {
+              changed.push(section.name);
+            }
+          });
+          if (!library.saveLibrary(entries)) {
+            ini_busy = false;
+            ini_messages = [
+              {
+                kind: "error",
+                text: "Cannot save: the storage of the browser is not available.",
+              },
+            ];
+            return;
+          }
+          if (fresh.length > 0) {
+            await loadIniIntoEngine(
+              library.libraryText(fresh),
+              "/fairyground-save.ini",
+            );
+          }
+          const loaded = fresh
+            .map((s) => s.name)
+            .filter((name) => isLoadedVariant(name));
+          loaded.forEach((name) =>
+            registerEditorVariant(name, name, "Saved in the variant editor."),
+          );
+          changed.forEach((name) => ini_pending_reload.add(name));
+          ini_messages.push({
+            kind: "ok",
+            text: `Saved ${names.join(", ")} to My variants.`,
+          });
+          fresh
+            .filter((s) => !loaded.includes(s.name))
+            .forEach((s) =>
+              ini_messages.push({
+                kind: "error",
+                text: `${s.name} could not be loaded. See the problems above.`,
+              }),
+            );
+          if (changed.length > 0) {
+            ini_messages.push({
+              kind: "info",
+              text: `The changed definition of ${changed.join(", ")} is used under its name after reloading the page. Until then it is shown as a draft.`,
+            });
+          }
+          ini_busy = false;
+          const show = variantToShow(names);
+          if (changed.includes(show)) {
+            tryIni(true);
+          } else if (loaded.includes(show)) {
+            window.setTimeout(() => {
+              selectVariant(show);
+              m.redraw();
+            }, 50);
+          }
+          m.redraw();
+        };
+
+        const editMyVariant = (entry) => {
+          if (
+            editorHasUnsavedText() &&
+            !window.confirm(
+              "The editor has unsaved changes. Replace them with " +
+                entry.name +
+                "?",
+            )
+          ) {
+            return;
+          }
+          setEditorText(entry.text + "\n");
+          ini_messages = [];
+        };
+        const deleteMyVariant = (entry) => {
+          const library = myVariantsApi();
+          if (!library) {
+            return;
+          }
+          const children = library
+            .loadLibrary()
+            .filter((e) => library.templateOf(e) == entry.name)
+            .map((e) => e.name);
+          if (children.length > 0) {
+            ini_messages = [
+              {
+                kind: "error",
+                text: `Cannot delete ${entry.name}: ${children.join(", ")} ${children.length == 1 ? "is" : "are"} based on it.`,
+              },
+            ];
+            return;
+          }
+          if (
+            !window.confirm(
+              `Delete ${entry.name} from My variants? It stays available until the page is reloaded.`,
+            )
+          ) {
+            return;
+          }
+          library.saveLibrary(
+            library.loadLibrary().filter((e) => e.name != entry.name),
+          );
+          ini_pending_reload.delete(entry.name);
+          ini_messages = [
+            { kind: "info", text: `Deleted ${entry.name} from My variants.` },
+          ];
+        };
+
+        let ini_preview_timer = null;
+        const onIniContext = (context) => {
+          ini_context = context;
+          window.clearTimeout(ini_preview_timer);
+          const api = variantEditorApi();
+          if (!context.betza || !api || !window.ffishlib) {
+            ini_preview = null;
+            m.redraw();
+            return;
+          }
+          const betza = context.betza;
+          // Computing a preview takes a moment, so wait for a pause.
+          ini_preview_timer = window.setTimeout(() => {
+            try {
+              ini_preview = {
+                betza,
+                result: api.betzaPreview(window.ffishlib, betza),
+              };
+            } catch (e) {
+              console.warn("Cannot compute the Betza preview:", e);
+              ini_preview = { betza, result: null };
+            }
+            m.redraw();
+          }, 150);
+          if (ini_preview && ini_preview.betza != betza) {
+            ini_preview = null;
+          }
+          m.redraw();
+        };
+
+        const loadVariantEditor = () => {
+          if (ini_editor_state != "idle") {
+            return;
+          }
+          ini_editor_state = "loading";
+          const script = document.createElement("script");
+          script.src = "./lib/varianteditor.js";
+          script.async = true;
+          script.onload = () => {
+            ini_editor_state = variantEditorApi() ? "ready" : "failed";
+            m.redraw();
+          };
+          script.onerror = () => {
+            ini_editor_state = "failed";
+            m.redraw();
+          };
+          document.head.appendChild(script);
+        };
+        const mountVariantEditor = (dom) => {
+          const api = variantEditorApi();
+          if (ini_editor || ini_editor_state != "ready" || !api) {
+            return;
+          }
+          ini_editor = api.createVariantEditor({
+            parent: dom,
+            doc: ini_text,
+            onChange: setIniText,
+            onContext: onIniContext,
+            onDiagnostics: (diagnostics) => {
+              ini_diagnostics = diagnostics;
+              m.redraw();
+            },
+            onRun: () => {
+              tryIni();
+              m.redraw();
+            },
+            runCheck: checkIniWithEngine,
+            nameProblem: iniNameProblem,
+            variantNames: () => allvariants.filter((id) => !ini_drafts.has(id)),
+          });
+        };
+
+        const openIniFile = (e) => {
+          const selected = e.currentTarget.files[0];
+          e.currentTarget.value = "";
+          if (!selected) {
+            return;
+          }
+          if (
+            editorHasUnsavedText() &&
+            !window.confirm(
+              `The editor has unsaved changes. Replace them with ${selected.name}?`,
+            )
+          ) {
+            return;
+          }
+          selected.text().then((text) => {
+            setEditorText(text);
+            ini_messages = [{ kind: "info", text: `Opened ${selected.name}.` }];
+            m.redraw();
+          });
+        };
+        const downloadIniFile = () => {
+          const url = URL.createObjectURL(
+            new Blob([ini_text], { type: "text/plain" }),
+          );
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "variants.ini";
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        };
+        // Example value when an option is added from the option search.
+        const exampleValue = (option) => {
+          if (option.type == "Piece") {
+            return option.key[0];
+          }
+          if (option.type == "CustomPiece") {
+            return "a:W";
+          }
+          if (option.default !== null) {
+            return option.default;
+          }
+          if (option.values) {
+            return option.values[0];
+          }
+          return "";
         };
         const selectPosition = (type, name) => {
           const typedropdown = document.getElementById(
@@ -4798,6 +5422,8 @@
           sliders:
             "M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6",
           terminal: "m4 17 6-6-6-6M12 19h8",
+          code: "m16 18 6-6-6-6M8 6l-6 6 6 6",
+          star: "M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5-5.9-3.2-5.9 3.2 1.2-6.5-4.8-4.6 6.6-.9z",
           wall: "M3 3h18v18H3zM3 9h18M3 15h18M9 9v6M15 3v6M15 15v6",
           skip: "m5 4 10 8-10 8V4zM19 5v14",
           user: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
@@ -7726,14 +8352,459 @@
             ],
           );
 
+          // ---------------- variant editor tab ----------------
+          if (active_tab == "variant") {
+            loadVariantEditor();
+          }
+          const editor_api = variantEditorApi();
+          const can_load_ini =
+            is_ready &&
+            !ini_busy &&
+            !!editor_api &&
+            app_mode == "analysis" &&
+            !review_mode &&
+            !board_setup_mode &&
+            !during_engine_match;
+          const load_ini_title =
+            app_mode != "analysis"
+              ? "Variants can be loaded on the analysis board."
+              : null;
+          const saved_variants = myVariants();
+          const option_results = (() => {
+            const words = ini_option_search
+              .trim()
+              .toLowerCase()
+              .split(/\s+/)
+              .filter((w) => w != "");
+            if (!editor_api || words.length == 0) {
+              return [];
+            }
+            const scored = [];
+            editor_api.variantOptions.options.forEach((option) => {
+              const key = option.key.toLowerCase();
+              const text = `${key} ${option.description.toLowerCase()}`;
+              if (!words.every((w) => text.includes(w))) {
+                return;
+              }
+              scored.push({
+                option,
+                score: words.every((w) => key.includes(w))
+                  ? key.startsWith(words[0])
+                    ? 0
+                    : 1
+                  : 2,
+              });
+            });
+            scored.sort(
+              (a, b) =>
+                a.score - b.score || a.option.key.localeCompare(b.option.key),
+            );
+            return scored.slice(0, 40).map((s) => s.option);
+          })();
+          const optionMeta = (option) =>
+            [
+              option.type,
+              option.values ? option.values.join(" | ") : null,
+              option.default !== null && option.default !== ""
+                ? `default ${option.default}`
+                : null,
+            ]
+              .filter((part) => part)
+              .join(" · ");
+          const error_count = iniErrorCount();
+          const warning_count = ini_diagnostics
+            ? ini_diagnostics.length - error_count
+            : 0;
+          const contextHelp = (() => {
+            if (!ini_context || !editor_api) {
+              return null;
+            }
+            if (ini_context.option) {
+              const option = ini_context.option;
+              return m("div.inihelp", [
+                m("div.inihelphead", [
+                  m("span.mono.key", option.key),
+                  m("span.pill", option.group),
+                ]),
+                optionMeta(option)
+                  ? m("p.hint.mono", optionMeta(option))
+                  : null,
+                m("p", option.description),
+                option.type && editor_api.variantOptions.types[option.type]
+                  ? m(
+                      "p.hint",
+                      `${option.type}: ${editor_api.variantOptions.types[option.type].description}` +
+                        (editor_api.variantOptions.types[option.type].hint
+                          ? ` [${editor_api.variantOptions.types[option.type].hint}]`
+                          : ""),
+                    )
+                  : null,
+              ]);
+            }
+            if (ini_context.key) {
+              return m("div.inihelp", [
+                m("div.inihelphead", [m("span.mono.key", ini_context.key)]),
+                m(
+                  "p.hint",
+                  "This is not a documented option. Search the options below or press Ctrl+Space for suggestions.",
+                ),
+              ]);
+            }
+            return null;
+          })();
+          const betzaPreviewView = (() => {
+            if (!ini_context || !ini_context.betza) {
+              return null;
+            }
+            const preview =
+              ini_preview && ini_preview.betza == ini_context.betza
+                ? ini_preview.result
+                : undefined;
+            if (preview === undefined) {
+              return m("div.betzapreview", m("p.hint", "Computing moves…"));
+            }
+            if (preview === null) {
+              return m(
+                "div.betzapreview",
+                m("p.hint.warn", "This Betza notation cannot be previewed."),
+              );
+            }
+            const rows = [];
+            for (let rank = preview.size; rank >= 1; rank--) {
+              for (let file = 0; file < preview.size; file++) {
+                const square = preview.files[file] + rank;
+                const quiet = preview.quiet.has(square);
+                const capture = preview.capture.has(square);
+                rows.push(
+                  m(
+                    "span.betzasq",
+                    {
+                      key: square,
+                      class: [
+                        (file + rank) % 2 ? "light" : "dark",
+                        square == preview.center ? "piece" : "",
+                        quiet && capture
+                          ? "both"
+                          : quiet
+                            ? "quiet"
+                            : capture
+                              ? "capture"
+                              : "",
+                        preview.hop.has(square) ? "hop" : "",
+                      ].join(" "),
+                      title:
+                        square == preview.center
+                          ? "Piece"
+                          : quiet && capture
+                            ? "Move or capture"
+                            : quiet
+                              ? "Move only"
+                              : capture
+                                ? "Capture only"
+                                : "",
+                    },
+                    square == preview.center ? icon("target", 14) : null,
+                  ),
+                );
+              }
+            }
+            return m("div.betzapreview", [
+              m("div.inihelphead", [
+                m("span.sect", "Movement"),
+                m("span.mono.key", ini_context.betza),
+              ]),
+              m(
+                "div.betzaboard",
+                { style: `--betza-size:${preview.size}` },
+                rows,
+              ),
+              m("div.betzalegend", [
+                m("span", [m("span.betzasq.quiet"), "Move"]),
+                m("span", [m("span.betzasq.capture"), "Capture"]),
+                m("span", [m("span.betzasq.both"), "Both"]),
+              ]),
+              preview.hop.size > 0
+                ? m(
+                    "p.hint",
+                    "Hopping moves are shown with a screen piece next to the piece.",
+                  )
+                : null,
+              preview.initial
+                ? m("p.hint", "Initial moves (i) are not shown.")
+                : null,
+              m("p.hint", "White moves up the board."),
+            ]);
+          })();
+          const variantTab = m(
+            "div.tabpanel#tab-variant",
+            {
+              class: active_tab == "variant" ? "on" : "",
+              hidden: app_mode == "setup",
+            },
+            [
+              m("div.secthead", [
+                m("span.sect", "Variant editor"),
+                m(
+                  "a.btn.sm.ghost",
+                  {
+                    href: "https://github.com/fairy-stockfish/Fairy-Stockfish/wiki/Variant-configuration",
+                    target: "_blank",
+                    rel: "noopener",
+                    title: "Documentation of the variants.ini format",
+                  },
+                  [icon("book", 14), "Docs"],
+                ),
+              ]),
+              m("div#variantini", {
+                oncreate: (vnode) => mountVariantEditor(vnode.dom),
+                onupdate: (vnode) => mountVariantEditor(vnode.dom),
+              }),
+              ini_editor_state == "failed"
+                ? m("p.hint.warn", "The variant editor could not be loaded.")
+                : ini_editor_state != "ready"
+                  ? m("p.hint", "Loading the variant editor…")
+                  : m(
+                      "p.inistatus",
+                      {
+                        class:
+                          error_count > 0
+                            ? "error"
+                            : warning_count > 0
+                              ? "warn"
+                              : "ok",
+                      },
+                      ini_diagnostics === null
+                        ? "Checking…"
+                        : error_count + warning_count == 0
+                          ? [icon("check", 14), "No problems found"]
+                          : `${error_count} error${error_count == 1 ? "" : "s"} · ${warning_count} warning${warning_count == 1 ? "" : "s"}`,
+                    ),
+              ini_diagnostics && ini_diagnostics.length > 0
+                ? m(
+                    "ul.inimessages",
+                    ini_diagnostics
+                      .slice()
+                      .sort((a, b) => a.line - b.line)
+                      .map((d) =>
+                        m(
+                          "li.clickable",
+                          {
+                            class: d.severity == "error" ? "error" : "warn",
+                            title: "Go to this line",
+                            onclick: () => {
+                              if (ini_editor) {
+                                ini_editor.goToLine(d.line);
+                              }
+                            },
+                          },
+                          `${d.line}: ${d.message}`,
+                        ),
+                      ),
+                  )
+                : null,
+              m("div.row", [
+                m(
+                  "button.sm.primary",
+                  {
+                    type: "button",
+                    disabled: !can_load_ini,
+                    title:
+                      load_ini_title ||
+                      "Try the variants on the board under temporary names (Ctrl+Enter).",
+                    onclick: () => tryIni(),
+                  },
+                  [icon("play", 16), ini_busy ? "Loading…" : "Try"],
+                ),
+                m(
+                  "button.sm",
+                  {
+                    type: "button",
+                    disabled: !can_load_ini,
+                    title:
+                      load_ini_title ||
+                      "Save the variants to My variants under their names. They are loaded on every visit.",
+                    onclick: saveIniToMyVariants,
+                  },
+                  [icon("save", 14), "Save to My variants"],
+                ),
+              ]),
+              ini_messages.length > 0
+                ? m(
+                    "ul.inimessages",
+                    { "aria-live": "polite" },
+                    ini_messages.map((message) =>
+                      m("li", { class: message.kind }, message.text),
+                    ),
+                  )
+                : null,
+              contextHelp || betzaPreviewView
+                ? m("div.inicontext", [contextHelp, betzaPreviewView])
+                : null,
+              m("div.stack.inioptions", [
+                m("span.sect", "Options"),
+                m("input[type=search]", {
+                  placeholder: "Search options, e.g., promotion…",
+                  value: ini_option_search,
+                  disabled: !editor_api,
+                  oninput: (e) => {
+                    ini_option_search = e.target.value;
+                  },
+                }),
+                option_results.length > 0
+                  ? m(
+                      "div.inioptionlist",
+                      option_results.map((option) =>
+                        m(
+                          "button.inioption",
+                          {
+                            type: "button",
+                            key: option.key,
+                            title: `Add ${option.key} to the variant at the cursor`,
+                            onclick: () => {
+                              if (
+                                ini_editor &&
+                                !ini_editor.insertOption(
+                                  option.key,
+                                  exampleValue(option),
+                                )
+                              ) {
+                                ini_messages = [
+                                  {
+                                    kind: "error",
+                                    text: "Add a variant section like [myvariant:chess] first.",
+                                  },
+                                ];
+                              }
+                            },
+                          },
+                          [
+                            m("span.rowhead", [
+                              m("span.mono.key", option.key),
+                              optionMeta(option)
+                                ? m("span.hint.mono", optionMeta(option))
+                                : null,
+                            ]),
+                            m("span.desc", option.description),
+                          ],
+                        ),
+                      ),
+                    )
+                  : ini_option_search.trim() != "" && editor_api
+                    ? m("p.hint", "No option matches.")
+                    : null,
+              ]),
+              m("div.stack", [
+                m("span.sect", "My variants"),
+                saved_variants.length == 0
+                  ? m(
+                      "p.hint",
+                      "Variants saved here are available in the variant picker on every visit.",
+                    )
+                  : m(
+                      "div.myvariants",
+                      saved_variants.map((entry) =>
+                        m("div.myvariant", { key: entry.name }, [
+                          m("span.mono.key", entry.name),
+                          ini_pending_reload.has(entry.name)
+                            ? m(
+                                "span.pill",
+                                {
+                                  title:
+                                    "The changed definition is used after reloading the page.",
+                                },
+                                "reload to update",
+                              )
+                            : null,
+                          m("span.spacer"),
+                          m(
+                            "button.sm.ghost",
+                            {
+                              type: "button",
+                              disabled:
+                                !can_load_ini ||
+                                !allvariants.includes(entry.name),
+                              title: "Show this variant on the board",
+                              onclick: () => selectVariant(entry.name),
+                            },
+                            [icon("play", 14), "Play"],
+                          ),
+                          m(
+                            "button.sm.ghost",
+                            {
+                              type: "button",
+                              disabled: !editor_api,
+                              title: "Open this variant in the editor",
+                              onclick: () => editMyVariant(entry),
+                            },
+                            [icon("edit", 14), "Edit"],
+                          ),
+                          m(
+                            "button.sm.ghost.iconbtn",
+                            {
+                              type: "button",
+                              title: "Delete this variant from My variants",
+                              onclick: () => deleteMyVariant(entry),
+                            },
+                            icon("trash", 14),
+                          ),
+                        ]),
+                      ),
+                    ),
+              ]),
+              m("div.row", [
+                m("label.btn.sm.ghost", { title: "Open a variants.ini file" }, [
+                  icon("upload", 14),
+                  "Open file",
+                  m("input[type=file]", {
+                    hidden: true,
+                    accept: ".ini,.txt,text/plain",
+                    disabled: !editor_api,
+                    onchange: openIniFile,
+                  }),
+                ]),
+                m(
+                  "button.sm.ghost",
+                  {
+                    type: "button",
+                    title: "Download the definition as variants.ini",
+                    onclick: downloadIniFile,
+                  },
+                  [icon("install", 14), "Download"],
+                ),
+                m(
+                  "button.sm.ghost",
+                  {
+                    type: "button",
+                    disabled: !editor_api,
+                    title: "Replace the definition with an example",
+                    onclick: () => {
+                      if (
+                        !editorHasUnsavedText() ||
+                        window.confirm(
+                          "The editor has unsaved changes. Replace them with the example?",
+                        )
+                      ) {
+                        setEditorText(INI_TEMPLATE);
+                        ini_messages = [];
+                      }
+                    },
+                  },
+                  [icon("doc", 14), "Example"],
+                ),
+              ]),
+            ],
+          );
+
           // ---------------- console tab ----------------
           const panel = m("section.panel.card#info", [
             m("div.tabs#outputs", { hidden: app_mode == "setup" }, [
               tabButton("moves", "Moves", "list"),
               tabButton("engine", "Engine", "cpu"),
+              tabButton("variant", "Variant", "code"),
             ]),
             movesTab,
             engineTab,
+            variantTab,
             setupTab,
           ]);
 
@@ -8262,8 +9333,20 @@
             const query = variant_search.trim().toLowerCase();
             const items = [];
             allvariants.forEach((id) => {
+              // Only the latest draft of a variant of the editor is listed.
+              if (
+                ini_drafts.has(id) &&
+                ini_latest_draft.get(ini_drafts.get(id)) != id &&
+                id != currentVariantId()
+              ) {
+                return;
+              }
               const type = getVariantType(id);
-              if (variant_filter != "" && type != variant_filter) {
+              if (variant_filter == FAVORITES_FILTER) {
+                if (!favorite_variants.has(id)) {
+                  return;
+                }
+              } else if (variant_filter != "" && type != variant_filter) {
                 return;
               }
               const name = getVariantName(id, true, false) || id;
@@ -8285,19 +9368,34 @@
               }
               items.push({ id, name, type, description, score });
             });
+            // Pseudo variants (named by piece symbols) are listed last.
+            const last = (item) => (item.type == PSEUDO_VARIANTS ? 1 : 0);
             items.sort(
-              (a, b) => a.score - b.score || a.name.localeCompare(b.name),
+              (a, b) =>
+                last(a) - last(b) ||
+                a.score - b.score ||
+                a.name.localeCompare(b.name),
             );
             return items;
           })();
+          // Own categories first, the remaining ones last.
           const variantTypesForFilter = (() => {
-            const types = varianttypes.slice();
+            const first = [MY_VARIANTS_TYPE];
+            const last = [PSEUDO_VARIANTS, NOT_CLASSIFIED, NOT_SUPPORTED];
+            const present = varianttypes.slice();
             if (
               allvariants.some((id) => getVariantType(id) == NOT_CLASSIFIED)
             ) {
-              types.push(NOT_CLASSIFIED);
+              present.push(NOT_CLASSIFIED);
             }
-            return types;
+            return first
+              .filter((type) => present.includes(type))
+              .concat(
+                present.filter(
+                  (type) => !first.includes(type) && !last.includes(type),
+                ),
+                last.filter((type) => present.includes(type)),
+              );
           })();
           const variantPicker = m(
             "div.backdrop",
@@ -8312,6 +9410,30 @@
             m("div.dialog.card.picker", [
               m("div.dialoghead", [
                 m("h2", "Variant"),
+                m(
+                  "button.sm.ghost",
+                  {
+                    type: "button",
+                    title:
+                      "Define your own variant in the variants.ini format and try it out",
+                    onclick: () => {
+                      variant_picker_open = false;
+                      active_tab = "variant";
+                      // On narrow screens the panel is below the board.
+                      window.setTimeout(() => {
+                        const tab = document.getElementById("tab-variant");
+                        if (
+                          tab &&
+                          tab.getBoundingClientRect().top >
+                            window.innerHeight / 2
+                        ) {
+                          tab.scrollIntoView({ block: "start" });
+                        }
+                      }, 50);
+                    },
+                  },
+                  [icon("code", 14), "Define variant"],
+                ),
                 m(
                   "button.iconbtn.ghost",
                   {
@@ -8350,6 +9472,17 @@
                   },
                   "All",
                 ),
+                m(
+                  "button.chip",
+                  {
+                    type: "button",
+                    class: variant_filter == FAVORITES_FILTER ? "on" : "",
+                    onclick: () => {
+                      variant_filter = FAVORITES_FILTER;
+                    },
+                  },
+                  [icon("star", 12), "Favorites"],
+                ),
                 variantTypesForFilter.map((type) =>
                   m(
                     "button.chip",
@@ -8366,33 +9499,57 @@
               ]),
               m("div.pickerlist", [
                 variantList.length == 0
-                  ? m("p.hint", "No variant matches.")
+                  ? m(
+                      "p.hint",
+                      variant_filter == FAVORITES_FILTER &&
+                        variant_search.trim() == ""
+                        ? "No favorites yet. Mark variants with the star to find them here."
+                        : "No variant matches.",
+                    )
                   : variantList.map((item) =>
-                      m(
-                        "button.pickrow",
-                        {
-                          type: "button",
-                          key: item.id,
-                          class:
-                            item.id == currentVariantId() ||
-                            (currentVariantId() == "" && item.id == "chess")
-                              ? "on"
-                              : "",
-                          onclick: () => {
-                            selectVariant(item.id);
+                      m("div.pickitem", { key: item.id }, [
+                        m(
+                          "button.pickrow",
+                          {
+                            type: "button",
+                            class:
+                              item.id == currentVariantId() ||
+                              (currentVariantId() == "" && item.id == "chess")
+                                ? "on"
+                                : "",
+                            onclick: () => {
+                              selectVariant(item.id);
+                            },
                           },
-                        },
-                        [
-                          m("span.rowhead", [
-                            m("span.name", item.name),
-                            m("span.id.mono", item.id),
-                            m("span.pill", variantTypeLabel(item.type)),
-                          ]),
-                          item.description
-                            ? m("span.desc", item.description)
-                            : null,
-                        ],
-                      ),
+                          [
+                            m("span.rowhead", [
+                              m("span.name", item.name),
+                              m("span.id.mono", item.id),
+                              m("span.pill", variantTypeLabel(item.type)),
+                            ]),
+                            item.description
+                              ? m("span.desc", item.description)
+                              : null,
+                          ],
+                        ),
+                        m(
+                          "button.iconbtn.ghost.favbtn",
+                          {
+                            type: "button",
+                            class: favorite_variants.has(item.id) ? "on" : "",
+                            title: favorite_variants.has(item.id)
+                              ? "Remove from favorites"
+                              : "Add to favorites",
+                            "aria-pressed": favorite_variants.has(item.id)
+                              ? "true"
+                              : "false",
+                            onclick: () => {
+                              toggleFavorite(item.id);
+                            },
+                          },
+                          icon("star", 16),
+                        ),
+                      ]),
                     ),
               ]),
             ]),

@@ -1,0 +1,1767 @@
+{
+  "source": "https://raw.githubusercontent.com/ianfab/fairy-stockfish.wasm/b2e693ef1e111233ce3fb40685921708b3276ed6/src/variants.ini",
+  "betzaHelp": [
+    "all base moves/atoms (W, F, etc.)",
+    "all directional modifiers (f, b, etc.)",
+    "limited and unlimited distance sliders/riders for W/R, F/B, and N directions",
+    "hoppers and grasshoppers for W/R and F/B directions, i.e., pR, pB, gR, and gB",
+    "lame leapers (n) for N, A, Z, and D directions, i.e., nN, nA, nZ, and nD"
+  ],
+  "types": {
+    "bool": {
+      "description": "boolean flag to enable/disable a feature",
+      "values": ["true", "false"],
+      "hint": "true, false"
+    },
+    "Rank": {
+      "description": "denotes a rank of the board",
+      "values": null,
+      "hint": "1-10"
+    },
+    "File": {
+      "description": "denotes a file of the board",
+      "values": null,
+      "hint": "1-12, a-i"
+    },
+    "int": {
+      "description": "any natural number",
+      "values": null,
+      "hint": "0, 1, ..."
+    },
+    "PieceType": {
+      "description": "a piece type",
+      "values": null,
+      "hint": "letters defined for pieces, e.g., p"
+    },
+    "PieceSet": {
+      "description": "multiple piece types",
+      "values": null,
+      "hint": "letters defined for pieces, e.g., nbrq"
+    },
+    "CastlingRights": {
+      "description": "set of castling rights",
+      "values": null,
+      "hint": "letters for castling rights as in FEN, e.g., KQkq"
+    },
+    "Bitboard": {
+      "description": "list of squares [e.g., d4 e4 d5 e5]. * can be used as wildcard for files (e.g., *1 is the first rank)",
+      "values": null,
+      "hint": null
+    },
+    "Value": {
+      "description": "game result for the side to move",
+      "values": ["win", "loss", "draw"],
+      "hint": "win, loss, draw"
+    },
+    "MaterialCounting": {
+      "description": "material counting rules for adjudication",
+      "values": [
+        "janggi",
+        "unweighted",
+        "whitedrawodds",
+        "blackdrawodds",
+        "none"
+      ],
+      "hint": "janggi, unweighted, whitedrawodds, blackdrawodds, none"
+    },
+    "CountingRule": {
+      "description": "makruk, cambodian, or ASEAN counting rules",
+      "values": ["makruk", "cambodian", "asean", "none"],
+      "hint": "makruk, cambodian, asean, none"
+    },
+    "ChasingRule": {
+      "description": "xiangqi chasing rules",
+      "values": ["axf", "none"],
+      "hint": "axf, none"
+    },
+    "EnclosingRule": {
+      "description": "reversi, ataxx, etc. enclosing rules",
+      "values": [
+        "reversi",
+        "ataxx",
+        "quadwrangle",
+        "snort",
+        "anyside",
+        "top",
+        "none"
+      ],
+      "hint": "reversi, ataxx, quadwrangle, snort, anyside, top, none"
+    },
+    "WallingRule": {
+      "description": "wall-placing rule",
+      "values": ["arrow", "duck", "edge", "past", "static", "none"],
+      "hint": "arrow, duck, edge, past, static, none"
+    }
+  },
+  "options": [
+    {
+      "key": "pawn",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as fmWfceF in Betza notation. The value is the letter of the piece, e.g., pawn = p, or - to remove it.",
+      "betza": "fmWfceF"
+    },
+    {
+      "key": "knight",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as N in Betza notation. The value is the letter of the piece, e.g., knight = k, or - to remove it.",
+      "betza": "N"
+    },
+    {
+      "key": "bishop",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as B in Betza notation. The value is the letter of the piece, e.g., bishop = b, or - to remove it.",
+      "betza": "B"
+    },
+    {
+      "key": "rook",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as R in Betza notation. The value is the letter of the piece, e.g., rook = r, or - to remove it.",
+      "betza": "R"
+    },
+    {
+      "key": "queen",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as Q in Betza notation. The value is the letter of the piece, e.g., queen = q, or - to remove it.",
+      "betza": "Q"
+    },
+    {
+      "key": "fers",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as F in Betza notation. The value is the letter of the piece, e.g., fers = f, or - to remove it.",
+      "betza": "F"
+    },
+    {
+      "key": "alfil",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as A in Betza notation. The value is the letter of the piece, e.g., alfil = a, or - to remove it.",
+      "betza": "A"
+    },
+    {
+      "key": "fersAlfil",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as FA in Betza notation. The value is the letter of the piece, e.g., fersAlfil = f, or - to remove it.",
+      "betza": "FA"
+    },
+    {
+      "key": "silver",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as FfW in Betza notation. The value is the letter of the piece, e.g., silver = s, or - to remove it.",
+      "betza": "FfW"
+    },
+    {
+      "key": "aiwok",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as RNF in Betza notation. The value is the letter of the piece, e.g., aiwok = a, or - to remove it.",
+      "betza": "RNF"
+    },
+    {
+      "key": "bers",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as RF in Betza notation. The value is the letter of the piece, e.g., bers = b, or - to remove it.",
+      "betza": "RF"
+    },
+    {
+      "key": "archbishop",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as BN in Betza notation. The value is the letter of the piece, e.g., archbishop = a, or - to remove it.",
+      "betza": "BN"
+    },
+    {
+      "key": "chancellor",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as RN in Betza notation. The value is the letter of the piece, e.g., chancellor = c, or - to remove it.",
+      "betza": "RN"
+    },
+    {
+      "key": "amazon",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as QN in Betza notation. The value is the letter of the piece, e.g., amazon = a, or - to remove it.",
+      "betza": "QN"
+    },
+    {
+      "key": "knibis",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as mNcB in Betza notation. The value is the letter of the piece, e.g., knibis = k, or - to remove it.",
+      "betza": "mNcB"
+    },
+    {
+      "key": "biskni",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as mBcN in Betza notation. The value is the letter of the piece, e.g., biskni = b, or - to remove it.",
+      "betza": "mBcN"
+    },
+    {
+      "key": "kniroo",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as mNcR in Betza notation. The value is the letter of the piece, e.g., kniroo = k, or - to remove it.",
+      "betza": "mNcR"
+    },
+    {
+      "key": "rookni",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as mRcN in Betza notation. The value is the letter of the piece, e.g., rookni = r, or - to remove it.",
+      "betza": "mRcN"
+    },
+    {
+      "key": "shogiPawn",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as fW in Betza notation. The value is the letter of the piece, e.g., shogiPawn = s, or - to remove it.",
+      "betza": "fW"
+    },
+    {
+      "key": "lance",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as fR in Betza notation. The value is the letter of the piece, e.g., lance = l, or - to remove it.",
+      "betza": "fR"
+    },
+    {
+      "key": "shogiKnight",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as fN in Betza notation. The value is the letter of the piece, e.g., shogiKnight = s, or - to remove it.",
+      "betza": "fN"
+    },
+    {
+      "key": "gold",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as WfF in Betza notation. The value is the letter of the piece, e.g., gold = g, or - to remove it.",
+      "betza": "WfF"
+    },
+    {
+      "key": "dragonHorse",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as BW in Betza notation. The value is the letter of the piece, e.g., dragonHorse = d, or - to remove it.",
+      "betza": "BW"
+    },
+    {
+      "key": "clobber",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as cW in Betza notation. The value is the letter of the piece, e.g., clobber = c, or - to remove it.",
+      "betza": "cW"
+    },
+    {
+      "key": "breakthrough",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as fmWfF in Betza notation. The value is the letter of the piece, e.g., breakthrough = b, or - to remove it.",
+      "betza": "fmWfF"
+    },
+    {
+      "key": "immobile",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as nothing (immobile) in Betza notation. The value is the letter of the piece, e.g., immobile = i, or - to remove it.",
+      "betza": ""
+    },
+    {
+      "key": "cannon",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as mRcpR in Betza notation. The value is the letter of the piece, e.g., cannon = c, or - to remove it.",
+      "betza": "mRcpR"
+    },
+    {
+      "key": "janggiCannon",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as pR in Betza notation. The value is the letter of the piece, e.g., janggiCannon = j, or - to remove it.",
+      "betza": "pR"
+    },
+    {
+      "key": "soldier",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as fsW in Betza notation. The value is the letter of the piece, e.g., soldier = s, or - to remove it.",
+      "betza": "fsW"
+    },
+    {
+      "key": "horse",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as nN in Betza notation. The value is the letter of the piece, e.g., horse = h, or - to remove it.",
+      "betza": "nN"
+    },
+    {
+      "key": "elephant",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as nA in Betza notation. The value is the letter of the piece, e.g., elephant = e, or - to remove it.",
+      "betza": "nA"
+    },
+    {
+      "key": "janggiElephant",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as nZ in Betza notation. The value is the letter of the piece, e.g., janggiElephant = j, or - to remove it.",
+      "betza": "nZ"
+    },
+    {
+      "key": "banner",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as RcpRnN in Betza notation. The value is the letter of the piece, e.g., banner = b, or - to remove it.",
+      "betza": "RcpRnN"
+    },
+    {
+      "key": "wazir",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as W in Betza notation. The value is the letter of the piece, e.g., wazir = w, or - to remove it.",
+      "betza": "W"
+    },
+    {
+      "key": "commoner",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as K in Betza notation. The value is the letter of the piece, e.g., commoner = c, or - to remove it.",
+      "betza": "K"
+    },
+    {
+      "key": "centaur",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as KN in Betza notation. The value is the letter of the piece, e.g., centaur = c, or - to remove it.",
+      "betza": "KN"
+    },
+    {
+      "key": "king",
+      "group": "Pieces",
+      "type": "Piece",
+      "values": null,
+      "default": null,
+      "description": "Predefined piece moving as K in Betza notation. The value is the letter of the piece, e.g., king = k, or - to remove it.",
+      "betza": "K"
+    },
+    {
+      "key": "customPiece1",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece2",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece3",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece4",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece5",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece6",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece7",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece8",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece9",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece10",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece11",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece12",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece13",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece14",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece15",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece16",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece17",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece18",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece19",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece20",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece21",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece22",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece23",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece24",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "customPiece25",
+      "group": "Pieces",
+      "type": "CustomPiece",
+      "values": null,
+      "default": null,
+      "description": "Custom piece with its letter and its movement in Betza notation, e.g., a:mRcB for a piece moving as a rook and capturing as a bishop."
+    },
+    {
+      "key": "pieceValueMg",
+      "group": "Pieces",
+      "type": "PieceValues",
+      "values": null,
+      "default": null,
+      "description": "Override the middlegame value of pieces for the engine, e.g., pieceValueMg = p:150 n:800. For orientation, the rook has r:1276."
+    },
+    {
+      "key": "pieceValueEg",
+      "group": "Pieces",
+      "type": "PieceValues",
+      "values": null,
+      "default": null,
+      "description": "Override the endgame value of pieces for the engine, e.g., pieceValueEg = p:150 n:800. For orientation, the rook has r:1380."
+    },
+    {
+      "key": "variantTemplate",
+      "group": "XBoard/WinBoard",
+      "type": null,
+      "values": ["fairy", "shogi", "bughouse"],
+      "default": "fairy",
+      "description": "base variant to inherit GUI logic from"
+    },
+    {
+      "key": "pieceToCharTable",
+      "group": "XBoard/WinBoard",
+      "type": null,
+      "values": null,
+      "default": "-",
+      "description": "mapping of piece characters to images, see https://www.gnu.org/software/xboard/whats_new/4.9.0/index.html#tag-B1"
+    },
+    {
+      "key": "pocketSize",
+      "group": "XBoard/WinBoard",
+      "type": "int",
+      "values": null,
+      "default": "0",
+      "description": "number of pockets shown by XBoard/WinBoard for drop variants"
+    },
+    {
+      "key": "maxRank",
+      "group": "Rules",
+      "type": "Rank",
+      "values": null,
+      "default": "8",
+      "description": "maximum rank"
+    },
+    {
+      "key": "maxFile",
+      "group": "Rules",
+      "type": "File",
+      "values": null,
+      "default": "8",
+      "description": "maximum file"
+    },
+    {
+      "key": "chess960",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "allow chess960 castling"
+    },
+    {
+      "key": "twoBoards",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "pocket pieces are added from an external source, usually from a second board (e.g., bughouse)"
+    },
+    {
+      "key": "startFen",
+      "group": "Rules",
+      "type": null,
+      "values": null,
+      "default": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "description": "FEN of starting position"
+    },
+    {
+      "key": "mobilityRegion",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": null,
+      "description": "the mobility area can be defined via options specific to color and piece, .e.g., mobilityRegionWhiteRook, mobilityRegionBlackJanggiElephant, etc."
+    },
+    {
+      "key": "pawnTypes",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "p",
+      "description": "define pieces considered as \"pawns\" for promotion, en passant, and n move rule see promotionPawnTypes, enPassantTypes, and nMoveRuleTypes for more specific overrides."
+    },
+    {
+      "key": "promotionRegionWhite",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "*8",
+      "description": "region where promotions are allowed for white"
+    },
+    {
+      "key": "promotionRegionBlack",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "*1",
+      "description": "region where promotions are allowed for black"
+    },
+    {
+      "key": "promotionPawnTypes",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "p",
+      "description": "promotion pawn types for both colors"
+    },
+    {
+      "key": "promotionPawnTypesWhite",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "p",
+      "description": "white promotion pawn types"
+    },
+    {
+      "key": "promotionPawnTypesBlack",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "p",
+      "description": "black promotion pawn types"
+    },
+    {
+      "key": "promotionPieceTypes",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "nbrq",
+      "description": "pawn promotion options"
+    },
+    {
+      "key": "promotionPieceTypesWhite",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "nbrq",
+      "description": "white pawn promotion options"
+    },
+    {
+      "key": "promotionPieceTypesBlack",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "nbrq",
+      "description": "black pawn promotion options"
+    },
+    {
+      "key": "sittuyinPromotion",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "enable Sittuyin-style pawn promotion"
+    },
+    {
+      "key": "promotionLimit",
+      "group": "Rules",
+      "type": null,
+      "values": null,
+      "default": "",
+      "description": "maximum number of pieces of a type, e.g., q:1 r:2"
+    },
+    {
+      "key": "promotedPieceType",
+      "group": "Rules",
+      "type": null,
+      "values": null,
+      "default": "",
+      "description": "mapping between unpromoted and promoted non-pawn piece types, e.g., p:g s:g"
+    },
+    {
+      "key": "piecePromotionOnCapture",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "piece promotion only allowed on captures (e.g., micro shogi)"
+    },
+    {
+      "key": "mandatoryPawnPromotion",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "true",
+      "description": "pawn promotion is mandatory"
+    },
+    {
+      "key": "mandatoryPiecePromotion",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "piece promotion (and demotion if enabled) is mandatory"
+    },
+    {
+      "key": "pieceDemotion",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "enable demotion of pieces (e.g., Kyoto shogi)"
+    },
+    {
+      "key": "blastOnCapture",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "captures explode all adjacent non-pawn pieces (e.g., atomic chess)"
+    },
+    {
+      "key": "blastImmuneTypes",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "none",
+      "description": "pieces completely immune to explosions (even at ground zero)"
+    },
+    {
+      "key": "mutuallyImmuneTypes",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "none",
+      "description": "pieces that can't capture another piece of same types (e.g., kings (commoners) in atomar)"
+    },
+    {
+      "key": "petrifyOnCaptureTypes",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "-",
+      "description": "defined pieces are turned into wall squares when capturing"
+    },
+    {
+      "key": "petrifyBlastPieces",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "if petrify and blast combined, should pieces destroyed in the blast be petrified?"
+    },
+    {
+      "key": "doubleStep",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "true",
+      "description": "enable pawn double step"
+    },
+    {
+      "key": "doubleStepRegionWhite",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "*2",
+      "description": "region where pawn double steps are allowed for white"
+    },
+    {
+      "key": "doubleStepRegionBlack",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "*7",
+      "description": "region where pawn double steps are allowed for black"
+    },
+    {
+      "key": "tripleStepRegionWhite",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "-",
+      "description": "region where pawn triple steps are allowed for white"
+    },
+    {
+      "key": "tripleStepRegionBlack",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "-",
+      "description": "region where pawn triple steps are allowed for black"
+    },
+    {
+      "key": "enPassantRegion",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "AllSquares",
+      "description": "define region (target squares) where en passant is allowed after double steps"
+    },
+    {
+      "key": "enPassantRegionWhite",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "AllSquares",
+      "description": "define region (target squares) where en passant is allowed for white"
+    },
+    {
+      "key": "enPassantRegionBlack",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "AllSquares",
+      "description": "define region (target squares) where en passant is allowed for black"
+    },
+    {
+      "key": "enPassantTypes",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "p",
+      "description": "define pieces able to capture en passant"
+    },
+    {
+      "key": "enPassantTypesWhite",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "p",
+      "description": "define white pieces able to capture en passant"
+    },
+    {
+      "key": "enPassantTypesBlack",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "p",
+      "description": "define black pieces able to capture en passant"
+    },
+    {
+      "key": "castling",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "true",
+      "description": "enable castling"
+    },
+    {
+      "key": "castlingDroppedPiece",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "enable castling with dropped rooks/kings"
+    },
+    {
+      "key": "castlingKingsideFile",
+      "group": "Rules",
+      "type": "File",
+      "values": null,
+      "default": "g",
+      "description": "destination file of king after kingside castling"
+    },
+    {
+      "key": "castlingQueensideFile",
+      "group": "Rules",
+      "type": "File",
+      "values": null,
+      "default": "c",
+      "description": "destination file of king after queenside castling"
+    },
+    {
+      "key": "castlingRank",
+      "group": "Rules",
+      "type": "Rank",
+      "values": null,
+      "default": "1",
+      "description": "relative rank of castling"
+    },
+    {
+      "key": "castlingKingFile",
+      "group": "Rules",
+      "type": "File",
+      "values": null,
+      "default": "e",
+      "description": "starting file of the castlingKingPiece if there can be more than one of that type"
+    },
+    {
+      "key": "castlingKingPiece",
+      "group": "Rules",
+      "type": "PieceType",
+      "values": null,
+      "default": "k",
+      "description": "first piece type that participates in castling"
+    },
+    {
+      "key": "castlingRookKingsideFile",
+      "group": "Rules",
+      "type": "File",
+      "values": null,
+      "default": "l",
+      "description": "starting file of castlingRookPieces on kingside (if not in corner)"
+    },
+    {
+      "key": "castlingRookQueensideFile",
+      "group": "Rules",
+      "type": "File",
+      "values": null,
+      "default": "a",
+      "description": "starting file of castlingRookPieces on queenside (if not in corner)"
+    },
+    {
+      "key": "castlingRookPieces",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "r",
+      "description": "second piece type that participates in castling"
+    },
+    {
+      "key": "oppositeCastling",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "can't castle same side as opponent"
+    },
+    {
+      "key": "checking",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "true",
+      "description": "allow checks"
+    },
+    {
+      "key": "dropChecks",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "true",
+      "description": "allow checks by piece drops"
+    },
+    {
+      "key": "mustCapture",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "captures are mandatory (check evasion still takes precedence)"
+    },
+    {
+      "key": "mustDrop",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "drops are mandatory (e.g., for Sittuyin setup phase)"
+    },
+    {
+      "key": "mustDropType",
+      "group": "Rules",
+      "type": "PieceType",
+      "values": null,
+      "default": "*",
+      "description": "piece type for which piece drops are mandatory"
+    },
+    {
+      "key": "pieceDrops",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "enable piece drops"
+    },
+    {
+      "key": "dropLoop",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "captures promoted pieces are not demoted"
+    },
+    {
+      "key": "capturesToHand",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "captured pieces go to opponent's hand"
+    },
+    {
+      "key": "firstRankPawnDrops",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "allow pawn drops to first rank"
+    },
+    {
+      "key": "promotionZonePawnDrops",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "allow pawn drops in promotion zone"
+    },
+    {
+      "key": "enclosingDrop",
+      "group": "Rules",
+      "type": "EnclosingRule",
+      "values": null,
+      "default": "none",
+      "description": "require piece drop to enclose pieces"
+    },
+    {
+      "key": "enclosingDropStart",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": null,
+      "description": "drop region for starting phase disregarding enclosingDrop (e.g., for reversi)"
+    },
+    {
+      "key": "dropRegionWhite",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": null,
+      "description": "restrict region for piece drops of all white pieces"
+    },
+    {
+      "key": "dropRegionBlack",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": null,
+      "description": "restrict region for piece drops of all black pieces"
+    },
+    {
+      "key": "sittuyinRookDrop",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "restrict region of rook drops to first rank"
+    },
+    {
+      "key": "dropOppositeColoredBishop",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "dropped bishops have to be on opposite-colored squares"
+    },
+    {
+      "key": "dropPromoted",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "pieces may be dropped in promoted state"
+    },
+    {
+      "key": "dropNoDoubled",
+      "group": "Rules",
+      "type": "PieceType",
+      "values": null,
+      "default": "-",
+      "description": "specified piece type can not be dropped to the same file (e.g. shogi pawn)"
+    },
+    {
+      "key": "dropNoDoubledCount",
+      "group": "Rules",
+      "type": "int",
+      "values": null,
+      "default": "1",
+      "description": "specifies the count of already existing pieces for dropNoDoubled"
+    },
+    {
+      "key": "immobilityIllegal",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "pieces may not move to squares where they can never move from"
+    },
+    {
+      "key": "gating",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "maintain squares on backrank with extra rights in castling field of FEN"
+    },
+    {
+      "key": "wallingRule",
+      "group": "Rules",
+      "type": "WallingRule",
+      "values": null,
+      "default": "none",
+      "description": "rule on where wall can be placed"
+    },
+    {
+      "key": "wallingRegionWhite",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "all squares",
+      "description": "mask where wall squares (including duck) can be placed by white"
+    },
+    {
+      "key": "wallingRegionBlack",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "all squares",
+      "description": "mask where wall squares (including duck) can be placed by black"
+    },
+    {
+      "key": "wallOrMove",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "can wall or move, but not both"
+    },
+    {
+      "key": "seirawanGating",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "allow gating of pieces in hand like in S-Chess, requires \"gating = true\""
+    },
+    {
+      "key": "cambodianMoves",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "enable special moves of cambodian chess, requires \"gating = true\""
+    },
+    {
+      "key": "diagonalLines",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": null,
+      "description": "enable special moves along diagonal for specific squares (Janggi)"
+    },
+    {
+      "key": "pass",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "allow passing"
+    },
+    {
+      "key": "passWhite",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "allow passing for white"
+    },
+    {
+      "key": "passBlack",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "allow passing for black"
+    },
+    {
+      "key": "passOnStalemate",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "allow passing in case of stalemate"
+    },
+    {
+      "key": "passOnStalemateWhite",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "allow passing in case of stalemate for white"
+    },
+    {
+      "key": "passOnStalemateBlack",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "allow passing in case of stalemate for black"
+    },
+    {
+      "key": "makpongRule",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "the king may not move away from check"
+    },
+    {
+      "key": "flyingGeneral",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "disallow general face-off like in xiangqi"
+    },
+    {
+      "key": "soldierPromotionRank",
+      "group": "Rules",
+      "type": "Rank",
+      "values": null,
+      "default": "1",
+      "description": "restrict soldier to shogi pawn movements until reaching n-th rank"
+    },
+    {
+      "key": "flipEnclosedPieces",
+      "group": "Rules",
+      "type": "EnclosingRule",
+      "values": null,
+      "default": "none",
+      "description": "change color of pieces that are enclosed by a drop"
+    },
+    {
+      "key": "nMoveRuleTypes",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "p",
+      "description": "define pieces resetting n move rule on irreversible moves"
+    },
+    {
+      "key": "nMoveRuleTypesWhite",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "p",
+      "description": "define white pieces resetting n move rule on irreversible moves"
+    },
+    {
+      "key": "nMoveRuleTypesBlack",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "p",
+      "description": "define black pieces resetting n move rule on irreversible moves"
+    },
+    {
+      "key": "nMoveRule",
+      "group": "Rules",
+      "type": "int",
+      "values": null,
+      "default": "50",
+      "description": "move count for 50/n-move rule"
+    },
+    {
+      "key": "nFoldRule",
+      "group": "Rules",
+      "type": "int",
+      "values": null,
+      "default": "3",
+      "description": "move count for 3/n-fold repetition rule"
+    },
+    {
+      "key": "nFoldValue",
+      "group": "Rules",
+      "type": "Value",
+      "values": null,
+      "default": "draw",
+      "description": "result in case of 3/n-fold repetition"
+    },
+    {
+      "key": "nFoldValueAbsolute",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "result in case of 3/n-fold repetition is from white's point of view"
+    },
+    {
+      "key": "perpetualCheckIllegal",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "prohibit perpetual checks"
+    },
+    {
+      "key": "moveRepetitionIllegal",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "prohibit moving back and forth with the same piece nFoldRule-1 times"
+    },
+    {
+      "key": "chasingRule",
+      "group": "Rules",
+      "type": "ChasingRule",
+      "values": null,
+      "default": "none",
+      "description": "enable chasing rules"
+    },
+    {
+      "key": "stalemateValue",
+      "group": "Rules",
+      "type": "Value",
+      "values": null,
+      "default": "draw",
+      "description": "result in case of stalemate"
+    },
+    {
+      "key": "stalematePieceCount",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "count material in case of stalemate"
+    },
+    {
+      "key": "checkmateValue",
+      "group": "Rules",
+      "type": "Value",
+      "values": null,
+      "default": "loss",
+      "description": "result in case of checkmate"
+    },
+    {
+      "key": "shogiPawnDropMateIllegal",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "prohibit checkmate via shogi pawn drops"
+    },
+    {
+      "key": "shatarMateRule",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "enable shatar mating rules"
+    },
+    {
+      "key": "bikjangRule",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "consider Janggi bikjang (facing kings) rule"
+    },
+    {
+      "key": "extinctionValue",
+      "group": "Rules",
+      "type": "Value",
+      "values": null,
+      "default": "none",
+      "description": "result when one of extinctionPieceTypes is extinct"
+    },
+    {
+      "key": "extinctionClaim",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "extinction of opponent pieces can only be claimed as side to move"
+    },
+    {
+      "key": "extinctionPseudoRoyal",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "treat the last extinction piece like a royal piece"
+    },
+    {
+      "key": "dupleCheck",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "when all pseudo-royal pieces are attacked, it counts as a check"
+    },
+    {
+      "key": "extinctionPieceTypes",
+      "group": "Rules",
+      "type": null,
+      "values": null,
+      "default": "",
+      "description": "list of piece types for extinction rules, e.g., pnbrq (* means all)"
+    },
+    {
+      "key": "extinctionPieceCount",
+      "group": "Rules",
+      "type": null,
+      "values": null,
+      "default": "0",
+      "description": "piece count at which the game is decided by extinction rule"
+    },
+    {
+      "key": "extinctionOpponentPieceCount",
+      "group": "Rules",
+      "type": null,
+      "values": null,
+      "default": "0",
+      "description": "opponent piece count required to adjudicate by extinction rule"
+    },
+    {
+      "key": "flagPiece",
+      "group": "Rules",
+      "type": "PieceType",
+      "values": null,
+      "default": "*",
+      "description": "piece type for capture the flag win rule"
+    },
+    {
+      "key": "flagPieceWhite",
+      "group": "Rules",
+      "type": "PieceType",
+      "values": null,
+      "default": "*",
+      "description": "piece type for capture the flag win rule"
+    },
+    {
+      "key": "flagPieceBlack",
+      "group": "Rules",
+      "type": "PieceType",
+      "values": null,
+      "default": "*",
+      "description": "piece type for capture the flag win rule"
+    },
+    {
+      "key": "flagRegion",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "",
+      "description": "target region for capture the flag win rule"
+    },
+    {
+      "key": "flagRegionWhite",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "",
+      "description": "white's target region for capture the flag win rule"
+    },
+    {
+      "key": "flagRegionBlack",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "",
+      "description": "black's target region for capture the flag win rule"
+    },
+    {
+      "key": "flagPieceCount",
+      "group": "Rules",
+      "type": "int",
+      "values": null,
+      "default": "1",
+      "description": "number of flag pieces that have to be in the flag zone"
+    },
+    {
+      "key": "flagPieceBlockedWin",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "for flagPieceCount > 1, win if at least one flag piece in flag zone and all others occupied by pieces"
+    },
+    {
+      "key": "flagMove",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "the other side gets one more move after one reaches the flag zone"
+    },
+    {
+      "key": "flagPieceSafe",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "the flag piece must be safe to win when flagPieceSafe and flagMove are combined, it means that only unsafe flag pieces cause an extra move."
+    },
+    {
+      "key": "checkCounting",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "enable check count win rule (check count is communicated via FEN, see 3check)"
+    },
+    {
+      "key": "connectN",
+      "group": "Rules",
+      "type": "int",
+      "values": null,
+      "default": "0",
+      "description": "number of aligned pieces for win"
+    },
+    {
+      "key": "connectPieceTypes",
+      "group": "Rules",
+      "type": "PieceSet",
+      "values": null,
+      "default": "*",
+      "description": "pieces evaluated for connection rule"
+    },
+    {
+      "key": "connectVertical",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "true",
+      "description": "connectN looks at Vertical rows"
+    },
+    {
+      "key": "connectHorizontal",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "true",
+      "description": "connectN looks at Horizontal rows"
+    },
+    {
+      "key": "connectDiagonal",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "true",
+      "description": "connectN looks at Diagonal rows"
+    },
+    {
+      "key": "connectRegion1White",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "-",
+      "description": "connect Region 1 to Region 2 for win. obeys connectVertical, connectHorizontal, connectDiagonal"
+    },
+    {
+      "key": "connectRegion2White",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "-",
+      "description": "connect Region 1 to Region 2 for win. obeys connectVertical, connectHorizontal, connectDiagonal"
+    },
+    {
+      "key": "connectRegion1Black",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "-",
+      "description": "connect Region 1 to Region 2 for win. obeys connectVertical, connectHorizontal, connectDiagonal"
+    },
+    {
+      "key": "connectRegion2Black",
+      "group": "Rules",
+      "type": "Bitboard",
+      "values": null,
+      "default": "-",
+      "description": "connect Region 1 to Region 2 for win. obeys connectVertical, connectHorizontal, connectDiagonal"
+    },
+    {
+      "key": "connectNxN",
+      "group": "Rules",
+      "type": "int",
+      "values": null,
+      "default": "0",
+      "description": "connect a tight NxN square for win"
+    },
+    {
+      "key": "collinearN",
+      "group": "Rules",
+      "type": "int",
+      "values": null,
+      "default": "0",
+      "description": "arrange N pieces collinearly (other squares can be between pieces)"
+    },
+    {
+      "key": "connectValue",
+      "group": "Rules",
+      "type": "Value",
+      "values": null,
+      "default": "win",
+      "description": "result in case of connect"
+    },
+    {
+      "key": "materialCounting",
+      "group": "Rules",
+      "type": "MaterialCounting",
+      "values": null,
+      "default": "none",
+      "description": "enable material counting rules"
+    },
+    {
+      "key": "adjudicateFullBoard",
+      "group": "Rules",
+      "type": "bool",
+      "values": null,
+      "default": "false",
+      "description": "apply material counting immediately when board is full"
+    },
+    {
+      "key": "countingRule",
+      "group": "Rules",
+      "type": "CountingRule",
+      "values": null,
+      "default": "none",
+      "description": "enable counting rules"
+    },
+    {
+      "key": "castlingWins",
+      "group": "Rules",
+      "type": "CastlingRights",
+      "values": null,
+      "default": "-",
+      "description": "Specified castling moves are win conditions. Losing these rights is losing."
+    }
+  ]
+}
