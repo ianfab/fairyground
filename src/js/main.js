@@ -1221,6 +1221,10 @@ class GameTree {
     let fenitems = this.OriginalFEN.split(this.BlankSplitter);
     let initialmoverround = fenitems[1] == "b" ? 1 : 0;
     let initialmovenumber = parseInt(fenitems.pop());
+    if (isNaN(initialmovenumber)) {
+      // FENs without move counters (e.g., custom variant start FENs) start at move 1
+      initialmovenumber = 1;
+    }
     this.MoveTree.SetInitialCondition(initialmovenumber, initialmoverround, 2);
     let tokens = this.MoveTree.ToPGNTokens(2);
     console.log(this.MoveTree);
@@ -1331,6 +1335,10 @@ class GameTree {
     let fenitems = this.OriginalFEN.split(this.BlankSplitter);
     let initialmoverround = fenitems[1] == "b" ? 1 : 0;
     let initialmovenumber = parseInt(fenitems.pop());
+    if (isNaN(initialmovenumber)) {
+      // FENs without move counters (e.g., custom variant start FENs) start at move 1
+      initialmovenumber = 1;
+    }
     this.MoveTree.SetInitialCondition(initialmovenumber, initialmoverround, 2);
     let tokens = this.MoveTree.ToPGNTokens(2);
     let i = 0,

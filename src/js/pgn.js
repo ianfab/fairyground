@@ -178,8 +178,8 @@ export function ParsePGNMovesToMoveTree(
   let initialmovenumber = parseInt(fenlist[fenlist.length - 1]);
   let sidetomove = WHITE;
   if (isNaN(initialmovenumber)) {
-    console.error("Error parsing PGN: Illegal FEN: " + fen);
-    return null;
+    // FENs without move counters (e.g., custom variant start FENs) start at move 1
+    initialmovenumber = 1;
   }
   if (fenlist[1] == "b") {
     sidetomove = BLACK;
